@@ -22,6 +22,9 @@ deliberately — not one per work session.
   stored source export and drops you into the full stepper workflow (Parse → Map →
   Generate → Validate) with all reports. `GET /project/open`; the store now keeps
   each mapping's source path (auto-migrated).
+- `pdi-migrate batch --translate`: run a whole corpus through the configured LLM.
+- Swagger /docs shows a "← Back to Migration Copilot" link; the masthead API-docs
+  link opens in a new tab.
 
 ## [1.8.0] — 2026-07-17
 

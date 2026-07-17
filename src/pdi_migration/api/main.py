@@ -70,7 +70,15 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 UI_DIST = REPO_ROOT / "frontend" / "dist"
 SAMPLE_FILE = REPO_ROOT / "samples" / "m_load_sales.xml"
 
-app = FastAPI(title="Migration Copilot", version=__version__)
+app = FastAPI(
+    title="Migration Copilot",
+    version=__version__,
+    description=(
+        "**[← Back to Migration Copilot](/)**\n\n"
+        "REST API behind the review UI: convert PowerCenter exports, translate "
+        "expressions, generate sandbox kits, diff outputs, and track the migration project."
+    ),
+)
 
 
 class ConversionResult(BaseModel):

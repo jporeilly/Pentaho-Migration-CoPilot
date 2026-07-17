@@ -112,7 +112,7 @@ export default function App() {
         </h1>
         <span className="links">
           Informatica PowerCenter → Pentaho Data Integration ·{' '}
-          <a href="/docs">API docs</a> ·{' '}
+          <a href="/docs" target="_blank" rel="noreferrer">API docs</a> ·{' '}
           <button
             className={`nav${view === 'project' ? ' active' : ''}`}
             onClick={() => setView(view === 'project' ? 'workflow' : 'project')}
