@@ -3,6 +3,10 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+**Versioning policy:** major architectural changes bump the minor version (x.Y.0);
+minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
+deliberately — not one per work session.
+
 ## [1.8.0] — 2026-07-17
 
 ### Added
