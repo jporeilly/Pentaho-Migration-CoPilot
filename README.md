@@ -1,9 +1,9 @@
 # Migration Copilot (PDI-Migration-CoPilot)
 
-**AI-assisted migration of legacy ETL — Informatica PowerCenter today; SSIS, Talend,
-DataStage next — into native Pentaho Data Integration pipelines.**
+**AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
+SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
 
-Version **1.9.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0: complete ·
+Version **1.10.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy ETL platform locks customers in with the sunk cost of thousands of
@@ -30,9 +30,11 @@ A guided dashboard walks each conversion through the pipeline with a stepper:
    plain-language pre-migration warnings (workflows/sessions not converted, mapplets,
    unmapped step types, SQL overrides, codepage caveats). Then the parsed structure:
    an SVG flow diagram plus every step's fields and expressions.
-3. **Map** — KPI tiles and a filterable table of every mapping decision with its
-   confidence: `auto` (rules library), `review` (needs a human eye), `manual` (no
-   mapping — human converts).
+3. **Map** — KPI tiles, a filterable table of every mapping decision with its
+   confidence (`auto` / `review` / `manual`), source-vs-converted diagrams, per-step
+   impact analysis with click-through navigation, and **🤖 AI-suggested solutions**:
+   the LLM proposes a concrete PDI approach (steps, config, code, pitfalls) for any
+   step, from its real configuration — advisory, never auto-applied.
 4. **Generate** — preview and download the .ktr; it opens as an editable transformation
    in Spoon, with all TODOs carried into step descriptions.
 5. **Validate** — migration confidence score (0–100, A–E), human review checklist,
@@ -112,9 +114,14 @@ a dozen authors. All 50 parse with zero errors, including a 7.2 MB export with 1
 connectors.
 
 Current coverage measured on that corpus with `pdi-migrate gaps`: **54% auto**,
-45% review (dominated by untranslated expressions — 4,321 of them), and 19 manual
-steps across 3 unmapped types (Stored Procedure, Custom Transformation, Transaction
-Control).
+45% review (dominated by untranslated expressions — 4,321 of them), and a handful
+of manual steps (Custom Transformation, Transaction Control).
+
+`samples/talend/` holds **40 genuine Talend jobs spanning versions 5.1 → 8.0.1** —
+production data warehouses, Red Hat's oVirt DWH, health-informatics ETL, Salesforce
+REST syncs — 763 steps across 104 distinct components, all parsing with zero errors.
+Rules v2 (extended from this corpus's gap analysis) cut manual steps from 207 to 42;
+avg confidence 62/100.
 
 ## Tests & CI
 

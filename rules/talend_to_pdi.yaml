@@ -4,10 +4,12 @@
 # Governance: bump _meta.version and record provenance on every change.
 
 _meta:
-  version: 1
+  version: 2
   updated: "2026-07-17"
   provenance:
     - "v1 (2026-07-17): initial component set from Talend Open Studio docs and PDI step inventory; to be validated against the real .item corpus."
+    - "v2 (2026-07-17): +18 components from gap analysis on the real corpus (40 jobs, 763 steps): hash staging, per-row SQL, connection/commit management, catchers, REST/JSON/XML extraction, tJavaFlex, tSetGlobalVar, tFlowToIterate."
+    - "v2b (2026-07-17): +9 from the harvest frequency table incl. Talend 8 TCK components without the t prefix (JDBCOutput)."
 
 # ---- database I/O (family rule: any t<Db>Input behaves the same) ----
 "tOracleInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
@@ -57,6 +59,65 @@ _meta:
 "tRowGenerator": { pdi_type: DataGrid, confidence: review, notes: "Generation expressions must be recreated." }
 "tFixedFlowInput": { pdi_type: DataGrid, confidence: auto, notes: "Inline values become Data Grid rows." }
 "tContextLoad": { pdi_type: Dummy, confidence: review, notes: "Context variables map to PDI parameters/variables — configure at transformation or job level." }
+
+# ---- in-memory staging (corpus: very common) ----
+"tHashOutput": { pdi_type: Dummy, confidence: review, notes: "In-memory staging: in PDI, pass rows between transformations with 'Copy rows to result' / serialize to file, or restructure into one stream." }
+"tHashInput": { pdi_type: Dummy, confidence: review, notes: "Reads tHashOutput staging — see tHashOutput; often the pair collapses into a single PDI stream." }
+"tBufferOutput": { pdi_type: Dummy, confidence: review, notes: "Buffer handoff — use 'Copy rows to result' toward the calling job in PDI." }
+"tBufferInput": { pdi_type: Dummy, confidence: review, notes: "Reads buffered rows — use 'Get rows from result' in PDI." }
+
+# ---- per-row / free SQL ----
+"tOracleRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Executes SQL per row; verify parameter substitution and commit behavior." }
+"tMysqlRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Executes SQL per row; verify parameter substitution and commit behavior." }
+"tPostgresqlRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Executes SQL per row; verify parameter substitution and commit behavior." }
+"tMSSqlRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Executes SQL per row; verify parameter substitution and commit behavior." }
+"tJDBCRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Executes SQL per row; verify parameter substitution and commit behavior." }
+"tDBRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Executes SQL per row; verify parameter substitution and commit behavior." }
+
+# ---- connection / transaction management (PDI handles per step) ----
+"tOracleConnection": { pdi_type: Dummy, confidence: review, notes: "PDI defines shared connections per step or via transformation transactions — delete this and configure connections directly; verify transaction boundaries." }
+"tMysqlConnection": { pdi_type: Dummy, confidence: review, notes: "See tOracleConnection." }
+"tPostgresqlConnection": { pdi_type: Dummy, confidence: review, notes: "See tOracleConnection." }
+"tJDBCConnection": { pdi_type: Dummy, confidence: review, notes: "See tOracleConnection." }
+"tOracleCommit": { pdi_type: Dummy, confidence: review, notes: "Commit boundaries move to PDI transactional settings ('Make the transformation database transactional') — verify semantics." }
+"tPostgresqlCommit": { pdi_type: Dummy, confidence: review, notes: "See tOracleCommit." }
+"tJDBCCommit": { pdi_type: Dummy, confidence: review, notes: "See tOracleCommit." }
+"tOracleRollback": { pdi_type: Dummy, confidence: review, notes: "Rollback is implicit in PDI transactional mode on error — verify error-handling paths." }
+"tJDBCRollback": { pdi_type: Dummy, confidence: review, notes: "See tOracleRollback." }
+"tOracleClose": { pdi_type: Dummy, confidence: auto, notes: "Connections close automatically in PDI — delete." }
+"tJDBCClose": { pdi_type: Dummy, confidence: auto, notes: "Connections close automatically in PDI — delete." }
+"tPostgresqlClose": { pdi_type: Dummy, confidence: auto, notes: "Connections close automatically in PDI — delete." }
+
+# ---- logging / monitoring framework ----
+"tLogCatcher": { pdi_type: Dummy, confidence: review, notes: "PDI logs to configured log tables (Transformation settings > Logging) — recreate alerting from there or with a Job error hop." }
+"tStatCatcher": { pdi_type: Dummy, confidence: review, notes: "Use PDI's built-in step metrics / logging tables." }
+"tFlowMeterCatcher": { pdi_type: Dummy, confidence: review, notes: "Use PDI's built-in step metrics / logging tables." }
+
+# ---- code / variables ----
+"tJavaFlex": { pdi_type: ScriptValueMod, confidence: review, notes: "Start/main/end Java blocks map to the script step's start/transform/end scripts — review carefully." }
+"tSetGlobalVar": { pdi_type: SetVariable, confidence: review, notes: "Variable scope differs: PDI variables set in a transformation are visible downstream in the JOB, not later rows of the same transformation." }
+"tFlowToIterate": { pdi_type: Dummy, confidence: review, notes: "Row-driven iteration is a job-level pattern in PDI: 'Copy rows to result' + a Job entry executing per row." }
+
+# ---- web / semi-structured ----
+"tRESTClient": { pdi_type: Rest, confidence: review, notes: "Recreate URL, method, auth, and body mapping in the REST Client step." }
+"tExtractJSONFields": { pdi_type: JsonInput, confidence: review, notes: "Recreate JSONPath field extraction." }
+"tExtractXMLField": { pdi_type: getXMLData, confidence: review, notes: "Recreate XPath field extraction." }
+"tXMLMap": { pdi_type: ScriptValueMod, confidence: review, notes: "XML mapping logic: combine Get data from XML / Add XML steps with scripted transforms — review the original mapping closely." }
+"tFileInputRaw": { pdi_type: LoadFileInput, confidence: review, notes: "Loads whole-file content — verify field/encoding configuration." }
+
+# ---- corpus-frequency additions ----
+"tFilterColumns": { pdi_type: SelectValues, confidence: auto, notes: "Column selection maps to Select values." }
+"tFileList": { pdi_type: GetFileNames, confidence: review, notes: "Iterate patterns usually move to a PDI Job loop; Get File Names feeds filenames as rows." }
+"tFileExist": { pdi_type: FileExists, confidence: auto }
+"tFileCopy": { pdi_type: ProcessFiles, confidence: review, notes: "Or a 'Copy Files' Job entry if it belongs at job level." }
+"tSendMail": { pdi_type: Mail, confidence: review, notes: "Often belongs in the Job (.kjb) as a Mail entry on success/failure hops." }
+"tLoop": { pdi_type: Dummy, confidence: review, notes: "Loops are a Job-level pattern in PDI (loop over a Job entry)." }
+"tForeach": { pdi_type: Dummy, confidence: review, notes: "Iteration is a Job-level pattern in PDI; feed values as rows instead." }
+"tMongoDBInput": { pdi_type: MongoDbInput, confidence: review }
+"JDBCOutput": { pdi_type: TableOutput, confidence: auto, notes: "Talend 8 connector-toolkit component (no t prefix); review batch/commit settings." }
+
+# ---- aggregation variant ----
+"tAggregateSortedRow": { pdi_type: GroupBy, confidence: auto, notes: "Input is already sorted (that's this component's contract) — Group By's requirement is satisfied." }
 
 # ---- orchestration (belongs in .kjb, not .ktr) ----
 "tRunJob": { pdi_type: Dummy, confidence: review, notes: "Calls another job — becomes a Job entry (.kjb), not a transformation step." }

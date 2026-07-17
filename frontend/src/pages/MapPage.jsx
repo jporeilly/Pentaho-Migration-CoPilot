@@ -68,7 +68,7 @@ export default function MapPage({ result, onUpdate }) {
       <StatTiles report={report} />
       <CompareView pipeline={pipeline} />
       <StepsTable steps={pipeline.steps} />
-      <ImpactPanel impact={result.impact} />
+      <ImpactPanel impact={result.impact} pipeline={pipeline} />
     </section>
   )
 }

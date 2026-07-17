@@ -171,6 +171,27 @@ async def convert(export: UploadFile) -> ConversionResponse:
     return ConversionResponse(source=source, results=results)
 
 
+class SuggestRequest(BaseModel):
+    pipeline: Pipeline
+    step: str
+    impact_entry: dict | None = None
+
+
+@app.post("/suggest", dependencies=[Depends(require_api_key)])
+def suggest(payload: SuggestRequest) -> dict[str, str]:
+    """AI-proposed PDI solution for one step (advisory markdown, human-reviewed)."""
+    from pdi_migration.llm.suggest import SolutionSuggester
+
+    try:
+        suggester = SolutionSuggester()
+        text = suggester.suggest(payload.pipeline, payload.step, payload.impact_entry)
+    except TranslationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {"suggestion": text, "model": suggester.settings.model or ""}
+
+
 class PdfRequest(BaseModel):
     source: SourceInfo | None = None
     result: "ConversionResult"

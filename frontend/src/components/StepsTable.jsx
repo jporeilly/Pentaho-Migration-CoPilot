@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { scrollToImpactEntry } from './ImpactPanel.jsx'
 
 const BADGES = { auto: '✓', review: '⚠', manual: '✋' }
 
@@ -59,8 +60,14 @@ export default function StepsTable({ steps }) {
         </thead>
         <tbody>
           {visible.map((s) => (
-            <tr key={s.name}>
-              <td>{s.name}</td>
+            <tr
+              key={s.name}
+              id={`step-row-${s.name}`}
+              className="row-link"
+              title="Show this step's impact analysis and AI suggestion"
+              onClick={() => scrollToImpactEntry(s.name)}
+            >
+              <td className="mapping-link">{s.name} ↓</td>
               <td>{s.source_type}</td>
               <td title={s.pdi_type ? PDI_TIPS[s.pdi_type] : 'No PDI mapping — manual conversion required.'}>
                 {s.pdi_type ?? '—'}

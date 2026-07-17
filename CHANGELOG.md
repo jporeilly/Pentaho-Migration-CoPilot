@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.10.0] — 2026-07-17
+
+**Phase 2 begins: multi-source. Talend is the second supported source.**
+
+### Added
+
+- **Talend support end-to-end**: deterministic `.item` parser (typed schemas from
+  `<metadata>` columns, FLOW/LOOKUP hops, tMap Java expressions extracted from mapper
+  data with passthroughs skipped), `talend_to_pdi.yaml` rules library (v2: 60+
+  components, extended from gap analysis on a real corpus), Talend-specific impact
+  knowledge (tMap = three PDI concepts in one, sorted-input traps, context-variable
+  scoping, connection/commit management), and a Java→JavaScript translation prompt
+  selected automatically per expression language. Source auto-detection (content
+  sniffing, not extensions) across upload, CLI, and the Project page; `batch`/`gaps`
+  glob `.item` files too.
+- **Real Talend corpus**: 40 verified jobs from public repos spanning Talend 5.1 →
+  8.0.1 (production DWHs, Red Hat oVirt, health informatics, Salesforce REST syncs) —
+  all parse with zero failures; 763 steps, 104 distinct components. Rules v2 measured:
+  manual steps 207 → 42, avg confidence 53 → 62.
+- **🤖 AI-suggested solutions per step**: every impact entry has a "Suggest a solution"
+  button — the configured LLM receives the step's real configuration, fields,
+  expressions, neighbors, and known behavioral differences, and proposes a concrete
+  PDI approach (steps, config, code, pitfalls). Advisory markdown, clearly labeled,
+  never auto-applied. `POST /suggest`.
+- **Step click-through**: impact entries jump to their row in the steps table and
+  table rows jump to (and expand) their impact entry, with a highlight flash.
+- **Richer PDF report**: human review checklist with full notes, expressions appendix
+  (source + translation state), complete high/medium impact detail, and a data-flow
+  listing.
+
+### Fixed
+
+- Hardcoded "Informatica" labels in the comparison heading, Map intro, and stepper;
+  uploads now keep their original filename (Talend job names derive from it — no more
+  `tmpr5t45a84`).
+
 ## [1.9.0] — 2026-07-17
 
 **Phase 0 roadmap complete.**

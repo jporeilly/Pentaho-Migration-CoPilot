@@ -143,29 +143,85 @@ def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, scor
             step.confidence.value, notes,
         ), widths, confidence=step.confidence.value)
 
-    # impact highlights
-    if impact and (impact.summary.top_risks or impact.summary.high):
+    # human review checklist — full, untruncated notes per non-auto step
+    review_steps = [s for s in pipeline.steps if s.confidence.value != "auto"]
+    if review_steps:
         pdf.ln(2)
-        _heading(pdf, "Impact highlights")
+        _heading(pdf, f"Human review checklist ({len(review_steps)} steps)")
+        for step in review_steps:
+            pdf.set_font("helvetica", "B", 8.5)
+            pdf.set_text_color(*CONFIDENCE_COLORS.get(step.confidence.value, MUTED))
+            pdf.cell(16, 4.6, _s(step.confidence.value.upper()))
+            pdf.set_text_color(*INK)
+            pdf.multi_cell(
+                0, 4.6,
+                _s(f"{step.name}  ({step.source_type} -> {step.pdi_type or 'no mapping'})"),
+                new_x="LMARGIN", new_y="NEXT",
+            )
+            pdf.set_font("helvetica", "", 8)
+            pdf.set_text_color(*MUTED)
+            for note in step.notes:
+                pdf.multi_cell(0, 4.2, _s(f"    - {note}"), new_x="LMARGIN", new_y="NEXT")
+
+    # expressions appendix — every expression with its translation state
+    expressions = [(s, e) for s in pipeline.steps for e in s.expressions]
+    if expressions:
+        pdf.ln(2)
+        _heading(pdf, f"Expressions ({len(expressions)})")
+        for step, expr in expressions:
+            pdf.set_font("helvetica", "B", 8)
+            pdf.set_text_color(*INK)
+            pdf.multi_cell(0, 4.4, _s(f"{step.name}.{expr.field}"), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", "", 7.8)
+            pdf.set_text_color(*MUTED)
+            pdf.multi_cell(0, 4, _s(f"    source ({expr.language}): {expr.raw}"), new_x="LMARGIN", new_y="NEXT")
+            if expr.translated is not None:
+                pdf.set_text_color(*LEVEL_COLORS["info"])
+                pdf.multi_cell(0, 4, _s(f"    PDI (JavaScript): {expr.translated}"), new_x="LMARGIN", new_y="NEXT")
+                if expr.notes:
+                    pdf.set_text_color(*MUTED)
+                    pdf.multi_cell(0, 4, _s(f"    {expr.notes}"), new_x="LMARGIN", new_y="NEXT")
+            else:
+                pdf.set_text_color(*LEVEL_COLORS["warning"])
+                pdf.multi_cell(0, 4, "    NOT TRANSLATED YET", new_x="LMARGIN", new_y="NEXT")
+
+    # impact analysis — top risks, then every high and medium entry in detail
+    if impact and (impact.summary.top_risks or impact.summary.high or impact.summary.medium):
+        pdf.ln(2)
+        _heading(pdf, "Impact analysis")
         pdf.set_font("helvetica", "", 8.5)
         for risk in impact.summary.top_risks:
             pdf.set_text_color(*LEVEL_COLORS["warning"])
             pdf.cell(5, 4.6, "!")
             pdf.set_text_color(*INK)
             pdf.multi_cell(0, 4.6, _s(risk), new_x="LMARGIN", new_y="NEXT")
-        high = [e for e in impact.entries if e.impact == "high"]
-        for entry in high:
+        for entry in [e for e in impact.entries if e.impact in ("high", "medium")]:
+            level_color = LEVEL_COLORS["serious"] if entry.impact == "high" else LEVEL_COLORS["warning"]
+            pdf.ln(1)
             pdf.set_font("helvetica", "B", 8.5)
-            pdf.set_text_color(*LEVEL_COLORS["serious"])
+            pdf.set_text_color(*level_color)
             pdf.multi_cell(
                 0, 4.6,
-                _s(f"{entry.step} ({entry.source_type} -> {entry.pdi_type or 'no mapping'})"),
+                _s(f"[{entry.impact.upper()}] {entry.step} ({entry.source_type} -> {entry.pdi_type or 'no mapping'})"),
                 new_x="LMARGIN", new_y="NEXT",
             )
-            pdf.set_font("helvetica", "", 8.5)
+            pdf.set_font("helvetica", "", 8)
             pdf.set_text_color(*INK)
-            for action in entry.actions[:3]:
-                pdf.multi_cell(0, 4.4, _s(f"   - {action}"), new_x="LMARGIN", new_y="NEXT")
+            for difference in entry.differences:
+                pdf.multi_cell(0, 4.2, _s(f"   difference: {difference}"), new_x="LMARGIN", new_y="NEXT")
+            for action in entry.actions:
+                pdf.multi_cell(0, 4.2, _s(f"   action: {action}"), new_x="LMARGIN", new_y="NEXT")
+
+    # data flow
+    if pipeline.hops:
+        pdf.ln(2)
+        _heading(pdf, "Data flow")
+        pdf.set_font("helvetica", "", 8)
+        pdf.set_text_color(*MUTED)
+        for hop in pipeline.hops[:60]:
+            pdf.multi_cell(0, 4, _s(f"{hop.from_step}  ->  {hop.to_step}"), new_x="LMARGIN", new_y="NEXT")
+        if len(pipeline.hops) > 60:
+            pdf.multi_cell(0, 4, _s(f"... and {len(pipeline.hops) - 60} more hops"), new_x="LMARGIN", new_y="NEXT")
 
     pdf.ln(3)
     pdf.set_font("helvetica", "I", 8)

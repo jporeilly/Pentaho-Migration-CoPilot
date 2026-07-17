@@ -21,6 +21,7 @@ export default defineConfig({
       '/sandbox': backend,
       '/diff': backend,
       '/report': backend,
+      '/suggest': backend,
       '/project': backend,
       '/best-practices': backend,
       '/brief': backend,
