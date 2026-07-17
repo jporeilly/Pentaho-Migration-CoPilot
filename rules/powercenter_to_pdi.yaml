@@ -1,0 +1,78 @@
+# Rules library: PowerCenter transformation type -> PDI step type (Stage 2: MAP).
+# These are the "clean 70-80%" 1:1 equivalents. Anything not listed here falls
+# through to LLM translation or manual handoff.
+#
+# pdi_type values are PDI step ids as they appear in .ktr XML <type> elements.
+
+"Source Qualifier":
+  pdi_type: TableInput
+  confidence: auto
+  notes: SQL override, if present, must be reviewed for dialect differences.
+
+"Expression":
+  pdi_type: ScriptValueMod          # Modified Java Script Value; simple cases may fit Calculator
+  confidence: review
+  notes: Port expressions require translation from Informatica expression language.
+
+"Aggregator":
+  pdi_type: GroupBy
+  confidence: auto
+  notes: PDI Group By requires sorted input; a Sort rows step is inserted upstream.
+
+"Sorter":
+  pdi_type: SortRows
+  confidence: auto
+
+"Filter":
+  pdi_type: FilterRows
+  confidence: review
+  notes: Filter condition requires expression translation.
+
+"Router":
+  pdi_type: SwitchCase
+  confidence: review
+  notes: Multiple output groups map to Switch/Case targets; conditions need translation.
+
+"Joiner":
+  pdi_type: MergeJoin
+  confidence: auto
+  notes: PDI Merge Join requires both inputs sorted on join keys.
+
+"Lookup Procedure":
+  pdi_type: StreamLookup
+  confidence: auto
+  notes: Connected lookups only; unconnected lookups need restructuring (manual).
+
+"Sequence Generator":
+  pdi_type: Sequence
+  confidence: auto
+
+"Union Transformation":
+  pdi_type: Append
+  confidence: auto
+
+"Rank":
+  pdi_type: SortRows
+  confidence: review
+  notes: Emulated as Sort rows + Sample rows; verify tie-handling semantics.
+
+"Update Strategy":
+  pdi_type: InsertUpdate
+  confidence: review
+  notes: DD_INSERT/DD_UPDATE/DD_DELETE flags map to Insert/Update or Delete steps.
+
+"Normalizer":
+  pdi_type: Normaliser
+  confidence: review
+
+"Target Definition":
+  pdi_type: TableOutput
+  confidence: auto
+
+"Source":
+  pdi_type: TableInput
+  confidence: auto
+
+"Target":
+  pdi_type: TableOutput
+  confidence: auto
