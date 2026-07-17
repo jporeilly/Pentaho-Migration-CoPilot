@@ -8,14 +8,30 @@ Interactive API docs at /docs.
 """
 
 import json
+import logging
+import os
 import tempfile
 import threading
+import time
 from pathlib import Path
 
 import httpx
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
+
+logger = logging.getLogger("pdi_migration.api")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+
+MAX_UPLOAD_BYTES = 50 * 1024 * 1024  # generous: largest real export seen is ~7 MB
+
+
+def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
+    """Optional shared-secret auth: set PDI_MIGRATION_API_KEY to enforce it on
+    mutating endpoints. Unset (the default) keeps local single-user use frictionless."""
+    expected = os.environ.get("PDI_MIGRATION_API_KEY")
+    if expected and x_api_key != expected:
+        raise HTTPException(status_code=401, detail="invalid or missing X-API-Key header")
 
 from pdi_migration import __version__
 from pdi_migration.generator import KtrGenerator
@@ -31,7 +47,9 @@ from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
+from pdi_migration.project import STATUSES, MappingRecord, list_mappings, set_status
 from pdi_migration.sandbox import SandboxKit, build_sandbox_kit
+from pdi_migration.validator.diff import DiffError, DiffReport, compare_csv
 from pdi_migration.validator import (
     ImpactAnalysis,
     MigrationReport,
@@ -81,7 +99,13 @@ def sample() -> FileResponse:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": __version__}
+    rules_meta = RulesMapper().meta
+    return {
+        "status": "ok",
+        "version": __version__,
+        "rules_version": str(rules_meta.get("version", "?")),
+        "rules_updated": str(rules_meta.get("updated", "?")),
+    }
 
 
 @app.get("/changelog", response_class=PlainTextResponse)
@@ -107,34 +131,77 @@ def technical_brief() -> FileResponse:
     return FileResponse(path, media_type="application/pdf")
 
 
-@app.post("/parse", response_model=list[Pipeline])
+@app.post("/parse", response_model=list[Pipeline], dependencies=[Depends(require_api_key)])
 async def parse(export: UploadFile) -> list[Pipeline]:
     """Parse a PowerCenter XML export into the normalized IR."""
     pipelines, _ = _parse_upload(await export.read())
     return pipelines
 
 
-@app.post("/convert", response_model=ConversionResponse)
+@app.post("/convert", response_model=ConversionResponse, dependencies=[Depends(require_api_key)])
 async def convert(export: UploadFile) -> ConversionResponse:
     """Full conversion: source analysis + parse -> map -> generate per mapping."""
+    started = time.monotonic()
     mapper = RulesMapper()
     generator = KtrGenerator()
-    pipelines, source = _parse_upload(await export.read())
+    data = await export.read()
+    pipelines, source = _parse_upload(data)
     results = []
     for pipeline in pipelines:
         mapper.apply(pipeline)
         results.append(_build_result(pipeline, generator))
     assess_source(source, pipelines)
+    logger.info(
+        "convert file=%s bytes=%d mappings=%d elapsed_ms=%d",
+        export.filename, len(data), len(results), (time.monotonic() - started) * 1000,
+    )
     return ConversionResponse(source=source, results=results)
 
 
-@app.post("/sandbox", response_model=SandboxKit)
+@app.post("/sandbox", response_model=SandboxKit, dependencies=[Depends(require_api_key)])
 def sandbox(pipeline: Pipeline) -> SandboxKit:
     """Sandbox test kit for a mapped pipeline: setup guide, DDL, synthetic CSVs."""
     return build_sandbox_kit(pipeline)
 
 
-@app.post("/translate", response_model=ConversionResult)
+@app.post("/diff", response_model=DiffReport, dependencies=[Depends(require_api_key)])
+async def diff(
+    expected: UploadFile, actual: UploadFile, key: str | None = None
+) -> DiffReport:
+    """Measured output parity: diff the original pipeline's CSV output against
+    the converted pipeline's CSV output (optionally matching rows by KEY column)."""
+    try:
+        return compare_csv(
+            (await expected.read()).decode("utf-8-sig"),
+            (await actual.read()).decode("utf-8-sig"),
+            key=key or None,
+        )
+    except DiffError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+class StatusUpdate(BaseModel):
+    file: str
+    mapping: str
+    status: str
+
+
+@app.get("/project", response_model=list[MappingRecord])
+def project() -> list[MappingRecord]:
+    """The migration project: every batch-converted mapping with its status."""
+    return list_mappings()
+
+
+@app.post("/project/status", dependencies=[Depends(require_api_key)])
+def project_status(update: StatusUpdate) -> dict[str, bool]:
+    if update.status not in STATUSES:
+        raise HTTPException(status_code=422, detail=f"status must be one of {STATUSES}")
+    if not set_status(update.file, update.mapping, update.status):
+        raise HTTPException(status_code=404, detail="mapping not found in project store")
+    return {"ok": True}
+
+
+@app.post("/translate", response_model=ConversionResult, dependencies=[Depends(require_api_key)])
 def translate(pipeline: Pipeline) -> ConversionResult:
     """Translate all untranslated expressions in a mapped pipeline via the
     configured LLM provider, then regenerate report + .ktr."""
@@ -156,7 +223,7 @@ def get_settings() -> SettingsResponse:
     return SettingsResponse(settings=load_settings(), detection=detection_report())
 
 
-@app.put("/settings", response_model=LLMSettings)
+@app.put("/settings", response_model=LLMSettings, dependencies=[Depends(require_api_key)])
 def put_settings(settings: LLMSettings) -> LLMSettings:
     save_settings(settings)
     return settings
@@ -188,7 +255,7 @@ def _run_pull(base_url: str, model: str) -> None:
         _pull_state.update(status="error", detail=str(exc))
 
 
-@app.post("/settings/ollama/pull")
+@app.post("/settings/ollama/pull", dependencies=[Depends(require_api_key)])
 def pull_model(model: str) -> dict[str, str]:
     """Start pulling MODEL on the configured Ollama server (non-blocking)."""
     if _pull_state["status"] == "pulling":
@@ -205,6 +272,11 @@ def pull_status() -> dict[str, str]:
 
 
 def _parse_upload(data: bytes) -> tuple[list[Pipeline], SourceInfo]:
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"upload exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)} MB limit",
+        )
     with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as tmp:
         tmp.write(data)
         tmp_path = Path(tmp.name)

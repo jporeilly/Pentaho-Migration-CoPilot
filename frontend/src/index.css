@@ -77,22 +77,25 @@ body {
   font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-.app { max-width: 1180px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.app { max-width: 1180px; margin: 0 auto; padding: 2.25rem 1.5rem 4rem; }
 
 /* ---------- header ---------- */
-.masthead { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .75rem; }
-.masthead h1 { font-size: 1.45rem; font-weight: 650; }
+.masthead {
+  display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;
+  gap: .75rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--gridline);
+}
+.masthead h1 { font-size: 1.5rem; font-weight: 650; }
 .masthead h1 em { color: var(--accent); font-style: normal; }
 .masthead .links { color: var(--text-muted); font-size: .85rem; }
 .masthead .links a { color: var(--accent); text-decoration: none; }
-.tagline { color: var(--text-muted); font-size: .88rem; margin: .2rem 0 1.4rem; }
+.tagline { color: var(--text-muted); font-size: .9rem; margin: 1rem 0 1.5rem; }
 
 /* ---------- upload ---------- */
-.uploader { display: flex; gap: .75rem; align-items: stretch; flex-wrap: wrap; }
+.uploader { display: flex; gap: .9rem; align-items: stretch; flex-wrap: wrap; margin-bottom: 1.5rem; }
 .drop {
   flex: 1; min-width: 280px;
   border: 2px dashed var(--baseline); border-radius: var(--radius);
-  padding: 1.6rem; text-align: center; cursor: pointer;
+  padding: 2rem 1.6rem; text-align: center; cursor: pointer;
   color: var(--text-secondary); transition: border-color .15s, background .15s;
 }
 .drop.over, .drop:hover { border-color: var(--accent); background: var(--surface-1); }
@@ -116,7 +119,7 @@ button.ghost:hover { background: var(--gridline); }
 /* ---------- pipeline card ---------- */
 .card {
   background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 1.4rem 1.5rem; margin-top: 1.4rem;
+  border-radius: var(--radius); padding: 1.6rem 1.7rem; margin-top: 1.75rem;
 }
 .card > header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .card h2 { font-size: 1.12rem; font-weight: 650; }
@@ -215,6 +218,24 @@ button.nav {
 button.nav.active { text-decoration: underline; }
 
 .back-btn { margin-top: 1.2rem; }
+.practices-cta { margin: -0.9rem 0 1.5rem; }
+.status-select {
+  background: var(--surface-1); color: var(--text-primary); border: none;
+  border-radius: 8px; padding: .3rem .55rem; font: .84rem system-ui, "Segoe UI", sans-serif;
+}
+.diff-runner { margin-top: 1.4rem; border-top: 1px solid var(--gridline); padding-top: .4rem; }
+.diff-inputs { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin: .6rem 0 1rem; }
+.file-pick { display: flex; flex-direction: column; gap: .35rem; font-size: .8rem; color: var(--text-muted); }
+.file-pick input[type="file"] { color: var(--text-secondary); font-size: .82rem; }
+.file-pick input[type="text"] {
+  background: var(--surface-2); color: var(--text-primary); border: none;
+  border-radius: 8px; padding: .5rem .7rem; font: .88rem system-ui, "Segoe UI", sans-serif;
+}
+.diff-verdict { font-weight: 650; margin: .4rem 0; }
+.diff-verdict.good { color: var(--status-good); }
+.diff-verdict.warn { color: var(--status-warning); }
+.diff-verdict.bad { color: var(--status-serious); }
+.diff-report table { margin-top: .7rem; }
 
 /* ---------- compare view ---------- */
 .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1rem; margin: 1rem 0; }
@@ -298,38 +319,40 @@ button.nav.active { text-decoration: underline; }
 .form-grid select:focus, .form-grid input:focus { outline: 2px solid var(--accent); }
 .form-grid .hint { color: var(--text-muted); font-size: .85rem; align-self: end; }
 
-/* ---------- stepper ---------- */
+/* ---------- stepper: its own band so the workflow reads at a glance ---------- */
 .stepper {
-  display: flex; list-style: none; padding: 0; margin: 0 0 1.4rem;
-  overflow-x: auto;
+  display: flex; list-style: none; overflow-x: auto;
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem; margin: 0 0 2rem;
 }
 .stepper li { display: flex; align-items: center; flex: 1; min-width: 0; }
 .stepper button {
-  display: flex; align-items: center; gap: .6rem; background: none; border: none;
-  cursor: pointer; padding: .4rem .5rem; border-radius: 8px; text-align: left;
+  display: flex; align-items: center; gap: .75rem; background: none; border: none;
+  cursor: pointer; padding: .55rem .7rem; border-radius: 8px; text-align: left;
 }
 .stepper button:disabled { cursor: not-allowed; opacity: .45; }
-.stepper button:not(:disabled):hover { background: var(--surface-1); }
+.stepper button:not(:disabled):hover { background: var(--surface-2); }
 .stepper .dot {
-  width: 30px; height: 30px; border-radius: 50%; flex: none;
-  display: grid; place-items: center; font-size: .85rem; font-weight: 650;
+  width: 38px; height: 38px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-size: 1rem; font-weight: 650;
   background: var(--surface-2); color: var(--text-muted);
-  border: 1.5px solid var(--baseline);
+  border: 2px solid var(--baseline);
 }
 .stepper li.active .dot { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .stepper li.done .dot { background: transparent; color: var(--status-good); border-color: var(--status-good); }
-.step-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
-.step-label { font-size: .88rem; font-weight: 650; color: var(--text-primary); }
+.step-text { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; gap: .1rem; }
+.step-label { font-size: .95rem; font-weight: 650; color: var(--text-primary); }
 .stepper li.locked .step-label { color: var(--text-muted); }
-.step-hint { font-size: .72rem; color: var(--text-muted); white-space: nowrap; }
-.stepper .bar { flex: 1; height: 1.5px; background: var(--gridline); margin: 0 .5rem; min-width: 12px; }
+.step-hint { font-size: .74rem; color: var(--text-muted); white-space: nowrap; }
+.stepper .bar { flex: 1; height: 2px; background: var(--gridline); margin: 0 .9rem; min-width: 18px; border-radius: 1px; }
 .stepper li.done .bar { background: var(--status-good); }
 
 /* ---------- workbench bar ---------- */
 .workbench-bar {
-  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap;
   background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: .6rem 1rem; margin-bottom: 1.2rem;
+  border-radius: var(--radius); padding: .8rem 1.15rem; margin: -0.75rem 0 1.75rem;
 }
 .workbench-bar .spacer { flex: 1; }
 .file-chip { color: var(--text-secondary); font-size: .88rem; }
@@ -346,7 +369,7 @@ button.nav.active { text-decoration: underline; }
 .mapping-select select:focus { outline: 2px solid var(--accent); }
 
 /* ---------- upload stage cards ---------- */
-.stage-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 1.6rem; }
+.stage-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.15rem; margin-top: 2.25rem; }
 .stage-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; }
 .stage-head { display: flex; align-items: center; gap: .55rem; margin-bottom: .5rem; }
 .stage-n {
@@ -384,12 +407,16 @@ button.nav.active { text-decoration: underline; }
 
 .opportunity {
   color: var(--text-secondary); font-size: .92rem; max-width: 62rem;
-  margin: 0 0 1.3rem; line-height: 1.6;
+  margin: 0 0 1.75rem; line-height: 1.65;
 }
 .opportunity a { color: var(--accent); text-decoration: none; }
 .opportunity a:hover { text-decoration: underline; }
 
-.phase-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1.2rem; }
+.phase-strip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem; margin-top: 2.25rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--gridline);
+}
 .phase {
   border-left: 3px solid var(--gridline); padding: .3rem 0 .3rem .9rem;
   display: flex; flex-direction: column; gap: .25rem;

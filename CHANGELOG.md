@@ -3,6 +3,40 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [1.8.0] — 2026-07-17
+
+### Added
+
+- **Diff harness (measured parity)**: compare the original pipeline's CSV output with
+  the converted pipeline's output — numeric-tolerant, key-matched or positional, with
+  per-column mismatch counts and row samples. `POST /diff` and an "Output parity
+  check" section on the Validate page with PASS / NEAR / FAIL verdicts. The measured
+  counterpart to the static confidence score.
+- **Project mode**: `pdi-migrate batch <dir>` converts a whole corpus (one output
+  subfolder per export file — no more mapping-name collisions), scores every mapping,
+  and records it in a SQLite project store; `pdi-migrate project` and the new
+  **📁 Project** page show the portfolio with per-mapping review status
+  (converted → in review → verified / failed) editable in the UI. First run over the
+  real corpus: 148 mappings, avg confidence 64/100.
+- **Hardening**: optional API-key auth on all mutating endpoints (set
+  `PDI_MIGRATION_API_KEY`), 50 MB upload limit (413), structured request logging.
+- **CI**: GitHub Actions — pytest (Python 3.13) and frontend build (Node 20) on every
+  push and PR.
+- **Docker packaging**: multi-stage `Dockerfile` (UI build → slim Python runtime);
+  `docker run -p 8321:8321 migration-copilot` serves API + UI.
+- **Rules governance**: `rules/powercenter_to_pdi.yaml` now carries `_meta`
+  (version, updated, provenance history); `/health` reports the rules version.
+- Favicon; real vendor logos supported via `frontend/public/logos/` (internal tool)
+  with lettermark fallback.
+
+### Changed
+
+- Layout breathing room: the stepper is its own band with larger targets; masthead,
+  sections, and cards get clear vertical rhythm (user feedback).
+- Masthead trimmed to API docs · Project · Settings; the technical-brief link lives in
+  the Upload intro and Best practices moved to the Upload page and the Validate
+  review checklist.
+
 ## [1.7.0] — 2026-07-17
 
 ### Added

@@ -106,6 +106,100 @@ def sandbox(
 
 
 @app.command()
+def batch(
+    directory: Path = typer.Argument(Path("samples/informatica")),
+    out_dir: Path = typer.Option(Path("output/informatica"), "--out", "-o"),
+) -> None:
+    """Convert every export in DIRECTORY (one subfolder per export file) and
+    record each mapping in the migration project store."""
+    from pdi_migration.project import MappingRecord, record_mapping
+
+    parser = PowerCenterParser()
+    mapper = RulesMapper()
+    generator = KtrGenerator()
+    total = failures = 0
+    scores: list[int] = []
+
+    for xml in sorted(directory.glob("*.xml")):
+        try:
+            pipelines = [mapper.apply(p) for p in parser.parse_file(xml)]
+        except Exception as exc:
+            failures += 1
+            typer.echo(f"{xml.name}: PARSE FAILED — {exc}", err=True)
+            continue
+        for pipeline in pipelines:
+            generator.write(pipeline, out_dir / xml.stem)
+            report = build_report(pipeline)
+            score = build_score(pipeline, build_impact_analysis(pipeline))
+            record_mapping(MappingRecord(
+                mapping=pipeline.name, file=xml.name, steps=report.total_steps,
+                auto=report.auto, review=report.review, manual=report.manual,
+                expressions=report.untranslated_expressions,
+                score=score.score, grade=score.grade,
+                status="converted", updated_at="",
+            ))
+            scores.append(score.score)
+            total += 1
+    avg = round(sum(scores) / len(scores)) if scores else 0
+    typer.echo(
+        f"batch complete: {total} mappings converted "
+        f"({failures} file failures), avg confidence {avg}/100 — "
+        f"see `pdi-migrate project` or the Project page"
+    )
+
+
+@app.command()
+def diff(
+    expected: Path = typer.Argument(..., help="CSV output of the ORIGINAL pipeline"),
+    actual: Path = typer.Argument(..., help="CSV output of the CONVERTED pipeline"),
+    key: str = typer.Option(None, "--key", "-k", help="Column to match rows by"),
+) -> None:
+    """Measured output parity: diff original vs converted pipeline output."""
+    from pdi_migration.validator.diff import DiffError, compare_csv
+
+    try:
+        report = compare_csv(
+            expected.read_text(encoding="utf-8-sig"),
+            actual.read_text(encoding="utf-8-sig"),
+            key=key,
+        )
+    except DiffError as exc:
+        typer.echo(f"cannot compare: {exc}", err=True)
+        raise typer.Exit(code=2)
+    typer.echo(f"{report.verdict}")
+    typer.echo(
+        f"parity: {report.parity:.1%}  rows: {report.expected_rows}/{report.actual_rows}  "
+        f"matching: {report.matching_rows}  mismatched: {report.mismatched_rows}  "
+        f"missing: {report.missing_rows}  extra: {report.extra_rows}"
+    )
+    for column in report.columns:
+        typer.echo(f"  column {column.column}: {column.mismatches} mismatch(es)")
+    for sample in report.samples[:10]:
+        typer.echo(f"  row {sample.row} [{sample.column}]: '{sample.expected}' != '{sample.actual}'")
+    raise typer.Exit(code=0 if report.parity >= 0.999 else 1)
+
+
+@app.command()
+def project() -> None:
+    """Show the migration project: every batch-converted mapping and its status."""
+    from pdi_migration.project import list_mappings
+
+    records = list_mappings()
+    if not records:
+        typer.echo("project store is empty — run `pdi-migrate batch <dir>` first")
+        return
+    by_status: dict[str, int] = {}
+    for r in records:
+        by_status[r.status] = by_status.get(r.status, 0) + 1
+    typer.echo(f"{len(records)} mappings — " + "  ".join(f"{k}: {v}" for k, v in by_status.items()))
+    typer.echo("")
+    for r in records:
+        typer.echo(
+            f"  {r.score:>3}/100 {r.grade}  [{r.status:<10}] {r.mapping:<40} ({r.file})"
+        )
+
+
+@app.command()
 def gaps(directory: Path = typer.Argument(Path("samples/informatica"))) -> None:
     """Batch-analyze every export in DIRECTORY: mapper coverage + gap list."""
     parser = PowerCenterParser()

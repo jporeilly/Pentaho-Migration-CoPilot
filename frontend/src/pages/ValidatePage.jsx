@@ -3,6 +3,7 @@ import StatTiles from '../components/StatTiles.jsx'
 import Markdown from '../components/Markdown.jsx'
 import { buildMarkdownReport } from '../lib/report.js'
 import ScorePanel from '../components/ScorePanel.jsx'
+import DiffRunner from '../components/DiffRunner.jsx'
 
 function downloadText(name, content) {
   const a = document.createElement('a')
@@ -12,7 +13,7 @@ function downloadText(name, content) {
   URL.revokeObjectURL(a.href)
 }
 
-export default function ValidatePage({ result, source }) {
+export default function ValidatePage({ result, source, onShowPractices }) {
   const { pipeline, report } = result
   const reviewItems = pipeline.steps.filter((s) => s.confidence !== 'auto')
   const [kit, setKit] = useState(null)
@@ -54,7 +55,10 @@ export default function ValidatePage({ result, source }) {
       <ScorePanel score={result.score} />
       <StatTiles report={report} />
 
-      <h3 className="subhead">Human review checklist</h3>
+      <h3 className="subhead">
+        Human review checklist{' '}
+        <button className="nav" onClick={onShowPractices}>📘 best practices</button>
+      </h3>
       {reviewItems.length === 0 ? (
         <p className="hint-line">Every step auto-converted — nothing needs review. 🎉</p>
       ) : (
@@ -119,14 +123,7 @@ export default function ValidatePage({ result, source }) {
         </div>
       )}
 
-      <div className="upcoming">
-        <h3 className="subhead">Runtime diff harness — upcoming milestone</h3>
-        <p className="hint-line">
-          The next validation layer runs the original and converted pipelines against
-          sample data and diffs the outputs row by row, scoring output parity per step.
-          No conversion auto-deploys without passing it.
-        </p>
-      </div>
+      <DiffRunner />
     </section>
   )
 }

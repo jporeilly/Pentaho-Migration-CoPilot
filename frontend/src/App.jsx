@@ -5,6 +5,7 @@ import DocModal from './components/DocModal.jsx'
 import SourceBadge from './components/SourceBadge.jsx'
 import SettingsPage from './components/SettingsPage.jsx'
 import UploadPage from './pages/UploadPage.jsx'
+import ProjectPage from './pages/ProjectPage.jsx'
 import ParsePage from './pages/ParsePage.jsx'
 import MapPage from './pages/MapPage.jsx'
 import GeneratePage from './pages/GeneratePage.jsx'
@@ -21,7 +22,7 @@ export default function App() {
   const [version, setVersion] = useState('')
   const [showChangelog, setShowChangelog] = useState(false)
   const [showPractices, setShowPractices] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
+  const [view, setView] = useState('workflow')  // workflow | project | settings
 
   useEffect(() => {
     fetch('/health')
@@ -86,10 +87,18 @@ export default function App() {
         </h1>
         <span className="links">
           Informatica PowerCenter → Pentaho Data Integration ·{' '}
-          <a href="/brief" target="_blank" rel="noreferrer">Technical brief</a> ·{' '}
-          <button className="nav" onClick={() => setShowPractices(true)}>📘 Best practices</button>{' '}
-          · <a href="/docs">API docs</a> ·{' '}
-          <button className={`nav${showSettings ? ' active' : ''}`} onClick={() => setShowSettings(!showSettings)}>
+          <a href="/docs">API docs</a> ·{' '}
+          <button
+            className={`nav${view === 'project' ? ' active' : ''}`}
+            onClick={() => setView(view === 'project' ? 'workflow' : 'project')}
+          >
+            📁 Project
+          </button>{' '}
+          ·{' '}
+          <button
+            className={`nav${view === 'settings' ? ' active' : ''}`}
+            onClick={() => setView(view === 'settings' ? 'workflow' : 'settings')}
+          >
             ⚙ Settings
           </button>
         </span>
@@ -101,8 +110,10 @@ export default function App() {
         <DocModal title="Migration best practices" url="/best-practices" onClose={() => setShowPractices(false)} />
       )}
 
-      {showSettings ? (
-        <SettingsPage onBack={() => setShowSettings(false)} />
+      {view === 'settings' ? (
+        <SettingsPage onBack={() => setView('workflow')} />
+      ) : view === 'project' ? (
+        <ProjectPage />
       ) : (
         <>
           <Stepper step={step} maxStep={maxStep} onStep={setStep} />
@@ -157,6 +168,7 @@ export default function App() {
               error={error}
               loading={loading}
               source={results.length === 0 ? source : null}
+              onShowPractices={() => setShowPractices(true)}
             />
           )}
           {step === 1 && result && <ParsePage result={result} source={source} />}
@@ -169,7 +181,9 @@ export default function App() {
             />
           )}
           {step === 3 && result && <GeneratePage result={result} />}
-          {step === 4 && result && <ValidatePage result={result} source={source} />}
+          {step === 4 && result && (
+            <ValidatePage result={result} source={source} onShowPractices={() => setShowPractices(true)} />
+          )}
 
           {results.length > 0 && step > 0 && (
             <PageNav step={step} maxStep={maxStep} onStep={setStep} />

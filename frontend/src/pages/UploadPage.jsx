@@ -14,7 +14,7 @@ const PHASES = [
   { name: 'Phase 2 — Multi-source', text: 'Add SSIS, then Talend / DataStage; broaden transformation coverage.' },
 ]
 
-export default function UploadPage({ onFile, onSample, error, loading, source }) {
+export default function UploadPage({ onFile, onSample, error, loading, source, onShowPractices }) {
   return (
     <>
       <p className="opportunity">
@@ -24,6 +24,9 @@ export default function UploadPage({ onFile, onSample, error, loading, source })
         effort measured in weeks: deterministic parsing where accuracy is non-negotiable,
         AI only where semantic judgment is genuinely required.{' '}
         <a href="/brief" target="_blank" rel="noreferrer">Read the technical brief →</a>
+      </p>
+      <p className="practices-cta">
+        <button className="ghost" onClick={onShowPractices}>📘 Migration best practices</button>
       </p>
 
       <DropZone onFile={onFile} onSample={onSample} />

@@ -82,10 +82,13 @@ parse · gaps · ui-install · ui-build · ui-dev · status · clean · distclea
 ## CLI
 
 ```powershell
-pdi-migrate parse   <export.xml>   # inspect the extracted IR
-pdi-migrate convert <export.xml>   # source analysis + .ktr files + report -> output\informatica
-pdi-migrate sandbox <export.xml>   # sandbox kit: setup guide + DDL + synthetic test CSVs
-pdi-migrate gaps    [directory]    # corpus coverage: auto/review/manual + gap list
+pdi-migrate parse   <export.xml>        # inspect the extracted IR
+pdi-migrate convert <export.xml>        # source analysis + .ktr + report + confidence score
+pdi-migrate sandbox <export.xml>        # sandbox kit: setup guide + DDL + synthetic test CSVs
+pdi-migrate batch   [directory]         # convert a whole corpus into the project store
+pdi-migrate project                     # portfolio view: every mapping, score, review status
+pdi-migrate gaps    [directory]         # corpus coverage: auto/review/manual + gap list
+pdi-migrate diff    old.csv new.csv -k ID  # measured output parity (exit 0 on PASS)
 ```
 
 `convert` prints the source analysis first — tool version, database, and warnings —
@@ -105,11 +108,23 @@ Current coverage measured on that corpus with `pdi-migrate gaps`: **54% auto**,
 steps across 3 unmapped types (Stored Procedure, Custom Transformation, Transaction
 Control).
 
-## Tests
+## Tests & CI
 
 ```powershell
-.venv\Scripts\python -m pytest      # 31 tests
+.venv\Scripts\python -m pytest      # 73 tests, incl. docs-consistency enforcement
 ```
+
+GitHub Actions runs the suite and the frontend build on every push.
+
+## Deployment
+
+```bash
+docker build -t migration-copilot .
+docker run -p 8321:8321 migration-copilot
+```
+
+Optional hardening: set `PDI_MIGRATION_API_KEY` to require an `X-API-Key` header on
+all mutating endpoints; uploads are capped at 50 MB.
 
 ## Roadmap
 
@@ -123,8 +138,11 @@ Control).
 - [x] Real-export corpus (50 files) + gap analysis
 - [x] Ollama settings with hardware-based model recommendation
 - [x] LLM expression translation (constrained, confidence-scored, mandatory review) — `--translate` / ✨ button
+- [x] Diff harness (measured parity): CSV compare with tolerance, key matching, verdicts
+- [x] Project mode: batch conversion, SQLite portfolio, review-status tracking
+- [x] Hardening (API key, size limits, logging), CI, Docker packaging, rules governance
 - [ ] Remaining step-type config: Merge Join, Stream Lookup, Insert/Update, Call DB Procedure
-- [ ] Runtime diff harness: run old vs. new on sample data, diff outputs, no auto-deploy
+- [ ] Automated diff execution: drive pan/kitchen directly against the sandbox
 - [ ] Workflow/Session → PDI Job (.kjb) conversion
 
 **Phase 1** — assisted customer product with confidence scoring and mandatory human

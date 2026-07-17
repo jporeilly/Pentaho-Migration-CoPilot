@@ -17,7 +17,12 @@ DEFAULT_RULES = Path(__file__).resolve().parents[3] / "rules" / "powercenter_to_
 class RulesMapper:
     def __init__(self, rules_path: str | Path = DEFAULT_RULES):
         with open(rules_path, encoding="utf-8") as f:
-            self.rules: dict[str, dict] = yaml.safe_load(f)
+            loaded: dict = yaml.safe_load(f)
+        # keys starting with "_" are governance metadata, not mapping rules
+        self.meta: dict = loaded.get("_meta", {})
+        self.rules: dict[str, dict] = {
+            k: v for k, v in loaded.items() if not k.startswith("_")
+        }
 
     def apply(self, pipeline: Pipeline) -> Pipeline:
         for step in pipeline.steps:

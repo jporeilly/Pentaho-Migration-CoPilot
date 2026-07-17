@@ -1,5 +1,8 @@
-// Source-tool identity badge. Lettermark only — vendors' actual logos are
-// trademarked; this is our own neutral mark, colored per tool.
+import { useState } from 'react'
+
+// Source-tool identity badge. If a real logo exists at
+// frontend/public/logos/<tool>.png (drop in the official asset — internal
+// tool), it is shown; otherwise a neutral lettermark fallback renders.
 const TOOLS = {
   powercenter: { short: 'INFA', label: 'Informatica PowerCenter', color: '#eb6834' },
   ssis: { short: 'SSIS', label: 'SQL Server Integration Services', color: '#3987e5' },
@@ -8,13 +11,26 @@ const TOOLS = {
 }
 
 export default function SourceBadge({ tool }) {
+  const [logoMissing, setLogoMissing] = useState(false)
   const t = TOOLS[tool] ?? { short: 'ETL', label: tool, color: 'var(--text-muted)' }
+
   return (
     <span className="source-badge" title={t.label}>
-      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-        <rect x="2" y="2" width="14" height="14" rx="4" transform="rotate(45 9 9)" fill={t.color} />
-      </svg>
-      {t.short}
+      {!logoMissing ? (
+        <img
+          src={`/logos/${tool}.png`}
+          alt={t.label}
+          height="20"
+          onError={() => setLogoMissing(true)}
+        />
+      ) : (
+        <>
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <rect x="2" y="2" width="14" height="14" rx="4" transform="rotate(45 9 9)" fill={t.color} />
+          </svg>
+          {t.short}
+        </>
+      )}
     </span>
   )
 }
