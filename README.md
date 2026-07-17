@@ -24,24 +24,27 @@ PARSE (deterministic) -> MAP (rules + LLM) -> GENERATE (templating) -> VALIDATE 
 
 A guided dashboard walks each conversion through the pipeline with a stepper:
 
-1. **Upload** — drag-and-drop a PowerCenter XML export (or one click on the bundled sample).
-2. **Parse** — *source analysis first*: detected PowerCenter release (8.1–10.5 mapped from
-   the repository version), repository/database/codepage facts, object counts, and
-   plain-language pre-migration warnings (workflows/sessions not converted, mapplets,
-   unmapped step types, SQL overrides, codepage caveats). Then the parsed structure:
-   an SVG flow diagram plus every step's fields and expressions.
+1. **Upload** — drag-and-drop a PowerCenter `.xml` or Talend `.item` export (format
+   auto-detected by content, never by extension) — or one click on the bundled sample.
+2. **Parse** — *source analysis first*: detected tool and release (PowerCenter 8.1–10.5
+   from the repository version; Talend from the job file), repository/database/codepage
+   facts, object counts, and plain-language pre-migration warnings (orchestration not
+   converted, mapplets/joblets, unmapped step types, SQL overrides, codepage caveats).
+   Then the parsed structure: an SVG flow diagram plus every step's fields and expressions.
 3. **Map** — KPI tiles, a filterable table of every mapping decision with its
    confidence (`auto` / `review` / `manual`), source-vs-converted diagrams, per-step
    impact analysis with click-through navigation, and **🤖 AI-suggested solutions**:
    the LLM proposes a concrete PDI approach (steps, config, code, pitfalls) for any
    step, from its real configuration — advisory, never auto-applied.
 4. **Generate** — preview and download the .ktr; it opens as an editable transformation
-   in Spoon, with all TODOs carried into step descriptions.
+   in Spoon, with all TODOs carried into step descriptions. PowerCenter workflows also
+   emit PDI Jobs (.kjb) with sessions wired to their .ktr files.
 5. **Validate** — migration confidence score (0–100, A–E), human review checklist,
    **sandbox test kit** (PDI setup guide, CREATE TABLE DDL inferred from the export's
    field metadata, seeded synthetic test CSVs — so first runs happen safely against a
    sandbox database, never production), **measured output parity** (upload old vs. new
-   CSV outputs for a PASS/NEAR/FAIL diff), and report downloads (markdown/JSON).
+   CSV outputs for a PASS/NEAR/FAIL diff), and report downloads — branded **PDF**,
+   markdown, and JSON.
 
 Also in the UI: a **📁 Project** page (the batch-converted portfolio — click any
 mapping to walk through its conversion; track review status per mapping), multi-mapping
@@ -58,14 +61,16 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 
 | Layer | Where | Status |
 | --- | --- | --- |
-| Parser (Parse) | `src/pdi_migration/parser/` | PowerCenter XML → normalized Pydantic IR; source analysis with version detection. Zero failures across the 50-file real corpus |
-| Rules mapper (Map) | `src/pdi_migration/mapper/` + `rules/powercenter_to_pdi.yaml` | 17 transformation-type rules with per-rule confidence; unknown types → explicit manual handoff |
-| LLM translator (Map) | `src/pdi_migration/llm/` | Working: deterministic fast-path + constrained Ollama translation (schema-forced JSON, function-mapping prompt); every LLM output flagged `review`; hardware detection recommends the model (multi-GPU aware) |
-| KTR generator (Generate) | `src/pdi_migration/generator/` | Steps, hops, layout + real config for Table Input (SQL), Table Output, Sort, Group By (keys + aggregates), script steps |
-| Validator (Validate) | `src/pdi_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact analysis, confidence score, CSV diff harness (measured parity) |
+| Parsers (Parse) | `src/pdi_migration/parser/` | PowerCenter XML and Talend .item → one normalized Pydantic IR; content-sniffing auto-detection; source analysis with version detection. Zero failures across both real corpora (90 files) |
+| Rules mappers (Map) | `src/pdi_migration/mapper/` + `rules/*.yaml` | Per-source rules libraries with governance metadata (PowerCenter v3: 18 types; Talend v2: 60+ components); unknown types → explicit manual handoff |
+| LLM (Map) | `src/pdi_migration/llm/` | Expression translation (Informatica + Java prompts, schema-forced JSON, always flagged `review`), per-step solution suggestions, hardware detection with multi-GPU model recommendation |
+| Generators (Generate) | `src/pdi_migration/generator/` | .ktr with real config for 9 step types (incl. Merge Join keys, Stream Lookup with injected lookup source); .kjb jobs from PowerCenter workflows |
+| Validator (Validate) | `src/pdi_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact knowledge base (both sources), confidence score, CSV diff harness (measured parity) |
 | Sandbox kits | `src/pdi_migration/sandbox.py` | Per-mapping setup guide, inferred DDL, seeded synthetic test data |
-| Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status |
-| API | `src/pdi_migration/api/` | convert/parse/translate/sandbox/diff/project/settings + docs pages — Swagger at `/docs`; optional API-key auth |
+| Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open |
+| PDI runner | `src/pdi_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
+| PDF reports | `src/pdi_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
+| API | `src/pdi_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 
 ## Quick start
@@ -126,7 +131,7 @@ avg confidence 62/100.
 ## Tests & CI
 
 ```powershell
-.venv\Scripts\python -m pytest      # 73 tests, incl. docs-consistency enforcement
+.venv\Scripts\python -m pytest      # 108 tests, incl. docs-consistency enforcement
 ```
 
 GitHub Actions runs the suite and the frontend build on every push.
@@ -143,7 +148,7 @@ all mutating endpoints; uploads are capped at 50 MB.
 
 ## Roadmap
 
-**Phase 0 — internal tool (PowerCenter only), in progress:**
+**Phase 0 — internal tool (PowerCenter), complete:**
 
 - [x] Deterministic parser + normalized IR (fields, expressions, hops)
 - [x] Rules library with per-step confidence; explicit manual handoff
@@ -161,10 +166,16 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] Workflow/Session → PDI Job (.kjb) conversion: sessions wired to sibling .ktr files, placeholders for unconvertible tasks, link conditions preserved
 - [x] PDF migration report (branded, per mapping)
 
-**Phase 0 roadmap complete.** Remaining refinements tracked in the changelog.
+**Phase 2 — multi-source, in progress:**
 
-**Phase 1** — assisted customer product with confidence scoring and mandatory human
-review. **Phase 2** — multi-source: SSIS, then Talend / DataStage.
+- [x] Talend (v1.10.0): .item parser, 60+ component rules validated against a 40-job
+  real corpus (versions 5.1 → 8.0.1), Java→JavaScript expression translation,
+  Talend impact knowledge, 🤖 per-step AI solution suggestions
+- [ ] SSIS (.dtsx)
+- [ ] IBM DataStage (.dsx)
+
+**Phase 1** — assisted customer product packaging (multi-user, confidence scoring and
+mandatory review are already built) — sequenced after Phase 2 sources per demand.
 
 ## Project documents
 
