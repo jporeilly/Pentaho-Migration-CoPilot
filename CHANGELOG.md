@@ -3,7 +3,7 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
-## [0.5.1] — 2026-07-17
+## [1.5.1] — 2026-07-17
 
 ### Added
 
@@ -28,12 +28,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 - Settings page: added a clear "← Back to workflow" button; the color-theme picker
   moved from the masthead into a new Appearance section (user feedback).
 - Source analysis now counts only *untranslated* expressions in its warning.
+- Release numbering restarted at 1.0.0 (previously 0.x); this release was briefly
+  numbered 0.5.0/0.5.1.
 
 ### Removed
 
 - `mapper/llm.py` stub (superseded by `llm/translate.py`).
 
-## [0.4.0] — 2026-07-17
+## [1.3.0] — 2026-07-17
 
 ### Added
 
@@ -48,15 +50,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
   overrides needing dialect review, untranslated expressions, old-version cautions,
   workflow-only exports (previously a silent no-op). Shown on the Parse page, in the
   CLI `convert` output, and surfaced even when an export contains no mappings.
-- **Color themes**: Midnight (default), Slate, Pentaho, Light — picker in the
-  masthead, persisted in localStorage, applied before first paint.
+- **Color themes**: Midnight (default), Slate, Pentaho, Light — picker persisted in
+  localStorage, applied before first paint.
 - Upload page explains the product using the technical brief (opportunity, four-stage
   cards, phase roadmap); the brief PDF is served at `/brief` and linked in the masthead.
 - Corpus grown to **50 verified real exports** (148 mappings, 1,316 steps) across six
   repository versions (PowerCenter ~9.0 → 10.5); gap analysis: 54% auto, three unmapped
   types remaining. Zero parser failures corpus-wide.
 
-## [0.3.0] — 2026-07-17
+## [1.2.0] — 2026-07-17
 
 ### Added
 
@@ -78,7 +80,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 - `OLLAMA_HOST=0.0.0.0` (a listen address) is now mapped to a connectable loopback
   URL, and a missing port defaults to 11434.
 
-## [0.2.0] — 2026-07-17
+## [1.1.0] — 2026-07-17
 
 ### Added
 
@@ -108,7 +110,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
   Group By (keys + aggregates), and script placeholder steps (was skeleton-only).
 - `INSTALL.md` moved to `docs/`.
 
-## [0.1.0] — 2026-07-17
+## [1.0.0] — 2026-07-17
 
 ### Added
 
@@ -118,9 +120,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
   each with `auto` / `review` / `manual` confidence; unknown types routed to manual handoff,
   never guessed. Untranslated expressions downgrade `auto` steps to `review`.
 - KTR generator: step types, hops, layout, and confidence/TODO annotations in step
-  descriptions; real per-step config for Table Input (SQL), Table Output, Sort rows,
-  Group By (keys + SUM/AVG/COUNT/MIN/MAX aggregates), and Modified Java Script placeholder
-  with typed output fields.
+  descriptions.
 - Static migration report: auto/review/manual step counts and untranslated-expression count.
 - CLI `pdi-migrate` with `parse` and `convert` commands.
 - FastAPI layer with dark-themed review UI at `/`: drag-and-drop a PowerCenter export,
