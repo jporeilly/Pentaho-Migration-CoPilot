@@ -3,22 +3,39 @@
 Run with:  uvicorn pdi_migration.api.main:app --reload
 Requires the [api] extra:  pip install -e ".[api]"
 
-Phase 0 exposes parse + convert for the services team; the Phase 1 review UI
-(React) will consume this same API.
+Serves the Phase 0 review UI at / and the API under /parse, /convert.
+Interactive API docs at /docs.
 """
 
 import tempfile
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
 from pdi_migration import __version__
+from pdi_migration.generator import KtrGenerator
 from pdi_migration.ir import Pipeline
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
+from pdi_migration.parser.powercenter import PowerCenterParseError
 from pdi_migration.validator import MigrationReport, build_report
 
+STATIC_DIR = Path(__file__).parent / "static"
+
 app = FastAPI(title="Migration Copilot", version=__version__)
+
+
+class ConversionResult(BaseModel):
+    pipeline: Pipeline
+    report: MigrationReport
+    ktr: str
+
+
+@app.get("/", include_in_schema=False)
+def index() -> FileResponse:
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/health")
@@ -32,11 +49,22 @@ async def parse(export: UploadFile) -> list[Pipeline]:
     return _parse_upload(await export.read())
 
 
-@app.post("/convert", response_model=list[MigrationReport])
-async def convert(export: UploadFile) -> list[MigrationReport]:
-    """Parse + map a PowerCenter export; return per-pipeline migration reports."""
+@app.post("/convert", response_model=list[ConversionResult])
+async def convert(export: UploadFile) -> list[ConversionResult]:
+    """Full conversion: parse -> map -> generate. Returns IR, report, and .ktr XML."""
     mapper = RulesMapper()
-    return [build_report(mapper.apply(p)) for p in _parse_upload(await export.read())]
+    generator = KtrGenerator()
+    results = []
+    for pipeline in _parse_upload(await export.read()):
+        mapper.apply(pipeline)
+        results.append(
+            ConversionResult(
+                pipeline=pipeline,
+                report=build_report(pipeline),
+                ktr=generator.generate(pipeline),
+            )
+        )
+    return results
 
 
 def _parse_upload(data: bytes) -> list[Pipeline]:
@@ -45,5 +73,7 @@ def _parse_upload(data: bytes) -> list[Pipeline]:
         tmp_path = Path(tmp.name)
     try:
         return PowerCenterParser().parse_file(tmp_path)
+    except (PowerCenterParseError, SyntaxError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:
         tmp_path.unlink(missing_ok=True)

@@ -31,6 +31,7 @@ class FieldDef(BaseModel):
     precision: int | None = None
     scale: int | None = None
     nullable: bool = True
+    attrs: dict[str, str] = Field(default_factory=dict)  # source-tool extras, e.g. PORTTYPE/EXPRESSIONTYPE
 
 
 class Expression(BaseModel):

@@ -6,7 +6,7 @@ Pentaho Data Integration pipelines. See `docs/` for the technical brief.
 **Design principle:** deterministic where accuracy is non-negotiable, AI only where
 semantic judgment is required.
 
-```
+```text
 PARSE (deterministic) -> MAP (rules + LLM) -> GENERATE (templating) -> VALIDATE (diff + confidence)
 ```
 
@@ -20,7 +20,7 @@ will consume that API.
 |--------------|----------|--------|
 | `parser/`    | Parse    | PowerCenter XML exports -> normalized IR |
 | `mapper/`    | Map      | Rules library working (`rules/powercenter_to_pdi.yaml`); LLM expression translation stubbed |
-| `generator/` | Generate | Emits .ktr skeletons (types, hops, layout, TODO notes); per-step config emission is the next milestone |
+| `generator/` | Generate | Emits .ktr files: types, hops, layout, TODO notes, plus real config for Table Input/Output, Sort, Group By, and script steps |
 | `validator/` | Validate | Static confidence report working; runtime diff harness stubbed |
 
 Every step carries a confidence level — `auto`, `review`, or `manual` — and the mapper
@@ -28,10 +28,14 @@ never guesses: unknown transformation types are routed to manual handoff explici
 
 ## Setup
 
+See [INSTALL.md](INSTALL.md). Quick version:
+
 ```powershell
 py -3.13 -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev,api]"
 ```
+
+Version: see [VERSION.md](VERSION.md) · History: see [CHANGELOG.md](CHANGELOG.md)
 
 ## Usage
 
@@ -42,8 +46,8 @@ pdi-migrate parse samples\m_load_sales.xml
 # Full conversion: .ktr skeletons + migration report
 pdi-migrate convert samples\m_load_sales.xml -o output
 
-# API (for the future review UI)
-uvicorn pdi_migration.api.main:app --reload
+# Review UI + API — open http://127.0.0.1:8000 (UI) or /docs (Swagger)
+.venv\Scripts\uvicorn pdi_migration.api.main:app --reload
 ```
 
 ## Tests
@@ -58,7 +62,9 @@ uvicorn pdi_migration.api.main:app --reload
 - [x] Rules library: top transformation types with per-rule confidence
 - [x] KTR skeleton generation with confidence + TODO annotations
 - [x] Static migration report (auto/review/manual counts)
-- [ ] Per-step-type KTR config emission (Group By aggregations, sort keys, join keys)
+- [x] Per-step-type KTR config emission: Table Input (SQL), Table Output, Sort keys, Group By keys + aggregates, script placeholder with typed output fields
+- [x] Review UI (dark, single page) served at / by FastAPI
+- [ ] Per-step-type config for remaining rule types (Merge Join keys, Stream Lookup, Insert/Update)
 - [ ] LLM expression translation (Informatica expression language -> PDI), constrained by validated examples
 - [ ] Runtime diff harness: run old vs. new on sample data, diff outputs
-- [ ] Sample study: parse real PowerCenter exports, measure the actual clean-mapping % 
+- [ ] Sample study: parse real PowerCenter exports, measure the actual clean-mapping %

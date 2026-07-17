@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Migration Copilot</title>
+<style>
+  :root {
+    --bg: #12151c;
+    --panel: #1a1f2a;
+    --panel-2: #212836;
+    --text: #e6e9f0;
+    --muted: #8b93a7;
+    --accent: #26a69a;
+    --auto: #2e9e6b;
+    --review: #d99a2b;
+    --manual: #d95757;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 15px/1.55 "Segoe UI", system-ui, sans-serif;
+    padding: 2rem 1.5rem; max-width: 1100px; margin: 0 auto;
+  }
+  h1 { font-size: 1.5rem; font-weight: 600; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); margin: .25rem 0 1.5rem; font-size: .9rem; }
+  .drop {
+    border: 2px dashed #3a4356; border-radius: var(--radius);
+    padding: 2.2rem; text-align: center; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--panel); }
+  .drop input { display: none; }
+  .drop strong { color: var(--accent); }
+  button.dl {
+    background: var(--accent); color: #08110f; border: none;
+    padding: .55rem 1.1rem; border-radius: 8px; font-weight: 600;
+    font-size: .9rem; cursor: pointer;
+  }
+  button.dl:hover { filter: brightness(1.12); }
+  .card {
+    background: var(--panel); border-radius: var(--radius);
+    padding: 1.25rem 1.4rem; margin-top: 1.25rem;
+  }
+  .card header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .card h2 { font-size: 1.1rem; font-weight: 600; }
+  .summary { color: var(--muted); font-size: .9rem; margin-top: .35rem; }
+  .summary b { color: var(--text); }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .9rem; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: .4rem .6rem; }
+  td { padding: .5rem .6rem; background: var(--panel-2); }
+  tr td:first-child { border-radius: 8px 0 0 8px; }
+  tr td:last-child { border-radius: 0 8px 8px 0; }
+  tbody tr { border-bottom: 4px solid var(--panel); }
+  .badge {
+    display: inline-block; padding: .1rem .6rem; border-radius: 99px;
+    font-size: .78rem; font-weight: 600; color: #10131a;
+  }
+  .badge.auto { background: var(--auto); }
+  .badge.review { background: var(--review); }
+  .badge.manual { background: var(--manual); }
+  .notes { color: var(--muted); font-size: .84rem; white-space: pre-line; }
+  .error { background: #3a2026; color: #f0b9b9; padding: .9rem 1.2rem; border-radius: var(--radius); margin-top: 1.25rem; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <h1>Migration <span>Copilot</span></h1>
+  <p class="sub">Informatica PowerCenter → Pentaho Data Integration · Phase 0 internal tool · <a href="/docs" style="color:var(--accent)">API docs</a></p>
+
+  <label class="drop" id="drop">
+    <input type="file" id="file" accept=".xml">
+    Drop a PowerCenter XML export here, or <strong>browse</strong>
+  </label>
+
+  <div id="error" class="error hidden"></div>
+  <div id="results"></div>
+
+<script>
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+const resultsEl = document.getElementById('results');
+const errorEl = document.getElementById('error');
+
+['dragover', 'dragleave', 'drop'].forEach(ev =>
+  drop.addEventListener(ev, e => {
+    e.preventDefault();
+    drop.classList.toggle('over', ev === 'dragover');
+    if (ev === 'drop' && e.dataTransfer.files.length) convert(e.dataTransfer.files[0]);
+  })
+);
+fileInput.addEventListener('change', () => fileInput.files.length && convert(fileInput.files[0]));
+
+async function convert(file) {
+  errorEl.classList.add('hidden');
+  resultsEl.innerHTML = '<p class="sub">Converting…</p>';
+  const form = new FormData();
+  form.append('export', file);
+  try {
+    const res = await fetch('/convert', { method: 'POST', body: form });
+    if (!res.ok) throw new Error((await res.json()).detail || res.statusText);
+    render(await res.json());
+  } catch (err) {
+    resultsEl.innerHTML = '';
+    errorEl.textContent = 'Conversion failed: ' + err.message;
+    errorEl.classList.remove('hidden');
+  }
+}
+
+function render(results) {
+  resultsEl.innerHTML = '';
+  for (const { pipeline, report, ktr } of results) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <header>
+        <div>
+          <h2>${esc(pipeline.name)}</h2>
+          <p class="summary">
+            <b>${report.total_steps}</b> steps ·
+            <b>${report.auto}</b> auto · <b>${report.review}</b> review ·
+            <b>${report.manual}</b> manual ·
+            <b>${report.untranslated_expressions}</b> expressions to translate
+          </p>
+        </div>
+        <button class="dl">Download .ktr</button>
+      </header>
+      <table>
+        <thead><tr><th>Step</th><th>Source type</th><th>PDI type</th><th>Confidence</th><th>Notes</th></tr></thead>
+        <tbody>${pipeline.steps.map(rowHtml).join('')}</tbody>
+      </table>`;
+    card.querySelector('.dl').addEventListener('click', () => {
+      const blob = new Blob([ktr], { type: 'application/xml' });
+      const a = Object.assign(document.createElement('a'), {
+        href: URL.createObjectURL(blob), download: pipeline.name + '.ktr',
+      });
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    resultsEl.appendChild(card);
+  }
+}
+
+function rowHtml(step) {
+  const notes = [
+    ...step.notes,
+    ...step.expressions.map(e => `TODO ${e.field}: ${e.raw}`),
+  ];
+  return `<tr>
+    <td>${esc(step.name)}</td>
+    <td>${esc(step.source_type)}</td>
+    <td>${step.pdi_type ? esc(step.pdi_type) : '—'}</td>
+    <td><span class="badge ${step.confidence}">${step.confidence}</span></td>
+    <td class="notes">${esc(notes.join('\n'))}</td>
+  </tr>`;
+}
+
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+</script>
+</body>
+</html>

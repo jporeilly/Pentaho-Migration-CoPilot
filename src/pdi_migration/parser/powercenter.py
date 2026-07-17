@@ -66,12 +66,18 @@ class PowerCenterParser:
         )
         for field in xform.iter("TRANSFORMFIELD"):
             name = field.get("NAME", "")
+            attrs = {
+                key: value
+                for key in ("PORTTYPE", "EXPRESSIONTYPE")
+                if (value := field.get(key))
+            }
             step.fields.append(
                 FieldDef(
                     name=name,
                     datatype=field.get("DATATYPE", "string"),
                     precision=_to_int(field.get("PRECISION")),
                     scale=_to_int(field.get("SCALE")),
+                    attrs=attrs,
                 )
             )
             raw_expr = field.get("EXPRESSION")
