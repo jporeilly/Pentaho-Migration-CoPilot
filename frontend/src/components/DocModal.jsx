@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
 import Markdown from './Markdown.jsx'
 
-export default function ChangelogModal({ onClose }) {
+// Generic document popup: fetches a markdown endpoint and renders it.
+export default function DocModal({ title, url, onClose }) {
   const [text, setText] = useState(null)
 
   useEffect(() => {
-    fetch('/changelog')
+    fetch(url)
       .then((r) => r.text())
       .then(setText)
-      .catch(() => setText('Could not load the changelog.'))
+      .catch(() => setText(`Could not load ${title}.`))
     const onKey = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [url, title, onClose])
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -20,11 +21,11 @@ export default function ChangelogModal({ onClose }) {
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Changelog"
+        aria-label={title}
         onClick={(e) => e.stopPropagation()}
       >
         <header>
-          <h3>Changelog</h3>
+          <h3>{title}</h3>
           <button className="ghost" onClick={onClose} aria-label="Close">✕</button>
         </header>
         <div className="modal-body">

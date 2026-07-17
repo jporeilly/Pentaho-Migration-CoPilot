@@ -16,6 +16,10 @@ export default function ParsePage({ result, source }) {
           <b>{expressions}</b> expressions extracted
         </p>
       </header>
+      <p className="hint-line">
+        What the deterministic parser extracted from the export — structure only, nothing
+        converted yet. Hover any diagram node or expand a step for its fields.
+      </p>
 
       <FlowDiagram pipeline={pipeline} />
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import Stepper from './components/Stepper.jsx'
 import PageNav from './components/PageNav.jsx'
-import ChangelogModal from './components/ChangelogModal.jsx'
+import DocModal from './components/DocModal.jsx'
+import SourceBadge from './components/SourceBadge.jsx'
 import SettingsPage from './components/SettingsPage.jsx'
 import UploadPage from './pages/UploadPage.jsx'
 import ParsePage from './pages/ParsePage.jsx'
@@ -19,6 +20,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [version, setVersion] = useState('')
   const [showChangelog, setShowChangelog] = useState(false)
+  const [showPractices, setShowPractices] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
@@ -84,13 +86,20 @@ export default function App() {
         </h1>
         <span className="links">
           Informatica PowerCenter → Pentaho Data Integration ·{' '}
-          <a href="/brief" target="_blank" rel="noreferrer">Technical brief</a> · <a href="/docs">API docs</a> ·{' '}
+          <a href="/brief" target="_blank" rel="noreferrer">Technical brief</a> ·{' '}
+          <button className="nav" onClick={() => setShowPractices(true)}>📘 Best practices</button>{' '}
+          · <a href="/docs">API docs</a> ·{' '}
           <button className={`nav${showSettings ? ' active' : ''}`} onClick={() => setShowSettings(!showSettings)}>
             ⚙ Settings
           </button>
         </span>
       </header>
-      {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
+      {showChangelog && (
+        <DocModal title="Changelog" url="/changelog" onClose={() => setShowChangelog(false)} />
+      )}
+      {showPractices && (
+        <DocModal title="Migration best practices" url="/best-practices" onClose={() => setShowPractices(false)} />
+      )}
 
       {showSettings ? (
         <SettingsPage onBack={() => setShowSettings(false)} />
@@ -100,7 +109,14 @@ export default function App() {
 
           {results.length > 0 && (
             <div className="workbench-bar">
+              {result && <SourceBadge tool={result.pipeline.source_tool} />}
               <span className="file-chip" title={fileName}>📄 {fileName}</span>
+              {result?.score && (
+                <span className={`score-chip grade-${result.score.grade}`}
+                      title={result.score.verdict}>
+                  confidence {result.score.score}/100 · {result.score.grade}
+                </span>
+              )}
               {results.length > 1 && (
                 <label className="mapping-select">
                   Mapping
@@ -114,6 +130,22 @@ export default function App() {
                 </label>
               )}
               <span className="spacer" />
+              {results.length > 1 && (
+                <button
+                  className="ghost"
+                  onClick={() =>
+                    results.forEach((r) => {
+                      const a = document.createElement('a')
+                      a.href = URL.createObjectURL(new Blob([r.ktr], { type: 'application/xml' }))
+                      a.download = `${r.pipeline.name}.ktr`
+                      a.click()
+                      URL.revokeObjectURL(a.href)
+                    })
+                  }
+                >
+                  ⬇ All .ktr ({results.length})
+                </button>
+              )}
               <button className="ghost" onClick={reset}>New upload</button>
             </div>
           )}
@@ -137,7 +169,7 @@ export default function App() {
             />
           )}
           {step === 3 && result && <GeneratePage result={result} />}
-          {step === 4 && result && <ValidatePage result={result} />}
+          {step === 4 && result && <ValidatePage result={result} source={source} />}
 
           {results.length > 0 && step > 0 && (
             <PageNav step={step} maxStep={maxStep} onStep={setStep} />

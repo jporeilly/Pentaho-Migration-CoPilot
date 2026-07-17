@@ -11,7 +11,13 @@ import typer
 from pdi_migration.generator import KtrGenerator
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import assess_source, build_gap_report, build_report
+from pdi_migration.validator import (
+    assess_source,
+    build_gap_report,
+    build_impact_analysis,
+    build_report,
+    build_score,
+)
 
 app = typer.Typer(help="Migration Copilot: legacy ETL -> Pentaho Data Integration.")
 
@@ -64,11 +70,15 @@ def convert(
     for pipeline in pipelines:
         out_path = generator.write(pipeline, out_dir)
         report = build_report(pipeline)
+        score = build_score(pipeline, build_impact_analysis(pipeline))
         typer.echo(f"{pipeline.name} -> {out_path}")
         typer.echo(
             f"  steps: {report.total_steps}  auto: {report.auto}  "
             f"review: {report.review}  manual: {report.manual}  "
             f"expressions to translate: {report.untranslated_expressions}"
+        )
+        typer.echo(
+            f"  confidence: {score.score}/100 ({score.grade}, static) — {score.verdict}"
         )
 
 
@@ -111,7 +121,13 @@ def gaps(directory: Path = typer.Argument(Path("samples/informatica"))) -> None:
             failures.append((xml.name, str(exc)))
 
     report = build_gap_report(pipelines)
+    scores = [build_score(p, build_impact_analysis(p)).score for p in pipelines]
+    avg_score = round(sum(scores) / len(scores)) if scores else 0
     typer.echo(f"files: {len(files)}  parsed: {len(files) - len(failures)}  failed: {len(failures)}")
+    typer.echo(
+        f"avg migration confidence: {avg_score}/100 (static) — "
+        f"range {min(scores, default=0)}..{max(scores, default=0)}"
+    )
     typer.echo(
         f"mappings: {report.mappings}  steps: {report.steps}  "
         f"auto: {report.auto} ({report.auto_rate:.0%})  "

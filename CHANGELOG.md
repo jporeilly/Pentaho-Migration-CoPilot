@@ -3,6 +3,38 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [1.7.0] — 2026-07-17
+
+### Added
+
+- **Side-by-side comparison** on the Map page: the original Informatica structure and
+  the converted PDI pipeline as twin flow diagrams with matching layouts, plus hover
+  tooltips on every diagram node.
+- **Impact analysis**: a per-step examination of what converts automatically and how
+  PDI's behavior differs from Informatica's — knowledge base covering sorted-input
+  requirements (Group By/Merge Join), NULL semantics in translated expressions,
+  lookup caching and multiple-match policies, sequence state persistence, update
+  strategies, router multi-match, session-level target settings, and more. Each entry
+  lists differences, required actions, and an impact level; a summary surfaces the top
+  risks per mapping. Shown on the Map page and included in reports.
+- **Migration confidence score** for every pipeline examined: a 0–100 static
+  prediction (grade A–E) weighted across step mapping, expression translation, config
+  completeness, and semantic impact — hero panel on the Validate page, chip in the
+  workbench bar, per-mapping in CLI `convert`, and corpus average in `gaps`. Clearly
+  labeled static until the diff harness provides measured confidence.
+- **Report downloads**: per-mapping migration report as markdown or JSON (source
+  analysis, score, step table, expressions, impact) from the Validate page; a
+  "Download all .ktr" button for multi-mapping exports.
+- **Best-practices guide** (`docs/BEST_PRACTICES.md`, 📘 in the masthead): inventory
+  first, migrate the common 80%, sandbox staging, output parity, orchestration
+  planning, sequence/state cutover, parallel running, audit trail.
+- **Tooltips and explanations everywhere**: stepper stages, KPI tiles, confidence
+  badges, PDI step types, diagram nodes, and page intros.
+- **Docs-consistency test**: the suite fails if pyproject, `__version__`, VERSION.md,
+  and the newest CHANGELOG entry disagree, or required docs are missing — documentation
+  updates are now enforced per release.
+- Source-tool badge (neutral lettermark) in the workbench bar.
+
 ## [1.6.0] — 2026-07-17
 
 ### Added

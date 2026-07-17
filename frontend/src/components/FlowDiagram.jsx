@@ -53,13 +53,15 @@ function layout(pipeline) {
   return { pos, width, height }
 }
 
-export default function FlowDiagram({ pipeline }) {
+export default function FlowDiagram({ pipeline, mode = 'pdi' }) {
   if (!pipeline.steps.length) return null
   const { pos, width, height } = layout(pipeline)
+  const isSource = mode === 'source'
 
   return (
     <div className="flow-wrap">
-      <svg width={width} height={height} role="img" aria-label={`Pipeline flow for ${pipeline.name}`}>
+      <svg width={width} height={height} role="img"
+           aria-label={`${isSource ? 'Source' : 'Converted'} pipeline flow for ${pipeline.name}`}>
         <defs>
           <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--text-muted)" />
@@ -84,30 +86,39 @@ export default function FlowDiagram({ pipeline }) {
           const status = STATUS[step.confidence] ?? STATUS.manual
           return (
             <g key={step.name}>
+              <title>
+                {`${step.name}\n${step.source_type} → ${step.pdi_type ?? 'no mapping'}\nconfidence: ${step.confidence}`}
+              </title>
               <rect
                 x={x} y={y} width={NODE_W} height={NODE_H} rx="8"
-                fill="var(--surface-1)" stroke={status.color} strokeWidth="1.75"
+                fill="var(--surface-1)"
+                stroke={isSource ? 'var(--baseline)' : status.color}
+                strokeWidth="1.75"
               />
               <text x={x + 12} y={y + 23} fill="var(--text-primary)" fontSize="12.5" fontWeight="650">
                 {step.name.length > 20 ? step.name.slice(0, 19) + '…' : step.name}
               </text>
               <text x={x + 12} y={y + 41} fill="var(--text-muted)" fontSize="11">
-                {step.source_type} → {step.pdi_type ?? '(manual)'}
+                {isSource ? step.source_type : `${step.source_type} → ${step.pdi_type ?? '(manual)'}`}
               </text>
-              <text x={x + NODE_W - 18} y={y + 23} fill={status.color} fontSize="12">
-                {status.icon}
-              </text>
+              {!isSource && (
+                <text x={x + NODE_W - 18} y={y + 23} fill={status.color} fontSize="12">
+                  {status.icon}
+                </text>
+              )}
             </g>
           )
         })}
       </svg>
-      <div className="flow-legend">
-        {Object.values(STATUS).map((s) => (
-          <span className="chip" key={s.label} style={{ color: s.color }}>
-            {s.icon} {s.label}
-          </span>
-        ))}
-      </div>
+      {!isSource && (
+        <div className="flow-legend">
+          {Object.values(STATUS).map((s) => (
+            <span className="chip" key={s.label} style={{ color: s.color }}>
+              {s.icon} {s.label}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

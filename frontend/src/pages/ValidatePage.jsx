@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import StatTiles from '../components/StatTiles.jsx'
 import Markdown from '../components/Markdown.jsx'
+import { buildMarkdownReport } from '../lib/report.js'
+import ScorePanel from '../components/ScorePanel.jsx'
 
 function downloadText(name, content) {
   const a = document.createElement('a')
@@ -10,7 +12,7 @@ function downloadText(name, content) {
   URL.revokeObjectURL(a.href)
 }
 
-export default function ValidatePage({ result }) {
+export default function ValidatePage({ result, source }) {
   const { pipeline, report } = result
   const reviewItems = pipeline.steps.filter((s) => s.confidence !== 'auto')
   const [kit, setKit] = useState(null)
@@ -34,7 +36,22 @@ export default function ValidatePage({ result }) {
     <section className="card">
       <header>
         <h2>Migration report <span>{pipeline.name}</span></h2>
+        <div className="actions">
+          <button
+            className="primary"
+            onClick={() => downloadText(`${pipeline.name}.report.md`, buildMarkdownReport(source, result))}
+          >
+            ⬇ Report (.md)
+          </button>
+          <button
+            className="ghost"
+            onClick={() => downloadText(`${pipeline.name}.report.json`, JSON.stringify({ source, ...result }, null, 2))}
+          >
+            ⬇ Report (.json)
+          </button>
+        </div>
       </header>
+      <ScorePanel score={result.score} />
       <StatTiles report={report} />
 
       <h3 className="subhead">Human review checklist</h3>

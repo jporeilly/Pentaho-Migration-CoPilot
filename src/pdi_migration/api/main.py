@@ -32,7 +32,15 @@ from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
 from pdi_migration.sandbox import SandboxKit, build_sandbox_kit
-from pdi_migration.validator import MigrationReport, assess_source, build_report
+from pdi_migration.validator import (
+    ImpactAnalysis,
+    MigrationReport,
+    MigrationScore,
+    assess_source,
+    build_impact_analysis,
+    build_report,
+    build_score,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 UI_DIST = REPO_ROOT / "frontend" / "dist"
@@ -45,6 +53,19 @@ class ConversionResult(BaseModel):
     pipeline: Pipeline
     report: MigrationReport
     ktr: str
+    impact: ImpactAnalysis
+    score: MigrationScore
+
+
+def _build_result(pipeline: Pipeline, generator: KtrGenerator) -> "ConversionResult":
+    impact = build_impact_analysis(pipeline)
+    return ConversionResult(
+        pipeline=pipeline,
+        report=build_report(pipeline),
+        ktr=generator.generate(pipeline),
+        impact=impact,
+        score=build_score(pipeline, impact),
+    )
 
 
 class ConversionResponse(BaseModel):
@@ -68,6 +89,13 @@ def changelog() -> str:
     """CHANGELOG.md content, shown by the UI's version popup."""
     path = REPO_ROOT / "CHANGELOG.md"
     return path.read_text(encoding="utf-8") if path.exists() else "No changelog available."
+
+
+@app.get("/best-practices", response_class=PlainTextResponse)
+def best_practices() -> str:
+    """docs/BEST_PRACTICES.md, shown by the UI's Best practices popup."""
+    path = REPO_ROOT / "docs" / "BEST_PRACTICES.md"
+    return path.read_text(encoding="utf-8") if path.exists() else "No guide available."
 
 
 @app.get("/brief", include_in_schema=False)
@@ -95,13 +123,7 @@ async def convert(export: UploadFile) -> ConversionResponse:
     results = []
     for pipeline in pipelines:
         mapper.apply(pipeline)
-        results.append(
-            ConversionResult(
-                pipeline=pipeline,
-                report=build_report(pipeline),
-                ktr=generator.generate(pipeline),
-            )
-        )
+        results.append(_build_result(pipeline, generator))
     assess_source(source, pipelines)
     return ConversionResponse(source=source, results=results)
 
@@ -120,11 +142,7 @@ def translate(pipeline: Pipeline) -> ConversionResult:
         ExpressionTranslator().translate_pipeline(pipeline)
     except TranslationError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return ConversionResult(
-        pipeline=pipeline,
-        report=build_report(pipeline),
-        ktr=KtrGenerator().generate(pipeline),
-    )
+    return _build_result(pipeline, KtrGenerator())
 
 
 class SettingsResponse(BaseModel):

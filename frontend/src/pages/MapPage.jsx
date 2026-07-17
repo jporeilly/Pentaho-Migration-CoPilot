@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import StatTiles from '../components/StatTiles.jsx'
 import StepsTable from '../components/StepsTable.jsx'
+import CompareView from '../components/CompareView.jsx'
+import ImpactPanel from '../components/ImpactPanel.jsx'
 
 export default function MapPage({ result, onUpdate }) {
   const { pipeline, report } = result
@@ -41,8 +43,14 @@ export default function MapPage({ result, onUpdate }) {
         )}
       </header>
       {error && <div className="error">Translation failed: {error}</div>}
+      <p className="hint-line">
+        How each Informatica transformation maps to PDI: side-by-side structure, per-step
+        confidence, and a detailed impact analysis of the behavioral differences.
+      </p>
       <StatTiles report={report} />
+      <CompareView pipeline={pipeline} />
       <StepsTable steps={pipeline.steps} />
+      <ImpactPanel impact={result.impact} />
     </section>
   )
 }
