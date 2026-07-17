@@ -47,7 +47,13 @@ from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
-from pdi_migration.project import STATUSES, MappingRecord, list_mappings, set_status
+from pdi_migration.project import (
+    STATUSES,
+    MappingRecord,
+    get_mapping,
+    list_mappings,
+    set_status,
+)
 from pdi_migration.sandbox import SandboxKit, build_sandbox_kit
 from pdi_migration.validator.diff import DiffError, DiffReport, compare_csv
 from pdi_migration.validator import (
@@ -178,6 +184,33 @@ async def diff(
         )
     except DiffError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/project/open", response_model=ConversionResponse)
+def project_open(file: str, mapping: str) -> ConversionResponse:
+    """Re-open a batch-converted mapping in the full workflow: re-parses its
+    source export and returns the same shape as /convert (source + results,
+    with the requested mapping first)."""
+    record = get_mapping(file, mapping)
+    if record is None:
+        raise HTTPException(status_code=404, detail="mapping not found in project store")
+    source_path = Path(record.source_path)
+    if not record.source_path or not source_path.exists():
+        raise HTTPException(
+            status_code=410,
+            detail=f"source export not found at '{record.source_path}' — "
+                   "it may have moved; re-run `pdi-migrate batch`",
+        )
+    mapper = RulesMapper()
+    generator = KtrGenerator()
+    parser = PowerCenterParser()
+    pipelines = [mapper.apply(p) for p in parser.parse_file(source_path)]
+    source = assess_source(parser.analyze_export(source_path), pipelines)
+    results = sorted(
+        (_build_result(p, generator) for p in pipelines),
+        key=lambda r: r.pipeline.name != mapping,  # requested mapping first
+    )
+    return ConversionResponse(source=source, results=results)
 
 
 class StatusUpdate(BaseModel):

@@ -66,6 +66,31 @@ export default function App() {
     convert(new File([blob], 'm_load_sales.xml', { type: 'text/xml' }))
   }
 
+  async function openFromProject(row) {
+    setError(null)
+    setLoading(true)
+    setView('workflow')
+    try {
+      const res = await fetch(
+        `/project/open?file=${encodeURIComponent(row.file)}&mapping=${encodeURIComponent(row.mapping)}`,
+      )
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || res.statusText)
+      setSource(data.source)
+      setResults(data.results)
+      setFileName(row.file)
+      setSelected(0)
+      setStep(1)
+    } catch (err) {
+      setResults([])
+      setSource(null)
+      setStep(0)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function reset() {
     setResults([])
     setSource(null)
@@ -113,7 +138,7 @@ export default function App() {
       {view === 'settings' ? (
         <SettingsPage onBack={() => setView('workflow')} />
       ) : view === 'project' ? (
-        <ProjectPage onBack={() => setView('workflow')} />
+        <ProjectPage onBack={() => setView('workflow')} onOpen={openFromProject} />
       ) : (
         <>
           <Stepper step={step} maxStep={maxStep} onStep={setStep} />

@@ -109,6 +109,11 @@ def sandbox(
 def batch(
     directory: Path = typer.Argument(Path("samples/informatica")),
     out_dir: Path = typer.Option(Path("output/informatica"), "--out", "-o"),
+    translate: bool = typer.Option(
+        False, "--translate", "-t",
+        help="Also translate expressions via the configured LLM (slow: one call "
+             "per non-trivial expression — plan hours for a large corpus)",
+    ),
 ) -> None:
     """Convert every export in DIRECTORY (one subfolder per export file) and
     record each mapping in the migration project store."""
@@ -117,6 +122,17 @@ def batch(
     parser = PowerCenterParser()
     mapper = RulesMapper()
     generator = KtrGenerator()
+    translator = None
+    if translate:
+        from pdi_migration.llm import ExpressionTranslator, TranslationError
+
+        try:
+            translator = ExpressionTranslator()
+            translator._check_provider()
+        except TranslationError as exc:
+            typer.echo(f"translation unavailable: {exc}", err=True)
+            raise typer.Exit(code=2)
+
     total = failures = 0
     scores: list[int] = []
 
@@ -128,11 +144,15 @@ def batch(
             typer.echo(f"{xml.name}: PARSE FAILED — {exc}", err=True)
             continue
         for pipeline in pipelines:
+            if translator is not None:
+                translated = translator.translate_pipeline(pipeline)
+                typer.echo(f"  {pipeline.name}: translated {translated} expression(s)")
             generator.write(pipeline, out_dir / xml.stem)
             report = build_report(pipeline)
             score = build_score(pipeline, build_impact_analysis(pipeline))
             record_mapping(MappingRecord(
-                mapping=pipeline.name, file=xml.name, steps=report.total_steps,
+                mapping=pipeline.name, file=xml.name,
+                source_path=str(xml.resolve()), steps=report.total_steps,
                 auto=report.auto, review=report.review, manual=report.manual,
                 expressions=report.untranslated_expressions,
                 score=score.score, grade=score.grade,

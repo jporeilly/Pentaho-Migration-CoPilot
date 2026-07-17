@@ -18,6 +18,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS mappings (
     mapping     TEXT NOT NULL,
     file        TEXT NOT NULL,
+    source_path TEXT NOT NULL DEFAULT '',
     steps       INTEGER NOT NULL,
     auto        INTEGER NOT NULL,
     review      INTEGER NOT NULL,
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS mappings (
 class MappingRecord(BaseModel):
     mapping: str
     file: str
+    source_path: str = ""
     steps: int
     auto: int
     review: int
@@ -56,6 +58,10 @@ def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(_db_path())
     conn.row_factory = sqlite3.Row
     conn.execute(SCHEMA)
+    # migrate stores created before source_path existed
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(mappings)")}
+    if "source_path" not in columns:
+        conn.execute("ALTER TABLE mappings ADD COLUMN source_path TEXT NOT NULL DEFAULT ''")
     return conn
 
 
@@ -63,16 +69,26 @@ def record_mapping(record: MappingRecord) -> None:
     with _connect() as conn:
         conn.execute(
             """INSERT INTO mappings
-               (mapping, file, steps, auto, review, manual, expressions, score, grade, status)
-               VALUES (?,?,?,?,?,?,?,?,?,?)
+               (mapping, file, source_path, steps, auto, review, manual, expressions, score, grade, status)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?)
                ON CONFLICT(file, mapping) DO UPDATE SET
+                 source_path=excluded.source_path,
                  steps=excluded.steps, auto=excluded.auto, review=excluded.review,
                  manual=excluded.manual, expressions=excluded.expressions,
                  score=excluded.score, grade=excluded.grade,
                  updated_at=datetime('now')""",
-            (record.mapping, record.file, record.steps, record.auto, record.review,
-             record.manual, record.expressions, record.score, record.grade, record.status),
+            (record.mapping, record.file, record.source_path, record.steps, record.auto,
+             record.review, record.manual, record.expressions, record.score, record.grade,
+             record.status),
         )
+
+
+def get_mapping(file: str, mapping: str) -> MappingRecord | None:
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM mappings WHERE file=? AND mapping=?", (file, mapping)
+        ).fetchone()
+    return MappingRecord(**dict(row)) if row else None
 
 
 def list_mappings() -> list[MappingRecord]:

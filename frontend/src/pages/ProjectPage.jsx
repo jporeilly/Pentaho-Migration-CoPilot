@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 const STATUSES = ['converted', 'in_review', 'verified', 'failed']
 const STATUS_ICON = { converted: '·', in_review: '⚠', verified: '✓', failed: '✋' }
 
-export default function ProjectPage({ onBack }) {
+export default function ProjectPage({ onBack, onOpen }) {
   const [rows, setRows] = useState(null)
 
   const refresh = useCallback(async () => {
@@ -56,6 +56,7 @@ export default function ProjectPage({ onBack }) {
       </header>
       <p className="summary">
         {STATUSES.map((s) => `${STATUS_ICON[s]} ${s.replace('_', ' ')}: ${counts[s] || 0}`).join(' · ')}
+        {' — '}click a mapping to walk through its conversion and reports
       </p>
       <div className="table-scroll">
         <table className="project-table">
@@ -69,17 +70,22 @@ export default function ProjectPage({ onBack }) {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={`${r.file}:${r.mapping}`}>
+              <tr
+                key={`${r.file}:${r.mapping}`}
+                className="row-link"
+                title="Open this mapping in the workflow"
+                onClick={() => onOpen(r)}
+              >
                 <td className="num">
                   <span className={`score-chip grade-${r.grade}`}>{r.score} {r.grade}</span>
                 </td>
-                <td className="cell-clip" title={r.mapping}>{r.mapping}</td>
+                <td className="cell-clip mapping-link" title={r.mapping}>{r.mapping} →</td>
                 <td className="notes cell-clip" title={r.file}>{r.file}</td>
                 <td className="num">{r.steps}</td>
                 <td className="num">{r.auto}</td>
                 <td className="num">{r.review}</td>
                 <td className="num">{r.manual}</td>
-                <td>
+                <td onClick={(e) => e.stopPropagation()}>
                   <select
                     className="status-select"
                     value={r.status}

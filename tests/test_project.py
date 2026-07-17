@@ -59,6 +59,35 @@ class TestProjectAPI:
         assert res.status_code == 422
 
 
+class TestProjectOpen:
+    SAMPLE = __import__("pathlib").Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
+
+    def test_open_rebuilds_full_result(self):
+        client = TestClient(app)
+        record_mapping(_record(name="m_load_sales", file="m_load_sales.xml").model_copy(
+            update={"source_path": str(self.SAMPLE)}
+        ))
+        res = client.get("/project/open", params={"file": "m_load_sales.xml", "mapping": "m_load_sales"})
+        assert res.status_code == 200
+        body = res.json()
+        assert body["results"][0]["pipeline"]["name"] == "m_load_sales"
+        assert body["results"][0]["score"]["grade"] in "ABCDE"
+        assert "<transformation>" in body["results"][0]["ktr"]
+
+    def test_open_unknown_mapping_404(self):
+        client = TestClient(app)
+        res = client.get("/project/open", params={"file": "x.xml", "mapping": "nope"})
+        assert res.status_code == 404
+
+    def test_open_moved_source_410(self):
+        client = TestClient(app)
+        record_mapping(_record(name="m_gone", file="gone.xml").model_copy(
+            update={"source_path": "C:/does/not/exist.xml"}
+        ))
+        res = client.get("/project/open", params={"file": "gone.xml", "mapping": "m_gone"})
+        assert res.status_code == 410
+
+
 class TestHardening:
     def test_api_key_enforced_when_configured(self, monkeypatch):
         monkeypatch.setenv("PDI_MIGRATION_API_KEY", "sekret")

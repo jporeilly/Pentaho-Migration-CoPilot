@@ -16,6 +16,13 @@ deliberately — not one per work session.
   container instead of crowding the card edge.
 - Project page has a "← Back to workflow" button (matching Settings).
 
+### Added
+
+- Project rows are clickable: opening a mapping re-runs its conversion from the
+  stored source export and drops you into the full stepper workflow (Parse → Map →
+  Generate → Validate) with all reports. `GET /project/open`; the store now keeps
+  each mapping's source path (auto-migrated).
+
 ## [1.8.0] — 2026-07-17
 
 ### Added
