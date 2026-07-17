@@ -31,6 +31,8 @@ deliberately — not one per work session.
   single-card alternative.
 - README and INSTALL updated: sandbox kits, project store, diff harness, multi-GPU
   detection, Docker, and hardening are documented.
+- Comparison view stacks vertically (source above, converted below) so wide
+  pipelines get the full width instead of two cramped panes.
 
 ## [1.8.0] — 2026-07-17
 
