@@ -73,6 +73,29 @@ def convert(
 
 
 @app.command()
+def sandbox(
+    export: Path,
+    out_dir: Path = typer.Option(
+        Path("output/informatica"), "--out", "-o",
+        help="Kits are written to <out>/sandbox/<mapping>/",
+    ),
+    rows: int = typer.Option(25, "--rows", help="Synthetic rows per source CSV"),
+) -> None:
+    """Generate sandbox test kits: setup guide, CREATE TABLE DDL, synthetic CSVs."""
+    from pdi_migration.sandbox import build_sandbox_kit, write_kit
+
+    mapper = RulesMapper()
+    for pipeline in PowerCenterParser().parse_file(export):
+        mapper.apply(pipeline)
+        kit = build_sandbox_kit(pipeline, rows=rows)
+        kit_dir = write_kit(kit, out_dir)
+        typer.echo(
+            f"{pipeline.name} -> {kit_dir}  "
+            f"(setup.md, setup.sql, {len(kit.data)} data file(s))"
+        )
+
+
+@app.command()
 def gaps(directory: Path = typer.Argument(Path("samples/informatica"))) -> None:
     """Batch-analyze every export in DIRECTORY: mapper coverage + gap list."""
     parser = PowerCenterParser()

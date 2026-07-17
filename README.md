@@ -84,6 +84,7 @@ parse · gaps · ui-install · ui-build · ui-dev · status · clean · distclea
 ```powershell
 pdi-migrate parse   <export.xml>   # inspect the extracted IR
 pdi-migrate convert <export.xml>   # source analysis + .ktr files + report -> output\informatica
+pdi-migrate sandbox <export.xml>   # sandbox kit: setup guide + DDL + synthetic test CSVs
 pdi-migrate gaps    [directory]    # corpus coverage: auto/review/manual + gap list
 ```
 

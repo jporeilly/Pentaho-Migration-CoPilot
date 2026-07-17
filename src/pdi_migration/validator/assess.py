@@ -78,6 +78,20 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
                  f"{source.database_type or 'source-database'} dialect differences.",
         ))
 
+    db_steps = sum(
+        1 for p in pipelines for s in p.steps
+        if s.pdi_type in ("TableInput", "TableOutput", "StreamLookup")
+    )
+    if db_steps:
+        warn(SourceWarning(
+            level=WarningLevel.WARNING,
+            text=f"{db_steps} step(s) read from or write to a database. Generated .ktr files "
+                 "contain empty connection placeholders — before running, create a PDI database "
+                 "connection to a SANDBOX environment (never production), create the tables, and "
+                 "load test data. A ready-made kit (setup guide, CREATE TABLE DDL, synthetic CSVs) "
+                 "is available on the Validate page or via `pdi-migrate sandbox`.",
+        ))
+
     expressions = sum(
         1 for p in pipelines for s in p.steps for e in s.expressions
         if e.translated is None

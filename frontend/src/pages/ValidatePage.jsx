@@ -1,8 +1,34 @@
+import { useState } from 'react'
 import StatTiles from '../components/StatTiles.jsx'
+import Markdown from '../components/Markdown.jsx'
+
+function downloadText(name, content) {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([content], { type: 'text/plain' }))
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
 
 export default function ValidatePage({ result }) {
   const { pipeline, report } = result
   const reviewItems = pipeline.steps.filter((s) => s.confidence !== 'auto')
+  const [kit, setKit] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  async function generateKit() {
+    setBusy(true)
+    try {
+      const res = await fetch('/sandbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pipeline),
+      })
+      if (res.ok) setKit(await res.json())
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <section className="card">
@@ -37,6 +63,43 @@ export default function ValidatePage({ result }) {
             </li>
           ))}
         </ol>
+      )}
+
+      <h3 className="subhead">Sandbox test kit</h3>
+      <p className="hint-line">
+        The converted transformation needs a database connection and tables before it can
+        run — <b>always against a sandbox, never production</b>. Generate a kit with a
+        PDI setup guide, <code>CREATE TABLE</code> DDL inferred from the export's field
+        metadata, and seeded synthetic test data shaped to the real column types.
+      </p>
+      {!kit ? (
+        <button className="primary" onClick={generateKit} disabled={busy}>
+          {busy ? 'Generating…' : '🧪 Generate sandbox kit'}
+        </button>
+      ) : (
+        <div className="kit">
+          <div className="actions">
+            <button className="ghost" onClick={() => downloadText('setup.md', kit.guide)}>
+              ⬇ setup.md
+            </button>
+            <button className="ghost" onClick={() => downloadText('setup.sql', kit.ddl)}>
+              ⬇ setup.sql
+            </button>
+            {Object.entries(kit.data).map(([name, content]) => (
+              <button key={name} className="ghost" onClick={() => downloadText(name, content)}>
+                ⬇ {name}
+              </button>
+            ))}
+          </div>
+          <details className="kit-guide" open>
+            <summary>Setup guide</summary>
+            <Markdown text={kit.guide} />
+          </details>
+          <details className="kit-guide">
+            <summary>setup.sql</summary>
+            <pre className="ktr-pre">{kit.ddl}</pre>
+          </details>
+        </div>
       )}
 
       <div className="upcoming">

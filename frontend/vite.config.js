@@ -16,6 +16,7 @@ export default defineConfig({
       '/changelog': backend,
       '/settings': backend,
       '/translate': backend,
+      '/sandbox': backend,
       '/brief': backend,
     },
   },

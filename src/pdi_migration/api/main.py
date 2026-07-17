@@ -31,6 +31,7 @@ from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
+from pdi_migration.sandbox import SandboxKit, build_sandbox_kit
 from pdi_migration.validator import MigrationReport, assess_source, build_report
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -103,6 +104,12 @@ async def convert(export: UploadFile) -> ConversionResponse:
         )
     assess_source(source, pipelines)
     return ConversionResponse(source=source, results=results)
+
+
+@app.post("/sandbox", response_model=SandboxKit)
+def sandbox(pipeline: Pipeline) -> SandboxKit:
+    """Sandbox test kit for a mapped pipeline: setup guide, DDL, synthetic CSVs."""
+    return build_sandbox_kit(pipeline)
 
 
 @app.post("/translate", response_model=ConversionResult)

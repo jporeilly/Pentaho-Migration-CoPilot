@@ -3,6 +3,23 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [1.6.0] — 2026-07-17
+
+### Added
+
+- **Sandbox test kits** — everything needed to run a converted .ktr safely:
+  `setup.md` (step-by-step PDI guide: create a sandbox DB connection, wire the empty
+  connection placeholders, create tables, load data, run & verify), `setup.sql`
+  (CREATE TABLE DDL inferred from the export's field metadata; write-side tables
+  derived from upstream fields), and `data_<step>.csv` synthetic test data shaped to
+  the real column types (seeded — same seed, same data, reproducible runs).
+  Available as `pdi-migrate sandbox <export.xml>` (writes to
+  `output/informatica/sandbox/<mapping>/`), `POST /sandbox`, and a
+  **🧪 Generate sandbox kit** section on the Validate page with per-file downloads.
+- **Source analysis now warns about database setup**: steps that read/write databases
+  are counted, with an explicit "connect to a SANDBOX, never production" warning and
+  a pointer to the kit.
+
 ## [1.5.2] — 2026-07-17
 
 ### Changed
