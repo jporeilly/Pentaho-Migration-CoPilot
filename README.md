@@ -17,7 +17,8 @@ FastAPI (`pdi_migration.api`) is a thin layer over it, and a React review UI
 (`frontend/`) is served by FastAPI at `/` — dark theme, drag-and-drop upload, KPI
 tiles, pipeline flow diagram, filterable step table, .ktr download.
 
-<img width="1025" height="1326" alt="image" src="https://github.com/user-attachments/assets/2108eac0-413a-41ed-9133-aade55409180" />
+<img width="1345" height="560" alt="arch_crop" src="https://github.com/user-attachments/assets/3d4ae800-129e-45fd-85b2-1297bfe2e597" />
+
 
 
 | Module       | Stage    | Status |
