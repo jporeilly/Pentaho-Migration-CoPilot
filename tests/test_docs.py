@@ -47,3 +47,10 @@ def test_version_markers_agree():
 def test_readme_references_version_and_changelog():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "VERSION.md" in readme and "CHANGELOG.md" in readme
+    # any literal version stamped into the README must match the code version
+    stamped = re.search(r"Version \*\*([^*]+)\*\*", readme)
+    assert stamped, "README should stamp the current version near the top"
+    assert stamped.group(1) == __version__, (
+        f"README says version {stamped.group(1)}, code says {__version__} — "
+        "update the README masthead line"
+    )
