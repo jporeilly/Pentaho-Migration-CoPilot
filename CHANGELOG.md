@@ -3,6 +3,13 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [1.5.2] — 2026-07-17
+
+### Changed
+
+- Converted .ktr files now default to `output/informatica/` (CLI, Makefile, helper
+  scripts); each file keeps the name of its source mapping, unchanged.
+
 ## [1.5.1] — 2026-07-17
 
 ### Added

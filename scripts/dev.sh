@@ -94,8 +94,8 @@ case "${1:-help}" in
     convert)
         assert_venv
         file="${2:-$SAMPLE}"
-        step "Converting $file -> $ROOT/output"
-        "$PYTHON" -m pdi_migration.cli convert "$file" -o "$ROOT/output"
+        step "Converting $file -> $ROOT/output/informatica"
+        "$PYTHON" -m pdi_migration.cli convert "$file" -o "$ROOT/output/informatica"
         ;;
     parse)
         assert_venv

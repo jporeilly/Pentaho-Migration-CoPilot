@@ -104,7 +104,7 @@ switch ($Command) {
     "convert" {
         Assert-Venv
         $file = if ($Target) { $Target } else { $Sample }
-        $out  = Join-Path $Root "output"
+        $out  = Join-Path $Root "output\informatica"
         Write-Step "Converting $file -> $out"
         & $Python -m pdi_migration.cli convert $file -o $out
         exit $LASTEXITCODE

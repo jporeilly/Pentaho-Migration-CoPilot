@@ -25,7 +25,7 @@ endif
 PYTHON  := $(VENV_BIN)/python
 PORT    ?= 8321
 SAMPLE  ?= samples/m_load_sales.xml
-OUT     ?= output
+OUT     ?= output/informatica
 
 .DEFAULT_GOAL := help
 .PHONY: help setup venv install test test-verbose run run-dev convert parse gaps ui-install ui-build ui-dev status clean distclean

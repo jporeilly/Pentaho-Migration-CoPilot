@@ -26,7 +26,10 @@ def parse(export: Path) -> None:
 @app.command()
 def convert(
     export: Path,
-    out_dir: Path = typer.Option(Path("output"), "--out", "-o", help="Directory for .ktr files"),
+    out_dir: Path = typer.Option(
+        Path("output/informatica"), "--out", "-o",
+        help="Directory for .ktr files (each named after its source mapping)",
+    ),
     translate: bool = typer.Option(
         False, "--translate", "-t",
         help="Translate expressions via the configured LLM provider (see Settings)",

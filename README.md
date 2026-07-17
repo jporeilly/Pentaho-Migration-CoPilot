@@ -82,9 +82,9 @@ parse · gaps · ui-install · ui-build · ui-dev · status · clean · distclea
 ## CLI
 
 ```powershell
-pdi-migrate parse   <export.xml>            # inspect the extracted IR
-pdi-migrate convert <export.xml> -o output  # source analysis + .ktr files + report
-pdi-migrate gaps    [directory]             # corpus coverage: auto/review/manual + gap list
+pdi-migrate parse   <export.xml>   # inspect the extracted IR
+pdi-migrate convert <export.xml>   # source analysis + .ktr files + report -> output\informatica
+pdi-migrate gaps    [directory]    # corpus coverage: auto/review/manual + gap list
 ```
 
 `convert` prints the source analysis first — tool version, database, and warnings —
