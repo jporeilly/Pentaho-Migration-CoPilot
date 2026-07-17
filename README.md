@@ -53,7 +53,7 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | --- | --- | --- |
 | Parser (Parse) | `src/pdi_migration/parser/` | PowerCenter XML → normalized Pydantic IR; source analysis with version detection. Zero failures across the 50-file real corpus |
 | Rules mapper (Map) | `src/pdi_migration/mapper/` + `rules/powercenter_to_pdi.yaml` | 17 transformation-type rules with per-rule confidence; unknown types → explicit manual handoff |
-| LLM translator (Map) | `src/pdi_migration/llm/` | Settings, hardware detection, and model recommendation done; translation itself is the next milestone |
+| LLM translator (Map) | `src/pdi_migration/llm/` | Working: deterministic fast-path + constrained Ollama translation (schema-forced JSON, function-mapping prompt); every LLM output flagged `review` |
 | KTR generator (Generate) | `src/pdi_migration/generator/` | Steps, hops, layout + real config for Table Input (SQL), Table Output, Sort, Group By (keys + aggregates), script steps |
 | Validator (Validate) | `src/pdi_migration/validator/` | Migration report, corpus gap analysis, pre-migration assessment; runtime diff harness stubbed |
 | API | `src/pdi_migration/api/` | `/convert`, `/parse`, `/settings`, `/changelog`, `/brief`, `/sample`, `/health` — Swagger at `/docs` |
@@ -121,7 +121,7 @@ Control).
 - [x] Pre-migration source analysis with version detection and risk warnings
 - [x] Real-export corpus (50 files) + gap analysis
 - [x] Ollama settings with hardware-based model recommendation
-- [ ] LLM expression translation (constrained, confidence-scored) — next
+- [x] LLM expression translation (constrained, confidence-scored, mandatory review) — `--translate` / ✨ button
 - [ ] Remaining step-type config: Merge Join, Stream Lookup, Insert/Update, Call DB Procedure
 - [ ] Runtime diff harness: run old vs. new on sample data, diff outputs, no auto-deploy
 - [ ] Workflow/Session → PDI Job (.kjb) conversion

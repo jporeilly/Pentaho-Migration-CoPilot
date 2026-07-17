@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import ThemeSelect from './ThemeSelect.jsx'
 
-export default function SettingsPage() {
+export default function SettingsPage({ onBack }) {
   const [data, setData] = useState(null)       // { settings, detection }
   const [form, setForm] = useState(null)       // editable copy of settings
   const [saved, setSaved] = useState(false)
@@ -72,6 +73,7 @@ export default function SettingsPage() {
 
   return (
     <div className="settings">
+      <button className="ghost back-btn" onClick={onBack}>← Back to workflow</button>
       <div className="settings-grid">
         <section className="card">
           <h2>Environment</h2>
@@ -184,6 +186,16 @@ export default function SettingsPage() {
         <div className="actions">
           <button className="primary" onClick={() => save()}>Save settings</button>
           {saved && <span className="ok">✓ saved</span>}
+        </div>
+      </section>
+
+      <section className="card">
+        <h2>Appearance</h2>
+        <div className="form-grid">
+          <label>
+            Color theme
+            <ThemeSelect />
+          </label>
         </div>
       </section>
     </div>

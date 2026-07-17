@@ -15,6 +15,8 @@ export default defineConfig({
       '/health': backend,
       '/changelog': backend,
       '/settings': backend,
+      '/translate': backend,
+      '/brief': backend,
     },
   },
   build: { outDir: 'dist' },

@@ -24,7 +24,14 @@ export default function ValidatePage({ result }) {
               <div>
                 <b>{s.name}</b> <span className="muted">({s.source_type} → {s.pdi_type ?? 'no mapping'})</span>
                 <div className="notes">
-                  {[...s.notes, ...s.expressions.map((e) => `Translate: ${e.field} = ${e.raw}`)].join('\n')}
+                  {[
+                    ...s.notes,
+                    ...s.expressions.map((e) =>
+                      e.translated != null
+                        ? `Verify translation: ${e.field} = ${e.translated}`
+                        : `Translate: ${e.field} = ${e.raw}`,
+                    ),
+                  ].join('\n')}
                 </div>
               </div>
             </li>

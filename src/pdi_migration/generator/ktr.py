@@ -77,7 +77,10 @@ class KtrGenerator:
         SubElement(step_el, "type").text = pdi_type
         description = [f"[confidence: {step.confidence.value}]", *step.notes]
         for expr in step.expressions:
-            description.append(f"TODO expression [{expr.field}]: {expr.raw}")
+            if expr.translated is None:
+                description.append(f"TODO expression [{expr.field}]: {expr.raw}")
+            else:
+                description.append(f"translated [{expr.field}] — verify: {expr.raw}")
         SubElement(step_el, "description").text = "\n".join(description)
         SubElement(step_el, "distribute").text = "Y"
         SubElement(step_el, "copies").text = "1"
@@ -164,8 +167,14 @@ def _emit_script_values(step: Step, el: Element) -> None:
     SubElement(script, "jsScript_name").text = "Script 1"
     lines = ["// Translated from Informatica Expression transformation."]
     for expr in step.expressions:
-        lines.append(f"// TODO translate: {expr.field} = {expr.raw}")
-        lines.append(f"var {expr.field} = null;")
+        if expr.translated is not None:
+            lines.append(f"// source: {expr.field} = {expr.raw}")
+            if expr.notes:
+                lines.append(f"// {expr.notes}")
+            lines.append(f"var {expr.field} = {expr.translated};")
+        else:
+            lines.append(f"// TODO translate: {expr.field} = {expr.raw}")
+            lines.append(f"var {expr.field} = null;")
     SubElement(script, "jsScript_script").text = "\n".join(lines)
 
     fields = SubElement(el, "fields")

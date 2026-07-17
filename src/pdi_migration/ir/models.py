@@ -43,6 +43,7 @@ class Expression(BaseModel):
     language: str = "informatica"
     translated: str | None = None
     confidence: Confidence = Confidence.MANUAL
+    notes: str | None = None
 
 
 class Step(BaseModel):

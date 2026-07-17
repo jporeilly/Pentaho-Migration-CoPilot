@@ -3,7 +3,6 @@ import Stepper from './components/Stepper.jsx'
 import PageNav from './components/PageNav.jsx'
 import ChangelogModal from './components/ChangelogModal.jsx'
 import SettingsPage from './components/SettingsPage.jsx'
-import ThemeSelect from './components/ThemeSelect.jsx'
 import UploadPage from './pages/UploadPage.jsx'
 import ParsePage from './pages/ParsePage.jsx'
 import MapPage from './pages/MapPage.jsx'
@@ -89,13 +88,12 @@ export default function App() {
           <button className={`nav${showSettings ? ' active' : ''}`} onClick={() => setShowSettings(!showSettings)}>
             ⚙ Settings
           </button>
-          {' '}<ThemeSelect />
         </span>
       </header>
       {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
 
       {showSettings ? (
-        <SettingsPage />
+        <SettingsPage onBack={() => setShowSettings(false)} />
       ) : (
         <>
           <Stepper step={step} maxStep={maxStep} onStep={setStep} />
@@ -130,7 +128,14 @@ export default function App() {
             />
           )}
           {step === 1 && result && <ParsePage result={result} source={source} />}
-          {step === 2 && result && <MapPage result={result} />}
+          {step === 2 && result && (
+            <MapPage
+              result={result}
+              onUpdate={(updated) =>
+                setResults(results.map((r, i) => (i === selected ? updated : r)))
+              }
+            />
+          )}
           {step === 3 && result && <GeneratePage result={result} />}
           {step === 4 && result && <ValidatePage result={result} />}
 

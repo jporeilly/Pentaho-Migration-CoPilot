@@ -27,12 +27,27 @@ def parse(export: Path) -> None:
 def convert(
     export: Path,
     out_dir: Path = typer.Option(Path("output"), "--out", "-o", help="Directory for .ktr files"),
+    translate: bool = typer.Option(
+        False, "--translate", "-t",
+        help="Translate expressions via the configured LLM provider (see Settings)",
+    ),
 ) -> None:
     """Convert a PowerCenter export to PDI .ktr skeletons + migration report."""
     parser = PowerCenterParser()
     mapper = RulesMapper()
     generator = KtrGenerator()
     pipelines = [mapper.apply(p) for p in parser.parse_file(export)]
+
+    if translate:
+        from pdi_migration.llm import ExpressionTranslator, TranslationError
+
+        try:
+            translator = ExpressionTranslator()
+            for pipeline in pipelines:
+                count = translator.translate_pipeline(pipeline)
+                typer.echo(f"translated {count} expression(s) in {pipeline.name}")
+        except TranslationError as exc:
+            typer.echo(f"translation unavailable: {exc}", err=True)
 
     source = assess_source(parser.analyze_export(export), pipelines)
     typer.echo(

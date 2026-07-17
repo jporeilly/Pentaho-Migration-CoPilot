@@ -19,14 +19,12 @@ export default function ThemeSelect() {
 
   return (
     <select
-      className="theme-select"
       value={theme}
       onChange={(e) => setTheme(e.target.value)}
-      title="Color theme"
       aria-label="Color theme"
     >
       {THEMES.map((t) => (
-        <option key={t.id} value={t.id}>🎨 {t.label}</option>
+        <option key={t.id} value={t.id}>{t.label}</option>
       ))}
     </select>
   )

@@ -47,7 +47,14 @@ export default function StepsTable({ steps }) {
               </td>
               <td className="num">{s.fields.length}</td>
               <td className="notes">
-                {[...s.notes, ...s.expressions.map((e) => `TODO ${e.field}: ${e.raw}`)].join('\n')}
+                {[
+                  ...s.notes,
+                  ...s.expressions.map((e) =>
+                    e.translated != null
+                      ? `${e.field} = ${e.translated}${e.notes ? `  (${e.notes})` : ''}`
+                      : `TODO ${e.field}: ${e.raw}`,
+                  ),
+                ].join('\n')}
               </td>
             </tr>
           ))}

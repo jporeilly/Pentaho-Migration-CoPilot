@@ -3,6 +3,36 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [0.5.1] — 2026-07-17
+
+### Added
+
+- **LLM expression translation** — the first AI-assisted stage, per the brief's hybrid
+  design. Two tiers: a deterministic fast-path passes through expressions that are
+  already valid JavaScript (confidence `auto`); everything else goes to the configured
+  Ollama model with a constrained function-mapping prompt (IIF, ISNULL, DECODE, SUBSTR
+  1-based→0-based, TO_DATE→str2date, …) and schema-forced JSON output. Every LLM
+  translation is flagged `review` — never silently trusted. Group By aggregates
+  (SUM/AVG/…) are recognized as natively handled, not sent to the LLM. Failures leave
+  an explicit TODO; they never block conversion.
+- Translated JavaScript is emitted into the generated Modified Java Script step with
+  the original Informatica expression and LLM confidence as comments; the .ktr step
+  description distinguishes "translated — verify" from TODO.
+- `POST /translate` API; `pdi-migrate convert --translate` CLI flag; **✨ Translate**
+  button on the Map page showing live progress and updated results.
+- Verified live against local Ollama (qwen2.5-coder:14b):
+  `IIF(ISNULL(AMOUNT), 0, AMOUNT * 1.2)` → `(AMOUNT == null) ? 0 : AMOUNT * 1.2`.
+
+### Changed
+
+- Settings page: added a clear "← Back to workflow" button; the color-theme picker
+  moved from the masthead into a new Appearance section (user feedback).
+- Source analysis now counts only *untranslated* expressions in its warning.
+
+### Removed
+
+- `mapper/llm.py` stub (superseded by `llm/translate.py`).
+
 ## [0.4.0] — 2026-07-17
 
 ### Added

@@ -20,7 +20,13 @@ from pydantic import BaseModel
 from pdi_migration import __version__
 from pdi_migration.generator import KtrGenerator
 from pdi_migration.ir import Pipeline, SourceInfo
-from pdi_migration.llm import LLMSettings, load_settings, save_settings
+from pdi_migration.llm import (
+    ExpressionTranslator,
+    LLMSettings,
+    TranslationError,
+    load_settings,
+    save_settings,
+)
 from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
@@ -97,6 +103,21 @@ async def convert(export: UploadFile) -> ConversionResponse:
         )
     assess_source(source, pipelines)
     return ConversionResponse(source=source, results=results)
+
+
+@app.post("/translate", response_model=ConversionResult)
+def translate(pipeline: Pipeline) -> ConversionResult:
+    """Translate all untranslated expressions in a mapped pipeline via the
+    configured LLM provider, then regenerate report + .ktr."""
+    try:
+        ExpressionTranslator().translate_pipeline(pipeline)
+    except TranslationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return ConversionResult(
+        pipeline=pipeline,
+        report=build_report(pipeline),
+        ktr=KtrGenerator().generate(pipeline),
+    )
 
 
 class SettingsResponse(BaseModel):

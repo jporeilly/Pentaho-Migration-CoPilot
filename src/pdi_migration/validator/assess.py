@@ -78,7 +78,10 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
                  f"{source.database_type or 'source-database'} dialect differences.",
         ))
 
-    expressions = sum(len(s.expressions) for p in pipelines for s in p.steps)
+    expressions = sum(
+        1 for p in pipelines for s in p.steps for e in s.expressions
+        if e.translated is None
+    )
     if expressions:
         warn(SourceWarning(
             level=WarningLevel.INFO,
