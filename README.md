@@ -1,4 +1,4 @@
-# Migration Copilot (PDI-Migration)
+# PDI Migration Copilot
 
 AI-assisted migration of legacy ETL (Informatica, SSIS, Talend, DataStage) into native
 Pentaho Data Integration pipelines. See `docs/` for the technical brief.
