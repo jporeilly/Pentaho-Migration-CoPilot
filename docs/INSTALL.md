@@ -54,3 +54,22 @@ Extras:
 ```
 
 Then open <http://127.0.0.1:8321> (UI) or <http://127.0.0.1:8321/docs> (Swagger).
+
+## Optional: LLM expression translation
+
+Install [Ollama](https://ollama.com), start it, then open **⚙ Settings** in the UI —
+it detects your hardware (multi-GPU VRAM aggregates), recommends a model, and pulls
+it with one click. Settings persist to `config/settings.json`.
+
+## Optional: Docker
+
+```bash
+docker build -t migration-copilot .
+docker run -p 8321:8321 migration-copilot
+```
+
+## Optional: hardening
+
+- `PDI_MIGRATION_API_KEY=<secret>` — requires an `X-API-Key` header on all mutating
+  endpoints (unset by default for frictionless local use).
+- Uploads are capped at 50 MB.

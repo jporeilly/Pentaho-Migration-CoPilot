@@ -35,14 +35,19 @@ A guided dashboard walks each conversion through the pipeline with a stepper:
    mapping — human converts).
 4. **Generate** — preview and download the .ktr; it opens as an editable transformation
    in Spoon, with all TODOs carried into step descriptions.
-5. **Validate** — migration report and a human review checklist; the runtime diff
-   harness (run old vs. new on sample data, diff outputs) is the next major milestone.
+5. **Validate** — migration confidence score (0–100, A–E), human review checklist,
+   **sandbox test kit** (PDI setup guide, CREATE TABLE DDL inferred from the export's
+   field metadata, seeded synthetic test CSVs — so first runs happen safely against a
+   sandbox database, never production), **measured output parity** (upload old vs. new
+   CSV outputs for a PASS/NEAR/FAIL diff), and report downloads (markdown/JSON).
 
-Also in the UI: multi-mapping selector (real exports hold up to 32 mappings per file),
-four color themes (Midnight, Slate, Pentaho, Light), a version badge that pops up the
-changelog, and a **⚙ Settings** page that auto-detects your hardware (RAM, NVIDIA VRAM),
-`OLLAMA_*` environment, and running Ollama server, then recommends and pulls the right
-local model for expression translation.
+Also in the UI: a **📁 Project** page (the batch-converted portfolio — click any
+mapping to walk through its conversion; track review status per mapping), multi-mapping
+selector (real exports hold up to 32 mappings per file), four color themes, a version
+badge that pops up the changelog, and a **⚙ Settings** page that auto-detects your
+hardware (RAM, NVIDIA GPUs — multi-GPU VRAM aggregates), `OLLAMA_*` environment, and
+running Ollama server, then recommends and pulls the right local model for expression
+translation.
 
 ## Architecture
 
@@ -53,10 +58,12 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | --- | --- | --- |
 | Parser (Parse) | `src/pdi_migration/parser/` | PowerCenter XML → normalized Pydantic IR; source analysis with version detection. Zero failures across the 50-file real corpus |
 | Rules mapper (Map) | `src/pdi_migration/mapper/` + `rules/powercenter_to_pdi.yaml` | 17 transformation-type rules with per-rule confidence; unknown types → explicit manual handoff |
-| LLM translator (Map) | `src/pdi_migration/llm/` | Working: deterministic fast-path + constrained Ollama translation (schema-forced JSON, function-mapping prompt); every LLM output flagged `review` |
+| LLM translator (Map) | `src/pdi_migration/llm/` | Working: deterministic fast-path + constrained Ollama translation (schema-forced JSON, function-mapping prompt); every LLM output flagged `review`; hardware detection recommends the model (multi-GPU aware) |
 | KTR generator (Generate) | `src/pdi_migration/generator/` | Steps, hops, layout + real config for Table Input (SQL), Table Output, Sort, Group By (keys + aggregates), script steps |
-| Validator (Validate) | `src/pdi_migration/validator/` | Migration report, corpus gap analysis, pre-migration assessment; runtime diff harness stubbed |
-| API | `src/pdi_migration/api/` | `/convert`, `/parse`, `/settings`, `/changelog`, `/brief`, `/sample`, `/health` — Swagger at `/docs` |
+| Validator (Validate) | `src/pdi_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact analysis, confidence score, CSV diff harness (measured parity) |
+| Sandbox kits | `src/pdi_migration/sandbox.py` | Per-mapping setup guide, inferred DDL, seeded synthetic test data |
+| Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status |
+| API | `src/pdi_migration/api/` | convert/parse/translate/sandbox/diff/project/settings + docs pages — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 
 ## Quick start

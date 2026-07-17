@@ -3,7 +3,7 @@
 from fastapi.testclient import TestClient
 
 from pdi_migration.api.main import app
-from pdi_migration.llm.detect import ollama_base_url, recommend
+from pdi_migration.llm.detect import ollama_base_url, parse_nvidia_smi, recommend
 
 client = TestClient(app)
 
@@ -20,6 +20,27 @@ class TestOllamaBaseUrl:
     def test_explicit_host_port_preserved(self, monkeypatch):
         monkeypatch.setenv("OLLAMA_HOST", "gpu-box:11435")
         assert ollama_base_url() == "http://gpu-box:11435"
+
+
+class TestMultiGpu:
+    def test_two_identical_cards_aggregate(self):
+        output = "NVIDIA GeForce RTX 3060, 12288\nNVIDIA GeForce RTX 3060, 12288\n"
+        name, vram, count = parse_nvidia_smi(output)
+        assert name == "2× NVIDIA GeForce RTX 3060"
+        assert vram == 24.0
+        assert count == 2
+
+    def test_single_card(self):
+        name, vram, count = parse_nvidia_smi("NVIDIA GeForce RTX 3060, 12288\n")
+        assert name == "NVIDIA GeForce RTX 3060"
+        assert vram == 12.0
+        assert count == 1
+
+    def test_dual_3060_recommends_32b_with_spread(self):
+        rec = recommend(ram_gb=64, vram_gb=24.0, gpu_count=2)
+        assert rec.model == "qwen2.5-coder:32b"
+        assert rec.env_suggestions["OLLAMA_SCHED_SPREAD"] == "1"
+        assert "split across 2 GPUs" in rec.reason
 
 
 class TestRecommend:

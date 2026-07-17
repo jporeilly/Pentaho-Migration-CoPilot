@@ -27,6 +27,7 @@ OLLAMA_ENV_VARS = (
     "OLLAMA_MAX_LOADED_MODELS",
     "OLLAMA_FLASH_ATTENTION",
     "OLLAMA_KV_CACHE_TYPE",
+    "OLLAMA_SCHED_SPREAD",
 )
 
 
@@ -46,8 +47,9 @@ class OllamaStatus(BaseModel):
 class DetectionReport(BaseModel):
     platform: str
     ram_gb: float | None
-    vram_gb: float | None
-    gpu_name: str | None
+    vram_gb: float | None      # total across all GPUs
+    gpu_name: str | None       # e.g. "2× NVIDIA GeForce RTX 3060"
+    gpu_count: int = 0
     env: dict[str, str]
     anthropic_key_present: bool
     ollama: OllamaStatus
@@ -93,19 +95,40 @@ def total_ram_gb() -> float | None:
         return None
 
 
-def nvidia_gpu() -> tuple[str | None, float | None]:
-    """(gpu_name, vram_gb) via nvidia-smi, or (None, None) without an NVIDIA GPU."""
+def parse_nvidia_smi(output: str) -> tuple[str | None, float | None, int]:
+    """(display_name, total_vram_gb, gpu_count) from nvidia-smi CSV output.
+    Multiple GPUs aggregate VRAM — Ollama layer-splits models across them."""
+    lines = [line for line in output.strip().splitlines() if line.strip()]
+    if not lines:
+        return None, None, 0
+    names, total_mb = [], 0.0
+    for line in lines:
+        name, mem_mb = line.rsplit(",", 1)
+        names.append(name.strip())
+        total_mb += float(mem_mb)
+    count = len(names)
+    if count == 1:
+        display = names[0]
+    elif len(set(names)) == 1:
+        display = f"{count}× {names[0]}"
+    else:
+        display = " + ".join(names)
+    return display, round(total_mb / 1024, 1), count
+
+
+def nvidia_gpu() -> tuple[str | None, float | None, int]:
+    """(display_name, total_vram_gb, gpu_count) via nvidia-smi; (None, None, 0)
+    without an NVIDIA GPU."""
     try:
         out = subprocess.run(
             ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader,nounits"],
             capture_output=True, text=True, timeout=5,
         )
         if out.returncode != 0 or not out.stdout.strip():
-            return None, None
-        name, mem_mb = out.stdout.strip().splitlines()[0].rsplit(",", 1)
-        return name.strip(), round(float(mem_mb) / 1024, 1)
+            return None, None, 0
+        return parse_nvidia_smi(out.stdout)
     except Exception:
-        return None, None
+        return None, None, 0
 
 
 def ollama_status() -> OllamaStatus:
@@ -122,22 +145,33 @@ def ollama_status() -> OllamaStatus:
     return status
 
 
-def recommend(ram_gb: float | None, vram_gb: float | None) -> Recommendation:
+def recommend(
+    ram_gb: float | None, vram_gb: float | None, gpu_count: int = 1
+) -> Recommendation:
     """Pick a code-oriented model sized to the hardware.
 
     Expression translation is a short-context structured-code task, so the
     qwen2.5-coder family is the default ladder; the constraint is memory.
+    Multi-GPU rigs aggregate VRAM (Ollama layer-splits across cards).
     """
     env = {
         "OLLAMA_KEEP_ALIVE": "30m",   # batch translation: keep the model warm between mappings
         "OLLAMA_NUM_PARALLEL": "2",   # short prompts; mild parallelism is safe
     }
+    multi = gpu_count > 1
+    if multi:
+        env["OLLAMA_SCHED_SPREAD"] = "1"  # spread layers across all GPUs
     if vram_gb:
         env["OLLAMA_FLASH_ATTENTION"] = "1"
         if vram_gb >= 24:
+            split_note = (
+                f" split across {gpu_count} GPUs — best quality; qwen2.5-coder:14b "
+                "on a single card is the faster alternative" if multi
+                else " fully on GPU — best translation quality"
+            )
             return Recommendation(
                 model="qwen2.5-coder:32b",
-                reason=f"{vram_gb} GB VRAM fits the 32B coder model fully on GPU — best translation quality.",
+                reason=f"{vram_gb} GB total VRAM fits the 32B coder model{split_note}.",
                 env_suggestions=env,
             )
         if vram_gb >= 12:
@@ -178,14 +212,15 @@ def recommend(ram_gb: float | None, vram_gb: float | None) -> Recommendation:
 
 def detection_report() -> DetectionReport:
     ram = total_ram_gb()
-    gpu_name, vram = nvidia_gpu()
+    gpu_name, vram, gpu_count = nvidia_gpu()
     return DetectionReport(
         platform=f"{platform.system()} {platform.release()}",
         ram_gb=ram,
         vram_gb=vram,
         gpu_name=gpu_name,
+        gpu_count=gpu_count,
         env={k: v for k in OLLAMA_ENV_VARS if (v := os.environ.get(k))},
         anthropic_key_present=bool(os.environ.get("ANTHROPIC_API_KEY")),
         ollama=ollama_status(),
-        recommendation=recommend(ram, vram),
+        recommendation=recommend(ram, vram, gpu_count),
     )

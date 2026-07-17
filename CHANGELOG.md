@@ -25,6 +25,12 @@ deliberately — not one per work session.
 - `pdi-migrate batch --translate`: run a whole corpus through the configured LLM.
 - Swagger /docs shows a "← Back to Migration Copilot" link; the masthead API-docs
   link opens in a new tab.
+- Multi-GPU detection: all NVIDIA cards are counted and VRAM aggregates (Ollama
+  layer-splits across cards); with 2× RTX 3060 (24 GB) the recommendation steps up
+  to qwen2.5-coder:32b with `OLLAMA_SCHED_SPREAD=1`, noting 14b as the faster
+  single-card alternative.
+- README and INSTALL updated: sandbox kits, project store, diff harness, multi-GPU
+  detection, Docker, and hardening are documented.
 
 ## [1.8.0] — 2026-07-17
 
