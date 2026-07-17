@@ -7,6 +7,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+### Fixed
+
+- Project table overlap: score chips no longer wrap, timestamps render compactly,
+  long mapping/file names ellipsize, and the table scrolls horizontally in its own
+  container instead of crowding the card edge.
+
 ## [1.8.0] — 2026-07-17
 
 ### Added

@@ -34,10 +34,12 @@ def test_version_markers_agree():
     assert f"**{__version__}**" in version_md, "VERSION.md not bumped"
 
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    first_entry = re.search(r"^## \[([^\]]+)\]", changelog, re.MULTILINE)
-    assert first_entry, "CHANGELOG.md has no release entries"
-    assert first_entry.group(1) == __version__, (
-        f"newest CHANGELOG entry is {first_entry.group(1)}, but the code version "
+    entries = re.findall(r"^## \[([^\]]+)\]", changelog, re.MULTILINE)
+    # an [Unreleased] section may accumulate work between deliberate releases
+    released = [e for e in entries if e.lower() != "unreleased"]
+    assert released, "CHANGELOG.md has no release entries"
+    assert released[0] == __version__, (
+        f"newest CHANGELOG release is {released[0]}, but the code version "
         f"is {__version__} — add a changelog entry for this release"
     )
 

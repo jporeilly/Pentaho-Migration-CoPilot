@@ -244,8 +244,14 @@ button.nav.active { text-decoration: underline; }
 /* ---------- score ---------- */
 .score-chip {
   font-size: .8rem; font-weight: 650; padding: .15rem .7rem; border-radius: 99px;
-  background: var(--surface-2);
+  background: var(--surface-2); white-space: nowrap;
 }
+
+.table-scroll { overflow-x: auto; }
+.project-table { min-width: 880px; }
+.project-table td { background: var(--surface-2); }
+.cell-clip { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cell-time { color: var(--text-muted); font-size: .8rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .score-chip.grade-A, .score-chip.grade-B { color: var(--status-good); }
 .score-chip.grade-C { color: var(--status-warning); }
 .score-chip.grade-D, .score-chip.grade-E { color: var(--status-serious); }

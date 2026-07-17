@@ -52,43 +52,45 @@ export default function ProjectPage() {
       <p className="summary">
         {STATUSES.map((s) => `${STATUS_ICON[s]} ${s.replace('_', ' ')}: ${counts[s] || 0}`).join(' · ')}
       </p>
-      <table>
-        <thead>
-          <tr>
-            <th className="num">Score</th><th>Mapping</th><th>Export file</th>
-            <th className="num">Steps</th><th className="num">Auto</th>
-            <th className="num">Review</th><th className="num">Manual</th>
-            <th>Status</th><th>Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={`${r.file}:${r.mapping}`}>
-              <td className="num">
-                <span className={`score-chip grade-${r.grade}`}>{r.score} {r.grade}</span>
-              </td>
-              <td>{r.mapping}</td>
-              <td className="notes">{r.file}</td>
-              <td className="num">{r.steps}</td>
-              <td className="num">{r.auto}</td>
-              <td className="num">{r.review}</td>
-              <td className="num">{r.manual}</td>
-              <td>
-                <select
-                  className="status-select"
-                  value={r.status}
-                  onChange={(e) => updateStatus(r, e.target.value)}
-                >
-                  {STATUSES.map((s) => (
-                    <option key={s} value={s}>{s.replace('_', ' ')}</option>
-                  ))}
-                </select>
-              </td>
-              <td className="notes">{r.updated_at}</td>
+      <div className="table-scroll">
+        <table className="project-table">
+          <thead>
+            <tr>
+              <th className="num">Score</th><th>Mapping</th><th>Export file</th>
+              <th className="num">Steps</th><th className="num">Auto</th>
+              <th className="num">Review</th><th className="num">Manual</th>
+              <th>Status</th><th>Updated</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={`${r.file}:${r.mapping}`}>
+                <td className="num">
+                  <span className={`score-chip grade-${r.grade}`}>{r.score} {r.grade}</span>
+                </td>
+                <td className="cell-clip" title={r.mapping}>{r.mapping}</td>
+                <td className="notes cell-clip" title={r.file}>{r.file}</td>
+                <td className="num">{r.steps}</td>
+                <td className="num">{r.auto}</td>
+                <td className="num">{r.review}</td>
+                <td className="num">{r.manual}</td>
+                <td>
+                  <select
+                    className="status-select"
+                    value={r.status}
+                    onChange={(e) => updateStatus(r, e.target.value)}
+                  >
+                    {STATUSES.map((s) => (
+                      <option key={s} value={s}>{s.replace('_', ' ')}</option>
+                    ))}
+                  </select>
+                </td>
+                <td className="cell-time">{r.updated_at.slice(0, 16)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }
