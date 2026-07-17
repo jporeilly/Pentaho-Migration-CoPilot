@@ -113,7 +113,7 @@ export default function App() {
       {view === 'settings' ? (
         <SettingsPage onBack={() => setView('workflow')} />
       ) : view === 'project' ? (
-        <ProjectPage />
+        <ProjectPage onBack={() => setView('workflow')} />
       ) : (
         <>
           <Stepper step={step} maxStep={maxStep} onStep={setStep} />

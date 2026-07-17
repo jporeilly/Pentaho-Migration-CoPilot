@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 const STATUSES = ['converted', 'in_review', 'verified', 'failed']
 const STATUS_ICON = { converted: '·', in_review: '⚠', verified: '✓', failed: '✋' }
 
-export default function ProjectPage() {
+export default function ProjectPage({ onBack }) {
   const [rows, setRows] = useState(null)
 
   const refresh = useCallback(async () => {
@@ -26,6 +26,8 @@ export default function ProjectPage() {
 
   if (!rows.length) {
     return (
+      <>
+      <button className="ghost back-btn" onClick={onBack}>← Back to workflow</button>
       <section className="card">
         <h2>Migration project</h2>
         <p className="hint-line">
@@ -37,6 +39,7 @@ export default function ProjectPage() {
           can track through <em>converted → in review → verified</em>.
         </p>
       </section>
+      </>
     )
   }
 
@@ -44,6 +47,8 @@ export default function ProjectPage() {
   const avg = Math.round(rows.reduce((n, r) => n + r.score, 0) / rows.length)
 
   return (
+    <>
+    <button className="ghost back-btn" onClick={onBack}>← Back to workflow</button>
     <section className="card">
       <header>
         <h2>Migration project <span>{rows.length} mappings · avg confidence {avg}/100</span></h2>
@@ -92,5 +97,6 @@ export default function ProjectPage() {
         </table>
       </div>
     </section>
+    </>
   )
 }

@@ -14,6 +14,7 @@ deliberately — not one per work session.
 - Project table overlap: score chips no longer wrap, timestamps render compactly,
   long mapping/file names ellipsize, and the table scrolls horizontally in its own
   container instead of crowding the card edge.
+- Project page has a "← Back to workflow" button (matching Settings).
 
 ## [1.8.0] — 2026-07-17
 
