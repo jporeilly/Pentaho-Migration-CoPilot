@@ -4,8 +4,22 @@ from pdi_migration.ir.models import (
     FieldDef,
     Hop,
     Pipeline,
+    SourceInfo,
     SourceTool,
+    SourceWarning,
     Step,
+    WarningLevel,
 )
 
-__all__ = ["Confidence", "Expression", "FieldDef", "Hop", "Pipeline", "SourceTool", "Step"]
+__all__ = [
+    "Confidence",
+    "Expression",
+    "FieldDef",
+    "Hop",
+    "Pipeline",
+    "SourceInfo",
+    "SourceTool",
+    "SourceWarning",
+    "Step",
+    "WarningLevel",
+]

@@ -3,6 +3,29 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [0.4.0] — 2026-07-17
+
+### Added
+
+- **Workflow dashboard UI**: a guided stepper (Upload → Parse → Map → Generate →
+  Validate) with one page per pipeline stage, next/back navigation, a workbench bar
+  with mapping selector for multi-mapping exports, and a "New upload" reset.
+- **Source analysis before migration**: detects the PowerCenter release from the
+  repository version (8.1 → 10.5 map), repository/database/codepage/export-date facts,
+  object counts (mappings, workflows, sessions, mapplets), and plain-language
+  pre-migration warnings — workflow/session orchestration not converted, mapplets not
+  expanded, unmapped step types (Stored Procedure, Custom, Transaction Control), SQL
+  overrides needing dialect review, untranslated expressions, old-version cautions,
+  workflow-only exports (previously a silent no-op). Shown on the Parse page, in the
+  CLI `convert` output, and surfaced even when an export contains no mappings.
+- **Color themes**: Midnight (default), Slate, Pentaho, Light — picker in the
+  masthead, persisted in localStorage, applied before first paint.
+- Upload page explains the product using the technical brief (opportunity, four-stage
+  cards, phase roadmap); the brief PDF is served at `/brief` and linked in the masthead.
+- Corpus grown to **50 verified real exports** (148 mappings, 1,316 steps) across six
+  repository versions (PowerCenter ~9.0 → 10.5); gap analysis: 54% auto, three unmapped
+  types remaining. Zero parser failures corpus-wide.
+
 ## [0.3.0] — 2026-07-17
 
 ### Added

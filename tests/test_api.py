@@ -23,11 +23,13 @@ def test_index_serves_ui():
     assert "Migration" in res.text
 
 
-def test_convert_returns_report_and_ktr():
+def test_convert_returns_source_report_and_ktr():
     with open(SAMPLE, "rb") as f:
         res = client.post("/convert", files={"export": ("m_load_sales.xml", f, "text/xml")})
     assert res.status_code == 200
-    (result,) = res.json()
+    body = res.json()
+    assert body["source"]["tool"] == "Informatica PowerCenter"
+    (result,) = body["results"]
     assert result["report"]["total_steps"] == 5
     assert result["pipeline"]["name"] == "m_load_sales"
     assert "<transformation>" in result["ktr"]

@@ -8,7 +8,30 @@ principle that accuracy in this stage is non-negotiable.
 from pathlib import Path
 from xml.etree import ElementTree
 
-from pdi_migration.ir import Confidence, Expression, FieldDef, Hop, Pipeline, SourceTool, Step
+from pdi_migration.ir import (
+    Confidence,
+    Expression,
+    FieldDef,
+    Hop,
+    Pipeline,
+    SourceInfo,
+    SourceTool,
+    Step,
+)
+
+# REPOSITORY_VERSION attribute -> PowerCenter product release.
+REPOSITORY_VERSIONS = {
+    "177.85": "8.1",
+    "178.87": "8.5",
+    "181.90": "8.6",
+    "179.88": "9.0/9.1",
+    "182.91": "9.6",
+    "184.93": "10.1",
+    "186.95": "10.2",
+    "187.96": "10.4.0",
+    "188.97": "10.4.1",
+    "189.98": "10.5",
+}
 
 
 class PowerCenterParseError(Exception):
@@ -17,16 +40,34 @@ class PowerCenterParseError(Exception):
 
 class PowerCenterParser:
     def parse_file(self, path: str | Path) -> list[Pipeline]:
-        tree = ElementTree.parse(path)
-        root = tree.getroot()
+        return [self._parse_mapping(m) for m in self._root(path).iter("MAPPING")]
+
+    def analyze_export(self, path: str | Path) -> SourceInfo:
+        """Export-level facts: tool version, repository, object counts."""
+        root = self._root(path)
+        repository = root.find("REPOSITORY")
+        repo_version = root.get("REPOSITORY_VERSION")
+        return SourceInfo(
+            repository_version=repo_version,
+            product_version=REPOSITORY_VERSIONS.get(repo_version or ""),
+            repository_name=repository.get("NAME") if repository is not None else None,
+            database_type=repository.get("DATABASETYPE") if repository is not None else None,
+            codepage=repository.get("CODEPAGE") if repository is not None else None,
+            creation_date=root.get("CREATION_DATE"),
+            folders=[f.get("NAME", "") for f in root.iter("FOLDER")],
+            mappings=sum(1 for _ in root.iter("MAPPING")),
+            workflows=sum(1 for _ in root.iter("WORKFLOW")),
+            sessions=sum(1 for _ in root.iter("SESSION")),
+            mapplets=sum(1 for _ in root.iter("MAPPLET")),
+        )
+
+    def _root(self, path: str | Path) -> ElementTree.Element:
+        root = ElementTree.parse(path).getroot()
         if root.tag != "POWERMART":
             raise PowerCenterParseError(
                 f"{path}: expected a PowerCenter export (root POWERMART), got <{root.tag}>"
             )
-        return [
-            self._parse_mapping(mapping)
-            for mapping in root.iter("MAPPING")
-        ]
+        return root
 
     def _parse_mapping(self, mapping: ElementTree.Element) -> Pipeline:
         pipeline = Pipeline(

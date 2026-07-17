@@ -11,7 +11,7 @@ import typer
 from pdi_migration.generator import KtrGenerator
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import build_gap_report, build_report
+from pdi_migration.validator import assess_source, build_gap_report, build_report
 
 app = typer.Typer(help="Migration Copilot: legacy ETL -> Pentaho Data Integration.")
 
@@ -29,10 +29,21 @@ def convert(
     out_dir: Path = typer.Option(Path("output"), "--out", "-o", help="Directory for .ktr files"),
 ) -> None:
     """Convert a PowerCenter export to PDI .ktr skeletons + migration report."""
+    parser = PowerCenterParser()
     mapper = RulesMapper()
     generator = KtrGenerator()
-    for pipeline in PowerCenterParser().parse_file(export):
-        mapper.apply(pipeline)
+    pipelines = [mapper.apply(p) for p in parser.parse_file(export)]
+
+    source = assess_source(parser.analyze_export(export), pipelines)
+    typer.echo(
+        f"source: {source.tool} {source.product_version or '?'} "
+        f"(repository {source.repository_version or '?'}), "
+        f"{source.database_type or 'unknown db'}, exported {source.creation_date or '?'}"
+    )
+    for warning in source.warnings:
+        typer.echo(f"  [{warning.level.value}] {warning.text}")
+
+    for pipeline in pipelines:
         out_path = generator.write(pipeline, out_dir)
         report = build_report(pipeline)
         typer.echo(f"{pipeline.name} -> {out_path}")

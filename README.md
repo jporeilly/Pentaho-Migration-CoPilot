@@ -60,12 +60,13 @@ and mirrored helper scripts — `scripts\dev.ps1` (Windows 11), `scripts/dev.sh`
 
 ## Real-world corpus
 
-`samples/informatica/` holds genuine PowerCenter exports (24 files, 118 mappings)
-spanning six repository versions (~9.0 to 10.5), sourced from public repos — the
-[HHS/Informatica](https://github.com/HHS/Informatica) production payroll ETL plus
-production and coursework exports from a dozen other authors. Used to measure
-mapper coverage with `pdi-migrate gaps`. All 24 parse with zero errors, including
-a 7.2 MB export with 11,327 connectors.
+`samples/informatica/` holds genuine PowerCenter exports (50 files, 148 mappings,
+1,316 steps) spanning six repository versions (~9.0 to 10.5), sourced from public
+repos — the [HHS/Informatica](https://github.com/HHS/Informatica) production payroll
+ETL, a Russian production DWH framework, and production/coursework exports from a
+dozen other authors. Used to measure mapper coverage with `pdi-migrate gaps`
+(currently 54% auto). All 50 parse with zero errors, including a 7.2 MB export
+with 11,327 connectors.
 
 ## Tests
 
@@ -80,8 +81,9 @@ a 7.2 MB export with 11,327 connectors.
 - [x] KTR skeleton generation with confidence + TODO annotations
 - [x] Static migration report (auto/review/manual counts)
 - [x] Per-step-type KTR config emission: Table Input (SQL), Table Output, Sort keys, Group By keys + aggregates, script placeholder with typed output fields
-- [x] Review UI: React (Vite) served at / by FastAPI — tiles, flow diagram, step table, .ktr download
-- [x] Real-export corpus (110 mappings) + `gaps` coverage analysis — currently 53% auto, 47% review, 1 unmapped type
+- [x] Review UI: React (Vite) dashboard served at / by FastAPI — guided stepper (Upload/Parse/Map/Generate/Validate), tiles, flow diagram, step table, .ktr download, themes
+- [x] Pre-migration source analysis: PowerCenter version detection + plain-language risk warnings
+- [x] Real-export corpus (50 files, 148 mappings, PC ~9.0–10.5) + `gaps` coverage analysis — currently 54% auto, 3 unmapped types (Stored Procedure, Custom, Transaction Control)
 - [ ] Per-step-type config for remaining rule types (Merge Join keys, Stream Lookup, Insert/Update)
 - [ ] LLM expression translation (Informatica expression language -> PDI), constrained by validated examples — 4,160 real expressions waiting in the corpus
 - [ ] Runtime diff harness: run old vs. new on sample data, diff outputs

@@ -19,13 +19,13 @@ from pydantic import BaseModel
 
 from pdi_migration import __version__
 from pdi_migration.generator import KtrGenerator
-from pdi_migration.ir import Pipeline
+from pdi_migration.ir import Pipeline, SourceInfo
 from pdi_migration.llm import LLMSettings, load_settings, save_settings
 from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
-from pdi_migration.validator import MigrationReport, build_report
+from pdi_migration.validator import MigrationReport, assess_source, build_report
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 UI_DIST = REPO_ROOT / "frontend" / "dist"
@@ -38,6 +38,11 @@ class ConversionResult(BaseModel):
     pipeline: Pipeline
     report: MigrationReport
     ktr: str
+
+
+class ConversionResponse(BaseModel):
+    source: SourceInfo
+    results: list[ConversionResult]
 
 
 @app.get("/sample", include_in_schema=False)
@@ -58,19 +63,30 @@ def changelog() -> str:
     return path.read_text(encoding="utf-8") if path.exists() else "No changelog available."
 
 
+@app.get("/brief", include_in_schema=False)
+def technical_brief() -> FileResponse:
+    """The technical product brief PDF, linked from the UI masthead."""
+    path = REPO_ROOT / "docs" / "Migration_Copilot_Technical_Brief.pdf"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Technical brief not found in docs/.")
+    return FileResponse(path, media_type="application/pdf")
+
+
 @app.post("/parse", response_model=list[Pipeline])
 async def parse(export: UploadFile) -> list[Pipeline]:
     """Parse a PowerCenter XML export into the normalized IR."""
-    return _parse_upload(await export.read())
+    pipelines, _ = _parse_upload(await export.read())
+    return pipelines
 
 
-@app.post("/convert", response_model=list[ConversionResult])
-async def convert(export: UploadFile) -> list[ConversionResult]:
-    """Full conversion: parse -> map -> generate. Returns IR, report, and .ktr XML."""
+@app.post("/convert", response_model=ConversionResponse)
+async def convert(export: UploadFile) -> ConversionResponse:
+    """Full conversion: source analysis + parse -> map -> generate per mapping."""
     mapper = RulesMapper()
     generator = KtrGenerator()
+    pipelines, source = _parse_upload(await export.read())
     results = []
-    for pipeline in _parse_upload(await export.read()):
+    for pipeline in pipelines:
         mapper.apply(pipeline)
         results.append(
             ConversionResult(
@@ -79,7 +95,8 @@ async def convert(export: UploadFile) -> list[ConversionResult]:
                 ktr=generator.generate(pipeline),
             )
         )
-    return results
+    assess_source(source, pipelines)
+    return ConversionResponse(source=source, results=results)
 
 
 class SettingsResponse(BaseModel):
@@ -141,12 +158,13 @@ def pull_status() -> dict[str, str]:
     return _pull_state
 
 
-def _parse_upload(data: bytes) -> list[Pipeline]:
+def _parse_upload(data: bytes) -> tuple[list[Pipeline], SourceInfo]:
     with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as tmp:
         tmp.write(data)
         tmp_path = Path(tmp.name)
     try:
-        return PowerCenterParser().parse_file(tmp_path)
+        parser = PowerCenterParser()
+        return parser.parse_file(tmp_path), parser.analyze_export(tmp_path)
     except (PowerCenterParseError, SyntaxError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:

@@ -61,6 +61,35 @@ class Hop(BaseModel):
     to_step: str
 
 
+class WarningLevel(str, Enum):
+    INFO = "info"
+    WARNING = "warning"
+    SERIOUS = "serious"
+
+
+class SourceWarning(BaseModel):
+    level: WarningLevel
+    text: str
+
+
+class SourceInfo(BaseModel):
+    """Export-level facts about the source tool, surfaced before migration."""
+
+    tool: str = "Informatica PowerCenter"
+    repository_version: str | None = None   # e.g. "187.96"
+    product_version: str | None = None      # e.g. "10.4.0"
+    repository_name: str | None = None
+    database_type: str | None = None
+    codepage: str | None = None
+    creation_date: str | None = None
+    folders: list[str] = Field(default_factory=list)
+    mappings: int = 0
+    workflows: int = 0
+    sessions: int = 0
+    mapplets: int = 0
+    warnings: list[SourceWarning] = Field(default_factory=list)
+
+
 class Pipeline(BaseModel):
     name: str
     source_tool: SourceTool

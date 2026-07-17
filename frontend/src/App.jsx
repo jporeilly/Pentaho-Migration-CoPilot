@@ -1,16 +1,26 @@
 import { useEffect, useState } from 'react'
-import DropZone from './components/DropZone.jsx'
-import PipelineCard from './components/PipelineCard.jsx'
+import Stepper from './components/Stepper.jsx'
+import PageNav from './components/PageNav.jsx'
 import ChangelogModal from './components/ChangelogModal.jsx'
 import SettingsPage from './components/SettingsPage.jsx'
+import ThemeSelect from './components/ThemeSelect.jsx'
+import UploadPage from './pages/UploadPage.jsx'
+import ParsePage from './pages/ParsePage.jsx'
+import MapPage from './pages/MapPage.jsx'
+import GeneratePage from './pages/GeneratePage.jsx'
+import ValidatePage from './pages/ValidatePage.jsx'
 
 export default function App() {
   const [results, setResults] = useState([])
+  const [source, setSource] = useState(null)
+  const [fileName, setFileName] = useState('')
+  const [selected, setSelected] = useState(0)
+  const [step, setStep] = useState(0)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [version, setVersion] = useState('')
   const [showChangelog, setShowChangelog] = useState(false)
-  const [view, setView] = useState('convert')
+  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     fetch('/health')
@@ -18,6 +28,9 @@ export default function App() {
       .then((h) => setVersion(h.version))
       .catch(() => {})
   }, [])
+
+  const maxStep = results.length ? 4 : 0
+  const result = results[selected]
 
   async function convert(file) {
     setError(null)
@@ -30,9 +43,15 @@ export default function App() {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.detail || res.statusText)
       }
-      setResults(await res.json())
+      const data = await res.json()
+      setSource(data.source)
+      setResults(data.results)
+      setFileName(file.name)
+      setSelected(0)
+      if (data.results.length) setStep(1)
     } catch (err) {
       setResults([])
+      setSource(null)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -45,46 +64,79 @@ export default function App() {
     convert(new File([blob], 'm_load_sales.xml', { type: 'text/xml' }))
   }
 
+  function reset() {
+    setResults([])
+    setSource(null)
+    setFileName('')
+    setStep(0)
+    setError(null)
+  }
+
   return (
     <div className="app">
       <header className="masthead">
         <h1>
           Migration <em>Copilot</em>
           {version && (
-            <button
-              className="version"
-              onClick={() => setShowChangelog(true)}
-              title="What's new — view the changelog"
-            >
+            <button className="version" onClick={() => setShowChangelog(true)} title="What's new — view the changelog">
               v{version}
             </button>
           )}
         </h1>
         <span className="links">
-          Informatica PowerCenter → Pentaho Data Integration · <a href="/docs">API docs</a> ·{' '}
-          <button
-            className={`nav${view === 'settings' ? ' active' : ''}`}
-            onClick={() => setView(view === 'settings' ? 'convert' : 'settings')}
-          >
+          Informatica PowerCenter → Pentaho Data Integration ·{' '}
+          <a href="/brief" target="_blank" rel="noreferrer">Technical brief</a> · <a href="/docs">API docs</a> ·{' '}
+          <button className={`nav${showSettings ? ' active' : ''}`} onClick={() => setShowSettings(!showSettings)}>
             ⚙ Settings
           </button>
+          {' '}<ThemeSelect />
         </span>
       </header>
       {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
-      <p className="tagline">
-        Phase 0 internal tool — parse, map, and generate .ktr with per-step confidence.
-      </p>
 
-      {view === 'settings' ? (
+      {showSettings ? (
         <SettingsPage />
       ) : (
         <>
-          <DropZone onFile={convert} onSample={loadSample} />
-          {error && <div className="error">Conversion failed: {error}</div>}
-          {loading && <p className="loading">Converting…</p>}
-          {results.map((r) => (
-            <PipelineCard key={r.pipeline.name} result={r} />
-          ))}
+          <Stepper step={step} maxStep={maxStep} onStep={setStep} />
+
+          {results.length > 0 && (
+            <div className="workbench-bar">
+              <span className="file-chip" title={fileName}>📄 {fileName}</span>
+              {results.length > 1 && (
+                <label className="mapping-select">
+                  Mapping
+                  <select value={selected} onChange={(e) => setSelected(Number(e.target.value))}>
+                    {results.map((r, i) => (
+                      <option key={r.pipeline.name} value={i}>
+                        {r.pipeline.name} ({r.pipeline.steps.length} steps)
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              <span className="spacer" />
+              <button className="ghost" onClick={reset}>New upload</button>
+            </div>
+          )}
+
+          {step === 0 && (
+            <UploadPage
+              onFile={convert}
+              onSample={loadSample}
+              error={error}
+              loading={loading}
+              source={results.length === 0 ? source : null}
+            />
+          )}
+          {step === 1 && result && <ParsePage result={result} source={source} />}
+          {step === 2 && result && <MapPage result={result} />}
+          {step === 3 && result && <GeneratePage result={result} />}
+          {step === 4 && result && <ValidatePage result={result} />}
+
+          {results.length > 0 && step > 0 && (
+            <PageNav step={step} maxStep={maxStep} onStep={setStep} />
+          )}
         </>
       )}
     </div>
