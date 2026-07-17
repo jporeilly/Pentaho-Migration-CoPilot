@@ -33,6 +33,12 @@ def test_convert_returns_report_and_ktr():
     assert "<transformation>" in result["ktr"]
 
 
+def test_changelog_served_for_version_popup():
+    res = client.get("/changelog")
+    assert res.status_code == 200
+    assert "# Changelog" in res.text
+
+
 def test_convert_rejects_non_powercenter_xml():
     res = client.post("/convert", files={"export": ("bad.xml", b"<html></html>", "text/xml")})
     assert res.status_code == 422

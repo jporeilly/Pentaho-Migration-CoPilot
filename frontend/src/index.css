@@ -1,0 +1,160 @@
+/* Migration Copilot — dark review UI.
+   Color roles follow the validated reference palette (dark-surface steps);
+   status colors are the fixed status palette and always ship icon + label. */
+
+:root {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface-1: #1a1a19;      /* cards / chart surface */
+  --surface-2: #242423;      /* nested rows, table cells */
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.10);
+  --accent: #3987e5;         /* categorical slot 1, dark step */
+  --status-good: #0ca30c;    /* auto  */
+  --status-warning: #fab219; /* review */
+  --status-serious: #ec835a; /* manual */
+  --status-critical: #d03b3b;/* errors */
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--page);
+  color: var(--text-primary);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.app { max-width: 1180px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* ---------- header ---------- */
+.masthead { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .75rem; }
+.masthead h1 { font-size: 1.45rem; font-weight: 650; }
+.masthead h1 em { color: var(--accent); font-style: normal; }
+.masthead .links { color: var(--text-muted); font-size: .85rem; }
+.masthead .links a { color: var(--accent); text-decoration: none; }
+.tagline { color: var(--text-muted); font-size: .88rem; margin: .2rem 0 1.4rem; }
+
+/* ---------- upload ---------- */
+.uploader { display: flex; gap: .75rem; align-items: stretch; flex-wrap: wrap; }
+.drop {
+  flex: 1; min-width: 280px;
+  border: 2px dashed var(--baseline); border-radius: var(--radius);
+  padding: 1.6rem; text-align: center; cursor: pointer;
+  color: var(--text-secondary); transition: border-color .15s, background .15s;
+}
+.drop.over, .drop:hover { border-color: var(--accent); background: var(--surface-1); }
+.drop strong { color: var(--accent); }
+.drop input { display: none; }
+
+button.primary, button.ghost {
+  border: none; border-radius: 8px; font: 600 .9rem system-ui, "Segoe UI", sans-serif;
+  padding: .55rem 1.15rem; cursor: pointer;
+}
+button.primary { background: var(--accent); color: #0d0d0d; }
+button.primary:hover { filter: brightness(1.12); }
+button.ghost { background: var(--surface-2); color: var(--text-primary); }
+button.ghost:hover { background: var(--gridline); }
+
+.error {
+  background: rgba(208, 59, 59, 0.14); border-left: 3px solid var(--status-critical);
+  color: #f0b9b9; padding: .8rem 1.1rem; border-radius: 8px; margin-top: 1.2rem;
+}
+
+/* ---------- pipeline card ---------- */
+.card {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.4rem 1.5rem; margin-top: 1.4rem;
+}
+.card > header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.card h2 { font-size: 1.12rem; font-weight: 650; }
+.card h2 span { color: var(--text-muted); font-weight: 400; font-size: .85rem; margin-left: .6rem; }
+
+/* ---------- stat tiles ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; margin-bottom: 1.25rem; }
+.tile { background: var(--surface-2); border-radius: 8px; padding: .8rem 1rem; }
+.tile .value { font-size: 1.7rem; font-weight: 650; line-height: 1.2; }
+.tile .value small { font-size: .95rem; color: var(--text-secondary); font-weight: 500; }
+.tile .label { color: var(--text-muted); font-size: .78rem; margin-top: .15rem; }
+
+/* ---------- flow diagram ---------- */
+.flow-wrap { overflow-x: auto; background: var(--surface-2); border-radius: 8px; padding: .5rem; margin-bottom: 1.25rem; }
+.flow-legend { display: flex; gap: 1.1rem; padding: .35rem .6rem 0; color: var(--text-secondary); font-size: .8rem; }
+.flow-legend .chip { display: inline-flex; align-items: center; gap: .35rem; }
+
+/* ---------- filters + table ---------- */
+.filters { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .75rem; }
+.filters button {
+  border: none; border-radius: 99px; padding: .3rem .9rem; cursor: pointer;
+  background: var(--surface-2); color: var(--text-secondary); font-size: .82rem; font-weight: 600;
+}
+.filters button.active { background: var(--text-primary); color: var(--page); }
+
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; color: var(--text-muted); font-weight: 500; padding: .4rem .6rem; }
+td { padding: .55rem .6rem; background: var(--surface-2); vertical-align: top; }
+tbody tr { border-bottom: 4px solid var(--surface-1); }
+tr td:first-child { border-radius: 8px 0 0 8px; }
+tr td:last-child { border-radius: 0 8px 8px 0; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.notes { color: var(--text-muted); font-size: .83rem; white-space: pre-line; }
+
+/* status badges: icon + label, never color alone */
+.badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .1rem .6rem; border-radius: 99px; font-size: .78rem; font-weight: 650;
+}
+.badge.auto   { color: var(--status-good);    background: rgba(12, 163, 12, 0.14); }
+.badge.review { color: var(--status-warning); background: rgba(250, 178, 25, 0.13); }
+.badge.manual { color: var(--status-serious); background: rgba(236, 131, 90, 0.14); }
+
+/* ---------- ktr panel ---------- */
+details.ktr { margin-top: 1.1rem; }
+details.ktr summary { cursor: pointer; color: var(--text-secondary); font-size: .88rem; }
+details.ktr pre {
+  margin-top: .6rem; background: var(--page); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1rem; overflow-x: auto;
+  font: .8rem/1.5 Consolas, "Cascadia Mono", monospace; color: var(--text-secondary);
+  max-height: 420px;
+}
+.loading { color: var(--text-muted); margin-top: 1.2rem; }
+
+/* ---------- version badge + changelog modal ---------- */
+button.version {
+  margin-left: .65rem; vertical-align: middle;
+  background: var(--surface-2); color: var(--accent);
+  border: none; border-radius: 99px; padding: .18rem .7rem;
+  font: 650 .78rem system-ui, "Segoe UI", sans-serif; cursor: pointer;
+}
+button.version:hover { background: var(--gridline); text-decoration: underline; }
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; justify-content: center; padding: 2rem;
+}
+.modal {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius); width: min(680px, 100%); max-height: 80vh;
+  display: flex; flex-direction: column;
+}
+.modal > header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--gridline);
+}
+.modal > header h3 { font-size: 1.05rem; }
+.modal-body { padding: .5rem 1.4rem 1.4rem; overflow-y: auto; }
+.modal-body .md h2 { font-size: 1.05rem; margin-top: 1.1rem; }
+.modal-body .md h3 { font-size: .98rem; margin-top: 1rem; color: var(--accent); }
+.modal-body .md h4 { font-size: .86rem; margin-top: .8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }
+.modal-body .md p { color: var(--text-secondary); font-size: .88rem; margin-top: .5rem; }
+.modal-body .md li { color: var(--text-secondary); font-size: .88rem; margin: .3rem 0 0 1.2rem; }
+.modal-body .md code {
+  background: var(--page); border-radius: 4px; padding: .05rem .35rem;
+  font: .8rem Consolas, "Cascadia Mono", monospace;
+}
+.modal-body .md a { color: var(--accent); }

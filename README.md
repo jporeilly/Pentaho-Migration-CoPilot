@@ -13,8 +13,9 @@ PARSE (deterministic) -> MAP (rules + LLM) -> GENERATE (templating) -> VALIDATE 
 ## Architecture
 
 The core is a framework-agnostic Python package (`src/pdi_migration/`) driven by a CLI.
-FastAPI (`pdi_migration.api`) is a thin layer over it; the Phase 1 review UI (React)
-will consume that API.
+FastAPI (`pdi_migration.api`) is a thin layer over it, and a React review UI
+(`frontend/`) is served by FastAPI at `/` — dark theme, drag-and-drop upload, KPI
+tiles, pipeline flow diagram, filterable step table, .ktr download.
 
 | Module       | Stage    | Status |
 |--------------|----------|--------|
@@ -46,9 +47,23 @@ pdi-migrate parse samples\m_load_sales.xml
 # Full conversion: .ktr skeletons + migration report
 pdi-migrate convert samples\m_load_sales.xml -o output
 
-# Review UI + API — open http://127.0.0.1:8000 (UI) or /docs (Swagger)
-.venv\Scripts\uvicorn pdi_migration.api.main:app --reload
+# Coverage/gap analysis over the real corpus (samples\informatica)
+pdi-migrate gaps samples\informatica
+
+# Review UI + API — open http://127.0.0.1:8321 (UI) or /docs (Swagger)
+.\scripts\dev.ps1 run        # Windows      (make run on Linux)
 ```
+
+Everyday tasks are wrapped by `make` (Linux/macOS, or Windows with make installed)
+and mirrored helper scripts — `scripts\dev.ps1` (Windows 11), `scripts/dev.sh`
+(Linux): `setup · test · run · convert · gaps · ui-build · status · clean`.
+
+## Real-world corpus
+
+`samples/informatica/` holds 11 genuine PowerCenter 10.x exports (110 mappings,
+1,045 steps) from the public [HHS/Informatica](https://github.com/HHS/Informatica)
+repository — real production payroll ETL, used to measure mapper coverage with
+`pdi-migrate gaps`.
 
 ## Tests
 
@@ -63,8 +78,9 @@ pdi-migrate convert samples\m_load_sales.xml -o output
 - [x] KTR skeleton generation with confidence + TODO annotations
 - [x] Static migration report (auto/review/manual counts)
 - [x] Per-step-type KTR config emission: Table Input (SQL), Table Output, Sort keys, Group By keys + aggregates, script placeholder with typed output fields
-- [x] Review UI (dark, single page) served at / by FastAPI
+- [x] Review UI: React (Vite) served at / by FastAPI — tiles, flow diagram, step table, .ktr download
+- [x] Real-export corpus (110 mappings) + `gaps` coverage analysis — currently 53% auto, 47% review, 1 unmapped type
 - [ ] Per-step-type config for remaining rule types (Merge Join keys, Stream Lookup, Insert/Update)
-- [ ] LLM expression translation (Informatica expression language -> PDI), constrained by validated examples
+- [ ] LLM expression translation (Informatica expression language -> PDI), constrained by validated examples — 4,160 real expressions waiting in the corpus
 - [ ] Runtime diff harness: run old vs. new on sample data, diff outputs
-- [ ] Sample study: parse real PowerCenter exports, measure the actual clean-mapping %
+- [ ] Workflow/Session (PDI Job) conversion — real corpus includes WORKFLOW elements, currently ignored

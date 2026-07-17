@@ -11,7 +11,7 @@ import typer
 from pdi_migration.generator import KtrGenerator
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import build_report
+from pdi_migration.validator import build_gap_report, build_report
 
 app = typer.Typer(help="Migration Copilot: legacy ETL -> Pentaho Data Integration.")
 
@@ -41,6 +41,39 @@ def convert(
             f"review: {report.review}  manual: {report.manual}  "
             f"expressions to translate: {report.untranslated_expressions}"
         )
+
+
+@app.command()
+def gaps(directory: Path = typer.Argument(Path("samples/informatica"))) -> None:
+    """Batch-analyze every export in DIRECTORY: mapper coverage + gap list."""
+    parser = PowerCenterParser()
+    mapper = RulesMapper()
+    pipelines = []
+    failures: list[tuple[str, str]] = []
+    files = sorted(directory.glob("*.xml"))
+    for xml in files:
+        try:
+            for pipeline in parser.parse_file(xml):
+                pipelines.append(mapper.apply(pipeline))
+        except Exception as exc:  # a parse failure is a finding, not a crash
+            failures.append((xml.name, str(exc)))
+
+    report = build_gap_report(pipelines)
+    typer.echo(f"files: {len(files)}  parsed: {len(files) - len(failures)}  failed: {len(failures)}")
+    typer.echo(
+        f"mappings: {report.mappings}  steps: {report.steps}  "
+        f"auto: {report.auto} ({report.auto_rate:.0%})  "
+        f"review: {report.review}  manual: {report.manual}  "
+        f"expressions: {report.expressions}"
+    )
+    typer.echo("\nsource type coverage (gaps first):")
+    for tc in report.types:
+        target = tc.pdi_type or "-- UNMAPPED --"
+        typer.echo(f"  {tc.count:>5}  {tc.source_type:<32} -> {target}  [{tc.confidence.value}]")
+    if failures:
+        typer.echo("\nparse failures:")
+        for name, error in failures:
+            typer.echo(f"  {name}: {error}")
 
 
 if __name__ == "__main__":

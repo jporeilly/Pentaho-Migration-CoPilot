@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
 
 from pdi_migration import __version__
@@ -22,7 +22,9 @@ from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
 from pdi_migration.validator import MigrationReport, build_report
 
-STATIC_DIR = Path(__file__).parent / "static"
+REPO_ROOT = Path(__file__).resolve().parents[3]
+UI_DIST = REPO_ROOT / "frontend" / "dist"
+SAMPLE_FILE = REPO_ROOT / "samples" / "m_load_sales.xml"
 
 app = FastAPI(title="Migration Copilot", version=__version__)
 
@@ -33,14 +35,22 @@ class ConversionResult(BaseModel):
     ktr: str
 
 
-@app.get("/", include_in_schema=False)
-def index() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+@app.get("/sample", include_in_schema=False)
+def sample() -> FileResponse:
+    """The bundled demo export, used by the UI's 'Try the sample' button."""
+    return FileResponse(SAMPLE_FILE, media_type="text/xml")
 
 
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "version": __version__}
+
+
+@app.get("/changelog", response_class=PlainTextResponse)
+def changelog() -> str:
+    """CHANGELOG.md content, shown by the UI's version popup."""
+    path = REPO_ROOT / "CHANGELOG.md"
+    return path.read_text(encoding="utf-8") if path.exists() else "No changelog available."
 
 
 @app.post("/parse", response_model=list[Pipeline])
@@ -77,3 +87,12 @@ def _parse_upload(data: bytes) -> list[Pipeline]:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:
         tmp_path.unlink(missing_ok=True)
+
+
+# Serve the built React UI for every non-API path. Mounted last so the API
+# routes above always win. Requires `npm run build` in frontend/ (see
+# scripts/dev.ps1 ui-build); without a build, only the API + /docs exist.
+if UI_DIST.is_dir():
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/", StaticFiles(directory=UI_DIST, html=True), name="ui")
