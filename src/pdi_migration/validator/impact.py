@@ -145,6 +145,17 @@ KNOWLEDGE: dict[str, TypeKnowledge] = {
             "Recreate rejected-row handling explicitly.",
         ],
     ),
+    "Stored Procedure": TypeKnowledge(
+        impact="high",
+        differences=[
+            "Informatica stored-procedure transformations can run per row, or once pre/post-session — PDI's Call DB Procedure runs per row only; pre/post execution belongs in the job (.kjb) as a SQL entry.",
+            "OUT/INOUT parameters and return values need explicit field mapping; the generated step assumes IN parameters.",
+        ],
+        actions=[
+            "Confirm the original's execution mode (per-row vs pre/post-session) and relocate to the job level if needed.",
+            "Map parameter directions and result fields by hand; verify the procedure exists in the sandbox database.",
+        ],
+    ),
     "Normalizer": TypeKnowledge(
         impact="medium",
         differences=[

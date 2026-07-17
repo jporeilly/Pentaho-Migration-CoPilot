@@ -20,6 +20,7 @@ export default defineConfig({
       '/translate/status': backend,
       '/sandbox': backend,
       '/diff': backend,
+      '/report': backend,
       '/project': backend,
       '/best-practices': backend,
       '/brief': backend,

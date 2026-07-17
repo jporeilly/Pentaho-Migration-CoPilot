@@ -13,7 +13,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
 
-from pdi_migration.ir import Pipeline, Step
+from pdi_migration.ir import Hop, Pipeline, Step
 
 # Placeholder for IR steps the mapper could not map.
 FALLBACK_STEP_TYPE = "Dummy"
@@ -44,9 +44,22 @@ PDI_AGGREGATES = {
 
 AGGREGATE_RE = re.compile(r"^\s*(SUM|AVG|COUNT|MIN|MAX)\s*\(\s*(\w+)\s*\)\s*$", re.IGNORECASE)
 
+# "LKP_COL = IN_PORT AND X = Y" -> [("LKP_COL", "IN_PORT"), ("X", "Y")]
+CONDITION_RE = re.compile(r"(\w+)\s*=\s*(\w+)")
+
+JOIN_TYPES = {
+    "Normal Join": "INNER",
+    "Master Outer Join": "RIGHT OUTER",
+    "Detail Outer Join": "LEFT OUTER",
+    "Full Outer Join": "FULL OUTER",
+}
+
 
 class KtrGenerator:
     def generate(self, pipeline: Pipeline) -> str:
+        # Work on a copy: lookup steps get an injected source step + hop, and
+        # the caller's pipeline must stay untouched.
+        pipeline = self._inject_lookup_sources(pipeline.model_copy(deep=True))
         root = Element("transformation")
         info = SubElement(root, "info")
         SubElement(info, "name").text = pipeline.name
@@ -65,12 +78,34 @@ class KtrGenerator:
             SubElement(hop_el, "enabled").text = "Y"
 
         for i, step in enumerate(pipeline.steps):
-            root.append(self._emit_step(step, position=i))
+            root.append(self._emit_step(step, position=i, pipeline=pipeline))
 
         ElementTree.indent(root)
         return ElementTree.tostring(root, encoding="unicode", xml_declaration=True)
 
-    def _emit_step(self, step: Step, position: int) -> Element:
+    def _inject_lookup_sources(self, pipeline: Pipeline) -> Pipeline:
+        """Every Stream Lookup needs a stream feeding its lookup data — inject a
+        Table Input reading the original lookup table, wired into the lookup."""
+        for step in list(pipeline.steps):
+            if step.pdi_type != "StreamLookup":
+                continue
+            source_name = f"{step.name}_lookup_src"
+            if pipeline.step(source_name):
+                continue
+            table = step.properties.get("Lookup table name", step.name)
+            sql = step.properties.get("Lookup Sql Override") or f"SELECT * FROM {table}"
+            pipeline.steps.append(Step(
+                name=source_name,
+                source_type="Lookup Source",
+                pdi_type="TableInput",
+                properties={"Sql Query": sql},
+                confidence=step.confidence,
+                notes=[f"Injected: feeds lookup data ({table}) into {step.name}."],
+            ))
+            pipeline.hops.append(Hop(from_step=source_name, to_step=step.name))
+        return pipeline
+
+    def _emit_step(self, step: Step, position: int, pipeline: Pipeline) -> Element:
         pdi_type = step.pdi_type or FALLBACK_STEP_TYPE
         step_el = Element("step")
         SubElement(step_el, "name").text = step.name
@@ -86,7 +121,7 @@ class KtrGenerator:
         SubElement(step_el, "copies").text = "1"
 
         if emitter := STEP_CONFIG_EMITTERS.get(pdi_type):
-            emitter(step, step_el)
+            emitter(step, step_el, pipeline)
 
         gui = SubElement(step_el, "GUI")
         SubElement(gui, "xloc").text = str(100 + position * 200)
@@ -102,7 +137,7 @@ class KtrGenerator:
         return out_path
 
 
-def _emit_table_input(step: Step, el: Element) -> None:
+def _emit_table_input(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "connection")  # connection is environment-specific; left for review
     sql = step.properties.get("Sql Query") or (
         "SELECT " + ", ".join(f.name for f in step.fields) + f"\nFROM {step.name}"
@@ -113,7 +148,7 @@ def _emit_table_input(step: Step, el: Element) -> None:
     SubElement(el, "limit").text = "0"
 
 
-def _emit_table_output(step: Step, el: Element) -> None:
+def _emit_table_output(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "connection")
     SubElement(el, "schema")
     SubElement(el, "table").text = step.name
@@ -123,7 +158,7 @@ def _emit_table_output(step: Step, el: Element) -> None:
     SubElement(el, "use_batch").text = "Y"
 
 
-def _emit_sort_rows(step: Step, el: Element) -> None:
+def _emit_sort_rows(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "directory").text = "%%java.io.tmpdir%%"
     SubElement(el, "prefix").text = "out"
     SubElement(el, "sort_size").text = "1000000"
@@ -135,7 +170,7 @@ def _emit_sort_rows(step: Step, el: Element) -> None:
         SubElement(field, "case_sensitive").text = "N"
 
 
-def _emit_group_by(step: Step, el: Element) -> None:
+def _emit_group_by(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "all_rows").text = "N"
     expression_fields = {e.field for e in step.expressions}
     group = SubElement(el, "group")
@@ -159,7 +194,7 @@ def _emit_group_by(step: Step, el: Element) -> None:
         SubElement(field, "type").text = PDI_AGGREGATES[func.upper()]
 
 
-def _emit_script_values(step: Step, el: Element) -> None:
+def _emit_script_values(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "compatible").text = "N"
     scripts = SubElement(el, "jsScripts")
     script = SubElement(scripts, "jsScript")
@@ -193,10 +228,90 @@ def step_field(step: Step, name: str):
     return next((f for f in step.fields if f.name == name), None)
 
 
+def _incoming(pipeline: Pipeline, step: Step) -> list[str]:
+    return [h.from_step for h in pipeline.hops if h.to_step == step.name]
+
+
+def _emit_merge_join(step: Step, el: Element, pipeline: Pipeline) -> None:
+    inputs = _incoming(pipeline, step)
+    SubElement(el, "join_type").text = JOIN_TYPES.get(
+        step.properties.get("Join Type", ""), "INNER"
+    )
+    SubElement(el, "step1").text = inputs[0] if inputs else ""
+    SubElement(el, "step2").text = inputs[1] if len(inputs) > 1 else ""
+    pairs = CONDITION_RE.findall(step.properties.get("Join Condition", ""))
+    keys_1 = SubElement(el, "keys_1")
+    keys_2 = SubElement(el, "keys_2")
+    for left, right in pairs:
+        SubElement(keys_1, "key").text = left
+        SubElement(keys_2, "key").text = right
+
+
+def _emit_stream_lookup(step: Step, el: Element, pipeline: Pipeline) -> None:
+    SubElement(el, "from").text = f"{step.name}_lookup_src"
+    SubElement(el, "input_sorted").text = "N"
+    SubElement(el, "preserve_memory").text = "Y"
+    SubElement(el, "sorted_list").text = "N"
+    SubElement(el, "integer_pair").text = "N"
+    lookup = SubElement(el, "lookup")
+    pairs = CONDITION_RE.findall(step.properties.get("Lookup condition", ""))
+    key_fields = set()
+    for lookup_col, stream_port in pairs:
+        key = SubElement(lookup, "key")
+        SubElement(key, "name").text = stream_port   # field from the main stream
+        SubElement(key, "field").text = lookup_col   # field in the lookup stream
+        key_fields.add(lookup_col)
+    for field in step.fields:
+        if field.name in key_fields:
+            continue
+        value = SubElement(lookup, "value")
+        SubElement(value, "name").text = field.name
+        SubElement(value, "rename").text = field.name
+        SubElement(value, "default").text = ""
+        SubElement(value, "type").text = PDI_DATATYPES.get(field.datatype.lower(), "String")
+
+
+def _emit_insert_update(step: Step, el: Element, pipeline: Pipeline) -> None:
+    outgoing = [h.to_step for h in pipeline.hops if h.from_step == step.name]
+    SubElement(el, "connection")
+    SubElement(el, "commit").text = "100"
+    SubElement(el, "update_bypassed").text = "N"
+    lookup = SubElement(el, "lookup")
+    SubElement(lookup, "schema")
+    SubElement(lookup, "table").text = outgoing[0] if outgoing else step.name
+    # key columns are a business decision (Informatica's strategy flags don't
+    # name them) — left empty deliberately; the step description carries the TODO
+    for field in step.fields:
+        value = SubElement(lookup, "value")
+        SubElement(value, "name").text = field.name
+        SubElement(value, "rename").text = field.name
+        SubElement(value, "update").text = "Y"
+
+
+def _emit_db_proc(step: Step, el: Element, pipeline: Pipeline) -> None:
+    SubElement(el, "connection")
+    SubElement(el, "procedure").text = (
+        step.properties.get("Stored Procedure Name")
+        or step.properties.get("Call Text")
+        or step.name
+    )
+    SubElement(el, "auto_commit").text = "Y"
+    arguments = SubElement(el, "arguments")
+    for field in step.fields:
+        arg = SubElement(arguments, "argument")
+        SubElement(arg, "name").text = field.name
+        SubElement(arg, "direction").text = "IN"
+        SubElement(arg, "type").text = PDI_DATATYPES.get(field.datatype.lower(), "String")
+
+
 STEP_CONFIG_EMITTERS = {
     "TableInput": _emit_table_input,
     "TableOutput": _emit_table_output,
     "SortRows": _emit_sort_rows,
     "GroupBy": _emit_group_by,
     "ScriptValueMod": _emit_script_values,
+    "MergeJoin": _emit_merge_join,
+    "StreamLookup": _emit_stream_lookup,
+    "InsertUpdate": _emit_insert_update,
+    "DBProc": _emit_db_proc,
 }

@@ -62,6 +62,29 @@ class Hop(BaseModel):
     to_step: str
 
 
+class JobEntry(BaseModel):
+    """One task instance in a source workflow (≈ a PDI job entry)."""
+
+    name: str
+    task_type: str                    # Session, Start, Email, Command, ...
+    mapping: str | None = None        # for Session tasks: the mapping it runs
+    notes: list[str] = Field(default_factory=list)
+
+
+class JobHop(BaseModel):
+    from_entry: str
+    to_entry: str
+    condition: str | None = None      # original workflow-link condition, if any
+
+
+class Job(BaseModel):
+    """A source workflow (≈ a PDI job / .kjb)."""
+
+    name: str
+    entries: list[JobEntry] = Field(default_factory=list)
+    hops: list[JobHop] = Field(default_factory=list)
+
+
 class WarningLevel(str, Enum):
     INFO = "info"
     WARNING = "warning"

@@ -267,11 +267,17 @@ button.nav.active { text-decoration: underline; }
 .score-grade { font-weight: 700; font-size: .95rem; }
 .score-kind { color: var(--text-muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }
 .score-verdict { color: var(--text-secondary); font-size: .9rem; }
-.score-factors { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .8rem 1.4rem; margin-top: 1rem; }
-.factor-head { display: flex; gap: .6rem; align-items: baseline; font-size: .82rem; }
-.factor-head span:first-child { color: var(--text-secondary); }
-.factor-detail { color: var(--text-muted); font-size: .75rem; flex: 1; }
-.factor-track { height: 6px; background: var(--surface-1); border-radius: 3px; margin-top: .3rem; overflow: hidden; }
+.score-factors {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.1rem 2.2rem; margin-top: 1.25rem;
+}
+.factor-head { display: flex; justify-content: space-between; align-items: baseline; gap: .8rem; font-size: .88rem; }
+.factor-head span:first-child { color: var(--text-primary); font-weight: 600; }
+.factor-head b { font-size: 1rem; }
+.factor-detail {
+  display: block; color: var(--text-muted); font-size: .78rem; margin: .15rem 0 .35rem;
+}
+.factor-track { height: 7px; background: var(--surface-1); border-radius: 3.5px; margin-top: .35rem; overflow: hidden; }
 .factor-bar { height: 100%; background: var(--accent); border-radius: 3px; }
 .score-note { color: var(--text-muted); font-size: .78rem; margin-top: .9rem; }
 

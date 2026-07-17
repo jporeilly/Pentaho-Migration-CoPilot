@@ -3,7 +3,7 @@
 **AI-assisted migration of legacy ETL — Informatica PowerCenter today; SSIS, Talend,
 DataStage next — into native Pentaho Data Integration pipelines.**
 
-Version **1.8.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0: internal tool ·
+Version **1.9.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0: complete ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy ETL platform locks customers in with the sunk cost of thousands of
@@ -96,6 +96,7 @@ pdi-migrate batch   [directory]         # convert a whole corpus into the projec
 pdi-migrate project                     # portfolio view: every mapping, score, review status
 pdi-migrate gaps    [directory]         # corpus coverage: auto/review/manual + gap list
 pdi-migrate diff    old.csv new.csv -k ID  # measured output parity (exit 0 on PASS)
+pdi-migrate run     <file.ktr|.kjb>     # execute in the local PDI install (Pan/Kitchen)
 ```
 
 `convert` prints the source analysis first — tool version, database, and warnings —
@@ -148,9 +149,12 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] Diff harness (measured parity): CSV compare with tolerance, key matching, verdicts
 - [x] Project mode: batch conversion, SQLite portfolio, review-status tracking
 - [x] Hardening (API key, size limits, logging), CI, Docker packaging, rules governance
-- [ ] Remaining step-type config: Merge Join, Stream Lookup, Insert/Update, Call DB Procedure
-- [ ] Automated diff execution: drive pan/kitchen directly against the sandbox
-- [ ] Workflow/Session → PDI Job (.kjb) conversion
+- [x] Remaining step-type config: Merge Join (keys from join conditions), Stream Lookup (with injected lookup-source step), Insert/Update, Call DB Procedure
+- [x] PDI execution: `pdi-migrate run` drives Pan/Kitchen in a local PDI install (auto-detected), log-aware verdicts
+- [x] Workflow/Session → PDI Job (.kjb) conversion: sessions wired to sibling .ktr files, placeholders for unconvertible tasks, link conditions preserved
+- [x] PDF migration report (branded, per mapping)
+
+**Phase 0 roadmap complete.** Remaining refinements tracked in the changelog.
 
 **Phase 1** — assisted customer product with confidence scoring and mandatory human
 review. **Phase 2** — multi-source: SSIS, then Talend / DataStage.

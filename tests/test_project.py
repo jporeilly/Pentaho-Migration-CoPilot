@@ -108,6 +108,8 @@ class TestHardening:
         assert res.status_code == 413
 
     def test_health_reports_rules_version(self):
+        from pdi_migration.mapper import RulesMapper
+
         client = TestClient(app)
         body = client.get("/health").json()
-        assert body["rules_version"] == "2"
+        assert body["rules_version"] == str(RulesMapper().meta["version"])

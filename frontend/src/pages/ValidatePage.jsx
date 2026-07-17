@@ -40,6 +40,24 @@ export default function ValidatePage({ result, source, onShowPractices }) {
         <div className="actions">
           <button
             className="primary"
+            onClick={async () => {
+              const res = await fetch('/report/pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ source, result }),
+              })
+              if (!res.ok) return
+              const a = document.createElement('a')
+              a.href = URL.createObjectURL(await res.blob())
+              a.download = `${pipeline.name}.report.pdf`
+              a.click()
+              URL.revokeObjectURL(a.href)
+            }}
+          >
+            ⬇ Report (.pdf)
+          </button>
+          <button
+            className="ghost"
             onClick={() => downloadText(`${pipeline.name}.report.md`, buildMarkdownReport(source, result))}
           >
             ⬇ Report (.md)
@@ -48,7 +66,7 @@ export default function ValidatePage({ result, source, onShowPractices }) {
             className="ghost"
             onClick={() => downloadText(`${pipeline.name}.report.json`, JSON.stringify({ source, ...result }, null, 2))}
           >
-            ⬇ Report (.json)
+            .json
           </button>
         </div>
       </header>

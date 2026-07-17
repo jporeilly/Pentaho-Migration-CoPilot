@@ -13,6 +13,9 @@ from pdi_migration.ir import (
     Expression,
     FieldDef,
     Hop,
+    Job,
+    JobEntry,
+    JobHop,
     Pipeline,
     SourceInfo,
     SourceTool,
@@ -41,6 +44,33 @@ class PowerCenterParseError(Exception):
 class PowerCenterParser:
     def parse_file(self, path: str | Path) -> list[Pipeline]:
         return [self._parse_mapping(m) for m in self._root(path).iter("MAPPING")]
+
+    def parse_workflows(self, path: str | Path) -> list[Job]:
+        """WORKFLOW elements -> Job IR (orchestration layer, ≈ PDI .kjb)."""
+        root = self._root(path)
+        # session name -> mapping name, defined at folder or workflow level
+        session_mappings = {
+            s.get("NAME", ""): s.get("MAPPINGNAME")
+            for s in root.iter("SESSION")
+        }
+        jobs = []
+        for workflow in root.iter("WORKFLOW"):
+            job = Job(name=workflow.get("NAME", "unnamed_workflow"))
+            for task in workflow.iter("TASKINSTANCE"):
+                name = task.get("NAME", "unnamed")
+                task_type = task.get("TASKTYPE", "Unknown")
+                entry = JobEntry(name=name, task_type=task_type)
+                if task_type == "Session":
+                    entry.mapping = session_mappings.get(task.get("TASKNAME", name))
+                job.entries.append(entry)
+            for link in workflow.iter("WORKFLOWLINK"):
+                job.hops.append(JobHop(
+                    from_entry=link.get("FROMTASK", ""),
+                    to_entry=link.get("TOTASK", ""),
+                    condition=link.get("CONDITION") or None,
+                ))
+            jobs.append(job)
+        return jobs
 
     def analyze_export(self, path: str | Path) -> SourceInfo:
         """Export-level facts: tool version, repository, object counts."""

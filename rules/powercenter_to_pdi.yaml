@@ -8,11 +8,12 @@
 # added or changed — the rules library is the product's accumulated knowledge.
 
 _meta:
-  version: 2
+  version: 3
   updated: "2026-07-17"
   provenance:
     - "v1 (2026-07-17): initial 16 rules from PowerCenter documentation and PDI step inventory."
     - "v2 (2026-07-17): added 'Sequence' alias — real 10.x exports use TYPE=\"Sequence\", found by gap analysis on the HHS corpus."
+    - "v3 (2026-07-17): added 'Stored Procedure' -> Call DB Procedure — 12 occurrences in the real corpus were unmapped."
 
 "Source Qualifier":
   pdi_type: TableInput
@@ -79,6 +80,11 @@ _meta:
 "Normalizer":
   pdi_type: Normaliser
   confidence: review
+
+"Stored Procedure":
+  pdi_type: DBProc
+  confidence: review
+  notes: Call DB Procedure runs per row; verify parameter directions (IN/OUT), return values, and whether the original ran pre/post-session instead of per row.
 
 "Target Definition":
   pdi_type: TableOutput

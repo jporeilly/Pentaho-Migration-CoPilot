@@ -8,7 +8,7 @@ from pathlib import Path
 
 import typer
 
-from pdi_migration.generator import KtrGenerator
+from pdi_migration.generator import KjbGenerator, KtrGenerator
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.validator import (
@@ -81,6 +81,18 @@ def convert(
             f"  confidence: {score.score}/100 ({score.grade}, static) — {score.verdict}"
         )
 
+    kjb_generator = KjbGenerator()
+    for job in parser.parse_workflows(export):
+        kjb_path = kjb_generator.write(job, out_dir)
+        sessions = sum(1 for e in job.entries if e.task_type == "Session")
+        placeholders = sum(
+            1 for e in job.entries if e.task_type not in ("Session", "Start")
+        )
+        typer.echo(
+            f"{job.name} -> {kjb_path}  "
+            f"({sessions} session(s) wired to .ktr files, {placeholders} placeholder(s) to review)"
+        )
+
 
 @app.command()
 def sandbox(
@@ -122,6 +134,7 @@ def batch(
     parser = PowerCenterParser()
     mapper = RulesMapper()
     generator = KtrGenerator()
+    kjb_generator = KjbGenerator()
     translator = None
     if translate:
         from pdi_migration.llm import ExpressionTranslator, TranslationError
@@ -160,12 +173,36 @@ def batch(
             ))
             scores.append(score.score)
             total += 1
+        for job in parser.parse_workflows(xml):
+            kjb_generator.write(job, out_dir / xml.stem)
     avg = round(sum(scores) / len(scores)) if scores else 0
     typer.echo(
         f"batch complete: {total} mappings converted "
         f"({failures} file failures), avg confidence {avg}/100 — "
         f"see `pdi-migrate project` or the Project page"
     )
+
+
+@app.command()
+def run(
+    artifact: Path = typer.Argument(..., help="A generated .ktr or .kjb file"),
+    timeout: int = typer.Option(600, "--timeout", help="Seconds before aborting"),
+) -> None:
+    """Execute a generated .ktr (Pan) or .kjb (Kitchen) in the local PDI install."""
+    from pdi_migration.pdi_runner import find_pdi_home, run_artifact
+
+    pdi_home = find_pdi_home()
+    if pdi_home is None:
+        typer.echo(
+            "no PDI installation found — set PDI_HOME or install to a standard location",
+            err=True,
+        )
+        raise typer.Exit(code=2)
+    typer.echo(f"using PDI at {pdi_home}")
+    result = run_artifact(artifact, pdi_home, timeout=timeout)
+    typer.echo(f"exit {result.exit_code} ({result.meaning})")
+    typer.echo(result.log_tail)
+    raise typer.Exit(code=0 if result.ok else 1)
 
 
 @app.command()

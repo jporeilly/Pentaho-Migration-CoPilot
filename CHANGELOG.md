@@ -7,7 +7,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.9.0] — 2026-07-17
+
+**Phase 0 roadmap complete.**
+
+### Added
+
+- **Workflow → Job conversion**: PowerCenter workflows parse into a Job IR
+  (task instances, session→mapping resolution, link conditions) and emit .kjb files —
+  sessions become Transformation entries wired to the sibling .ktr files via
+  `${Internal.Entry.Current.Directory}`; unconvertible task types (Email, Command, …)
+  become labeled placeholders, never silently dropped. Wired into `convert` and `batch`.
+  Verified live: a generated .kjb loaded and began executing under Kitchen (PDI 11.0).
+- **Remaining step-type configs**: Merge Join (join type + key pairs parsed from the
+  Informatica join condition, inputs from hops), Stream Lookup (keys/values from the
+  lookup condition, plus an auto-injected Table Input feeding the lookup data),
+  Insert/Update (target table from downstream, field values; key columns an explicit
+  TODO), and Call DB Procedure — `Stored Procedure` now maps (rules v3), clearing the
+  corpus's largest unmapped type.
+- **PDI runner**: `pdi-migrate run <file.ktr|.kjb>` executes generated artifacts via
+  Pan/Kitchen in a locally detected PDI install (PDI_HOME or common paths), with
+  documented exit-code meanings and a log-aware verdict (Windows .bat wrappers can
+  swallow Java's exit code — the log is trusted over a false zero).
+- **PDF migration report**: branded, per-mapping (score hero with factor bars, source
+  facts and warnings, step table with color-coded confidence, impact highlights) —
+  `POST /report/pdf` and a "⬇ Report (.pdf)" button on the Validate page.
 
 ### Fixed
 
@@ -16,6 +40,8 @@ deliberately — not one per work session.
   `/translate/status`), showing "Translating 7/20…" — a browser fetch can no longer
   outlive its timeout while the LLM works. The synchronous `POST /translate` remains
   for scripting small mappings.
+- Squashed score-factor layout on the Validate page: two-column grid, detail text on
+  its own line, larger bars.
 
 ## [1.8.1] — 2026-07-17
 

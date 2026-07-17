@@ -18,7 +18,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
 logger = logging.getLogger("pdi_migration.api")
@@ -171,6 +171,30 @@ async def convert(export: UploadFile) -> ConversionResponse:
         export.filename, len(data), len(results), (time.monotonic() - started) * 1000,
     )
     return ConversionResponse(source=source, results=results)
+
+
+class PdfRequest(BaseModel):
+    source: SourceInfo | None = None
+    result: "ConversionResult"
+
+
+@app.post("/report/pdf", dependencies=[Depends(require_api_key)])
+def report_pdf(payload: PdfRequest) -> Response:
+    """Branded PDF migration report for one mapping."""
+    from pdi_migration.report_pdf import build_pdf_report
+
+    result = payload.result
+    pdf_bytes = build_pdf_report(
+        payload.source, result.pipeline, result.report, result.score, result.impact,
+    )
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition":
+                f'attachment; filename="{result.pipeline.name}.report.pdf"',
+        },
+    )
 
 
 @app.post("/sandbox", response_model=SandboxKit, dependencies=[Depends(require_api_key)])

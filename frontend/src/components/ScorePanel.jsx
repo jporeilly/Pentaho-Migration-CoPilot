@@ -28,9 +28,9 @@ export default function ScorePanel({ score }) {
           <div className="factor" key={f.name}>
             <div className="factor-head">
               <span>{f.name}</span>
-              <span className="factor-detail">{f.detail}</span>
               <b>{f.score}</b>
             </div>
+            <span className="factor-detail">{f.detail}</span>
             <div className="factor-track">
               <div className="factor-bar" style={{ width: `${f.score}%` }} />
             </div>
