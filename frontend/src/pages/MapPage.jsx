@@ -7,26 +7,43 @@ import ImpactPanel from '../components/ImpactPanel.jsx'
 export default function MapPage({ result, onUpdate }) {
   const { pipeline, report } = result
   const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState('')
   const [error, setError] = useState(null)
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
   async function translate() {
     setBusy(true)
     setError(null)
+    setProgress('starting…')
     try {
-      const res = await fetch('/translate', {
+      const start = await fetch('/translate/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pipeline),
       })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.detail || res.statusText)
+      const started = await start.json()
+      if (!start.ok) throw new Error(started.detail || start.statusText)
+
+      // poll the background job — each poll is its own short request,
+      // so long translations can never hit a browser fetch timeout
+      for (;;) {
+        await sleep(1500)
+        const res = await fetch(`/translate/status?job=${started.job}`)
+        const state = await res.json()
+        if (!res.ok) throw new Error(state.detail || res.statusText)
+        if (state.status === 'error') throw new Error(state.detail || 'translation failed')
+        if (state.status === 'done') {
+          onUpdate(state.result)
+          break
+        }
+        if (state.total) setProgress(`${state.done}/${state.total}`)
       }
-      onUpdate(await res.json())
     } catch (err) {
       setError(err.message)
     } finally {
       setBusy(false)
+      setProgress('')
     }
   }
 
@@ -37,7 +54,7 @@ export default function MapPage({ result, onUpdate }) {
         {report.untranslated_expressions > 0 && (
           <button className="primary" onClick={translate} disabled={busy}>
             {busy
-              ? 'Translating… (local LLM, this can take a while)'
+              ? `Translating ${progress}… (local LLM)`
               : `✨ Translate ${report.untranslated_expressions} expressions`}
           </button>
         )}

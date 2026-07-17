@@ -13,6 +13,7 @@ import os
 import tempfile
 import threading
 import time
+import uuid
 from pathlib import Path
 
 import httpx
@@ -244,13 +245,58 @@ def project_status(update: StatusUpdate) -> dict[str, bool]:
 
 @app.post("/translate", response_model=ConversionResult, dependencies=[Depends(require_api_key)])
 def translate(pipeline: Pipeline) -> ConversionResult:
-    """Translate all untranslated expressions in a mapped pipeline via the
-    configured LLM provider, then regenerate report + .ktr."""
+    """Translate all untranslated expressions synchronously (small mappings /
+    scripting). The UI uses the /translate/start job flow instead — a browser
+    fetch times out on long translations."""
     try:
         ExpressionTranslator().translate_pipeline(pipeline)
     except TranslationError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return _build_result(pipeline, KtrGenerator())
+
+
+# Long translations run as background jobs the UI polls — one browser request
+# per poll, so no fetch ever outlives the browser's timeout.
+_translate_jobs: dict[str, dict] = {}
+
+
+@app.post("/translate/start", dependencies=[Depends(require_api_key)])
+def translate_start(pipeline: Pipeline) -> dict[str, str]:
+    """Start translating in the background; returns a job id to poll."""
+    try:
+        translator = ExpressionTranslator()
+        translator._check_provider()
+    except TranslationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    job_id = uuid.uuid4().hex[:12]
+    job: dict = {"status": "running", "done": 0, "total": 0, "detail": "", "result": None}
+    _translate_jobs[job_id] = job
+
+    def run() -> None:
+        try:
+            def progress(done: int, total: int) -> None:
+                job["done"], job["total"] = done, total
+
+            translator.translate_pipeline(pipeline, progress=progress)
+            job["result"] = _build_result(pipeline, KtrGenerator()).model_dump()
+            job["status"] = "done"
+        except Exception as exc:
+            job["status"] = "error"
+            job["detail"] = str(exc)
+            logger.exception("translate job %s failed", job_id)
+
+    threading.Thread(target=run, daemon=True).start()
+    return {"job": job_id}
+
+
+@app.get("/translate/status")
+def translate_status(job: str) -> dict:
+    """Progress of a translation job; includes the full result when done."""
+    state = _translate_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown translation job")
+    return state
 
 
 class SettingsResponse(BaseModel):

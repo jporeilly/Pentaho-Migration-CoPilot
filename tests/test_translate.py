@@ -108,6 +108,37 @@ class TestTranslateAPI:
         assert res.status_code == 503
         assert "No Ollama model" in res.json()["detail"]
 
+    def test_job_flow_start_poll_done(self, tmp_path, monkeypatch):
+        import time
+
+        monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+        monkeypatch.setattr(
+            "pdi_migration.llm.translate.ExpressionTranslator._chat",
+            FakeTranslator._chat,
+        )
+        client = TestClient(app)
+        client.put("/settings", json={
+            "provider": "ollama", "base_url": "http://127.0.0.1:11434",
+            "model": "test-model", "env": {},
+        })
+        pipeline = _mapped_pipeline()
+        res = client.post("/translate/start", json=pipeline.model_dump())
+        assert res.status_code == 200
+        job = res.json()["job"]
+
+        for _ in range(50):
+            state = client.get(f"/translate/status?job={job}").json()
+            if state["status"] != "running":
+                break
+            time.sleep(0.1)
+        assert state["status"] == "done"
+        assert state["result"]["report"]["untranslated_expressions"] == 0
+        assert "/* fake */" in state["result"]["ktr"]
+
+    def test_job_status_unknown_404(self):
+        client = TestClient(app)
+        assert client.get("/translate/status?job=nope").status_code == 404
+
     def test_translate_returns_updated_result(self, tmp_path, monkeypatch):
         monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
         monkeypatch.setattr(

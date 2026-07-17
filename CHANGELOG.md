@@ -7,6 +7,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+### Fixed
+
+- "Translation failed: Failed to fetch" on long translations: the ✨ Translate button
+  now starts a background job and polls progress (`/translate/start` +
+  `/translate/status`), showing "Translating 7/20…" — a browser fetch can no longer
+  outlive its timeout while the LLM works. The synchronous `POST /translate` remains
+  for scripting small mappings.
+
 ## [1.8.1] — 2026-07-17
 
 ### Fixed

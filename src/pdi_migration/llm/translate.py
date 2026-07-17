@@ -93,28 +93,34 @@ class ExpressionTranslator:
         self.settings = settings or load_settings()
         self.timeout = timeout
 
-    def translate_pipeline(self, pipeline: Pipeline) -> int:
+    def translate_pipeline(self, pipeline: Pipeline, progress=None) -> int:
         """Translate every untranslated expression in place; returns the count
         successfully translated. Raises TranslationError only if the provider
-        is unusable; per-expression failures become notes, not crashes."""
+        is unusable; per-expression failures become notes, not crashes.
+        `progress(done, total)` is called after each expression."""
         from pdi_migration.generator.ktr import AGGREGATE_RE
 
         self._check_provider()
-        translated = 0
-        for step in pipeline.steps:
-            for expr in step.expressions:
-                if expr.translated is not None:
-                    continue
-                # Group By aggregates are emitted as native aggregation config
-                # by the generator — nothing to translate.
-                if step.pdi_type == "GroupBy" and AGGREGATE_RE.match(expr.raw):
-                    expr.translated = expr.raw
-                    expr.confidence = Confidence.AUTO
-                    expr.notes = "handled natively as a Group By aggregation"
-                    translated += 1
-                    continue
-                if self.translate(expr).translated is not None:
-                    translated += 1
+        pending = [
+            (step, expr)
+            for step in pipeline.steps
+            for expr in step.expressions
+            if expr.translated is None
+        ]
+        translated = done = 0
+        for step, expr in pending:
+            # Group By aggregates are emitted as native aggregation config
+            # by the generator — nothing to translate.
+            if step.pdi_type == "GroupBy" and AGGREGATE_RE.match(expr.raw):
+                expr.translated = expr.raw
+                expr.confidence = Confidence.AUTO
+                expr.notes = "handled natively as a Group By aggregation"
+                translated += 1
+            elif self.translate(expr).translated is not None:
+                translated += 1
+            done += 1
+            if progress:
+                progress(done, len(pending))
         return translated
 
     def translate(self, expr: Expression) -> Expression:
