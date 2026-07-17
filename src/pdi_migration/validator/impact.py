@@ -188,6 +188,62 @@ KNOWLEDGE: dict[str, TypeKnowledge] = {
     "Target Definition": TypeKnowledge(impact="medium", differences=["See Target."], actions=["Set commit/batch sizes and error handling."]),
 }
 
+TALEND_KNOWLEDGE: dict[str, TypeKnowledge] = {
+    "tMap": TypeKnowledge(
+        impact="high",
+        differences=[
+            "tMap is three PDI concepts in one: lookups (Stream Lookup), filters (Filter rows), and Java output expressions (JavaScript) — the converted script step only covers the expressions.",
+            "Inner-join reject and lookup-miss behaviors (die on error, catch rejects) need explicit PDI error/filter hops.",
+            "Java null semantics vs JavaScript coercion differ; .equals vs == matters for strings.",
+        ],
+        actions=[
+            "Rebuild lookup inputs as Stream Lookup steps (lookup hops are preserved in the diagram).",
+            "Review every translated expression; route reject flows explicitly.",
+        ],
+    ),
+    "tAggregateRow": TypeKnowledge(
+        impact="high",
+        differences=["PDI Group By REQUIRES rows sorted on the group keys; tAggregateRow does not."],
+        actions=["Insert a Sort rows step upstream; verify aggregate functions and null handling."],
+    ),
+    "tJoin": TypeKnowledge(
+        impact="medium",
+        differences=["PDI Merge Join requires both inputs sorted; join type mapping (inner/left) must be verified."],
+        actions=["Sort both inputs on the join keys; confirm the join type."],
+    ),
+    "tJavaRow": TypeKnowledge(
+        impact="medium",
+        differences=["Free-form per-row Java becomes JavaScript — libraries, typed variables, and side effects may not translate."],
+        actions=["Review the translated script; consider a User Defined Java Class step if the logic is heavy."],
+    ),
+    "tJava": TypeKnowledge(
+        impact="medium",
+        differences=["Standalone Java blocks usually perform side effects (logging, setup) that belong at job level in PDI."],
+        actions=["Decide whether this logic belongs in the .kjb (job entries) instead of the transformation."],
+    ),
+    "tRunJob": TypeKnowledge(
+        impact="high",
+        differences=["Job orchestration: tRunJob calls another Talend job; in PDI this is a Job entry in a .kjb, not a transformation step."],
+        actions=["Recreate the calling structure as PDI Job entries; convert the called job separately."],
+    ),
+    "tContextLoad": TypeKnowledge(
+        impact="medium",
+        differences=["Talend context variables map to PDI parameters/variables with different scoping (context groups vs. transformation/job parameters)."],
+        actions=["Define equivalent PDI parameters; replace context.X references in expressions."],
+    ),
+    "tReplicate": TypeKnowledge(
+        impact="low",
+        differences=["PDI hops natively copy rows to multiple targets — no step needed."],
+        actions=["Delete the placeholder and set the outgoing hop distribution to 'Copy data to next steps'."],
+    ),
+    "tUniqRow": TypeKnowledge(
+        impact="low",
+        differences=["PDI Unique rows requires sorted input; tUniqRow does not."],
+        actions=["Insert a Sort rows step upstream on the dedup keys."],
+    ),
+}
+KNOWLEDGE.update(TALEND_KNOWLEDGE)
+
 UNMAPPED_KNOWLEDGE = TypeKnowledge(
     impact="high",
     differences=["No PDI equivalent is configured — this logic does not exist in the converted output."],

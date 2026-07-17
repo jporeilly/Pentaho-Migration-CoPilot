@@ -1,12 +1,13 @@
 import FlowDiagram from './FlowDiagram.jsx'
+import { toolLabel } from './SourceBadge.jsx'
 
-// Side-by-side comparison: original Informatica structure vs converted PDI
-// pipeline. Same layout in both diagrams so steps line up visually.
+// Stacked comparison: original source structure above, converted PDI pipeline
+// below. Same layout in both diagrams so steps line up vertically.
 export default function CompareView({ pipeline }) {
   return (
     <div className="compare">
       <div className="compare-col">
-        <h3 className="subhead">Source — Informatica PowerCenter</h3>
+        <h3 className="subhead">Source — {toolLabel(pipeline.source_tool)}</h3>
         <FlowDiagram pipeline={pipeline} mode="source" />
       </div>
       <div className="compare-col">

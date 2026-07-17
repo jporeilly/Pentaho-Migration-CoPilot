@@ -77,6 +77,37 @@ Input:  IIF(ISNULL(AMOUNT), 0, AMOUNT * 1.2)
 Output: {"translation": "(AMOUNT == null) ? 0 : AMOUNT * 1.2", "confidence": "high", "notes": ""}
 """
 
+JAVA_PROMPT = """\
+You translate Java expressions from Talend components (tMap, tFilterRow, tJavaRow)
+into JavaScript for Pentaho Data Integration's "Modified Java Script Value" step.
+
+Rules:
+- Row aliases like row1.CUSTOMER_ID or out1.TOTAL refer to stream fields — drop the
+  alias and use the bare field name (CUSTOMER_ID). Do NOT drop class prefixes like Math.
+- Reply with JSON only: {"translation": "<javascript>", "confidence": "high"|"medium"|"low", "notes": "<caveats or empty>"}
+- If semantics may differ, use confidence "medium"/"low" and explain in notes.
+
+Mappings (authoritative — prefer these):
+a.equals(b)                          -> a == b        (string compare)
+!a.equals(b)                         -> a != b
+StringHandling.UPCASE(s) / DOWNCASE  -> s.toUpperCase() / s.toLowerCase()
+StringHandling.TRIM(s)               -> trim(s)
+StringHandling.LEN(s)                -> s.length
+s.substring(a, b)                    -> s.substring(a, b)
+TalendDate.getCurrentDate()          -> new Date()
+TalendDate.parseDate("yyyy-MM-dd", s)-> str2date(s, "yyyy-MM-dd")
+TalendDate.formatDate("yyyy-MM-dd",d)-> date2str(d, "yyyy-MM-dd")
+Integer.parseInt(s) / Double.parseDouble(s) -> str2num(s)
+String.valueOf(x)                    -> "" + x
+condition ? a : b                    -> unchanged
+x == null / x != null                -> unchanged
+Numeric.sequence("s1", 1, 1)         -> use a PDI Add sequence step instead — confidence "low"
+context.NAME                         -> getVariable("NAME", "") — confidence "low" (map to a PDI parameter)
+globalMap.get("key")                 -> no direct equivalent — confidence "low"
+"""
+
+PROMPTS = {"informatica": SYSTEM_PROMPT, "java": JAVA_PROMPT}
+
 RESPONSE_SCHEMA = {
     "type": "object",
     "properties": {
@@ -124,7 +155,12 @@ class ExpressionTranslator:
         return translated
 
     def translate(self, expr: Expression) -> Expression:
-        if (simple := translate_deterministic(expr.raw)) is not None:
+        # The deterministic fast-path is Informatica-only: Java expressions carry
+        # row aliases (row1.FIELD) that must be rewritten, so they always go to
+        # the LLM with the alias rule in the prompt.
+        if expr.language == "informatica" and (
+            (simple := translate_deterministic(expr.raw)) is not None
+        ):
             expr.translated = simple
             expr.confidence = Confidence.AUTO
             expr.notes = "passthrough: already valid JavaScript"
@@ -163,7 +199,7 @@ class ExpressionTranslator:
             json={
                 "model": self.settings.model,
                 "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": PROMPTS.get(expr.language, SYSTEM_PROMPT)},
                     {
                         "role": "user",
                         "content": f"Translate this Informatica expression "

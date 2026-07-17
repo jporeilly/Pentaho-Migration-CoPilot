@@ -10,7 +10,7 @@ import typer
 
 from pdi_migration.generator import KjbGenerator, KtrGenerator
 from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
+from pdi_migration.parser import detect_parser
 from pdi_migration.validator import (
     assess_source,
     build_gap_report,
@@ -24,8 +24,8 @@ app = typer.Typer(help="Migration Copilot: legacy ETL -> Pentaho Data Integratio
 
 @app.command()
 def parse(export: Path) -> None:
-    """Parse a PowerCenter export and print the extracted pipelines."""
-    for pipeline in PowerCenterParser().parse_file(export):
+    """Parse a source export (PowerCenter .xml or Talend .item) and print the IR."""
+    for pipeline in detect_parser(export).parse_file(export):
         typer.echo(pipeline.model_dump_json(indent=2))
 
 
@@ -41,11 +41,12 @@ def convert(
         help="Translate expressions via the configured LLM provider (see Settings)",
     ),
 ) -> None:
-    """Convert a PowerCenter export to PDI .ktr skeletons + migration report."""
-    parser = PowerCenterParser()
-    mapper = RulesMapper()
+    """Convert a source export (PowerCenter/Talend) to PDI .ktr + migration report."""
+    parser = detect_parser(export)
     generator = KtrGenerator()
-    pipelines = [mapper.apply(p) for p in parser.parse_file(export)]
+    pipelines = [
+        RulesMapper.for_pipeline(p).apply(p) for p in parser.parse_file(export)
+    ]
 
     if translate:
         from pdi_migration.llm import ExpressionTranslator, TranslationError
@@ -82,7 +83,7 @@ def convert(
         )
 
     kjb_generator = KjbGenerator()
-    for job in parser.parse_workflows(export):
+    for job in (parser.parse_workflows(export) if hasattr(parser, "parse_workflows") else []):
         kjb_path = kjb_generator.write(job, out_dir)
         sessions = sum(1 for e in job.entries if e.task_type == "Session")
         placeholders = sum(
@@ -106,9 +107,8 @@ def sandbox(
     """Generate sandbox test kits: setup guide, CREATE TABLE DDL, synthetic CSVs."""
     from pdi_migration.sandbox import build_sandbox_kit, write_kit
 
-    mapper = RulesMapper()
-    for pipeline in PowerCenterParser().parse_file(export):
-        mapper.apply(pipeline)
+    for pipeline in detect_parser(export).parse_file(export):
+        RulesMapper.for_pipeline(pipeline).apply(pipeline)
         kit = build_sandbox_kit(pipeline, rows=rows)
         kit_dir = write_kit(kit, out_dir)
         typer.echo(
@@ -131,8 +131,6 @@ def batch(
     record each mapping in the migration project store."""
     from pdi_migration.project import MappingRecord, record_mapping
 
-    parser = PowerCenterParser()
-    mapper = RulesMapper()
     generator = KtrGenerator()
     kjb_generator = KjbGenerator()
     translator = None
@@ -149,9 +147,13 @@ def batch(
     total = failures = 0
     scores: list[int] = []
 
-    for xml in sorted(directory.glob("*.xml")):
+    files = sorted([*directory.glob("*.xml"), *directory.glob("*.item")])
+    for xml in files:
         try:
-            pipelines = [mapper.apply(p) for p in parser.parse_file(xml)]
+            parser = detect_parser(xml)
+            pipelines = [
+                RulesMapper.for_pipeline(p).apply(p) for p in parser.parse_file(xml)
+            ]
         except Exception as exc:
             failures += 1
             typer.echo(f"{xml.name}: PARSE FAILED — {exc}", err=True)
@@ -173,7 +175,7 @@ def batch(
             ))
             scores.append(score.score)
             total += 1
-        for job in parser.parse_workflows(xml):
+        for job in (parser.parse_workflows(xml) if hasattr(parser, "parse_workflows") else []):
             kjb_generator.write(job, out_dir / xml.stem)
     avg = round(sum(scores) / len(scores)) if scores else 0
     typer.echo(
@@ -259,15 +261,13 @@ def project() -> None:
 @app.command()
 def gaps(directory: Path = typer.Argument(Path("samples/informatica"))) -> None:
     """Batch-analyze every export in DIRECTORY: mapper coverage + gap list."""
-    parser = PowerCenterParser()
-    mapper = RulesMapper()
     pipelines = []
     failures: list[tuple[str, str]] = []
-    files = sorted(directory.glob("*.xml"))
+    files = sorted([*directory.glob("*.xml"), *directory.glob("*.item")])
     for xml in files:
         try:
-            for pipeline in parser.parse_file(xml):
-                pipelines.append(mapper.apply(pipeline))
+            for pipeline in detect_parser(xml).parse_file(xml):
+                pipelines.append(RulesMapper.for_pipeline(pipeline).apply(pipeline))
         except Exception as exc:  # a parse failure is a finding, not a crash
             failures.append((xml.name, str(exc)))
 

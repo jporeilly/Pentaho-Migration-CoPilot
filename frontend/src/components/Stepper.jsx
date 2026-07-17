@@ -1,6 +1,6 @@
 const STEPS = [
-  { label: 'Upload', hint: 'PowerCenter export',
-    tip: 'Drop an Informatica PowerCenter XML export. The source analysis identifies the tool version and flags migration risks before anything is converted.' },
+  { label: 'Upload', hint: 'source export',
+    tip: 'Drop a PowerCenter .xml or Talend .item export. The source analysis identifies the tool and version and flags migration risks before anything is converted.' },
   { label: 'Parse', hint: 'deterministic',
     tip: 'Real XML parsing — no AI. Extracts steps, fields, expressions, and hops into a normalized model you can inspect as a flow diagram.' },
   { label: 'Map', hint: 'rules + AI',

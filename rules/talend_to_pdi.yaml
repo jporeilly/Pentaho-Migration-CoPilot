@@ -1,0 +1,66 @@
+# Rules library: Talend component -> PDI step type (Stage 2: MAP).
+#
+# pdi_type values are PDI step ids as they appear in .ktr XML <type> elements.
+# Governance: bump _meta.version and record provenance on every change.
+
+_meta:
+  version: 1
+  updated: "2026-07-17"
+  provenance:
+    - "v1 (2026-07-17): initial component set from Talend Open Studio docs and PDI step inventory; to be validated against the real .item corpus."
+
+# ---- database I/O (family rule: any t<Db>Input behaves the same) ----
+"tOracleInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+"tMysqlInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+"tPostgresqlInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+"tMSSqlInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+"tDBInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+"tJDBCInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+
+"tOracleOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tMysqlOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tPostgresqlOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tMSSqlOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tDBOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tJDBCOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+
+# ---- files ----
+"tFileInputDelimited": { pdi_type: CsvInput, confidence: auto, notes: "Verify separator, header, and encoding settings." }
+"tFileOutputDelimited": { pdi_type: TextFileOutput, confidence: auto, notes: "Verify separator, header, and encoding settings." }
+"tFileInputExcel": { pdi_type: ExcelInput, confidence: review, notes: "Sheet/range configuration must be recreated." }
+"tFileInputXML": { pdi_type: getXMLData, confidence: review, notes: "XPath loop and field mappings must be recreated." }
+
+# ---- transformation core ----
+"tMap":
+  pdi_type: ScriptValueMod
+  confidence: review
+  notes: "tMap combines joins, filters, and Java expressions in one component. Lookup inputs become Stream Lookups; output expressions translate Java -> JavaScript; inner-join reject flows need Filter rows."
+"tFilterRow": { pdi_type: FilterRows, confidence: review, notes: "Conditions (or advanced-mode Java) need translation." }
+"tAggregateRow": { pdi_type: GroupBy, confidence: auto, notes: "PDI Group By requires sorted input; insert a Sort rows step upstream." }
+"tSortRow": { pdi_type: SortRows, confidence: auto }
+"tJoin": { pdi_type: MergeJoin, confidence: review, notes: "Both inputs must be sorted on the join keys; verify join type and key mapping." }
+"tUniqRow": { pdi_type: Unique, confidence: auto, notes: "PDI Unique rows requires sorted input." }
+"tUnite": { pdi_type: Append, confidence: auto, notes: "Row layouts must match across all inputs." }
+"tReplicate": { pdi_type: Dummy, confidence: review, notes: "PDI hops copy rows to multiple targets natively — set hop distribution to 'Copy' instead of a step." }
+"tNormalize": { pdi_type: Normaliser, confidence: review }
+"tDenormalize": { pdi_type: Denormaliser, confidence: review }
+"tConvertType": { pdi_type: SelectValues, confidence: review, notes: "Recreate type conversions in Select values metadata tab." }
+"tReplace": { pdi_type: ReplaceString, confidence: review }
+"tSampleRow": { pdi_type: SampleRows, confidence: auto }
+
+# ---- code components ----
+"tJavaRow": { pdi_type: ScriptValueMod, confidence: review, notes: "Per-row Java translates to JavaScript; review carefully." }
+"tJava": { pdi_type: ScriptValueMod, confidence: review, notes: "Free-form Java (often side effects); may belong in the job, not the transformation." }
+
+# ---- logging / misc ----
+"tLogRow": { pdi_type: WriteToLog, confidence: auto }
+"tRowGenerator": { pdi_type: DataGrid, confidence: review, notes: "Generation expressions must be recreated." }
+"tFixedFlowInput": { pdi_type: DataGrid, confidence: auto, notes: "Inline values become Data Grid rows." }
+"tContextLoad": { pdi_type: Dummy, confidence: review, notes: "Context variables map to PDI parameters/variables — configure at transformation or job level." }
+
+# ---- orchestration (belongs in .kjb, not .ktr) ----
+"tRunJob": { pdi_type: Dummy, confidence: review, notes: "Calls another job — becomes a Job entry (.kjb), not a transformation step." }
+"tPrejob": { pdi_type: Dummy, confidence: review, notes: "Pre-job actions belong in the PDI job (.kjb) START flow." }
+"tPostjob": { pdi_type: Dummy, confidence: review, notes: "Post-job actions belong in the PDI job (.kjb) end flow." }
+"tDie": { pdi_type: Abort, confidence: auto }
+"tWarn": { pdi_type: WriteToLog, confidence: auto }

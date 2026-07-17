@@ -1,0 +1,912 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><talendfile:ProcessType xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" xmlns:TalendMapper="http://www.talend.org/mapper" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" defaultContext="Default" jobType="Standard" xmi:version="2.0">
+  <context confirmationNeeded="false" hide="false" name="Default">
+    <contextParameter comment="" internalId="_ip3xoLtiEe65_pL7HwxoNg" name="Oracle_staging_Port" prompt="Oracle_staging_Port?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="1521"/>
+    <contextParameter comment="" internalId="_ip3xobtiEe65_pL7HwxoNg" name="Oracle_staging_Server" prompt="Oracle_staging_Server?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="10.86.77.7"/>
+    <contextParameter comment="" internalId="_ip3xortiEe65_pL7HwxoNg" name="Oracle_staging_Login" prompt="Oracle_staging_Login?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="system"/>
+    <contextParameter comment="" internalId="_ip3xo7tiEe65_pL7HwxoNg" name="Oracle_staging_ServiceName" prompt="Oracle_staging_ServiceName?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="ORCL"/>
+    <contextParameter comment="" internalId="_ip3xpLtiEe65_pL7HwxoNg" name="Oracle_staging_Password" prompt="Oracle_staging_Password?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_Password" value="enc:system.encryption.key.v1:jw7ewijOJ8zl5fSrPer9u9POqtPTBqllFLPVm5FeYZWHWU+Glxg="/>
+    <contextParameter comment="" internalId="_ip3xpbtiEe65_pL7HwxoNg" name="Oracle_staging_Schema" prompt="Oracle_staging_Schema?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_ip3xprtiEe65_pL7HwxoNg" name="Oracle_staging_AdditionalParams" prompt="Oracle_staging_AdditionalParams?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_Q1SnYMXDEe6laLkK1KLYzQ" name="idx_exists" prompt="idx_exists?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value=""/>
+  </context>
+  <context confirmationNeeded="false" hide="false" name="PRE_PROD">
+    <contextParameter comment="" internalId="_Q1SnYMXDEe6laLkK1KLYzQ" name="idx_exists" prompt="idx_exists?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value=""/>
+    <contextParameter comment="" internalId="_l6OHcFWGEe-ox_GTNTE4lg" name="Oracle_staging_Port" prompt="Oracle_staging_Port?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="1521"/>
+    <contextParameter comment="" internalId="_l6OHcVWGEe-ox_GTNTE4lg" name="Oracle_staging_Server" prompt="Oracle_staging_Server?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="10.86.81.8"/>
+    <contextParameter comment="" internalId="_l6OHclWGEe-ox_GTNTE4lg" name="Oracle_staging_Login" prompt="Oracle_staging_Login?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="system"/>
+    <contextParameter comment="" internalId="_l6OHc1WGEe-ox_GTNTE4lg" name="Oracle_staging_ServiceName" prompt="Oracle_staging_ServiceName?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value="ORCL"/>
+    <contextParameter comment="" internalId="_l6OHdFWGEe-ox_GTNTE4lg" name="Oracle_staging_Password" prompt="Oracle_staging_Password?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_Password" value="enc:system.encryption.key.v1:gWs1eZYbSVeLTxyD0FLlm7a2h3T6RT3hk+qWxwEXq9xmj2d2imQ="/>
+    <contextParameter comment="" internalId="_l6OHdVWGEe-ox_GTNTE4lg" name="Oracle_staging_Schema" prompt="Oracle_staging_Schema?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_l6OHdlWGEe-ox_GTNTE4lg" name="Oracle_staging_AdditionalParams" prompt="Oracle_staging_AdditionalParams?" promptNeeded="false" repositoryContextId="_UzQAELtiEe65_pL7HwxoNg" type="id_String" value=""/>
+  </context>
+  <parameters>
+    <elementParameter field="CLOSED_LIST" name="LOG4J_RUN_LEVEL" show="false" value="Info"/>
+    <elementParameter field="TEXT" name="SCREEN_OFFSET_X" show="false" value="0"/>
+    <elementParameter field="TEXT" name="SCREEN_OFFSET_Y" show="false" value="0"/>
+    <elementParameter field="TEXT" name="REPOSITORY_CONNECTION_ID" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_PROPERTY_TYPENAME" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_HADOOP_DISTRIBUTION" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_HADOOP_VERSION" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_ENABLE_KERBEROS" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_NAME_NODE_PRINCIPAL" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_USERNAME" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_GROUP" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_USE_KEYTAB" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_KT_PRINCIPAL" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_KEY_TAB" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_ENABLE_OO_KERBEROS" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_NAME_NODE_END_POINT" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_JOB_TRACKER_ENDPOINT" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_END_POINT" show="false" value=""/>
+    <elementParameter field="CHECK" name="IMPLICITCONTEXT_USE_PROJECT_SETTINGS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="STATANDLOG_USE_PROJECT_SETTINGS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="MULTI_THREAD_EXECATION" value="false"/>
+    <elementParameter field="TEXT" name="PARALLELIZE_UNIT_SIZE" value="25000"/>
+    <elementParameter field="CHECK" name="IMPLICIT_TCONTEXTLOAD" value="false"/>
+    <elementParameter field="RADIO" name="FROM_FILE_FLAG_IMPLICIT_CONTEXT" show="false" value="false"/>
+    <elementParameter field="RADIO" name="FROM_DATABASE_FLAG_IMPLICIT_CONTEXT" show="false" value="false"/>
+    <elementParameter field="FILE" name="IMPLICIT_TCONTEXTLOAD_FILE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="OVERRIDE_ENCODING_FLAG" show="false" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="OVERRIDE_ENCODING_IN_EXTRA" show="false" value="ISO-8859-15"/>
+    <elementParameter field="TECHNICAL" name="OVERRIDE_ENCODING_IN_EXTRA:ENCODING_TYPE" show="false" value="ISO-8859-15"/>
+    <elementParameter field="CLOSED_LIST" name="DB_TYPE_IMPLICIT_CONTEXT" show="false" value=""/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION_IMPLICIT_CONTEXT" show="false" value=""/>
+    <elementParameter field="TEXT" name="URL_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TABLE" name="DRIVER_JAR_IMPLICIT_CONTEXT" show="false"/>
+    <elementParameter field="TEXT" name="DRIVER_CLASS_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="HOST_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PORT_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PROPERTIES_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="USER_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS_IMPLICIT_CONTEXT" show="false" value="enc:system.encryption.key.v1:WmbdXhGUy6dibhJM5yAL07zGjdGxTAePsVIoGhD8"/>
+    <elementParameter field="FILE" name="DBFILE_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="DBTABLE_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="QUERY_CONDITION_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="LOAD_NEW_VARIABLE" show="false" value="Warning"/>
+    <elementParameter field="CLOSED_LIST" name="NOT_LOAD_OLD_VARIABLE" show="false" value="Warning"/>
+    <elementParameter field="CHECK" name="PRINT_OPERATIONS" show="false" value="false"/>
+    <elementParameter field="CHECK" name="DISABLE_ERROR" show="false" value="false"/>
+    <elementParameter field="CHECK" name="DISABLE_WARNINGS" show="false" value="false"/>
+    <elementParameter field="CHECK" name="DISABLE_INFO" show="false" value="false"/>
+    <elementParameter field="CHECK" name="ON_STATCATCHER_FLAG" value="true"/>
+    <elementParameter field="CHECK" name="ON_LOGCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_METERCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_CONSOLE_FLAG" show="false" value="false"/>
+    <elementParameter field="CHECK" name="ON_FILES_FLAG" show="false" value="false"/>
+    <elementParameter field="DIRECTORY" name="FILE_PATH" show="false" value="&quot;C:/Users/Roman.Kepa/workspace/.metadata&quot;"/>
+    <elementParameter field="TEXT" name="FILENAME_STATS" show="false" value="&quot;stats_file.txt&quot;"/>
+    <elementParameter field="TEXT" name="FILENAME_LOGS" show="false" value="&quot;logs_file.txt&quot;"/>
+    <elementParameter field="TEXT" name="FILENAME_METTER" show="false" value="&quot;meter_file.txt&quot;"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="ISO-8859-15"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" show="false" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="ON_DATABASE_FLAG" show="false" value="false"/>
+    <elementParameter field="CLOSED_LIST" name="DB_TYPE" show="false" value="JDBCOutput"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_12"/>
+    <elementParameter field="TEXT" name="URL" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TABLE" name="DRIVER_JAR" show="false"/>
+    <elementParameter field="TEXT" name="DRIVER_CLASS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="DATASOURCE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:wpe0Q4AHPJ7j2W6hQElMXQy323q/gl87+DrPbz55"/>
+    <elementParameter field="FILE" name="DBFILE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE_STATS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE_LOGS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE_METER" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="CATCH_RUNTIME_ERRORS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_USER_ERRORS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_USER_WARNING" show="false" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_REALTIME_STATS" show="false" value="true"/>
+    <elementParameter field="TEXT" name="HEADERFOOTER_HEADERID" show="false" value=""/>
+    <elementParameter field="CHECK" name="HEADER_ENABLED" show="false" value="false"/>
+    <elementParameter field="TEXT" name="HEADER_LIBRARY" show="false" value=""/>
+    <elementParameter field="TEXT" name="HEADER_CODE" show="false" value=""/>
+    <elementParameter field="TEXT" name="HEADER_IMPORT" show="false" value=""/>
+    <elementParameter field="TEXT" name="HEADERFOOTER_FOOTERID" show="false" value=""/>
+    <elementParameter field="CHECK" name="FOOTER_ENABLED" show="false" value="false"/>
+    <elementParameter field="TEXT" name="FOOTER_LIBRARY" show="false" value=""/>
+    <elementParameter field="TEXT" name="FOOTER_CODE" show="false" value=""/>
+    <elementParameter field="TEXT" name="FOOTER_IMPORT" show="false" value=""/>
+    <elementParameter field="CHECK" name="UPDATE_COMPONENTS" value="false"/>
+    <elementParameter field="CHECK" name="STATS_DEFAULT_PROJECTSETTING" value="true"/>
+    <elementParameter field="PROPERTY_TYPE" name="PROPERTY_TYPE" value=""/>
+    <elementParameter field="TECHNICAL" name="PROPERTY_TYPE:PROPERTY_TYPE" value="BUILT_IN"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY_TYPE:REPOSITORY_PROPERTY_TYPE" value=""/>
+  </parameters>
+  <node componentName="tPrejob" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="64" posY="32">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tPrejob_1"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+  </node>
+  <node componentName="tOracleConnection" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="224" posY="32">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBConnection_1"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="CHECK" name="USE_TNS_FILE" value="false"/>
+    <elementParameter field="FILE" name="TNS_FILE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TNS_EDITOR" name="TNS_EDITOR" show="false" value=""/>
+    <elementParameter field="TEXT" name="HOST" value="context.Oracle_staging_Server"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="PORT" value="context.Oracle_staging_Port"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.Oracle_staging_ServiceName"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" value="context.Oracle_staging_Schema"/>
+    <elementParameter field="TEXT" name="USER" value="context.Oracle_staging_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:I6vgOUMLqSWXjP/RKvVKCLzGv4qegqBMFtGP3V8JeHaooVwgueu/jDmgJbLC3V7kUemEV8aIbhhhqCg="/>
+    <elementParameter field="CHECK" name="USE_SSL" show="false" value="false"/>
+    <elementParameter field="FILE" name="SSL_TRUSTSERVER_TRUSTSTORE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="SSL_TRUSTSERVER_PASSWORD" show="false" value="enc:system.encryption.key.v1:wviOYoViwrcz3FfYhKYWYGgD2yJcvgmS9MJ3XPxE"/>
+    <elementParameter field="CHECK" name="NEED_CLIENT_AUTH" show="false" value="false"/>
+    <elementParameter field="FILE" name="SSL_KEYSTORE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="SSL_KEYSTORE_PASSWORD" show="false" value="enc:system.encryption.key.v1:bT9VqJRXZ/IBhfl1EgzuUq/d4ESNVFSxkBl9Qkfh"/>
+    <elementParameter field="CHECK" name="DISABLE_CBC_PROTECTION" show="false" value="true"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.Oracle_staging_AdditionalParams"/>
+    <elementParameter field="LABEL" name="NOTE" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="USE_SHARED_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="SHARED_CONNECTION_NAME" show="false" value=""/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="JDBC_URL" show="false" value="&quot;jdbc:oracle:thin:USER/MDP@server&quot;"/>
+    <elementParameter field="CHECK" name="AUTO_COMMIT" value="true"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Oracle_staging"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+  </node>
+  <node componentName="tPostjob" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="480" posY="32">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tPostjob_1"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+  </node>
+  <node componentName="tOracleClose" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="608" posY="32">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBClose_1"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="256" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_2"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:wxLz9zU7LBphTVv5C5V2aTvJ88Suav5Oo3uD4yRR9mFPTrcYI7nm/Q=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;---insert do Agronomis_scope&#13;&#10;INSERT INTO K2V_DEV.agronomis_scope (PAR_PARTNER_NR)&#13;&#10;SELECT PAR_PARTNER_NR  FROM sev.partner par&#13;&#10;WHERE LENGTH(par_partner_nr) = 8&#13;&#10;  AND (par_partner_nr_bd BETWEEN 101 AND 108&#13;&#10;    OR EXISTS&#13;&#10;          (SELECT 1 FROM sev.police pol&#13;&#10;           WHERE pol.par_partner_nr = par.par_partner_nr&#13;&#10;             AND pol.pol_police_typ IN ('VH','KH')&#13;&#10;             AND pol.pol_zustand = 'lebend'&#13;&#10;             AND pol.pol_historie = 'HN'))&#13;&#10;  AND par_bezirksverein_nr IS NOT NULL&#13;&#10;  AND (EXISTS&#13;&#10;          (SELECT 1  FROM sev.partner_anschrift pan&#13;&#10;           WHERE pan.par_partner_nr = par.par_partner_nr) -- Es existiert eine Anschrift oder&#13;&#10;    OR EXISTS&#13;&#10;          (SELECT 1  FROM sev.police pol&#13;&#10;           WHERE pol.par_partner_nr = par.par_partner_nr&#13;&#10;             AND pol.pol_police_typ IN ('VH','KH')&#13;&#10;             AND pol.pol_zustand = 'lebend'&#13;&#10;             AND pol.pol_historie &lt; 'HT')) --  eine ehemals/aktuell lebende VH- oder KH Police&#13;&#10;  AND (LOWER(par.par_name) NOT LIKE 'x%'&#13;&#10;    OR EXISTS&#13;&#10;          (SELECT 1 FROM sev.police pol&#13;&#10;           WHERE pol.par_partner_nr = par.par_partner_nr&#13;&#10;             AND pol.pol_police_typ IN ('VH','KH')&#13;&#10;             AND pol.pol_zustand = 'lebend'&#13;&#10;             AND pol.pol_historie &lt; 'HT'))&#13;&#10;  AND (LOWER(par_name) NOT LIKE 'gelöscht'&#13;&#10;    OR EXISTS&#13;&#10;          (SELECT 1 FROM sev.police pol&#13;&#10;           WHERE pol.par_partner_nr = par.par_partner_nr&#13;&#10;             AND pol.pol_police_typ IN ('VH','KH')&#13;&#10;             AND pol.pol_zustand = 'lebend'&#13;&#10;             AND pol.pol_historie &lt; 'HT'))&#13;&#10;  AND par_partner_nr NOT IN (12086814,&#13;&#10;                             12086901,&#13;&#10;                             12086820,&#13;&#10;                             12086835,&#13;&#10;                             12086843,&#13;&#10;                             12086857,&#13;&#10;                             12086862,&#13;&#10;                             12086878,&#13;&#10;                             12086881,&#13;&#10;                             12086899,&#13;&#10;                             12028451) --Testkontakte&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Agronomis_scope"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_2"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="736" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_3"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:3mTOwLJmkjSOM5d9vF6LdR5azOriYyCvXM3FODdH6OcA/1H8N1/znQ=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;begin&#13;&#10;---PRE CLEANSING TASK - for all numbers -----------------------------------&#13;&#10;&#13;&#10;---removing special chars between digits only&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET a.PHONE_PRE_CLEANSED = (CASE WHEN REGEXP_LIKE(a.PHONE_NUM_ORIG ,'([0-9])([ |-]+)([0])') THEN  REGEXP_replace(a.PHONE_NUM_ORIG ,'([0-9])([ |-])+([0-9])','\\1\\2\\3')&#13;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;ELSE REGEXP_replace(a.PHONE_NUM_ORIG ,'([0-9])([ |-])+([0-9])','\\1\\3') END )&#13;&#10;;&#13;&#10;&#13;&#10;---removing special chars from end of the number&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET a.PHONE_PRE_CLEANSED = trim(REPLACE(REGEXP_REPLACE(a.PHONE_PRE_CLEANSED ,'[)( :;?*^$/.!,\&quot;%&amp;§-]+$',''),chr(10),'')) &#13;&#10;--WHERE REGEXP_LIKE(a.PHONE_PRE_CLEANSED  , '[)( :?*^$/.!,\&quot;%&amp;§-]+$') &#13;&#10;;&#13;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&#13;&#10;---removing special chars from beggining of the number&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET a.PHONE_PRE_CLEANSED = trim(REGEXP_REPLACE(a.PHONE_PRE_CLEANSED ,'^[)( :;?*^$/.!,\&quot;%&amp;§-]+','')) &#13;&#10;--WHERE REGEXP_LIKE(a.PHONE_PRE_CLEANSED  , '^[ |^|\\*|\\?|-|\\.]') &#13;&#10;;&#13;&#10;--- removing numbers with only zeros&#13;&#10;delete FROM K2V_DEV.AGRONIMIS_PHONE_NORMALIZED apn &#13;&#10;WHERE REGEXP_LIKE(apn.PHONE_NUM_ORIG ,'^(.)\\1+$')&#13;&#10;OR REGEXP_LIKE(apn.PHONE_PRE_CLEANSED  ,'^(.)\\1+$') &#13;&#10;;&#13;&#10;----changing first 3 or more zeros to two (12 recs)&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A&#13;&#10;SET a.PHONE_PRE_CLEANSED = REGEXP_REPLACE(a.PHONE_PRE_CLEANSED ,'^([a-z ]*)([0]{3})','\\100' )&#13;&#10;WHERE REGEXP_LIKE(lower(a.PHONE_PRE_CLEANSED), '^[a-z ]*[0]{3}')&#13;&#10;;&#13;&#10;---replace +00 from begining of the number with 00 only (2 recs)&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET a.PHONE_PRE_CLEANSED = replace(A.PHONE_PRE_CLEANSED,'+00','00')&#13;&#10;WHERE A.PHONE_PRE_CLEANSED LIKE '+00%'&#13;&#10;;&#13;&#10;&#13;&#10;--replace begining + with 00 (472 recs)&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET a.PHONE_PRE_CLEANSED = REGEXP_REPLACE(a.PHONE_PRE_CLEANSED  , '^([A-Za-zäöüÄÖÜß ]*)(\\+\\s*)','\\100' )&#13;&#10;WHERE REGEXP_LIKE(lower(a.PHONE_PRE_CLEANSED), '^[a-z ]*\\+')&#13;&#10;;&#13;&#10;&#13;&#10;----calculating PRECLEANSED_PATTERN field&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET precleansed_pattern = REGEXP_REPLACE(a.PHONE_PRE_CLEANSED,'[A-Za-zäöüÄÖÜß]{1,}','a')&#13;&#10;;&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A &#13;&#10;SET precleansed_pattern = REGEXP_REPLACE(a.precleansed_pattern,'\\d{1,}','9')&#13;&#10;;&#13;&#10;&#13;&#10;&#13;&#10;----cleansing 0/0 pattern&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED A&#13;&#10;SET a.STATUS = 'not migrated'&#13;&#10;WHERE a.PHONE_PRE_CLEANSED  = '0/0'&#13;&#10;;&#13;&#10;&#13;&#10;----end of pre cleansing tasks ------------------------------------------&#13;&#10;----stare zapytania ----&#13;&#10;---DETAILED CLEANSING ------------------------------&#13;&#10;--cleansing phones step 1  --- 98% OF phones migration TO dest COLUMN - only digits present  in nuber filed&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;SET a.PHONE_NORMALIZED = CASE WHEN LENGTH(a.PHONE_PRE_CLEANSED)&lt;=20 THEN trim(a.PHONE_PRE_CLEANSED) ELSE '999999999' END , ---dummy num FOR LONG NUMBER phones&#13;&#10;a.REMARKS = CASE WHEN LENGTH(a.PHONE_PRE_CLEANSED)&lt;=20 THEN a.ASOCIATED_NUM ELSE COALESCE(a.ASOCIATED_NUM,'')||'orig_num: '||a.PHONE_PRE_CLEANSED end  ,&#13;&#10;a.STATUS = 'cleansed stage 1',&#13;&#10;a.UPDATE_DATE = SYSDATE &#13;&#10;WHERE a.PRECLEANSED_PATTERN ='9'&#13;&#10;AND a.status IS null&#13;&#10;;&#13;&#10;&#13;&#10;--cleansing phones step 2  --- numbers divided by /&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;SET a.PHONE_NORMALIZED = trim(replace(a.PHONE_PRE_CLEANSED,'/','')),&#13;&#10;a.REMARKS = a.ASOCIATED_NUM,&#13;&#10;a.STATUS = 'cleansed stage 2a',&#13;&#10;a.UPDATE_DATE = SYSDATE &#13;&#10;WHERE a.PRECLEANSED_PATTERN ='9/9'&#13;&#10;AND a.PHONE_PRE_CLEANSED LIKE '00%'&#13;&#10;AND a.status IS null&#13;&#10;;&#13;&#10;&#13;&#10;execute immediate 'create INDEX K2V_DEV.K2V_AGRONIMIS_PHONE_NORMALIZED_I1 ON K2V_DEV.AGRONIMIS_PHONE_NORMALIZED (precleansed_pattern)';&#13;&#10;execute immediate 'create INDEX K2V_DEV.K2V_AGRONIMIS_PHONE_NORMALIZED_I2 ON K2V_DEV.AGRONIMIS_PHONE_NORMALIZED (PARTNER_ID)' ;&#13;&#10;execute immediate 'create INDEX K2V_DEV.K2V_AGRONIMIS_PHONE_NORMALIZED_I3 ON K2V_DEV.AGRONIMIS_PHONE_NORMALIZED (status)' ;&#13;&#10;&#13;&#10;DECLARE&#13;&#10;&#9;numer_1 varchar2(200);&#13;&#10;&#9;numer_2 varchar2(200);&#13;&#10;&#9;numer_dod varchar2(200);&#13;&#10;&#9;status_info varchar2(200) := 'cleansed stage 2b';&#13;&#10;&#9;max_dl_num integer := 18;&#13;&#10;&#9;--v_rec RECORD;&#13;&#10;BEGIN&#13;&#10;&#9;FOR v_rec IN (SELECT * FROM K2V_DEV.AGRONIMIS_PHONE_NORMALIZED &#13;&#10;&#9;&#9;&#9;&#9; WHERE status IS NULL&#13;&#10;&#9;&#9;&#9;&#9; AND PRECLEANSED_PATTERN = '9/9'&#13;&#10;&#9;&#9;&#9;&#9; --AND rownum&lt;1001&#13;&#10;&#9;&#9;&#9;&#9; --AND PARTNER_ID  = 12685033&#13;&#10;&#9;&#9;&#9;&#9; )&#13;&#10;&#9;LOOP&#13;&#10;&#9;&#9;&#13;&#10;&#9;&#9;numer_1 := substr(v_rec.phone_pre_cleansed,1,REGEXP_INSTR(v_rec.phone_pre_cleansed,'/')-1);&#13;&#10;&#9;&#9;numer_2 := substr(v_rec.phone_pre_cleansed,REGEXP_INSTR(v_rec.phone_pre_cleansed,'/')+1);&#13;&#10;&#9;&#9;&#13;&#10;&#9;&#9;--dbms_output.put_line('id: '||v_rec.id);&#13;&#10;&#9;&#9;--dbms_output.put_line('numer_oryg: '||v_rec.phone_pre_cleansed);&#13;&#10;&#9;&#9;--dbms_output.put_line('pierwszy numer: '||numer_1);&#13;&#10;&#9;&#9;--dbms_output.put_line('drugi numer: '||numer_2);&#13;&#10;&#9;&#9;&#13;&#10;&#9;&#9;IF v_rec.historical = 'N' THEN&#13;&#10;&#9;&#9;&#9;IF (substr(numer_1,1,3) = substr(numer_2,1,3)) THEN &#13;&#10;&#9;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = numer_1,&#13;&#10;&#9;&#9;&#9;&#9;a.PHONE_SECOND = numer_2,&#13;&#10;&#9;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;&#9;&#13;&#10;&#9;&#9;&#9;ELSIF (substr(numer_1,1,3) &lt;&gt; substr(numer_2,1,3)) AND (LENGTH(numer_2) &lt; LENGTH(numer_1)) then &#13;&#10;&#9;&#9;&#9;&#9;if (substr(numer_2,1,3) = substr(numer_1,-LENGTH(numer_2),3)) then&#13;&#10;&#9;&#9;&#9;&#9;&#9;numer_dod := substr(numer_1,1,LENGTH(numer_1)-LENGTH(numer_2))||numer_2;&#13;&#10;&#9;&#9;&#9;&#9;&#9;&#13;&#10;&#9;&#9;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = numer_1,&#13;&#10;&#9;&#9;&#9;&#9;&#9;a.PHONE_SECOND = numer_dod,&#13;&#10;&#9;&#9;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;&#9;&#9;ELSIF length(v_rec.phone_pre_cleansed)&lt; max_dl_num then&#13;&#10;&#9;&#9;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = REPLACE(v_rec.phone_pre_cleansed,'/',''),&#13;&#10;&#9;&#9;&#9;&#9;&#9;a.REMARKS  = CASE WHEN LENGTH(numer_2)&lt;4 then trim(COALESCE(a.ASOCIATED_NUM,'')||' orig_num: '||v_rec.phone_num_orig) ELSE a.ASOCIATED_NUM END,&#13;&#10;&#9;&#9;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;&#9;&#9;ELSE &#13;&#10;&#9;&#9;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = numer_1,&#13;&#10;&#9;&#9;&#9;&#9;&#9;a.REMARKS  = trim(COALESCE(a.ASOCIATED_NUM,'')||' orig_num: '||v_rec.phone_num_orig),&#13;&#10;&#9;&#9;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;&#9;&#9;END IF;&#13;&#10;&#9;&#9;&#9;ELSE &#13;&#10;&#9;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = REPLACE(v_rec.phone_pre_cleansed,'/',''),&#13;&#10;&#9;&#9;&#9;&#9;a.REMARKS  = CASE WHEN LENGTH(numer_2)&lt;4 then trim(COALESCE(a.ASOCIATED_NUM,'')||' orig_num: '||v_rec.phone_num_orig) ELSE a.ASOCIATED_NUM END,&#13;&#10;&#9;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;&#9;END IF;&#13;&#10;&#9;&#9;&#13;&#10;&#9;&#9;ELSIF (v_rec.historical = 'Y') AND  (length(v_rec.phone_pre_cleansed)&lt; max_dl_num) then&#13;&#10;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = REPLACE(v_rec.phone_pre_cleansed,'/',''),&#13;&#10;&#9;&#9;&#9;a.REMARKS  = CASE WHEN LENGTH(numer_2)&lt;4 then trim(COALESCE(a.ASOCIATED_NUM,'')||' orig_num: '||v_rec.phone_num_orig) ELSE a.ASOCIATED_NUM END, &#13;&#10;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;ELSE &#13;&#10;&#9;&#9;&#9;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED a&#13;&#10;&#9;&#9;&#9;SET a.PHONE_NORMALIZED = numer_1,&#13;&#10;&#9;&#9;&#9;a.REMARKS  = trim(COALESCE(a.ASOCIATED_NUM,'')||' orig_num: '||v_rec.phone_num_orig),&#13;&#10;&#9;&#9;&#9;a.STATUS = status_info&#13;&#10;&#9;&#9;&#9;WHERE a.ID  = v_rec.id;&#13;&#10;&#9;&#9;END IF;&#13;&#10;&#9;END LOOP;&#13;&#10;END;&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;end;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Agronomis phones cleansing "/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_3"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="960" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_4"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:mx3WOTLPMnaO9UbAlRpFjEwXgBbq6yJwbxukxjIpvA0JrkXxB89fbw=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;begin&#13;&#10;-----uzupelnienie tablicy calosciowej&#13;&#10;insert into K2V_DEV.AGRONIMIS_PHONE_ALL (PAR_PARTNER_NR, PHONE_NUMBER, PHONE_TYPE)&#13;&#10;SELECT a.par_partner_nr, a.phone_number, a.phone_type&#13;&#10;FROM (&#13;&#10;SELECT p.par_partner_nr, REPLACE(trim(p.par_priv_telefon),'*^:&amp;%','') AS phone_number, 'PT' AS phone_type&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE REPLACE(trim(p.par_priv_telefon),'*^:&amp;%','') IS NOT NULL&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION&#13;&#10;&#13;&#10;SELECT p.par_partner_nr, REPLACE(trim(p.par_fa_telefon),'*^:&amp;%','') AS phone_number, 'BT' AS phone_type&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE REPLACE(trim(p.par_fa_telefon),'*^:&amp;%','') IS NOT NULL &#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;SELECT p.par_partner_nr, REPLACE(trim(p.par_priv_handy),'*^:&amp;%','') AS phone_number, 'PM' AS phone_type&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE REPLACE(trim(p.par_priv_handy),'*^:&amp;%','') IS NOT NULL &#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION&#13;&#10;&#13;&#10;SELECT p.par_partner_nr, REPLACE(trim(p.par_fa_handy),'*^:&amp;%','') AS phone_number, 'BM' AS phone_type&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE REPLACE(trim(p.par_fa_handy),'*^:&amp;%','') IS NOT NULL &#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;SELECT p.par_partner_nr, REPLACE(trim(p.par_priv_fax),'*^:&amp;%','') AS phone_number, 'PF' AS phone_type&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE REPLACE(trim(p.par_priv_fax),'*^:&amp;%','') IS NOT NULL &#13;&#10;AND  EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION&#13;&#10;&#13;&#10;SELECT p.par_partner_nr, REPLACE(trim(p.par_fa_fax),'*^:&amp;%','') AS phone_number, 'BF' AS phone_type&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE REPLACE(trim(p.par_fa_fax),'*^:&amp;%','') IS NOT NULL&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;) a;&#13;&#10;&#13;&#10;end;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Agronomis_phone_all"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_4"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1408" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_5"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:yqkKITpirxQpZJAhQoUVi8P9Ep6zsjsvYiskI8oMjKaosQDXO+XT6A=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;BEGIN&#13;&#10;insert into K2V_DEV.agr_entity_type (PAR_PARTNER_NR, ID)&#13;&#10;SELECT DISTINCT p.PAR_PARTNER_NR , CAST (101 AS number(10)) AS id&#13;&#10;FROM sev.PARTNER p&#13;&#10;LEFT  JOIN sev.PARTNER_ROLLE     pr  ON p.PAR_PARTNER_NR = pr.PAR_PARTNER_NR&#13;&#10;LEFT  JOIN sev.PARTNER_BEZIEHUNG pb  ON p.PAR_PARTNER_NR = pb.PAR_PARTNER_NR&#13;&#10;LEFT  JOIN sev.PARTNER_BEZIEHUNG pbe ON p.PAR_PARTNER_NR = pbe.PBE_PARTNER_NR&#13;&#10;WHERE p.PAR_RECHTSFORM IN (1,2,3,4,5,8,9,12,13,14)&#13;&#10;OR lower(p.PAR_VORNAME) like '%gmbh%' OR lower(p.PAR_VORNAME) like '%mbh%' OR lower(p.PAR_VORNAME) like '%gmbh%' OR lower(p.PAR_VORNAME) like '%m.b.h.%'&#13;&#10;OR lower(p.PAR_NAME)    like '%gmbh%' OR lower(p.PAR_NAME)    like '%mbh%' OR lower(p.PAR_NAME)    like '%gmbh%' OR lower(p.PAR_NAME)    like '%m.b.h.%'&#13;&#10;OR lower(p.PAR_NAME2)   like '%gmbh%' OR lower(p.PAR_NAME2)   like '%mbh%' OR lower(p.PAR_NAME2)   like '%gmbh%' OR lower(p.PAR_NAME2)   like '%m.b.h.%'&#13;&#10;OR lower(p.PAR_VORNAME) like '%gbr%'  OR lower(p.PAR_VORNAME) like '%g.b.r.%' OR lower(p.PAR_VORNAME) like '%b.r.%'&#13;&#10;OR lower(p.PAR_NAME)    like '%gbr%'  OR lower(p.PAR_NAME)    like '%g.b.r.%' OR lower(p.PAR_NAME)    like '%b.r.%'&#13;&#10;OR lower(p.PAR_NAME2)   like '%gbr%'  OR lower(p.PAR_NAME2)   like '%g.b.r.%' OR lower(p.PAR_NAME2)   like '%b.r.%'&#13;&#10;OR p.PAR_VORNAME like '% KG %' OR p.PAR_VORNAME like '% KG' OR lower(p.PAR_VORNAME) like '% co.%'&#13;&#10;OR p.PAR_NAME    like '% KG %' OR p.PAR_NAME    like '% KG' OR lower(p.PAR_NAME)    like '% co.%'&#13;&#10;OR p.PAR_NAME2   like '% KG %' OR p.PAR_NAME2   like '% KG' OR lower(p.PAR_NAME2)   like '% co.%'&#13;&#10;OR p.PAR_VORNAME like '% AG %' OR p.PAR_VORNAME like '% AG'&#13;&#10;OR p.PAR_NAME    like '% AG %' OR p.PAR_NAME    like '% AG'&#13;&#10;OR p.PAR_NAME2   like '% AG %' OR p.PAR_NAME2   like '% AG'&#13;&#10;OR lower(p.PAR_VORNAME) like '%genossenschaft%' OR p.PAR_VORNAME like '% eG%' OR p.PAR_VORNAME like '% e.G.%' OR p.PAR_VORNAME like '% e. G.%' OR p.PAR_VORNAME like '% Gen.M.B.H.%'&#13;&#10;OR lower(p.PAR_NAME)    like '%genossenschaft%' OR p.PAR_NAME    like '% eG%' OR p.PAR_NAME    like '% e.G.%' OR p.PAR_NAME    like '% e. G.%' OR p.PAR_NAME    like '% Gen.M.B.H.%'&#13;&#10;OR lower(p.PAR_NAME2)   like '%genossenschaft%' OR p.PAR_NAME2   like '% eG%' OR p.PAR_NAME2   like '% e.G.%' OR p.PAR_NAME2   like '% e. G.%' OR p.PAR_NAME2   like '% Gen.M.B.H.%'&#13;&#10;OR lower(p.PAR_VORNAME) like '%ohg%'&#13;&#10;OR lower(p.PAR_NAME)    like '%ohg%'&#13;&#10;OR lower(p.PAR_NAME2)   like '%ohg%'&#13;&#10;OR p.PAR_VORNAME like '% UG %' OR p.PAR_VORNAME like '% UG'&#13;&#10;OR p.PAR_NAME    like '% UG %' OR p.PAR_NAME    like '% UG'&#13;&#10;OR p.PAR_NAME2   like '% UG %' OR p.PAR_NAME2   like '% UG'&#13;&#10;OR p.PAR_ANREDE IN (13,19,28,29,38)&#13;&#10;OR (p.PAR_GF_VORSTAND IS NOT NULL AND p.PAR_GF_VORSTAND NOT LIKE '+%' AND p.PAR_GF_VORSTAND NOT LIKE '0%')&#13;&#10;OR pr.PRE_ROLLE = 'Rückversicherer' OR pr.PRE_ROLLE = 'Hagelversicherer' OR pr.PRE_ROLLE = 'sonstiger Versicherer'&#13;&#10;OR pb.PBE_ART_1  = 'Gesellschaft'&#13;&#10;OR pbe.PBE_ART_2 = 'Gesellschaft'&#13;&#10;;&#13;&#10;&#13;&#10;INSERT INTO K2V_DEV.AGR_ENTITY_TYPE &#13;&#10;SELECT  p.PAR_PARTNER_NR, CAST(10003 AS number(10)) AS id&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE NOT EXISTS (SELECT 1 FROM K2V_DEV.AGR_ENTITY_TYPE aet2 WHERE aet2.PAR_PARTNER_NR = p.PAR_PARTNER_NR)&#13;&#10;and (p.PAR_RECHTSFORM IN (6,7)&#13;&#10;OR p.PAR_ANREDE IN (16,17,18,20,21,22,34,35,36,45,58)&#13;&#10;OR p.PAR_AMTSGERICHT IS NOT NULL&#13;&#10;OR p.PAR_VORNAME like '% e.K. %' OR p.PAR_VORNAME like '% eK%'&#13;&#10;OR p.PAR_NAME    like '% e.K. %' OR p.PAR_NAME    like '% eK%'&#13;&#10;OR p.PAR_NAME2   like '% e.K. %' OR p.PAR_NAME2   like '% eK%'&#13;&#10;OR EXISTS (SELECT 1 FROM sev.PARTNER_BEZIEHUNG pb  &#13;&#10;&#9;WHERE ((p.PAR_PARTNER_NR = pb.PAR_PARTNER_NR  AND pb.PBE_ART_1  IN ('Gesellschaft','Arbeitgeber','Berufsbetreuer (Vormund)','Firma','Firmengruppe','Insolvenzverwalter/IN','Maklerbüro','Tochter-Firma'))&#13;&#10;&#9;OR (p.PAR_PARTNER_NR = pb.PBE_PARTNER_NR AND pb.PBE_ART_2  IN ('Gesellschaft','Arbeitgeber','Berufsbetreuer (Vormund)','Firma','Firmengruppe','Insolvenzverwalter/IN','Maklerbüro','Tochter-Firma'))))&#13;&#10;OR EXISTS (SELECT 1 FROM sev.PARTNER_ROLLE  pr WHERE p.PAR_PARTNER_NR = pr.PAR_PARTNER_NR AND pr.PRE_ROLLE IN ('Schätzerlokal','Hotel','Schulungslokal','Makler','WEB AV anzeigen','Interessent_WEB','Interessent','Insolvenzverwalter/-in'))&#13;&#10;OR EXISTS (SELECT 1 FROM sev.PARTNER        p2  WHERE p2.PAR_VERMITTLER_NR_VM = p.par_partner_nr)&#13;&#10;OR EXISTS (SELECT 1 FROM sev.police         pol WHERE pol.par_partner_nr = p.par_partner_nr)&#13;&#10;OR EXISTS (SELECT 1 FROM sev.ANGEBOT_POLICE ap2 WHERE ap2.par_partner_nr = p.par_partner_nr)&#13;&#10;);&#13;&#10;&#13;&#10;EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX K2V_DEV.K2V_AGR_ENTITY_TYPE_I1 ON K2V_DEV.AGR_ENTITY_TYPE (PAR_PARTNER_NR)';&#13;&#10;END;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="agr_entity_type"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_5"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1664" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tRunJob_1"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_JOB" value="false"/>
+    <elementParameter field="TEXT" name="CONTEXT_JOB" show="false" value=""/>
+    <elementParameter field="PROCESS_TYPE" name="PROCESS" value="MyPartner_EmailAndPhoneNormalization"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_CONTEXT" value="Default"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_PROCESS" value="VH:_BwfEsM7cEe2fxdNsoOGCiQ"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_VERSION" value="Latest"/>
+    <elementParameter field="TEXT" name="CONTEXT_NAME" show="false" value="Default"/>
+    <elementParameter field="CHECK" name="USE_INDEPENDENT_PROCESS" value="false"/>
+    <elementParameter field="CHECK" name="DIE_ON_CHILD_ERROR" value="true"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="false"/>
+    <elementParameter field="TABLE" name="CONTEXTPARAMS"/>
+    <elementParameter field="CHECK" name="PROPAGATE_CHILD_RESULT" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_PARAMETER" value="false"/>
+    <elementParameter field="CHECK" name="TRANSMIT_ORIGINAL_CONTEXT" show="false" value="true"/>
+    <elementParameter field="RADIO" name="USE_CHILD_JVM_SETTING" show="false" value="true"/>
+    <elementParameter field="RADIO" name="USE_CUSTOM_JVM_SETTING" show="false" value="false"/>
+    <elementParameter field="TABLE" name="JVM_ARGUMENTS" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_CONTEXT" value="false"/>
+    <elementParameter field="TEXT" name="DYNAMIC_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="USE_EXTRA_CLASSPATH" show="false" value="false"/>
+    <elementParameter field="TEXT" name="EXTRA_CLASSPATH" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="LOAD_CONTEXT_FROM_FILE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="__PROCESS__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <elementParameter field="CHECK" name="USE_BASE64" value="false"/>
+    <metadata connector="FLOW" name="tRunJob_1"/>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="96" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_6"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:qjHh3TtnWIKNCMqdWxbdcKlSZh8D+CndCm+VeKCrhFokE+evQB8foA=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;begin&#13;&#10;execute immediate 'truncate TABLE K2V_DEV.agronomis_scope';&#13;&#10;execute immediate 'truncate TABLE k2v_dev.Agronimis_phone_normalized';&#13;&#10;execute immediate 'TRUNCATE TABLE K2V_DEV.AGRONIMIS_PHONE_ALL';&#13;&#10;execute immediate 'TRUNCATE TABLE K2V_DEV.agronomis_additional_emails';&#13;&#10;execute immediate 'TRUNCATE TABLE K2V_DEV.agr_entity_type';&#13;&#10;end;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Table truncate"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_6"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="480" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_7"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:sNQuaPgXigU++DK95X7RnT3r3gk+nwF8+CzNLNB8+G/NFKTyM47QpQ=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;begin&#13;&#10;----INSERT TELEFONOW AKTUALNYCH ---&#13;&#10;INSERT INTO K2V_DEV.AGRONIMIS_PHONE_NORMALIZED&#13;&#10;(PARTNER_ID, ASOCIATED_NUM, PHONE_NUM_ORIG, PHONE_TYPE)&#13;&#10;&#13;&#10;---telefon sluzbowy ---- BT (bussiens Telephone -fixed line)&#13;&#10;SELECT p.PAR_PARTNER_NR ,CASE WHEN REGEXP_LIKE(regexp_REPLACE(trim(p.PAR_PRIV_TELEFON),'[()*^:&amp;%]',''),'(^[a-z]{1,})\\D{1,}$','i') THEN trim(regexp_REPLACE(p.PAR_PRIV_TELEFON,'[*^:&amp;%]','')) ELSE NULL END&#13;&#10;,trim(p.PAR_FA_TELEFON), 'BT'&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE  REPLACE(trim(p.PAR_FA_TELEFON),'*^:&amp;%','') IS NOT NULL  ---nie moze byc null&#13;&#10;AND NOT REGEXP_LIKE(REPLACE(trim(p.PAR_FA_TELEFON),'*^:&amp;%',''),'(^\\D{1,}$)','i') ----nie moze zawierac tylko liter i znakow specjalnych - musi miec tez cyfry&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;---telefon prywatny ---- PT (Private Telephone -fixed line)&#13;&#10;SELECT p.PAR_PARTNER_NR ,CASE WHEN REGEXP_LIKE(regexp_REPLACE(trim(p.PAR_FA_TELEFON),'[()*^:&amp;%]',''),'(^[a-z]{1,})\\D{1,}$','i') THEN trim(regexp_REPLACE(p.PAR_FA_TELEFON,'[*^:&amp;%]','')) ELSE NULL END&#13;&#10;,trim(p.PAR_PRIV_TELEFON), 'PT'&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE  REPLACE(trim(p.PAR_PRIV_TELEFON),'*^:&amp;%','') IS NOT NULL  ---nie moze byc null&#13;&#10;AND NOT REGEXP_LIKE(REPLACE(trim(p.PAR_PRIV_TELEFON),'*^:&amp;%',''),'(^\\D{1,}$)','i') ----nie moze zawierac tylko liter i znakow specjalnych - musi miec tez cyfry&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;---komorka sluzbowa ---BM (bussiens mobile)&#13;&#10;SELECT p.PAR_PARTNER_NR ,CASE WHEN REGEXP_LIKE(regexp_REPLACE(trim(p.PAR_PRIV_HANDY),'[()*^:&amp;%]',''),'(^[a-z]{1,})\\D{1,}$','i') THEN trim(regexp_REPLACE(p.PAR_PRIV_HANDY,'[*^:&amp;%]','')) ELSE NULL END&#13;&#10;,trim(p.PAR_FA_HANDY), 'BM'&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE  REPLACE(trim(p.PAR_FA_HANDY),'*^:&amp;%','') IS NOT NULL  ---nie moze byc null&#13;&#10;AND NOT REGEXP_LIKE(REPLACE(trim(p.PAR_FA_HANDY),'*^:&amp;%',''),'(^\\D{1,}$)','i') ----nie moze zawierac tylko liter i znakow specjalnych - musi miec tez cyfry&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;--AND REGEXP_LIKE(REPLACE(trim(p.PAR_PRIV_HANDY),'*^:&amp;%',''),'(^[a-z]{1,})\\D{1,}$','i')&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;---komorka prywatna ---- PM (Private Mobile)&#13;&#10;SELECT p.PAR_PARTNER_NR ,CASE WHEN REGEXP_LIKE(regexp_REPLACE(trim(p.PAR_FA_HANDY),'[()*^:&amp;%]',''),'(^[a-z]{1,})\\D{1,}$','i') THEN trim(regexp_REPLACE(p.PAR_FA_HANDY,'[*^:&amp;%]','')) ELSE NULL END&#13;&#10;,trim(p.PAR_PRIV_HANDY), 'PM'&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE  REPLACE(trim(p.PAR_PRIV_HANDY),'*^:&amp;%','') IS NOT NULL  ---nie moze byc null&#13;&#10;AND NOT REGEXP_LIKE(REPLACE(trim(p.PAR_PRIV_HANDY),'*^:&amp;%',''),'(^\\D{1,}$)','i') ----nie moze zawierac tylko liter i znakow specjalnych - musi miec tez cyfry&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;---faks sluzbowy ---BF (bussiens fax)&#13;&#10;SELECT p.PAR_PARTNER_NR ,CASE WHEN REGEXP_LIKE(regexp_REPLACE(trim(p.PAR_PRIV_FAX),'[()*^:&amp;%]',''),'(^[a-z]{1,})\\D{1,}$','i') THEN trim(regexp_REPLACE(p.PAR_PRIV_FAX,'[*^:&amp;%]','')) ELSE NULL END&#13;&#10;,trim(p.PAR_FA_FAX), 'BF'&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE  REPLACE(trim(p.PAR_FA_FAX),'*^:&amp;%','') IS NOT NULL  ---nie moze byc null&#13;&#10;AND NOT REGEXP_LIKE(REPLACE(trim(p.PAR_FA_FAX),'*^:&amp;%',''),'(^\\D{1,}$)','i') ----nie moze zawierac tylko liter i znakow specjalnych - musi miec tez cyfry&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;&#13;&#10;UNION &#13;&#10;&#13;&#10;---faks prywatny ---- PF (Private Fax)&#13;&#10;SELECT p.PAR_PARTNER_NR ,CASE WHEN REGEXP_LIKE(regexp_REPLACE(trim(p.PAR_FA_FAX),'[()*^:&amp;%]',''),'(^[a-z]{1,})\\D{1,}$','i') THEN trim(regexp_REPLACE(p.PAR_FA_FAX,'[*^:&amp;%]','')) ELSE NULL END&#13;&#10;,trim(p.PAR_PRIV_FAX), 'PF'&#13;&#10;FROM sev.PARTNER p &#13;&#10;WHERE  REPLACE(trim(p.PAR_PRIV_FAX),'*^:&amp;%','') IS NOT NULL  ---nie moze byc null&#13;&#10;AND NOT REGEXP_LIKE(REPLACE(trim(p.PAR_PRIV_FAX),'*^:&amp;%',''),'(^\\D{1,}$)','i') ----nie moze zawierac tylko liter i znakow specjalnych - musi miec tez cyfry&#13;&#10;and EXISTS (SELECT 1 FROM K2V_DEV.AGRONOMIS_SCOPE ags WHERE ags.PAR_PARTNER_NR  = p.PAR_PARTNER_NR  )&#13;&#10;;&#13;&#10;&#13;&#10;---setting IDIT Telephone TypeRef &#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED&#13;&#10;SET phone_type_idit = CASE PHONE_TYPE &#13;&#10;&#9;WHEN 'PT' THEN 3&#13;&#10;&#9;WHEN 'BT' THEN 2&#13;&#10;&#9;WHEN 'PM' THEN 1&#13;&#10;&#9;WHEN 'BM' THEN 4&#13;&#10;&#9;WHEN 'PF' THEN 1000000&#13;&#10;&#9;WHEN 'BF' THEN 1000001&#13;&#10;&#9;END ;&#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED &#13;&#10;SET phone_type_desc_idit = CASE PHONE_TYPE &#13;&#10;&#9;WHEN 'PT' THEN 'Home Telephone'&#13;&#10;&#9;WHEN 'BT' THEN 'Work Telephone'&#13;&#10;&#9;WHEN 'PM' THEN 'Private Telephone'&#13;&#10;&#9;WHEN 'BM' THEN 'Mobile Telephone'&#13;&#10;&#9;WHEN 'PF' THEN 'Private Fax'&#13;&#10;&#9;WHEN 'BF' THEN 'Work Fax'&#13;&#10;&#9;END ;&#13;&#10;end;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Agronomis phone_normalized"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_7"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1184" posY="448">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_1"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_tTaV8LnGEe2a4PO8eXSf6g"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;10.86.77.7&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;ORCL&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="ORACLE_SERVICE_NAME"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;system&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:NcyXvWpXU+Fi9evB5st19gTQLEAGFPBEAnTm7G3KsBrZRn5S91Dydw=="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;&#13;&#10;begin&#13;&#10;&#13;&#10;----insert maili do tablicy z mailami&#13;&#10;insert into k2v_dev.agronomis_additional_emails  (PAR_PARTNER_NR, PRIVATE_EMAIL, BUSSINES_EMAIL)&#13;&#10;SELECT apa.PAR_PARTNER_NR ,CASE WHEN apa.PHONE_TYPE IN ('PM','PT','PF') THEN apa.PHONE_NUMBER END AS private_email,&#13;&#10;CASE WHEN apa.PHONE_TYPE IN ('BM','BT','BF') THEN apa.PHONE_NUMBER END AS bussines_email&#13;&#10;FROM K2V_DEV.AGRONIMIS_PHONE_ALL apa &#13;&#10;WHERE apa.PHONE_NUMBER LIKE '%@%';&#13;&#10;&#13;&#10;---czyszczenie maili z tablicy &#13;&#10;UPDATE K2V_DEV.AGRONIMIS_PHONE_NORMALIZED &#13;&#10;SET ASOCIATED_NUM = NULL &#13;&#10;WHERE ASOCIATED_NUM LIKE '%@%';&#13;&#10;end;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="Agronomis additional_emails"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_1"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tFixedFlowInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="96" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tFixedFlowInput_1"/>
+    <elementParameter field="TEXT" name="NB_ROWS" value="1"/>
+    <elementParameter field="RADIO" name="USE_SINGLEMODE" value="false"/>
+    <elementParameter field="TABLE" name="VALUES" show="false">
+      <elementValue elementRef="SCHEMA_COLUMN" value="schema_name"/>
+      <elementValue elementRef="VALUE" value=""/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="table_name"/>
+      <elementValue elementRef="VALUE" value=""/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="columns"/>
+      <elementValue elementRef="VALUE" value=""/>
+    </elementParameter>
+    <elementParameter field="RADIO" name="USE_INTABLE" value="false"/>
+    <elementParameter field="TABLE" name="INTABLE" show="false"/>
+    <elementParameter field="RADIO" name="USE_INLINECONTENT" value="true"/>
+    <elementParameter field="TEXT" name="ROWSEPARATOR" value="&quot;\n&quot;"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value="&quot;\t&quot;"/>
+    <elementParameter field="MEMO" name="INLINECONTENT" value="sev&#9;ANGEBOT_POLICE&#9;(par_partner_nr)&#13;&#10;WEBAV&#9;FELDSTUECK&#9;(ID_SEV_PARTNER)&#13;&#10;WEBAV&#9;FELDSTUECK&#9;(ANBAUJAHR)&#13;&#10;WEBAV&#9;FELDSTUECK&#9;(ID_SEV_GEMEINDE_FELDMARK)&#13;&#10;SEV&#9;GEFAHR_OBJEKT_RISIKO&#9;(POL_POLICEN_NR , VER_VERTRAG_NR , POL_GUELTIG_AB)&#13;&#10;SEV&#9;GEFAHR_OBJEKT&#9;(POL_POLICEN_NR , VER_VERTRAG_NR , GEF_GEFAHR_NR , POL_GUELTIG_AB)&#13;&#10;SEV&#9;GEFAHR_OBJEKT&#9;(POL_POLICEN_NR, VER_VERTRAG_NR, GEF_GEFAHR_NR, OBJ_OBJEKT_NR, POL_GUELTIG_AB,POL_AENDERUNG)&#13;&#10;SEV&#9;GEFAHR_OBJEKT&#9;(GOB_HISTORIE)&#13;&#10;SEV&#9;GEFAHR_OBJEKT&#9;(gob_zustand)&#13;&#10;SEV&#9;KORRESPONDENZ&#9;(KOR_ARCHIVIERUNG_ID)&#13;&#10;SEV&#9;KORRESPONDENZ&#9;(KOR_EMAIL_ABSENDER)&#13;&#10;sev&#9;OBJEKT_FRUCHTART&#9;(ID_WEBAV_POSITION)&#13;&#10;SEV&#9;OBJEKT_FRUCHTART&#9;(POL_POLICEN_NR, VER_VERTRAG_NR, GEF_GEFAHR_NR, OBJ_OBJEKT_NR, POL_GUELTIG_AB,POL_AENDERUNG)&#13;&#10;sev&#9;PARTNER&#9;(PAR_PARTNER_NR_BD)&#13;&#10;sev&#9;PARTNER&#9;(PAR_RECHTSFORM)&#13;&#10;sev&#9;PARTNER&#9;(PAR_ANREDE)&#13;&#10;sev&#9;PARTNER&#9;(PAR_VERMITTLER_NR_VM)&#13;&#10;sev&#9;PARTNER&#9;(PAR_PARTNER_NR_VM)&#13;&#10;sev&#9;partner_anschrift&#9;(par_partner_nr)&#13;&#10;sev&#9;PARTNER_BEZIEHUNG&#9;(PBE_ART_1)&#13;&#10;sev&#9;PARTNER_BEZIEHUNG&#9;(PBE_ART_2)&#13;&#10;sev&#9;PARTNER_BEZIEHUNG&#9;(PAR_PARTNER_NR)&#13;&#10;sev&#9;PARTNER_BEZIEHUNG&#9;(PBE_PARTNER_NR)&#13;&#10;SEV&#9;PARTNER_HISTORIE&#9;(PAR_PARTNER_NR)&#13;&#10;sev&#9;PARTNER_ROLLE&#9;(PRE_ROLLE)&#13;&#10;sev&#9;PARTNER_ROLLE&#9;(PAR_PARTNER_NR)&#13;&#10;sev&#9;police&#9;(POL_POLICEN_NR)&#13;&#10;sev&#9;police&#9;(pol_police_typ)&#13;&#10;sev&#9;police&#9;(pol_zustand)&#13;&#10;sev&#9;police&#9;(pol_historie)&#13;&#10;sev&#9;police&#9;(par_partner_nr)&#13;&#10;sev&#9;police&#9;(POL_KORRESPONDENZEMPFAENGER)&#13;&#10;WEBAV&#9;POSITION&#9;(SEV_POL_POLICEN_NR , SEV_VER_VERTRAG_NR , ID)&#13;&#10;WEBAV&#9;POSITION&#9;(ID_FELDSTUECK)&#13;&#10;SEV&#9;VERTRAG&#9;(POL_POLICEN_NR, VER_VERTRAG_NR)&#13;&#10;SEV&#9;VERTRAG&#9;(VER_ZUSTAND)&#13;&#10;SEV&#9;VERTRAG&#9;(VER_HISTORIE)&#13;&#10;SEV&#9;VERTRAG&#9;(VER_PRODUKT_TYP)&#13;&#10;SEV&#9;VERTRAG&#9;(POL_POLICEN_NR)&#13;&#10;SEV&#9;VM&#9;(VMR_VERTRIEBSFORM)&#13;&#10;SEV&#9;VM&#9;(VMR_HIERARCHIE)&#13;&#10;SEV&#9;VM_POLICE&#9;(POL_POLICEN_NR,VER_VERTRAG_NR,POL_GUELTIG_AB,VMP_UNGUELTIG_AB,VMP_HISTORIE,VMP_ZUSTAND)&#13;&#10;SEV&#9;VM_POLICE&#9;(PAR_PARTNER_NR,VMR_VERMITTLER_NR)&#13;&#10;SEV&#9;SCHADEN&#9;(SAK_AKTE_NR)&#13;&#10;SEV&#9;SCHADEN&#9;(POL_POLICEN_NR,VER_VERTRAG_NR)&#13;&#10;SEV&#9;SCHADENAKTE&#9;(SAK_ERNTEJAHR)&#13;&#10;"/>
+    <elementParameter field="TEXT" name="LABEL" value="input index data"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tFixedFlowInput_1">
+      <column comment="" key="false" length="10" name="schema_name" nullable="true" originalLength="10" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="500" name="table_name" nullable="true" originalLength="500" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="4000" name="columns" nullable="true" originalLength="4000" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tJavaRow" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="320" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJavaRow_1"/>
+    <elementParameter field="MEMO_JAVA" name="CODE" value="//Code generated according to input schema and output schema&#13;&#10;output_row.schema_name = input_row.schema_name.toUpperCase();&#13;&#10;output_row.table_name = input_row.table_name.toUpperCase();&#13;&#10;output_row.columns = input_row.columns.toUpperCase();&#13;&#10;"/>
+    <elementParameter field="MEMO_IMPORT" name="IMPORT" value="//import java.util.List;"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tJavaRow_1">
+      <column comment="" key="false" length="10" name="schema_name" nullable="true" originalLength="10" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="500" name="table_name" nullable="true" originalLength="500" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="4000" name="columns" nullable="true" originalLength="4000" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="544" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_1"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_-_C68LUhEe6WmudBiNCanQ-tMap_1-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="out1">
+      <column comment="" key="false" length="10" name="schema_name" nullable="true" originalLength="10" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="4000" name="index_name" nullable="false" originalLength="4000" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="4000" name="query" nullable="true" originalLength="4000" pattern="" precision="-1" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties/>
+      <varTables name="Var" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="Numeric.sequence(row2.schema_name+row2.table_name,1,1) " name="idx_seq" type="id_Integer"/>
+        <mapperTableEntries expression="row2.schema_name +&quot;.&quot;+  row2.table_name " name="full_tbl_name" type="id_String"/>
+        <mapperTableEntries expression="row2.schema_name +&quot;.K2V_&quot;+  row2.table_name +&quot;_I&quot;+  Var.idx_seq " name="index_name" type="id_String"/>
+        <mapperTableEntries expression="&quot;K2V_&quot;+  row2.table_name +&quot;_I&quot;+  Var.idx_seq " name="short_idx_name" type="id_String"/>
+      </varTables>
+      <outputTables name="out1" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="row2.schema_name " name="schema_name" nullable="true" type="id_String"/>
+        <mapperTableEntries expression="Var.short_idx_name  " name="index_name" type="id_String"/>
+        <mapperTableEntries expression="&quot;execute immediate 'create index &quot;+  Var.index_name +&quot; ON &quot;+  Var.full_tbl_name +&quot; &quot;+row1.columns+&quot;';&quot; " name="query" nullable="true" type="id_String"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="row2" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="schema_name" nullable="true" type="id_String"/>
+        <mapperTableEntries name="table_name" nullable="true" type="id_String"/>
+        <mapperTableEntries name="columns" nullable="true" type="id_String"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tFlowToIterate" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="704" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tFlowToIterate_1"/>
+    <elementParameter field="CHECK" name="DEFAULT_MAP" value="true"/>
+    <elementParameter field="TABLE" name="MAP" show="false"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tFlowToIterate_1"/>
+  </node>
+  <node componentName="tOracleInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="864" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_1"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SID"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="Oracle"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:srVwVBarZvrRF7WH3O1r3820oxKJIrFUa139T/tF"/>
+    <elementParameter field="TEXT" name="JDBC_URL" show="false" value="&quot;jdbc:oracle:oci:/@talend&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="GUESS_SCHEMA" name="GUESS_SCHEMA" value="&quot;&quot;"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;select max(idx) from (&#13;&#10;select 0 as idx from dual union all &#13;&#10;SELECT 1 FROM ALL_INDEXES &#13;&#10;WHERE INDEX_NAME  = '&quot;+((String)globalMap.get(&quot;out1.index_name&quot;))+&quot;'  &#13;&#10;AND OWNER  = '&quot;+((String)globalMap.get(&quot;out1.schema_name&quot;))+&quot;'&#13;&#10; )&quot;&#13;&#10;&#13;&#10;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="oracle_id"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="IS_CONVERT_XMLTYPE" value="false"/>
+    <elementParameter field="TABLE" name="CONVERT_XMLTYPE" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" show="false" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="USE_CURSOR" value="false"/>
+    <elementParameter field="TEXT" name="CURSOR_SIZE" show="false" value="1000"/>
+    <elementParameter field="CHECK" name="TRIM_ALL_COLUMN" value="false"/>
+    <elementParameter field="TABLE" name="TRIM_COLUMN">
+      <elementValue elementRef="SCHEMA_COLUMN" value="idx_exists"/>
+      <elementValue elementRef="TRIM" value="false"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="NO_NULL_VALUES" value="false"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBInput_1">
+      <column comment="" key="false" length="1" name="idx_exists" nullable="true" originalLength="1" pattern="" precision="-1" sourceType="INTEGER" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tJavaRow" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1024" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJavaRow_2"/>
+    <elementParameter field="MEMO_JAVA" name="CODE" value="// code sample:&#10;//&#10;// multiply by 2 the row identifier&#10;// output_row.id = input_row.id * 2;&#10;//&#10;// lowercase the name&#10;// output_row.name = input_row.name.toLowerCase();&#10;&#10;System.out.println(&quot;Wartosc select dla : &quot;+((String)globalMap.get(&quot;out1.index_name&quot;))+&quot; wynosi: &quot;+input_row.idx_exists);&#10;&#10;&#10;if (input_row.idx_exists ==1) {&#10;&#10;System.out.println(&quot;Index &quot;+((String)globalMap.get(&quot;out1.index_name&quot;))+&quot; already exists&quot;);&#10;};&#10;&#10;context.idx_exists = input_row.idx_exists;"/>
+    <elementParameter field="MEMO_IMPORT" name="IMPORT" value="//import java.util.List;"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tJavaRow_2"/>
+  </node>
+  <node componentName="tOracleRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1440" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_8"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="true"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" value="tDBConnection_1"/>
+    <elementParameter field="CLOSED_LIST" name="CONNECTION_TYPE" show="false" value="ORACLE_SID"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_18"/>
+    <elementParameter field="TEXT" name="RAC_URL" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;1521&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="Oracle"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:zGSpHbEDSUtDHe0vG8qI8cVTj6dBgPw7pHCfLcsG"/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;begin &quot;&#13;&#10;+((String)globalMap.get(&quot;out1.query&quot;))+ &quot;&#13;&#10;end;&#13;&#10;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="USE_NB_LINE" value="NONE"/>
+    <elementParameter field="LABEL" name="USE_NB_LINE_NOTE" value="* Only used if the query is an insert, an update or a delete."/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="true"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="*Note: Example for Additional JDBC Parameters: &quot;parameterName1=value1&amp;&amp;parameterName2=value2&quot;"/>
+    <elementParameter field="CHECK" name="PROPAGATE_RECORD_SET" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="RECORD_SET_COLUMN" show="false" value=""/>
+    <elementParameter field="CHECK" name="USE_PREPAREDSTATEMENT" value="false"/>
+    <elementParameter field="TABLE" name="SET_PREPAREDSTATEMENT_PARAMETERS" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" show="false" value="10000"/>
+    <elementParameter field="CHECK" name="SUPPORT_NLS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBRow_8"/>
+    <metadata connector="REJECT" name="REJECT">
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tJava" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1632" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJava_2"/>
+    <elementParameter field="MEMO_JAVA" name="CODE" value="System.out.println(&quot;Index &quot;+((String)globalMap.get(&quot;out1.index_name&quot;))+&quot; created&quot;);&#10;"/>
+    <elementParameter field="MEMO_IMPORT" name="IMPORT" value="//import java.util.List;"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tJava_2"/>
+  </node>
+  <node componentName="tJava" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1248" posY="192">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJava_3"/>
+    <elementParameter field="MEMO_JAVA" name="CODE" value="System.out.println(&quot;Query: &quot;+((String)globalMap.get(&quot;out1.query&quot;)));"/>
+    <elementParameter field="MEMO_IMPORT" name="IMPORT" value="//import java.util.List;"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tJava_3"/>
+  </node>
+  <connection connectorName="COMPONENT_OK" label="OnComponentOk" lineStyle="3" metaname="tPrejob_1" offsetLabelX="0" offsetLabelY="0" source="tPrejob_1" target="tDBConnection_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnComponentOk1"/>
+  </connection>
+  <connection connectorName="COMPONENT_OK" label="OnComponentOk" lineStyle="3" metaname="tPostjob_1" offsetLabelX="0" offsetLabelY="0" source="tPostjob_1" target="tDBClose_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnComponentOk2"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_2" offsetLabelX="0" offsetLabelY="0" source="tDBRow_2" target="tDBRow_7">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk2"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_3" offsetLabelX="0" offsetLabelY="0" source="tDBRow_3" target="tDBRow_4">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk3"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_4" offsetLabelX="0" offsetLabelY="0" source="tDBRow_4" target="tDBRow_1">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk4"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_5" offsetLabelX="0" offsetLabelY="0" source="tDBRow_5" target="tRunJob_1">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk5"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_6" offsetLabelX="0" offsetLabelY="0" source="tDBRow_6" target="tDBRow_2">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk6"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_7" offsetLabelX="0" offsetLabelY="0" source="tDBRow_7" target="tDBRow_3">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk7"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_1" offsetLabelX="0" offsetLabelY="0" source="tDBRow_1" target="tDBRow_5">
+    <elementParameter field="CHECK" name="ACTIVATE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk1"/>
+  </connection>
+  <connection connectorName="FLOW" label="row1" lineStyle="0" metaname="tFixedFlowInput_1" offsetLabelX="0" offsetLabelY="0" source="tFixedFlowInput_1" target="tJavaRow_1">
+    <elementParameter field="TABLE" name="TRACES_CONNECTION_FILTER" show="false">
+      <elementValue elementRef="TRACE_COLUMN" value="schema_name"/>
+      <elementValue elementRef="TRACE_COLUMN_CHECKED" value="true"/>
+      <elementValue elementRef="TRACE_COLUMN_CONDITION" value=""/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="row1"/>
+  </connection>
+  <connection connectorName="FLOW" label="row2" lineStyle="0" metaname="tJavaRow_1" offsetLabelX="0" offsetLabelY="0" source="tJavaRow_1" target="tMap_1">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="row2"/>
+  </connection>
+  <connection connectorName="FLOW" label="out1" lineStyle="0" metaname="out1" offsetLabelX="0" offsetLabelY="0" source="tMap_1" target="tFlowToIterate_1">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="out1"/>
+  </connection>
+  <connection connectorName="ITERATE" label="Iterate" lineStyle="7" metaname="tFlowToIterate_1" offsetLabelX="0" offsetLabelY="0" source="tFlowToIterate_1" target="tDBInput_1">
+    <elementParameter field="CHECK" name="ENABLE_PARALLEL" value="false"/>
+    <elementParameter field="TEXT" name="NUMBER_PARALLEL" show="false" value="2"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="iterate1"/>
+  </connection>
+  <connection connectorName="FLOW" label="row3" lineStyle="0" metaname="tDBInput_1" offsetLabelX="0" offsetLabelY="0" source="tDBInput_1" target="tJavaRow_2">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="row3"/>
+  </connection>
+  <connection connectorName="RUN_IF" label="If" lineStyle="6" metaname="tJavaRow_2" offsetLabelX="0" offsetLabelY="0" source="tJavaRow_2" target="tJava_3">
+    <elementParameter field="MEMO_JAVA" name="CONDITION" value="context.idx_exists == 0"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="If1"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tDBRow_8" offsetLabelX="0" offsetLabelY="0" source="tDBRow_8" target="tJava_2">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk9"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tJava_3" offsetLabelX="0" offsetLabelY="0" source="tJava_3" target="tDBRow_8">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk10"/>
+  </connection>
+  <subjob>
+    <elementParameter field="CHECK" name="SHOW_SUBJOB_TITLE" value="true"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tPrejob_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" value="230;100;0"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="255;220;180"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBConnection_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="CHECK" name="SHOW_SUBJOB_TITLE" value="true"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tPostjob_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" value="230;100;0"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="255;220;180"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBClose_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_2"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_3"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_4"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_5"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tRunJob_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_6"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_7"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="CHECK" name="SHOW_SUBJOB_TITLE" value="true"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tFixedFlowInput_1"/>
+    <elementParameter field="TEXT" name="SUBJOB_TITLE" value="Create indexes"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBRow_8"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJava_2"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJava_3"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="92;131;150"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#" Id="_be52bbd4-8b57-48ac-b9de-3e08383653df"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>fsUpEJrMA+TlclfHylYSHeER/plcdgd/mtAtSVycN71yMiTURmPRjXI5J7MERUN4A7bMhdhwL3+R&#13;
+7EpPsCFyvA==</DigestValue></Reference><Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties" URI="#_89de8ce0-f1d2-41e5-a6b6-45ff6191bad4"><Transforms><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>NxHdhcug084UKrryeox8rGBxN6cMQtY5EIxR0awjwJ5Q5A5DIAjiX+wytzTXEFdC5UjvEorJ7UO9&#13;
+QEHYktm/Ng==</DigestValue></Reference></SignedInfo><SignatureValue>Uhxio25ZMn66vHCZoD2Ks+X0my9fHnQbO6qK7H3beiDtA6+kEuphNjXIRXblJs9M6WnQa+XIr6RY&#13;
+f32msPPtizNSQ9sPNIsiVy7LGLJ+XeW9EgaJJ7ma6RWBBUfZDRuqHsG/6DCr6t4dBhzlM+cU8TwP&#13;
+VwMJuEVArknBmR1I3MctNzN72wbSnRPB9/FEQTbEMk+1IF41UjA5m+WuyQwmGQm1FFgEHG1B4tdh&#13;
+GeKznqogiErA0gIcjDg97mXxXRd/4/2IBBHqqqQqWnvJTbnoJFTRdrt+H0DRBiZWwzt4+TetvLD+&#13;
++HUPPLXFDvjLaahEsav8H5oigNJHKdUujOP6mg==</SignatureValue><KeyInfo><X509Data><X509SubjectName>C=FR,ST=Paris,L=Paris,O=Talend Inc.,OU=R&amp;D,CN=Talend Code Signing certificate</X509SubjectName><X509Certificate>MIIFADCCAuigAwIBAgIIA2OsD6bRyj0wDQYJKoZIhvcNAQELBQAwgY0xCzAJBgNVBAYTAkZSMQ4w&#13;
+DAYDVQQIEwVQYXJpczEOMAwGA1UEBxMFUGFyaXMxFDASBgNVBAoTC1RhbGVuZCBJbmMuMQwwCgYD&#13;
+VQQLDANSJkQxFjAUBgNVBAMMDVRhbGVuZCBSJkQgQ0ExIjAgBgkqhkiG9w0BCQEWE3NlY3VyaXR5&#13;
+QHRhbGVuZC5jb20wHhcNMTkwNjAzMDgxODIwWhcNMjkwNjAzMDAwMDAwWjB7MSgwJgYDVQQDEx9U&#13;
+YWxlbmQgQ29kZSBTaWduaW5nIGNlcnRpZmljYXRlMQwwCgYDVQQLDANSJkQxFDASBgNVBAoTC1Rh&#13;
+bGVuZCBJbmMuMQ4wDAYDVQQHEwVQYXJpczEOMAwGA1UECBMFUGFyaXMxCzAJBgNVBAYTAkZSMIIB&#13;
+IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp5TMF8BmRt8dY51t9kIDdDkoOKVVytJN2gn2&#13;
+DhMGi8hzpUofNDykJDhe9SPqyJdGZ6o/h7laTA0/CivKyPT1OJQ9E2gMHKs8cTZM/cO2w0Atlqkl&#13;
+alIxepol0DNnUtmECVBqdnVsJesfmdoeptxgJAtxYbquFsTsrATNY2cscXpwmOca/Ewip48WQLFx&#13;
+e5s067jaIsAQGRIqpIup3bOtWBySrtImJ40lQCPeEcl96qzkv3utaVaNc3ukkhYkCDbMbK8NVd1B&#13;
+CVeeIBAe+n/SdpHH20o+6eIiZecsBGDLwlTYrFvuVqAa6xI7y8Vdz6irjPAVBEtG/iOc782aJ/lZ&#13;
+TwIDAQABo3UwczAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEF&#13;
+BQcDAzAdBgNVHQ4EFgQUGdfzQEbjQnANq28sfhEMTx+rsOcwHwYDVR0jBBgwFoAU530Lcvy1gZnG&#13;
+gCvZLOyCczK1qPcwDQYJKoZIhvcNAQELBQADggIBAEr22wnaQwZm2dhbUCqD+qZpTq2AF/tzxqAM&#13;
+eL/CiTjPbTblS4SNNwCKvTgMe9ucpUbenXmK7xE+DU9dN4om+t3VHbkOLQVyuLcd2WGsy7ZGwRvA&#13;
+f+TFwLbwjyTukOGm6Sd1qyZgvCPzBsKnft6vscvGy2yEpmFCeHJyBP8pvchg607zguRdNbkGYZXw&#13;
+G6jNipAbTtzdPTFKKr1bEf0sUGqMrlZIMPjflh2Vewu8ImNdX5IZdvBD6DdFVOC5wqV6u+W9ukE/&#13;
+mXZxDBYNl2AF7FTh04ucEVN3mHv7m2L0uFvUlhxchcagJhJsdQG+A0LVCemHbp6CSNQJx02KxqUG&#13;
+hakvpzhOyLo91h8YAQrEZJdNuKA8IYmBrFZQZDCz0uywKSyFfzPyJhvxylCLG/iDPPfE0VWcrMJ/&#13;
+WQJly/2XPg/NBCTF3pSKS0kCiA7PeaI3cWkMYYA3PMwYDvzqs1opBRglG7ikj0bQxSm3lcjMuuvW&#13;
+gBRksFKjP3K/nztsjSoYITOM9jR29ReIL3v0E8RbAFwA2RGq6Dxd0ixfbucMesy5Gnr8tfYy6rW+&#13;
+qSQqd3ah4+PSzBNVwIB4ytpdrG3SlhCI2i2Th8ek8Sjsaquh9qPAerWNd2+84HWOOGj1Xe1qc6vg&#13;
+qqu6JoK9EXKDiwBqDVkueIa+MhamE1VDnhn2pPui</X509Certificate></X509Data></KeyInfo><Object><SignatureProperties><SignatureProperty Id="_89de8ce0-f1d2-41e5-a6b6-45ff6191bad4" Target="#_be52bbd4-8b57-48ac-b9de-3e08383653df"><Timestamp>2024-08-19 13:55:16</Timestamp></SignatureProperty></SignatureProperties></Object></Signature></talendfile:ProcessType>

@@ -17,10 +17,10 @@ export default function DropZone({ onFile, onSample }) {
       >
         <input
           type="file"
-          accept=".xml"
+          accept=".xml,.item"
           onChange={(e) => e.target.files.length && onFile(e.target.files[0])}
         />
-        Drop a PowerCenter XML export here, or <strong>browse</strong>
+        Drop a PowerCenter .xml or Talend .item export here, or <strong>browse</strong>
       </label>
       <button className="ghost" onClick={onSample}>Try the sample</button>
     </div>

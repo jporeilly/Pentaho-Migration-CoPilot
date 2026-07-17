@@ -1,0 +1,1493 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><talendfile:ProcessType xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" xmlns:TalendMapper="http://www.talend.org/mapper" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" defaultContext="Default" jobType="Standard" xmi:version="2.0">
+  <context confirmationNeeded="false" hide="false" name="Default">
+    <contextParameter comment="" internalId="_sClu0FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sClu0VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="stage"/>
+    <contextParameter comment="" internalId="_sCmV4FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:WSTEVfvnhF5fd0/FFHl3eo5PFDmq6qaiPu5koCMJ29BLIcKN4Q=="/>
+    <contextParameter comment="" internalId="_sCmV4VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmV4ljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmV41jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmV5FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmV5VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmV5ljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmV51jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmV6FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:W2acn9+1qkBvv8LTY+ZmbV7gjc0gbBRMNSb/EALHD5o8sChmlQ=="/>
+    <contextParameter comment="" internalId="_sCmV6VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="EDW"/>
+    <contextParameter comment="" internalId="_sCmV6ljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sCmV61jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmV7FjyEe-icM7TK_-09Q" name="workflow_name" prompt="workflow_name?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="fact_liquor_sales_county_load"/>
+    <contextParameter comment="" internalId="_sCmV7VjyEe-icM7TK_-09Q" name="dim_source_stg_sales_by_county" prompt="dim_source_stg_sales_by_county?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="6"/>
+    <contextParameter comment="" internalId="_sCmV7ljyEe-icM7TK_-09Q" name="dim_source_stg_county_population" prompt="dim_source_stg_county_population?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="5"/>
+    <contextParameter comment="" internalId="_wodqUFmNEe-UIcPcFdeHww" name="job_log_id" prompt="job_log_id?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="0"/>
+  </context>
+  <context confirmationNeeded="false" hide="false" name="Prod">
+    <contextParameter comment="" internalId="_sCmV71jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sCmV8FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="stage"/>
+    <contextParameter comment="" internalId="_sCmV8VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:ASh1sS6/WXMJJxXpRFapKsKGDIkgOPkwbf5arWM7GFyjBBE4bA=="/>
+    <contextParameter comment="" internalId="_sCmV8ljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmV81jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmV9FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmV9VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmV9ljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmV91jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmV-FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmV-VjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:0Xwf/h+ay5/FbO+nE81YwhFR9K8zwb39R9w3n6/+cTUbrprzhA=="/>
+    <contextParameter comment="" internalId="_sCmV-ljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="EDW"/>
+    <contextParameter comment="" internalId="_sCmV-1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sCmV_FjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmV_VjyEe-icM7TK_-09Q" name="workflow_name" prompt="workflow_name?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="fact_liquor_sales_county_load"/>
+    <contextParameter comment="" internalId="_sCmV_ljyEe-icM7TK_-09Q" name="dim_source_stg_sales_by_county" prompt="dim_source_stg_sales_by_county?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="6"/>
+    <contextParameter comment="" internalId="_sCmV_1jyEe-icM7TK_-09Q" name="dim_source_stg_county_population" prompt="dim_source_stg_county_population?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="5"/>
+    <contextParameter comment="" internalId="_wodqUVmNEe-UIcPcFdeHww" name="job_log_id" prompt="job_log_id?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="0"/>
+  </context>
+  <context confirmationNeeded="false" hide="false" name="Dev">
+    <contextParameter comment="" internalId="_sCmWAFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sCmWAVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="stage"/>
+    <contextParameter comment="" internalId="_sCmWAljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:rBaM/tWbO2hWdTwvmRZs+sfaekWMIu2w887EVSK6yYjSKyDk5g=="/>
+    <contextParameter comment="" internalId="_sCmWA1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmWBFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmWBVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmWBljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmWB1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmWCFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmWCVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmWCljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:DGzUzRVFvpfFZjfnghxi1h57AiwFMEVzL/OM7v2wQoHH79zDsQ=="/>
+    <contextParameter comment="" internalId="_sCmWC1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="EDW"/>
+    <contextParameter comment="" internalId="_sCmWDFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sCmWDVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmWDljyEe-icM7TK_-09Q" name="workflow_name" prompt="workflow_name?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="fact_liquor_sales_county_load"/>
+    <contextParameter comment="" internalId="_sCmWD1jyEe-icM7TK_-09Q" name="dim_source_stg_sales_by_county" prompt="dim_source_stg_sales_by_county?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="6"/>
+    <contextParameter comment="" internalId="_sCmWEFjyEe-icM7TK_-09Q" name="dim_source_stg_county_population" prompt="dim_source_stg_county_population?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="5"/>
+    <contextParameter comment="" internalId="_wodqUlmNEe-UIcPcFdeHww" name="job_log_id" prompt="job_log_id?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="0"/>
+  </context>
+  <context confirmationNeeded="false" hide="false" name="Test">
+    <contextParameter comment="" internalId="_sCmWEVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="IOWA_LIQUOR_DB"/>
+    <contextParameter comment="" internalId="_sCmWEljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="STAGE"/>
+    <contextParameter comment="" internalId="_sCmWE1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:qM5vDBcTeAxk9iwhPGrRauu3txC4M9pESSc9ZhqpwJO4lILGyQ=="/>
+    <contextParameter comment="" internalId="_sCmWFFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmWFVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmWFljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmWF1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_SNh_AFd2Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmWGFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="damg7370"/>
+    <contextParameter comment="" internalId="_sCmWGVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="sqlserverdamg73701.database.windows.net"/>
+    <contextParameter comment="" internalId="_sCmWGljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="1433"/>
+    <contextParameter comment="" internalId="_sCmWG1jyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Password?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_Password" value="enc:system.encryption.key.v1:kX7uGBzWVhkmBnMU3sA4EqpQGnDzaiAaDdPk7aro9rQ1ySnofQ=="/>
+    <contextParameter comment="" internalId="_sCmWHFjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="EDW"/>
+    <contextParameter comment="" internalId="_sCmWHVjyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value="DAMG7370SU24"/>
+    <contextParameter comment="" internalId="_sCmWHljyEe-icM7TK_-09Q" name="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams" prompt="IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams?" promptNeeded="false" repositoryContextId="_fTv_oFd8Ee-RMpTvhu7AjQ" type="id_String" value=""/>
+    <contextParameter comment="" internalId="_sCmWH1jyEe-icM7TK_-09Q" name="workflow_name" prompt="workflow_name?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="fact_liquor_sales_county_load"/>
+    <contextParameter comment="" internalId="_sCmWIFjyEe-icM7TK_-09Q" name="dim_source_stg_sales_by_county" prompt="dim_source_stg_sales_by_county?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="6"/>
+    <contextParameter comment="" internalId="_sCmWIVjyEe-icM7TK_-09Q" name="dim_source_stg_county_population" prompt="dim_source_stg_county_population?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="5"/>
+    <contextParameter comment="" internalId="_wodqU1mNEe-UIcPcFdeHww" name="job_log_id" prompt="job_log_id?" promptNeeded="false" repositoryContextId="built-in" type="id_Integer" value="0"/>
+  </context>
+  <parameters>
+    <elementParameter field="CLOSED_LIST" name="LOG4J_RUN_LEVEL" show="false" value="Info"/>
+    <elementParameter field="TEXT" name="SCREEN_OFFSET_X" show="false" value="240"/>
+    <elementParameter field="TEXT" name="SCREEN_OFFSET_Y" show="false" value="440"/>
+    <elementParameter field="TEXT" name="REPOSITORY_CONNECTION_ID" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_PROPERTY_TYPENAME" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_HADOOP_DISTRIBUTION" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_HADOOP_VERSION" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_ENABLE_KERBEROS" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_NAME_NODE_PRINCIPAL" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_USERNAME" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_GROUP" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_USE_KEYTAB" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_KT_PRINCIPAL" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_KEY_TAB" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_ENABLE_OO_KERBEROS" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_NAME_NODE_END_POINT" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_JOB_TRACKER_ENDPOINT" show="false" value=""/>
+    <elementParameter field="TEXT" name="OOZIE_END_POINT" show="false" value=""/>
+    <elementParameter field="CHECK" name="IMPLICITCONTEXT_USE_PROJECT_SETTINGS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="STATANDLOG_USE_PROJECT_SETTINGS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="MULTI_THREAD_EXECATION" value="false"/>
+    <elementParameter field="TEXT" name="PARALLELIZE_UNIT_SIZE" value="25000"/>
+    <elementParameter field="CHECK" name="IMPLICIT_TCONTEXTLOAD" value="false"/>
+    <elementParameter field="RADIO" name="FROM_FILE_FLAG_IMPLICIT_CONTEXT" show="false" value="false"/>
+    <elementParameter field="RADIO" name="FROM_DATABASE_FLAG_IMPLICIT_CONTEXT" show="false" value="false"/>
+    <elementParameter field="FILE" name="IMPLICIT_TCONTEXTLOAD_FILE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="OVERRIDE_ENCODING_FLAG" show="false" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="OVERRIDE_ENCODING_IN_EXTRA" show="false" value="ISO-8859-15"/>
+    <elementParameter field="TECHNICAL" name="OVERRIDE_ENCODING_IN_EXTRA:ENCODING_TYPE" show="false" value="ISO-8859-15"/>
+    <elementParameter field="CLOSED_LIST" name="DB_TYPE_IMPLICIT_CONTEXT" show="false" value=""/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION_IMPLICIT_CONTEXT" show="false" value=""/>
+    <elementParameter field="TEXT" name="URL_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TABLE" name="DRIVER_JAR_IMPLICIT_CONTEXT" show="false"/>
+    <elementParameter field="TEXT" name="DRIVER_CLASS_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="HOST_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PORT_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PROPERTIES_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="USER_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS_IMPLICIT_CONTEXT" show="false" value="enc:system.encryption.key.v1:DzUqTKG19G5UmxIAc31RXJZRt+3kRaNXMZKqvK6H"/>
+    <elementParameter field="FILE" name="DBFILE_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="DBTABLE_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="QUERY_CONDITION_IMPLICIT_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="LOAD_NEW_VARIABLE" show="false" value="Warning"/>
+    <elementParameter field="CLOSED_LIST" name="NOT_LOAD_OLD_VARIABLE" show="false" value="Warning"/>
+    <elementParameter field="CHECK" name="PRINT_OPERATIONS" show="false" value="false"/>
+    <elementParameter field="CHECK" name="DISABLE_ERROR" show="false" value="false"/>
+    <elementParameter field="CHECK" name="DISABLE_WARNINGS" show="false" value="false"/>
+    <elementParameter field="CHECK" name="DISABLE_INFO" show="false" value="false"/>
+    <elementParameter field="CHECK" name="ON_STATCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_LOGCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_METERCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_CONSOLE_FLAG" show="false" value="false"/>
+    <elementParameter field="CHECK" name="ON_FILES_FLAG" show="false" value="false"/>
+    <elementParameter field="DIRECTORY" name="FILE_PATH" show="false" value="&quot;/Applications/TalendStudio-8.0.1/studio/workspace/.metadata&quot;"/>
+    <elementParameter field="TEXT" name="FILENAME_STATS" show="false" value="&quot;stats_file.txt&quot;"/>
+    <elementParameter field="TEXT" name="FILENAME_LOGS" show="false" value="&quot;logs_file.txt&quot;"/>
+    <elementParameter field="TEXT" name="FILENAME_METTER" show="false" value="&quot;meter_file.txt&quot;"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="ISO-8859-15"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" show="false" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="ON_DATABASE_FLAG" show="false" value="false"/>
+    <elementParameter field="CLOSED_LIST" name="DB_TYPE" show="false" value="JDBCOutput"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" show="false" value="ORACLE_12"/>
+    <elementParameter field="TEXT" name="URL" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TABLE" name="DRIVER_JAR" show="false"/>
+    <elementParameter field="TEXT" name="DRIVER_CLASS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="HOST" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PORT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="DATASOURCE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="DBNAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="PROPERTIES" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" show="false" value="&quot;&quot;"/>
+    <elementParameter field="TEXT" name="USER" show="false" value="&quot;&quot;"/>
+    <elementParameter field="PASSWORD" name="PASS" show="false" value="enc:system.encryption.key.v1:EiFow6xQnmbmbITGAD0EoTYnUDCtlsp1PjjJzLvn"/>
+    <elementParameter field="FILE" name="DBFILE" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE_STATS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE_LOGS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="DBTABLE" name="TABLE_METER" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="CATCH_RUNTIME_ERRORS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_USER_ERRORS" show="false" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_USER_WARNING" show="false" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_REALTIME_STATS" show="false" value="false"/>
+    <elementParameter field="TEXT" name="HEADERFOOTER_HEADERID" show="false" value=""/>
+    <elementParameter field="CHECK" name="HEADER_ENABLED" show="false" value="false"/>
+    <elementParameter field="TEXT" name="HEADER_LIBRARY" show="false" value=""/>
+    <elementParameter field="TEXT" name="HEADER_CODE" show="false" value=""/>
+    <elementParameter field="TEXT" name="HEADER_IMPORT" show="false" value=""/>
+    <elementParameter field="TEXT" name="HEADERFOOTER_FOOTERID" show="false" value=""/>
+    <elementParameter field="CHECK" name="FOOTER_ENABLED" show="false" value="false"/>
+    <elementParameter field="TEXT" name="FOOTER_LIBRARY" show="false" value=""/>
+    <elementParameter field="TEXT" name="FOOTER_CODE" show="false" value=""/>
+    <elementParameter field="TEXT" name="FOOTER_IMPORT" show="false" value=""/>
+  </parameters>
+  <node componentName="tMSSqlInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="280" posY="80">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_1"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="false"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_DRFN0Fd2Ee-RMpTvhu7AjQ"/>
+    <elementParameter field="TEXT" name="HOST" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server"/>
+    <elementParameter field="CLOSED_LIST" name="DRIVER" value="MSSQL_PROP"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="MSSQL"/>
+    <elementParameter field="TEXT" name="PORT" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port"/>
+    <elementParameter field="TEXT" name="DB_SCHEMA" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database"/>
+    <elementParameter field="TEXT" name="USER" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:oqmGsP97te7uUDMg1sz1hp1tQ//5LuwRn76E+8KKkOkfftXR9+DIU+cHunScta9m+ILGsqYRX89DvhcH8BWgyds/Ap2YgmMLhMg+uNeZbaKtTQlMxQGH"/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:SCHEMA_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:REPOSITORY_SCHEMA_TYPE" show="false" value="_DRFN0Fd2Ee-RMpTvhu7AjQ - STG_IOWA_COUNTY_POPULATION_BY_YEAR"/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;STG_IOWA_COUNTY_POPULATION_BY_YEAR&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="GUESS_SCHEMA" name="GUESS_SCHEMA" value="&quot;&quot;"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;SELECT \&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.FIPS,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.County,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.\&quot;Year\&quot;,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.Population,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.\&quot;Primary Point\&quot;,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.DI_CREATED_DATE,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR.PID&quot;&#10;+&quot;&#10;FROM&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_COUNTY_POPULATION_BY_YEAR&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="id_MSSQL"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams"/>
+    <elementParameter field="CHECK" name="ACTIVE_DIR_AUTH" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="TRIM_ALL_COLUMN" value="false"/>
+    <elementParameter field="TABLE" name="TRIM_COLUMN">
+      <elementValue elementRef="SCHEMA_COLUMN" value="FIPS"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="County"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="Year"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="Population"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="Primary_Point"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DI_CREATED_DATE"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="PID"/>
+      <elementValue elementRef="TRIM" value="false"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="SET_QUERY_TIMEOUT" value="false"/>
+    <elementParameter field="TEXT" name="QUERY_TIMEOUT_IN_SECONDS" show="false" value="30"/>
+    <elementParameter field="TEXT" name="LABEL" value="__TABLE__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="STG_IOWA_COUNTY_POPULATION_BY_YEAR" name="tDBInput_1">
+      <column comment="" key="false" length="2147483647" name="FIPS" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Year" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Population" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Primary_Point" nullable="true" originalDbColumnName="Primary Point" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="DI_CREATED_DATE" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="PID" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="640" posY="80">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_1"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_1-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="population_transformed" name="population_transformed">
+      <column comment="" key="false" length="2147483647" name="Year" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Population" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="-1" name="dim_source_sk" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties/>
+      <varTables minimized="true" name="Var" sizeState="INTERMEDIATE"/>
+      <outputTables name="population_transformed" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="stg_iowa_county_population_by_year.Year != null &amp;&amp; !stg_iowa_county_population_by_year.Year.trim().isEmpty() ? &#10;    (TalendDate.isDate(stg_iowa_county_population_by_year.Year, &quot;MMMM dd yyyy&quot;) ? &#10;        Integer.parseInt(TalendDate.formatDate(&quot;yyyy&quot;, TalendDate.parseDate(&quot;MMMM dd yyyy&quot;, stg_iowa_county_population_by_year.Year))) : &#10;        -999) : &#10;    -999 " name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="stg_iowa_county_population_by_year.County != null ? &#10;    stg_iowa_county_population_by_year.County.trim().toUpperCase().replace(&quot; COUNTY&quot;, &quot;&quot;) : &#10;    null " name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries expression="stg_iowa_county_population_by_year.Population != null &amp;&amp; !stg_iowa_county_population_by_year.Population.trim().isEmpty() ? &#10;    Integer.parseInt(stg_iowa_county_population_by_year.Population) : &#10;    -999 " name="Population" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="context.dim_source_stg_county_population " name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="stg_iowa_county_population_by_year" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="FIPS" nullable="true" type="id_String"/>
+        <mapperTableEntries name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Year" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Population" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Primary_Point" nullable="true" type="id_String"/>
+        <mapperTableEntries name="DI_CREATED_DATE" nullable="true" type="id_String"/>
+        <mapperTableEntries name="PID" nullable="true" type="id_String"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="880" posY="160">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_9"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_9-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="county_merged" name="county_merged">
+      <column comment="" key="false" length="2147483647" name="Year" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Population" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Sale__Dollars" nullable="true" originalDbColumnName="Sale (Dollars)" pattern="" precision="0" sourceType="NVARCHAR" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Volume_Sold__Gallons" nullable="true" originalDbColumnName="Volume Sold (Gallons)" pattern="" precision="0" sourceType="NVARCHAR" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="-1" name="dim_source_sk" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties shellMaximized="true"/>
+      <varTables minimized="true" name="Var" sizeState="INTERMEDIATE"/>
+      <outputTables activateCondensedTool="true" name="county_merged" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="population_transformed.Year " name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="population_transformed.County.trim() " name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries expression="population_transformed.Population " name="Population" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="sales_transformed.Sale__Dollars " name="Sale__Dollars" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="sales_transformed.Volume_Sold__Gallons " name="Volume_Sold__Gallons" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="population_transformed.dim_source_sk " name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="population_transformed" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Population" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </inputTables>
+      <inputTables activateCondensedTool="true" innerJoin="true" lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="sales_transformed" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="population_transformed.Year " name="Year" nullable="true" operator="=" type="id_Integer"/>
+        <mapperTableEntries expression="population_transformed.County " name="County" nullable="true" operator="=" type="id_String"/>
+        <mapperTableEntries name="Sale__Dollars" nullable="true" type="id_Float"/>
+        <mapperTableEntries name="Volume_Sold__Gallons" nullable="true" type="id_Float"/>
+        <mapperTableEntries name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tMSSqlInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="280" posY="280">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_2"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="false"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_DRFN0Fd2Ee-RMpTvhu7AjQ"/>
+    <elementParameter field="TEXT" name="HOST" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Server"/>
+    <elementParameter field="CLOSED_LIST" name="DRIVER" value="MSSQL_PROP"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="MSSQL"/>
+    <elementParameter field="TEXT" name="PORT" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Port"/>
+    <elementParameter field="TEXT" name="DB_SCHEMA" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Database"/>
+    <elementParameter field="TEXT" name="USER" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:gi7FDrdT0G/g9Tso/pJyf4h+z0QVGrHw8Nw6XUNX6jAWz7UGiPVTvJWcb+HPMaKSGjAGsTj/u6llLd1WIMryEFtYwv/vh4UIGdts5tNm9oOXpcu+zFXh"/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:SCHEMA_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:REPOSITORY_SCHEMA_TYPE" show="false" value="_DRFN0Fd2Ee-RMpTvhu7AjQ - STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY"/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="GUESS_SCHEMA" name="GUESS_SCHEMA" value="&quot;&quot;"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;SELECT \&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY.Date,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY.County,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY.\&quot;Sale (Dollars)\&quot;,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY.\&quot;Volume Sold (Gallons)\&quot;,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY.DI_CREATED_DATE,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY.PID&quot;&#10;+&quot;&#10;FROM&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_Schema+&quot;\&quot;.STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="id_MSSQL"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.IOWA_LIQUOR_SALES_AZURE_STAGING_CONNECTION_AdditionalParams"/>
+    <elementParameter field="CHECK" name="ACTIVE_DIR_AUTH" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="TRIM_ALL_COLUMN" value="false"/>
+    <elementParameter field="TABLE" name="TRIM_COLUMN">
+      <elementValue elementRef="SCHEMA_COLUMN" value="Date"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="County"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="Sale__Dollars"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="Volume_Sold__Gallons"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DI_CREATED_DATE"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="PID"/>
+      <elementValue elementRef="TRIM" value="false"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="SET_QUERY_TIMEOUT" value="false"/>
+    <elementParameter field="TEXT" name="QUERY_TIMEOUT_IN_SECONDS" show="false" value="30"/>
+    <elementParameter field="TEXT" name="LABEL" value="__TABLE__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="STG_IOWA_LIQUOR_SALES_BY_YEAR_AND_COUNTY" name="tDBInput_2">
+      <column comment="" key="false" length="2147483647" name="Date" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Sale__Dollars" nullable="true" originalDbColumnName="Sale (Dollars)" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Volume_Sold__Gallons" nullable="true" originalDbColumnName="Volume Sold (Gallons)" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="DI_CREATED_DATE" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="PID" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="640" posY="280">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_3"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_3-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="sales_transformed" name="sales_transformed">
+      <column comment="" key="false" length="2147483647" name="Year" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Sale__Dollars" nullable="true" originalDbColumnName="Sale (Dollars)" pattern="" precision="0" sourceType="NVARCHAR" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Volume_Sold__Gallons" nullable="true" originalDbColumnName="Volume Sold (Gallons)" pattern="" precision="0" sourceType="NVARCHAR" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="-1" name="dim_source_sk" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties/>
+      <varTables minimized="true" name="Var" sizeState="INTERMEDIATE"/>
+      <outputTables name="sales_transformed" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="stg_iowa_sales_by_county.Date != null &amp;&amp; !stg_iowa_sales_by_county.Date.trim().isEmpty() ? &#10;    Integer.parseInt(stg_iowa_sales_by_county.Date) : &#10;    -999 " name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="stg_iowa_sales_by_county.County == null ? null : stg_iowa_sales_by_county.County.trim().toUpperCase() " name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries expression="stg_iowa_sales_by_county.Sale__Dollars != null &amp;&amp; !stg_iowa_sales_by_county.Sale__Dollars.trim().isEmpty() ? &#10;    Float.parseFloat(stg_iowa_sales_by_county.Sale__Dollars) : &#10;    -999.0f " name="Sale__Dollars" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="stg_iowa_sales_by_county.Volume_Sold__Gallons != null &amp;&amp; !stg_iowa_sales_by_county.Volume_Sold__Gallons.trim().isEmpty() ? &#10;    Float.parseFloat(stg_iowa_sales_by_county.Volume_Sold__Gallons) : &#10;    -999.0f " name="Volume_Sold__Gallons" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="context.dim_source_stg_sales_by_county " name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="stg_iowa_sales_by_county" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="Date" nullable="true" type="id_String"/>
+        <mapperTableEntries name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Sale__Dollars" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Volume_Sold__Gallons" nullable="true" type="id_String"/>
+        <mapperTableEntries name="DI_CREATED_DATE" nullable="true" type="id_String"/>
+        <mapperTableEntries name="PID" nullable="true" type="id_String"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="1240" posY="80">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_6"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_6-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="fact_county_yearly_trnasformed" name="fact_county_yearly_trnasformed">
+      <column comment="" key="false" length="2147483647" name="Year" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="true" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Population" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="-1" name="sale_dollars" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Float" usefulColumn="true"/>
+      <column comment="" key="false" length="-1" name="volume_sold_gallons" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Float" usefulColumn="true"/>
+      <column comment="" key="false" length="-1" name="dim_source_sk" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties shellMaximized="true"/>
+      <varTables minimized="true" name="Var" sizeState="INTERMEDIATE"/>
+      <outputTables activateCondensedTool="true" name="fact_county_yearly_trnasformed" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="county_merged.Year " name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="dim_county_tbl.DIM_COUNTRY_SK " name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="county_merged.County " name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries expression="county_merged.Population " name="Population" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="county_merged.Sale__Dollars " name="sale_dollars" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="county_merged.Volume_Sold__Gallons " name="volume_sold_gallons" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="county_merged.dim_source_sk " name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="county_merged" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Population" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="Sale__Dollars" nullable="true" type="id_Float"/>
+        <mapperTableEntries name="Volume_Sold__Gallons" nullable="true" type="id_Float"/>
+        <mapperTableEntries name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </inputTables>
+      <inputTables activateCondensedTool="true" innerJoin="true" lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="dim_county_tbl" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="county_merged.County " name="COUNTY_NAME" nullable="true" operator="=" type="id_String"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tMSSqlInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="760" posY="-120">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_3"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="false"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_SOQwEFd8Ee-RMpTvhu7AjQ"/>
+    <elementParameter field="TEXT" name="HOST" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server"/>
+    <elementParameter field="CLOSED_LIST" name="DRIVER" value="MSSQL_PROP"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="MSSQL"/>
+    <elementParameter field="TEXT" name="PORT" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port"/>
+    <elementParameter field="TEXT" name="DB_SCHEMA" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database"/>
+    <elementParameter field="TEXT" name="USER" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:1NBQEmdNrtssQiNl9cNOPbkgDyWtdzaBaBWzMzntoSEzFLIdO/GDU9EEh2/ZJ03S7Lay81J09EE4m8peLGUHZj8N5YS6rs7gl/AzJmo2/t+iCak="/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:SCHEMA_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:REPOSITORY_SCHEMA_TYPE" show="false" value="_SOQwEFd8Ee-RMpTvhu7AjQ - DIM_COUNTY"/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;DIM_COUNTY&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="GUESS_SCHEMA" name="GUESS_SCHEMA" value="&quot;&quot;"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;SELECT \&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.DIM_COUNTRY_SK,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.SOURCE_COUNTY_NUMBER,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.COUNTY_NAME,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.DW_LOAD_WORKFLOW_NAME,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.DW_LOAD_JOB_ID,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.DW_LOAD_DATE,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY.DIM_SOURCE_SK&quot;&#10;+&quot;&#10;FROM&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.DIM_COUNTY&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="id_MSSQL"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams"/>
+    <elementParameter field="CHECK" name="ACTIVE_DIR_AUTH" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="TRIM_ALL_COLUMN" value="false"/>
+    <elementParameter field="TABLE" name="TRIM_COLUMN">
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_COUNTRY_SK"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="SOURCE_COUNTY_NUMBER"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="COUNTY_NAME"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_WORKFLOW_NAME"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_JOB_ID"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_DATE"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_SOURCE_SK"/>
+      <elementValue elementRef="TRIM" value="false"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="SET_QUERY_TIMEOUT" value="false"/>
+    <elementParameter field="TEXT" name="QUERY_TIMEOUT_IN_SECONDS" show="false" value="30"/>
+    <elementParameter field="TEXT" name="LABEL" value="__TABLE__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="DIM_COUNTY" name="tDBInput_3">
+      <column comment="" key="true" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="SOURCE_COUNTY_NUMBER" nullable="true" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="100" name="COUNTY_NAME" nullable="true" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="50" name="DW_LOAD_WORKFLOW_NAME" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="50" name="DW_LOAD_JOB_ID" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="DW_LOAD_DATE" nullable="false" pattern="&quot;dd-MM-yyyy&quot;" precision="0" sourceType="DATE" type="id_Date" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="DIM_SOURCE_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="1000" posY="-120">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_4"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_4-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="dim_county_tbl" name="dim_county_tbl">
+      <column comment="" key="true" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="100" name="COUNTY_NAME" nullable="true" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties/>
+      <varTables minimized="true" name="Var" sizeState="INTERMEDIATE"/>
+      <outputTables name="dim_county_tbl" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="dim_county.DIM_COUNTRY_SK " name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="dim_county.COUNTY_NAME == null ? null : dim_county.COUNTY_NAME.trim().toUpperCase() " name="COUNTY_NAME" nullable="true" type="id_String"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="dim_county" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries name="SOURCE_COUNTY_NUMBER" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="COUNTY_NAME" nullable="true" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_WORKFLOW_NAME" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_JOB_ID" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_DATE" type="id_Date"/>
+        <mapperTableEntries name="DIM_SOURCE_SK" type="id_Integer"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="1600" posY="0">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_8"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_8-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="FACT_COUNTY_YEARLY" name="fact_yearly_county_load">
+      <column key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="YEAR" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_POPULATION" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_SALES_IN_DOLLARS" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="SALES_PER_CAPITA" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_WORKFLOW_NAME" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_JOB_ID" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DW_LOAD_DATE" nullable="false" pattern="&quot;dd-MM-yyyy&quot;" precision="0" sourceType="DATE" type="id_Date" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_SOURCE_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties/>
+      <varTables name="Var" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="TalendDate.getCurrentDate() " name="dw_load_date" type="id_Date"/>
+        <mapperTableEntries expression="pid" name="dw_job_id" type="id_String"/>
+      </varTables>
+      <outputTables activateCondensedTool="true" name="fact_yearly_county_load" rejectInnerJoin="true" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="max_sk.FACT_COUNTY_YEARLY_SK &gt; 0 ? Numeric.sequence(&quot;fact_yearly_county_load&quot;,max_sk.FACT_COUNTY_YEARLY_SK+1,1):Numeric.sequence(&quot;fact_yearly_county_load&quot;,1,1) " name="FACT_COUNTY_YEARLY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.DIM_COUNTRY_SK " name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.Year " name="YEAR" type="id_Integer"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.Population " name="TOTAL_POPULATION" nullable="true" type="id_Integer"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.sale_dollars " name="TOTAL_SALES_IN_DOLLARS" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.volume_sold_gallons " name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.Population != null &amp;&amp; fact_county_yearly_trnasformed.Population &gt; 0 ?&#10;    (float) (fact_county_yearly_trnasformed.sale_dollars / fact_county_yearly_trnasformed.Population) :&#10;    0.0f " name="SALES_PER_CAPITA" nullable="true" type="id_Float"/>
+        <mapperTableEntries expression="context.workflow_name" name="DW_LOAD_WORKFLOW_NAME" type="id_String"/>
+        <mapperTableEntries expression="Var.dw_job_id" name="DW_LOAD_JOB_ID" type="id_String"/>
+        <mapperTableEntries expression="Var.dw_load_date" name="DW_LOAD_DATE" type="id_Date"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.dim_source_sk " name="DIM_SOURCE_SK" type="id_Integer"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="fact_county_yearly_trnasformed" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="Year" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries name="County" nullable="true" type="id_String"/>
+        <mapperTableEntries name="Population" nullable="true" type="id_Integer"/>
+        <mapperTableEntries name="sale_dollars" nullable="true" type="id_Float"/>
+        <mapperTableEntries name="volume_sold_gallons" nullable="true" type="id_Float"/>
+        <mapperTableEntries name="dim_source_sk" nullable="true" type="id_Integer"/>
+      </inputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="ALL_ROWS" name="max_sk" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="FACT_COUNTY_YEARLY_SK" type="id_Integer"/>
+      </inputTables>
+      <inputTables activateCondensedTool="true" innerJoin="true" lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="curr_tbl" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="FACT_COUNTY_YEARLY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.DIM_COUNTRY_SK " name="DIM_COUNTRY_SK" operator="=" type="id_Integer"/>
+        <mapperTableEntries expression="fact_county_yearly_trnasformed.Year " name="YEAR" operator="=" type="id_Integer"/>
+        <mapperTableEntries name="TOTAL_POPULATION" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="TOTAL_SALES_IN_DOLLARS" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="SALES_PER_CAPITA" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="DW_LOAD_WORKFLOW_NAME" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_JOB_ID" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_DATE" type="id_Date"/>
+        <mapperTableEntries name="DIM_SOURCE_SK" type="id_Integer"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tAggregateRow" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1480" posY="-360">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tAggregateRow_1"/>
+    <elementParameter field="TABLE" name="GROUPBYS"/>
+    <elementParameter field="TABLE" name="OPERATIONS">
+      <elementValue elementRef="OUTPUT_COLUMN" value="FACT_COUNTY_YEARLY_SK"/>
+      <elementValue elementRef="FUNCTION" value="max"/>
+      <elementValue elementRef="INPUT_COLUMN" value="FACT_COUNTY_YEARLY_SK"/>
+      <elementValue elementRef="IGNORE_NULL" value="false"/>
+    </elementParameter>
+    <elementParameter field="TEXT" name="LIST_DELIMITER" value="&quot;,&quot;"/>
+    <elementParameter field="CHECK" name="USE_FINANCIAL_PRECISION" value="true"/>
+    <elementParameter field="CHECK" name="CHECK_TYPE_OVERFLOW" value="false"/>
+    <elementParameter field="CHECK" name="CHECK_ULP" value="false"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tAggregateRow_1">
+      <column key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+  </node>
+  <node componentName="tMSSqlOutput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1840" posY="0">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBOutput_1"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_SOQwEFd8Ee-RMpTvhu7AjQ"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="false"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" show="false" value=""/>
+    <elementParameter field="CLOSED_LIST" name="DRIVER" value="MSSQL_PROP"/>
+    <elementParameter field="TEXT" name="HOST" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server"/>
+    <elementParameter field="TEXT" name="PORT" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port"/>
+    <elementParameter field="TEXT" name="DB_SCHEMA" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="MSSQL"/>
+    <elementParameter field="TEXT" name="USER" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:SlPIJKLWphS/Ai/a5AajDQJgt7ct5hhF8gR6XBhki9ZwReIE7+BZSkFk6pLrWoDKeYeU+sXv64xxIu77CWTEBpFkbAOR9qm9hWM07YxvmpsYWH8="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;FACT_COUNTY_YEARLY&quot;"/>
+    <elementParameter field="CLOSED_LIST" name="TABLE_ACTION" value="NONE"/>
+    <elementParameter field="CHECK" name="IDENTITY_INSERT" value="false"/>
+    <elementParameter field="CLOSED_LIST" name="DATA_ACTION" value="INSERT"/>
+    <elementParameter field="LABEL" name="NOTE" show="false" value="NOTE: batch size must be less than or equal to total number of parameter markers divided by number of columns"/>
+    <elementParameter field="CHECK" name="SPECIFY_IDENTITY_FIELD" show="false" value="false"/>
+    <elementParameter field="COLUMN_LIST" name="IDENTITY_FIELD" show="false" value="FACT_COUNTY_YEARLY_SK"/>
+    <elementParameter field="TEXT" name="START_VALUE" show="false" value="1"/>
+    <elementParameter field="TEXT" name="STEP" show="false" value="1"/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" value="false"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="id_MSSQL"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams"/>
+    <elementParameter field="CHECK" name="ACTIVE_DIR_AUTH" value="false"/>
+    <elementParameter field="CHECK" name="USE_ALTERNATE_SCHEMA" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ALTERNATE_SCHEMA" show="false" value="&quot;&quot;"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="TEXT" name="COMMIT_EVERY" value="10000"/>
+    <elementParameter field="TABLE" name="ADD_COLS"/>
+    <elementParameter field="CHECK" name="USE_FIELD_OPTIONS" value="false"/>
+    <elementParameter field="TABLE" name="FIELD_OPTIONS" show="false">
+      <elementValue elementRef="SCHEMA_COLUMN" value="FACT_COUNTY_YEARLY_SK"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_COUNTRY_SK"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="YEAR"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="TOTAL_POPULATION"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="TOTAL_SALES_IN_DOLLARS"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="TOTAL_VOLUME_SOLD_IN_GALLONS"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="SALES_PER_CAPITA"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_WORKFLOW_NAME"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_JOB_ID"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_DATE"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_SOURCE_SK"/>
+      <elementValue elementRef="UPDATE_KEY" value="false"/>
+      <elementValue elementRef="DELETE_KEY" value="false"/>
+      <elementValue elementRef="UPDATABLE" value="true"/>
+      <elementValue elementRef="INSERTABLE" value="true"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="IGNORE_DATE_OUTOF_RANGE" value="false"/>
+    <elementParameter field="CHECK" name="ENABLE_DEBUG_MODE" value="false"/>
+    <elementParameter field="CHECK" name="SUPPORT_NULL_WHERE" value="false"/>
+    <elementParameter field="CHECK" name="USE_BATCH_SIZE" value="true"/>
+    <elementParameter field="TEXT" name="BATCH_SIZE" value="10000"/>
+    <elementParameter field="CHECK" name="SET_QUERY_TIMEOUT" value="false"/>
+    <elementParameter field="TEXT" name="QUERY_TIMEOUT_IN_SECONDS" show="false" value="30"/>
+    <elementParameter field="TEXT" name="LABEL" value="__TABLE__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="FACT_COUNTY_YEARLY" name="tDBOutput_1">
+      <column key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="YEAR" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_POPULATION" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_SALES_IN_DOLLARS" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="SALES_PER_CAPITA" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_WORKFLOW_NAME" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_JOB_ID" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DW_LOAD_DATE" nullable="false" pattern="&quot;dd-MM-yyyy&quot;" precision="0" sourceType="DATE" type="id_Date" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_SOURCE_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+    <metadata connector="REJECT" label="FACT_COUNTY_YEARLY" name="REJECT">
+      <column key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="YEAR" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_POPULATION" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_SALES_IN_DOLLARS" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="SALES_PER_CAPITA" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_Float" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_WORKFLOW_NAME" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_JOB_ID" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DW_LOAD_DATE" nullable="false" pattern="&quot;dd-MM-yyyy&quot;" precision="0" sourceType="DATE" type="id_Date" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_SOURCE_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column defaultValue="" key="false" length="255" name="errorCode" nullable="true" originalLength="-1" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="errorMessage" nullable="true" originalLength="-1" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tMap" componentVersion="2.1" offsetLabelX="0" offsetLabelY="0" posX="1400" posY="-80">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tMap_2"/>
+    <elementParameter field="EXTERNAL" name="MAP" value=""/>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"/>
+    <elementParameter field="DIRECTORY" name="TEMPORARY_DATA_DIRECTORY" value=""/>
+    <elementParameter field="IMAGE" name="PREVIEW" value="_hCLPAFjqEe-icM7TK_-09Q-tMap_2-PREVIEW.bmp"/>
+    <elementParameter field="CHECK" name="DIE_ON_ERROR" show="false" value="true"/>
+    <elementParameter field="CHECK" name="LKUP_PARALLELIZE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="LEVENSHTEIN" show="false" value="0"/>
+    <elementParameter field="TEXT" name="JACCARD" show="false" value="0"/>
+    <elementParameter field="CHECK" name="ENABLE_AUTO_CONVERT_TYPE" show="false" value="false"/>
+    <elementParameter field="TEXT" name="ROWS_BUFFER_SIZE" value="2000000"/>
+    <elementParameter field="CHECK" name="CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="curr_tbl2" name="curr_tbl">
+      <column key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="CHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="YEAR" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_POPULATION" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="20" name="TOTAL_SALES_IN_DOLLARS" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="SALES_PER_CAPITA" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_WORKFLOW_NAME" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="50" name="DW_LOAD_JOB_ID" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DW_LOAD_DATE" nullable="false" pattern="&quot;dd-MM-yyyy&quot;" precision="0" sourceType="DATE" type="id_Date" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column key="false" length="10" name="DIM_SOURCE_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties/>
+      <varTables minimized="true" name="Var" sizeState="INTERMEDIATE"/>
+      <outputTables name="curr_tbl" sizeState="INTERMEDIATE">
+        <mapperTableEntries expression="county_cur_tbl.FACT_COUNTY_YEARLY_SK" name="FACT_COUNTY_YEARLY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="county_cur_tbl.DIM_COUNTRY_SK" name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries expression="county_cur_tbl.YEAR" name="YEAR" type="id_Integer"/>
+        <mapperTableEntries expression="county_cur_tbl.TOTAL_POPULATION" name="TOTAL_POPULATION" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries expression="county_cur_tbl.TOTAL_SALES_IN_DOLLARS" name="TOTAL_SALES_IN_DOLLARS" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries expression="county_cur_tbl.TOTAL_VOLUME_SOLD_IN_GALLONS" name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries expression="county_cur_tbl.SALES_PER_CAPITA" name="SALES_PER_CAPITA" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries expression="county_cur_tbl.DW_LOAD_WORKFLOW_NAME" name="DW_LOAD_WORKFLOW_NAME" type="id_String"/>
+        <mapperTableEntries expression="county_cur_tbl.DW_LOAD_JOB_ID" name="DW_LOAD_JOB_ID" type="id_String"/>
+        <mapperTableEntries expression="county_cur_tbl.DW_LOAD_DATE" name="DW_LOAD_DATE" type="id_Date"/>
+        <mapperTableEntries expression="county_cur_tbl.DIM_SOURCE_SK" name="DIM_SOURCE_SK" type="id_Integer"/>
+      </outputTables>
+      <inputTables lookupMode="LOAD_ONCE" matchingMode="UNIQUE_MATCH" name="county_cur_tbl" sizeState="INTERMEDIATE">
+        <mapperTableEntries name="FACT_COUNTY_YEARLY_SK" type="id_Integer"/>
+        <mapperTableEntries name="DIM_COUNTRY_SK" type="id_Integer"/>
+        <mapperTableEntries name="YEAR" type="id_Integer"/>
+        <mapperTableEntries name="TOTAL_POPULATION" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="TOTAL_SALES_IN_DOLLARS" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="SALES_PER_CAPITA" nullable="true" type="id_BigDecimal"/>
+        <mapperTableEntries name="DW_LOAD_WORKFLOW_NAME" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_JOB_ID" type="id_String"/>
+        <mapperTableEntries name="DW_LOAD_DATE" type="id_Date"/>
+        <mapperTableEntries name="DIM_SOURCE_SK" type="id_Integer"/>
+      </inputTables>
+    </nodeData>
+  </node>
+  <node componentName="tMSSqlInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1200" posY="-160">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_4"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="false"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_SOQwEFd8Ee-RMpTvhu7AjQ"/>
+    <elementParameter field="TEXT" name="HOST" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server"/>
+    <elementParameter field="CLOSED_LIST" name="DRIVER" value="MSSQL_PROP"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="MSSQL"/>
+    <elementParameter field="TEXT" name="PORT" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port"/>
+    <elementParameter field="TEXT" name="DB_SCHEMA" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database"/>
+    <elementParameter field="TEXT" name="USER" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:5QLbldCbenhMFxUr+coqAmOqJ6xHUIdKhZe78IrFKchGFqpzY3VzmDscphkIbgfM89a6vULgIqLiLAAn1KdxzCLa7zslsqIfnXc/EQ35JVSqZAY="/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:SCHEMA_TYPE" show="false" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="SCHEMA:REPOSITORY_SCHEMA_TYPE" show="false" value="_SOQwEFd8Ee-RMpTvhu7AjQ - FACT_COUNTY_YEARLY"/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;FACT_COUNTY_YEARLY&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="GUESS_SCHEMA" name="GUESS_SCHEMA" value="&quot;&quot;"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;SELECT \&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.FACT_COUNTY_YEARLY_SK,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DIM_COUNTRY_SK,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.\&quot;YEAR\&quot;,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.TOTAL_POPULATION,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.TOTAL_SALES_IN_DOLLARS,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.TOTAL_VOLUME_SOLD_IN_GALLONS,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.SALES_PER_CAPITA,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DW_LOAD_WORKFLOW_NAME,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DW_LOAD_JOB_ID,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DW_LOAD_DATE,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DIM_SOURCE_SK&quot;&#10;+&quot;&#10;FROM&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="id_MSSQL"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams"/>
+    <elementParameter field="CHECK" name="ACTIVE_DIR_AUTH" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="TRIM_ALL_COLUMN" value="false"/>
+    <elementParameter field="TABLE" name="TRIM_COLUMN">
+      <elementValue elementRef="SCHEMA_COLUMN" value="FACT_COUNTY_YEARLY_SK"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_COUNTRY_SK"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="YEAR"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="TOTAL_POPULATION"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="TOTAL_SALES_IN_DOLLARS"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="TOTAL_VOLUME_SOLD_IN_GALLONS"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="SALES_PER_CAPITA"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_WORKFLOW_NAME"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_JOB_ID"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DW_LOAD_DATE"/>
+      <elementValue elementRef="TRIM" value="false"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_SOURCE_SK"/>
+      <elementValue elementRef="TRIM" value="false"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="SET_QUERY_TIMEOUT" value="false"/>
+    <elementParameter field="TEXT" name="QUERY_TIMEOUT_IN_SECONDS" show="false" value="30"/>
+    <elementParameter field="TEXT" name="LABEL" value="__TABLE__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="FACT_COUNTY_YEARLY" name="tDBInput_4">
+      <column comment="" key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="YEAR" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="20" name="TOTAL_POPULATION" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="20" name="TOTAL_SALES_IN_DOLLARS" nullable="true" pattern="" precision="0" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="TOTAL_VOLUME_SOLD_IN_GALLONS" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="SALES_PER_CAPITA" nullable="true" pattern="" precision="2" sourceType="NUMERIC" type="id_BigDecimal" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="50" name="DW_LOAD_WORKFLOW_NAME" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="50" name="DW_LOAD_JOB_ID" nullable="false" pattern="" precision="0" sourceType="VARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="DW_LOAD_DATE" nullable="false" pattern="&quot;dd-MM-yyyy&quot;" precision="0" sourceType="DATE" type="id_Date" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="10" name="DIM_SOURCE_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+  </node>
+  <node componentName="tMSSqlInput" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="1200" posY="-320">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_5"/>
+    <elementParameter field="CHECK" name="USE_EXISTING_CONNECTION" value="false"/>
+    <elementParameter field="COMPONENT_LIST" name="CONNECTION" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:PROPERTY_TYPE" value="REPOSITORY"/>
+    <elementParameter field="TECHNICAL" name="PROPERTY:REPOSITORY_PROPERTY_TYPE" show="false" value="_SOQwEFd8Ee-RMpTvhu7AjQ"/>
+    <elementParameter field="TEXT" name="HOST" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Server"/>
+    <elementParameter field="CLOSED_LIST" name="DRIVER" value="MSSQL_PROP"/>
+    <elementParameter field="TEXT" name="TYPE" show="false" value="MSSQL"/>
+    <elementParameter field="TEXT" name="PORT" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Port"/>
+    <elementParameter field="TEXT" name="DB_SCHEMA" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema"/>
+    <elementParameter field="TEXT" name="DBNAME" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Database"/>
+    <elementParameter field="TEXT" name="USER" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Login"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:IXVTDapVVw+3Gl4kgEGDj7k12BCqP07nveYoBI+AjLEDCgJm9ROy6rBNyUCITzTQooQUTaqjtzIEnm8yi5pR90lebfYNbeek20jHb36T3S3jl9Y="/>
+    <elementParameter field="DBTABLE" name="TABLE" value="&quot;FACT_COUNTY_YEARLY&quot;"/>
+    <elementParameter field="QUERYSTORE_TYPE" name="QUERYSTORE" value="&quot;&quot;"/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:REPOSITORY_QUERYSTORE_TYPE" show="false" value=""/>
+    <elementParameter field="TECHNICAL" name="QUERYSTORE:QUERYSTORE_TYPE" value="BUILT_IN"/>
+    <elementParameter field="GUESS_SCHEMA" name="GUESS_SCHEMA" value="&quot;&quot;"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;SELECT \&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.FACT_COUNTY_YEARLY_SK,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DIM_COUNTRY_SK,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.\&quot;YEAR\&quot;,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.TOTAL_POPULATION,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.TOTAL_SALES_IN_DOLLARS,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.TOTAL_VOLUME_SOLD_IN_GALLONS,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.SALES_PER_CAPITA,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DW_LOAD_WORKFLOW_NAME,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DW_LOAD_JOB_ID,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DW_LOAD_DATE,&#10;&#9;&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY.DIM_SOURCE_SK&quot;&#10;+&quot;&#10;FROM&#9;\&quot;&quot;+context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_Schema+&quot;\&quot;.FACT_COUNTY_YEARLY&quot;"/>
+    <elementParameter field="LABEL" name="NOTE" value="This option only applies when deploying and running in the Talend Runtime"/>
+    <elementParameter field="CHECK" name="SPECIFY_DATASOURCE_ALIAS" value="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE_ALIAS" show="false" value="&quot;&quot;"/>
+    <elementParameter field="MAPPING_TYPE" name="MAPPING" show="false" value="id_MSSQL"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="context.IOWA_LIQUOR_SALES_AZURE_EDW_CONNECTION_AdditionalParams"/>
+    <elementParameter field="CHECK" name="ACTIVE_DIR_AUTH" value="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" show="false" value="&quot;ISO-8859-15&quot;"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15"/>
+    <elementParameter field="CHECK" name="TRIM_ALL_COLUMN" value="false"/>
+    <elementParameter field="TABLE" name="TRIM_COLUMN">
+      <elementValue elementRef="SCHEMA_COLUMN" value="FACT_COUNTY_YEARLY_SK"/>
+      <elementValue elementRef="TRIM" value="false"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="SET_QUERY_TIMEOUT" value="false"/>
+    <elementParameter field="TEXT" name="QUERY_TIMEOUT_IN_SECONDS" show="false" value="30"/>
+    <elementParameter field="TEXT" name="LABEL" value="__TABLE__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tDBInput_5">
+      <column key="true" length="10" name="FACT_COUNTY_YEARLY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+    </metadata>
+  </node>
+  <node componentName="tLogRow" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1560" posY="160">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tLogRow_1"/>
+    <elementParameter field="CHECK" name="ACTIVATE" value="false"/>
+    <elementParameter field="RADIO" name="BASIC_MODE" value="true"/>
+    <elementParameter field="RADIO" name="TABLE_PRINT" value="false"/>
+    <elementParameter field="RADIO" name="VERTICAL" value="false"/>
+    <elementParameter field="RADIO" name="PRINT_UNIQUE" show="false" value="true"/>
+    <elementParameter field="RADIO" name="PRINT_LABEL" show="false" value="false"/>
+    <elementParameter field="RADIO" name="PRINT_UNIQUE_LABEL" show="false" value="false"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value="&quot;|&quot;"/>
+    <elementParameter field="CHECK" name="PRINT_HEADER" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_UNIQUE_NAME" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_COLNAMES" value="false"/>
+    <elementParameter field="CHECK" name="USE_FIXED_LENGTH" value="false"/>
+    <elementParameter field="TABLE" name="LENGTHS" show="false">
+      <elementValue elementRef="SCHEMA_COLUMN" value="Year"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="DIM_COUNTRY_SK"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="County"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="Population"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="sale_dollars"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="volume_sold_gallons"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="dim_source_sk"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="PRINT_CONTENT_WITH_LOG4J" value="true"/>
+    <elementParameter field="TEXT" name="SCHEMA_OPT_NUM" show="false" value="100"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" label="fact_county_yearly_trnasformed" name="tLogRow_1">
+      <column comment="" key="false" length="2147483647" name="Year" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="true" length="10" name="DIM_COUNTRY_SK" nullable="false" pattern="" precision="0" sourceType="INT" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="County" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_String" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="2147483647" name="Population" nullable="true" pattern="" precision="0" sourceType="NVARCHAR" type="id_Integer" usefulColumn="true">
+        <additionalField key="Comment" value=""/>
+      </column>
+      <column comment="" key="false" length="-1" name="sale_dollars" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Float" usefulColumn="true"/>
+      <column comment="" key="false" length="-1" name="volume_sold_gallons" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Float" usefulColumn="true"/>
+      <column comment="" key="false" length="-1" name="dim_source_sk" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="-200" posY="120">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tRunJob_1"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_JOB" value="false"/>
+    <elementParameter field="TEXT" name="CONTEXT_JOB" show="false" value=""/>
+    <elementParameter field="PROCESS_TYPE" name="PROCESS" value="pre_job_log"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_CONTEXT" value="Default"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_PROCESS" value="DATABI:_f5VnIFl4Ee-dRvLB1p_zYg"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_VERSION" value="Latest"/>
+    <elementParameter field="TEXT" name="CONTEXT_NAME" show="false" value="Default"/>
+    <elementParameter field="CHECK" name="USE_INDEPENDENT_PROCESS" value="false"/>
+    <elementParameter field="CHECK" name="DIE_ON_CHILD_ERROR" value="true"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="false"/>
+    <elementParameter field="TABLE" name="CONTEXTPARAMS">
+      <elementValue elementRef="PARAM_NAME_COLUMN" value="JobName"/>
+      <elementValue elementRef="PARAM_VALUE_COLUMN" value="context.workflow_name"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="PROPAGATE_CHILD_RESULT" value="true"/>
+    <elementParameter field="CHECK" name="PRINT_PARAMETER" value="false"/>
+    <elementParameter field="CHECK" name="TRANSMIT_ORIGINAL_CONTEXT" show="false" value="true"/>
+    <elementParameter field="RADIO" name="USE_CHILD_JVM_SETTING" show="false" value="true"/>
+    <elementParameter field="RADIO" name="USE_CUSTOM_JVM_SETTING" show="false" value="false"/>
+    <elementParameter field="TABLE" name="JVM_ARGUMENTS" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_CONTEXT" value="false"/>
+    <elementParameter field="TEXT" name="DYNAMIC_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="USE_EXTRA_CLASSPATH" show="false" value="false"/>
+    <elementParameter field="TEXT" name="EXTRA_CLASSPATH" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="LOAD_CONTEXT_FROM_FILE" show="false" value="false"/>
+    <elementParameter field="CHECK" name="USE_BASE64" value="true"/>
+    <elementParameter field="TEXT" name="LABEL" value="PRE_JOB"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tRunJob_1">
+      <column comment="" key="false" length="-1" name="job_log_id" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tJavaRow" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="0" posY="280">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tJavaRow_1"/>
+    <elementParameter field="MEMO_JAVA" name="CODE" value="// code sample:&#10;//&#10;// multiply by 2 the row identifier&#10;// output_row.id = input_row.id * 2;&#10;//&#10;// lowercase the name&#10;// output_row.name = input_row.name.toLowerCase();&#10;&#10;context.job_log_id = pre_job_log_id.job_log_id;&#10;"/>
+    <elementParameter field="MEMO_IMPORT" name="IMPORT" value="//import java.util.List;"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tJavaRow_1">
+      <column comment="" key="false" length="-1" name="job_log_id" nullable="true" originalLength="-1" pattern="" precision="-1" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="2040" posY="0">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tRunJob_2"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_JOB" value="false"/>
+    <elementParameter field="TEXT" name="CONTEXT_JOB" show="false" value=""/>
+    <elementParameter field="PROCESS_TYPE" name="PROCESS" value="post_job_log"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_CONTEXT" value="Default"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_PROCESS" value="DATABI:_rV44EFl6Ee-dRvLB1p_zYg"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_VERSION" value="Latest"/>
+    <elementParameter field="TEXT" name="CONTEXT_NAME" show="false" value="Default"/>
+    <elementParameter field="CHECK" name="USE_INDEPENDENT_PROCESS" value="false"/>
+    <elementParameter field="CHECK" name="DIE_ON_CHILD_ERROR" value="true"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="false"/>
+    <elementParameter field="TABLE" name="CONTEXTPARAMS">
+      <elementValue elementRef="PARAM_NAME_COLUMN" value="job_log_id"/>
+      <elementValue elementRef="PARAM_VALUE_COLUMN" value="context.job_log_id"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="PROPAGATE_CHILD_RESULT" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_PARAMETER" value="false"/>
+    <elementParameter field="CHECK" name="TRANSMIT_ORIGINAL_CONTEXT" show="false" value="true"/>
+    <elementParameter field="RADIO" name="USE_CHILD_JVM_SETTING" show="false" value="true"/>
+    <elementParameter field="RADIO" name="USE_CUSTOM_JVM_SETTING" show="false" value="false"/>
+    <elementParameter field="TABLE" name="JVM_ARGUMENTS" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_CONTEXT" value="false"/>
+    <elementParameter field="TEXT" name="DYNAMIC_CONTEXT" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="USE_EXTRA_CLASSPATH" show="false" value="false"/>
+    <elementParameter field="TEXT" name="EXTRA_CLASSPATH" show="false" value="&quot;&quot;"/>
+    <elementParameter field="CHECK" name="LOAD_CONTEXT_FROM_FILE" show="false" value="false"/>
+    <elementParameter field="CHECK" name="USE_BASE64" value="true"/>
+    <elementParameter field="TEXT" name="LABEL" value="post_job"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tRunJob_2"/>
+  </node>
+  <node componentName="tLogCatcher" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1400" posY="440">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tLogCatcher_1"/>
+    <elementParameter field="CHECK" name="CATCH_JAVA_EXCEPTION" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_TDIE" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_TWARN" value="true"/>
+    <elementParameter field="CHECK" name="CATCH_TACTIONFAILURE" value="true"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tLogCatcher_1">
+      <column defaultValue="" key="false" length="0" name="moment" nullable="true" originalLength="-1" pattern="&quot;yyyy-MM-dd HH:mm:ss&quot;" precision="0" sourceType="" type="id_Date" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="20" name="pid" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="20" name="root_pid" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="20" name="father_pid" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="50" name="project" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="job" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="50" name="context" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="3" name="priority" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_Integer" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="type" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="origin" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="message" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="3" name="code" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tLogRow" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="1760" posY="440">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tLogRow_2"/>
+    <elementParameter field="RADIO" name="BASIC_MODE" value="true"/>
+    <elementParameter field="RADIO" name="TABLE_PRINT" value="false"/>
+    <elementParameter field="RADIO" name="VERTICAL" value="false"/>
+    <elementParameter field="RADIO" name="PRINT_UNIQUE" show="false" value="true"/>
+    <elementParameter field="RADIO" name="PRINT_LABEL" show="false" value="false"/>
+    <elementParameter field="RADIO" name="PRINT_UNIQUE_LABEL" show="false" value="false"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value="&quot;|&quot;"/>
+    <elementParameter field="CHECK" name="PRINT_HEADER" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_UNIQUE_NAME" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_COLNAMES" value="false"/>
+    <elementParameter field="CHECK" name="USE_FIXED_LENGTH" value="false"/>
+    <elementParameter field="TABLE" name="LENGTHS" show="false">
+      <elementValue elementRef="SCHEMA_COLUMN" value="moment"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="pid"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="root_pid"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="father_pid"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="project"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="job"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="context"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="priority"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="type"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="origin"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="message"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+      <elementValue elementRef="SCHEMA_COLUMN" value="code"/>
+      <elementValue elementRef="LENGTH" value="10"/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="PRINT_CONTENT_WITH_LOG4J" value="true"/>
+    <elementParameter field="TEXT" name="SCHEMA_OPT_NUM" show="false" value="100"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tLogRow_2">
+      <column defaultValue="" key="false" length="0" name="moment" nullable="true" originalLength="-1" pattern="&quot;yyyy-MM-dd HH:mm:ss&quot;" precision="0" sourceType="" type="id_Date" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="20" name="pid" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="20" name="root_pid" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="20" name="father_pid" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="50" name="project" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="job" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="50" name="context" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="3" name="priority" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_Integer" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="type" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="origin" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="255" name="message" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column defaultValue="" key="false" length="3" name="code" nullable="true" originalLength="-1" precision="0" sourceType="" type="id_Integer" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <connection connectorName="FLOW" label="stg_iowa_county_population_by_year" lineStyle="0" metaname="tDBInput_1" offsetLabelX="0" offsetLabelY="0" source="tDBInput_1" target="tMap_1">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="stg_iowa_county_population_by_year"/>
+  </connection>
+  <connection connectorName="FLOW" label="population_transformed" lineStyle="0" metaname="population_transformed" offsetLabelX="0" offsetLabelY="0" source="tMap_1" target="tMap_9">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="population_transformed"/>
+  </connection>
+  <connection connectorName="FLOW" label="county_merged" lineStyle="0" metaname="county_merged" offsetLabelX="0" offsetLabelY="0" source="tMap_9" target="tMap_6">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="county_merged"/>
+  </connection>
+  <connection connectorName="FLOW" label="stg_iowa_sales_by_county" lineStyle="0" metaname="tDBInput_2" offsetLabelX="0" offsetLabelY="0" source="tDBInput_2" target="tMap_3">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="stg_iowa_sales_by_county"/>
+  </connection>
+  <connection connectorName="FLOW" label="sales_transformed" lineStyle="8" metaname="sales_transformed" offsetLabelX="0" offsetLabelY="0" source="tMap_3" target="tMap_9">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="sales_transformed"/>
+  </connection>
+  <connection connectorName="FLOW" label="fact_county_yearly_trnasformed" lineStyle="0" metaname="fact_county_yearly_trnasformed" offsetLabelX="0" offsetLabelY="0" source="tMap_6" target="tMap_8">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="fact_county_yearly_trnasformed"/>
+  </connection>
+  <connection connectorName="FLOW" label="dim_county" lineStyle="0" metaname="tDBInput_3" offsetLabelX="0" offsetLabelY="0" source="tDBInput_3" target="tMap_4">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="dim_county"/>
+  </connection>
+  <connection connectorName="FLOW" label="dim_county_tbl" lineStyle="8" metaname="dim_county_tbl" offsetLabelX="0" offsetLabelY="0" source="tMap_4" target="tMap_6">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="dim_county_tbl"/>
+  </connection>
+  <connection connectorName="FLOW" label="fact_yearly_county_load" lineStyle="0" metaname="fact_yearly_county_load" offsetLabelX="0" offsetLabelY="0" source="tMap_8" target="tDBOutput_1">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="fact_yearly_county_load"/>
+  </connection>
+  <connection connectorName="FLOW" label="max_sk" lineStyle="8" metaname="tAggregateRow_1" offsetLabelX="0" offsetLabelY="0" source="tAggregateRow_1" target="tMap_8">
+    <elementParameter field="TABLE" name="TRACES_CONNECTION_FILTER" show="false">
+      <elementValue elementRef="TRACE_COLUMN" value="FACT_COUNTY_YEARLY_SK"/>
+      <elementValue elementRef="TRACE_COLUMN_CHECKED" value="true"/>
+      <elementValue elementRef="TRACE_COLUMN_CONDITION" value=""/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="max_sk"/>
+  </connection>
+  <connection connectorName="COMPONENT_OK" label="OnComponentOk" lineStyle="3" metaname="tDBOutput_1" offsetLabelX="0" offsetLabelY="0" source="tDBOutput_1" target="tRunJob_2">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnComponentOk1"/>
+  </connection>
+  <connection connectorName="FLOW" label="curr_tbl" lineStyle="8" metaname="curr_tbl" offsetLabelX="0" offsetLabelY="0" source="tMap_2" target="tMap_8">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="curr_tbl"/>
+  </connection>
+  <connection connectorName="FLOW" label="county_cur_tbl" lineStyle="0" metaname="tDBInput_4" offsetLabelX="0" offsetLabelY="0" source="tDBInput_4" target="tMap_2">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="county_cur_tbl"/>
+  </connection>
+  <connection connectorName="FLOW" label="fct_county_yearly_tbl" lineStyle="0" metaname="tDBInput_5" offsetLabelX="0" offsetLabelY="0" source="tDBInput_5" target="tAggregateRow_1">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="fct_county_yearly_tbl"/>
+  </connection>
+  <connection connectorName="FLOW" label="pre_job_log_id" lineStyle="0" metaname="tRunJob_1" offsetLabelX="0" offsetLabelY="0" source="tRunJob_1" target="tJavaRow_1">
+    <elementParameter field="TABLE" name="TRACES_CONNECTION_FILTER" show="false">
+      <elementValue elementRef="TRACE_COLUMN" value="job_log_id"/>
+      <elementValue elementRef="TRACE_COLUMN_CHECKED" value="true"/>
+      <elementValue elementRef="TRACE_COLUMN_CONDITION" value=""/>
+    </elementParameter>
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="pre_job_log_id"/>
+  </connection>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tRunJob_1" offsetLabelX="0" offsetLabelY="0" source="tRunJob_1" target="tDBInput_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="OnSubjobOk1"/>
+  </connection>
+  <connection connectorName="FLOW" label="row1" lineStyle="0" metaname="tLogCatcher_1" offsetLabelX="0" offsetLabelY="0" source="tLogCatcher_1" target="tLogRow_2">
+    <elementParameter field="CHECK" name="MONITOR_CONNECTION" value="false"/>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="row1"/>
+  </connection>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tDBInput_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="255;255;255"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="47;47;47"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tLogRow_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="255;255;255"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="47;47;47"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tRunJob_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="255;255;255"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="47;47;47"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tRunJob_2"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="255;255;255"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="47;47;47"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" show="false" value="tLogCatcher_1"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" show="false" value="255;255;255"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="47;47;47"/>
+  </subjob>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#" Id="_dabd0b6d-0d88-427d-b9ef-3dfffd700bf9"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>GdsAklXpNIgey+V8uvHhtPD7JiottnwHN1cbHlXivVm9KTqQjmM4+3Yo1pLWca6Iv+ElFFEs5FXY&#13;
+bPpTY66k4g==</DigestValue></Reference><Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties" URI="#_b89c975c-713c-4a80-a639-f7cf6721b698"><Transforms><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>SN2heDlxLF6fwv4Ns1L89Qp5SgZJKUB+TMeOzR3cdLKny/y2j0BEkq0sGCua8O+tGAKCeYchNS1a&#13;
+h3hZLGrrvA==</DigestValue></Reference></SignedInfo><SignatureValue>RbFYrpum+8t8PGLAZTZKSM/uYWsmn+0GDHq2k60eGZxZYWl06CH6hI/s7DsiOGDAN8BBjsYBnGJj&#13;
+rmURqjXitH2CPlZRi0bWxoQEjQttY0NdA/VkFd5hOk4vs8UP1kbwd9h57fIRtEqc/9O4PmVuWc52&#13;
+GGy3/vODupMpdh5J23cjkSiGFW4zmCvjGQxea8l3b3jVCx8OckZrAIZq3u3S4VvK0TOvlhBvhhvH&#13;
+xTvHjEbvmY7luIrS0GmVx1m11gmV5QFYl9DpouyZUy6Qne7z7w2b5pi1NNtasvAw0CgtVkCTgElL&#13;
+CmTnHiU4xAmOFWsf9n2MgaQ1HI+KmmIqXkE15Q==</SignatureValue><KeyInfo><X509Data><X509SubjectName>C=FR,ST=Paris,L=Paris,O=Talend Inc.,OU=R&amp;D,CN=Talend Code Signing certificate</X509SubjectName><X509Certificate>MIIFADCCAuigAwIBAgIIA2OsD6bRyj0wDQYJKoZIhvcNAQELBQAwgY0xCzAJBgNVBAYTAkZSMQ4w&#13;
+DAYDVQQIEwVQYXJpczEOMAwGA1UEBxMFUGFyaXMxFDASBgNVBAoTC1RhbGVuZCBJbmMuMQwwCgYD&#13;
+VQQLDANSJkQxFjAUBgNVBAMMDVRhbGVuZCBSJkQgQ0ExIjAgBgkqhkiG9w0BCQEWE3NlY3VyaXR5&#13;
+QHRhbGVuZC5jb20wHhcNMTkwNjAzMDgxODIwWhcNMjkwNjAzMDAwMDAwWjB7MSgwJgYDVQQDEx9U&#13;
+YWxlbmQgQ29kZSBTaWduaW5nIGNlcnRpZmljYXRlMQwwCgYDVQQLDANSJkQxFDASBgNVBAoTC1Rh&#13;
+bGVuZCBJbmMuMQ4wDAYDVQQHEwVQYXJpczEOMAwGA1UECBMFUGFyaXMxCzAJBgNVBAYTAkZSMIIB&#13;
+IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp5TMF8BmRt8dY51t9kIDdDkoOKVVytJN2gn2&#13;
+DhMGi8hzpUofNDykJDhe9SPqyJdGZ6o/h7laTA0/CivKyPT1OJQ9E2gMHKs8cTZM/cO2w0Atlqkl&#13;
+alIxepol0DNnUtmECVBqdnVsJesfmdoeptxgJAtxYbquFsTsrATNY2cscXpwmOca/Ewip48WQLFx&#13;
+e5s067jaIsAQGRIqpIup3bOtWBySrtImJ40lQCPeEcl96qzkv3utaVaNc3ukkhYkCDbMbK8NVd1B&#13;
+CVeeIBAe+n/SdpHH20o+6eIiZecsBGDLwlTYrFvuVqAa6xI7y8Vdz6irjPAVBEtG/iOc782aJ/lZ&#13;
+TwIDAQABo3UwczAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEF&#13;
+BQcDAzAdBgNVHQ4EFgQUGdfzQEbjQnANq28sfhEMTx+rsOcwHwYDVR0jBBgwFoAU530Lcvy1gZnG&#13;
+gCvZLOyCczK1qPcwDQYJKoZIhvcNAQELBQADggIBAEr22wnaQwZm2dhbUCqD+qZpTq2AF/tzxqAM&#13;
+eL/CiTjPbTblS4SNNwCKvTgMe9ucpUbenXmK7xE+DU9dN4om+t3VHbkOLQVyuLcd2WGsy7ZGwRvA&#13;
+f+TFwLbwjyTukOGm6Sd1qyZgvCPzBsKnft6vscvGy2yEpmFCeHJyBP8pvchg607zguRdNbkGYZXw&#13;
+G6jNipAbTtzdPTFKKr1bEf0sUGqMrlZIMPjflh2Vewu8ImNdX5IZdvBD6DdFVOC5wqV6u+W9ukE/&#13;
+mXZxDBYNl2AF7FTh04ucEVN3mHv7m2L0uFvUlhxchcagJhJsdQG+A0LVCemHbp6CSNQJx02KxqUG&#13;
+hakvpzhOyLo91h8YAQrEZJdNuKA8IYmBrFZQZDCz0uywKSyFfzPyJhvxylCLG/iDPPfE0VWcrMJ/&#13;
+WQJly/2XPg/NBCTF3pSKS0kCiA7PeaI3cWkMYYA3PMwYDvzqs1opBRglG7ikj0bQxSm3lcjMuuvW&#13;
+gBRksFKjP3K/nztsjSoYITOM9jR29ReIL3v0E8RbAFwA2RGq6Dxd0ixfbucMesy5Gnr8tfYy6rW+&#13;
+qSQqd3ah4+PSzBNVwIB4ytpdrG3SlhCI2i2Th8ek8Sjsaquh9qPAerWNd2+84HWOOGj1Xe1qc6vg&#13;
+qqu6JoK9EXKDiwBqDVkueIa+MhamE1VDnhn2pPui</X509Certificate></X509Data></KeyInfo><Object><SignatureProperties><SignatureProperty Id="_b89c975c-713c-4a80-a639-f7cf6721b698" Target="#_dabd0b6d-0d88-427d-b9ef-3dfffd700bf9"><Timestamp>2024-08-15 01:54:39</Timestamp></SignatureProperty></SignatureProperties></Object></Signature></talendfile:ProcessType>

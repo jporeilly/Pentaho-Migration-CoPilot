@@ -3,12 +3,14 @@ import { useState } from 'react'
 // Source-tool identity badge. If a real logo exists at
 // frontend/public/logos/<tool>.png (drop in the official asset — internal
 // tool), it is shown; otherwise a neutral lettermark fallback renders.
-const TOOLS = {
+export const TOOLS = {
   powercenter: { short: 'INFA', label: 'Informatica PowerCenter', color: '#eb6834' },
   ssis: { short: 'SSIS', label: 'SQL Server Integration Services', color: '#3987e5' },
   talend: { short: 'TLND', label: 'Talend', color: '#1baf7a' },
   datastage: { short: 'DS', label: 'IBM DataStage', color: '#9085e9' },
 }
+
+export const toolLabel = (tool) => TOOLS[tool]?.label ?? tool
 
 export default function SourceBadge({ tool }) {
   const [logoMissing, setLogoMissing] = useState(false)

@@ -46,8 +46,7 @@ from pdi_migration.llm import (
 )
 from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.parser.powercenter import PowerCenterParseError
+from pdi_migration.parser import ParseError, detect_parser
 from pdi_migration.project import (
     STATUSES,
     MappingRecord,
@@ -149,7 +148,7 @@ def technical_brief() -> FileResponse:
 @app.post("/parse", response_model=list[Pipeline], dependencies=[Depends(require_api_key)])
 async def parse(export: UploadFile) -> list[Pipeline]:
     """Parse a PowerCenter XML export into the normalized IR."""
-    pipelines, _ = _parse_upload(await export.read())
+    pipelines, _ = _parse_upload(await export.read(), export.filename)
     return pipelines
 
 
@@ -157,13 +156,12 @@ async def parse(export: UploadFile) -> list[Pipeline]:
 async def convert(export: UploadFile) -> ConversionResponse:
     """Full conversion: source analysis + parse -> map -> generate per mapping."""
     started = time.monotonic()
-    mapper = RulesMapper()
     generator = KtrGenerator()
     data = await export.read()
-    pipelines, source = _parse_upload(data)
+    pipelines, source = _parse_upload(data, export.filename)
     results = []
     for pipeline in pipelines:
-        mapper.apply(pipeline)
+        RulesMapper.for_pipeline(pipeline).apply(pipeline)
         results.append(_build_result(pipeline, generator))
     assess_source(source, pipelines)
     logger.info(
@@ -234,10 +232,11 @@ def project_open(file: str, mapping: str) -> ConversionResponse:
             detail=f"source export not found at '{record.source_path}' — "
                    "it may have moved; re-run `pdi-migrate batch`",
         )
-    mapper = RulesMapper()
     generator = KtrGenerator()
-    parser = PowerCenterParser()
-    pipelines = [mapper.apply(p) for p in parser.parse_file(source_path)]
+    parser = detect_parser(source_path)
+    pipelines = [
+        RulesMapper.for_pipeline(p).apply(p) for p in parser.parse_file(source_path)
+    ]
     source = assess_source(parser.analyze_export(source_path), pipelines)
     results = sorted(
         (_build_result(p, generator) for p in pipelines),
@@ -382,22 +381,22 @@ def pull_status() -> dict[str, str]:
     return _pull_state
 
 
-def _parse_upload(data: bytes) -> tuple[list[Pipeline], SourceInfo]:
+def _parse_upload(data: bytes, filename: str | None = None) -> tuple[list[Pipeline], SourceInfo]:
     if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(
             status_code=413,
             detail=f"upload exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)} MB limit",
         )
-    with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as tmp:
-        tmp.write(data)
-        tmp_path = Path(tmp.name)
-    try:
-        parser = PowerCenterParser()
-        return parser.parse_file(tmp_path), parser.analyze_export(tmp_path)
-    except (PowerCenterParseError, SyntaxError) as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-    finally:
-        tmp_path.unlink(missing_ok=True)
+    # keep the ORIGINAL filename on disk — Talend job names derive from it
+    safe_name = Path(filename or "export.xml").name or "export.xml"
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir) / safe_name
+        tmp_path.write_bytes(data)
+        try:
+            parser = detect_parser(tmp_path)
+            return parser.parse_file(tmp_path), parser.analyze_export(tmp_path)
+        except (ParseError, SyntaxError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 # Serve the built React UI for every non-API path. Mounted last so the API

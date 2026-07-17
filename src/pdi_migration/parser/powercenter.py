@@ -37,7 +37,10 @@ REPOSITORY_VERSIONS = {
 }
 
 
-class PowerCenterParseError(Exception):
+from pdi_migration.parser.errors import ParseError
+
+
+class PowerCenterParseError(ParseError):
     pass
 
 

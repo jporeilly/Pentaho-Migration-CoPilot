@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ProcessType xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" defaultContext="Default" jobType="Standard" version="8.0.1">
+  <context confirmationNeeded="false" name="Default"/>
+  <node componentName="tFileInputDelimited" componentVersion="0.102" offsetLabelX="0" offsetLabelY="0" posX="100" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tFileInputDelimited_1"/>
+    <elementParameter field="FILE" name="FILENAME" value="&quot;C:/data/orders.csv&quot;"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value="&quot;;&quot;"/>
+    <metadata connector="FLOW" name="tFileInputDelimited_1">
+      <column comment="" key="false" length="10" name="ORDER_ID" nullable="false" pattern="" precision="0" sourceType="" type="id_Integer" usefulColumn="true"/>
+      <column comment="" key="false" length="20" name="REGION" nullable="true" pattern="" precision="0" sourceType="" type="id_String" usefulColumn="true"/>
+      <column comment="" key="false" length="12" name="AMOUNT" nullable="true" pattern="" precision="2" sourceType="" type="id_BigDecimal" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tMysqlInput" componentVersion="0.102" posX="100" posY="260">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tMysqlInput_1"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value="&quot;SELECT REGION_CODE, REGION_NAME FROM REGIONS&quot;"/>
+    <metadata connector="FLOW" name="tMysqlInput_1">
+      <column key="true" length="10" name="REGION_CODE" nullable="false" precision="0" type="id_String" usefulColumn="true"/>
+      <column key="false" length="40" name="REGION_NAME" nullable="true" precision="0" type="id_String" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tMap" componentVersion="2.0" posX="300" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tMap_1"/>
+    <metadata connector="FLOW" name="out1">
+      <column key="false" length="10" name="ORDER_ID" nullable="false" precision="0" type="id_Integer" usefulColumn="true"/>
+      <column key="false" length="40" name="REGION_NAME" nullable="true" precision="0" type="id_String" usefulColumn="true"/>
+      <column key="false" length="12" name="AMOUNT_TAXED" nullable="true" precision="2" type="id_BigDecimal" usefulColumn="true"/>
+    </metadata>
+    <nodeData xsi:type="mapper:MapperData" xmlns:mapper="http://www.talend.org/mapper">
+      <uiPropertiesState/>
+      <outputTables sizeState="INTERMEDIATE" name="out1">
+        <mapperTableEntries name="ORDER_ID" expression="row1.ORDER_ID" type="id_Integer"/>
+        <mapperTableEntries name="REGION_NAME" expression="row2.REGION_NAME == null ? &quot;UNKNOWN&quot; : StringHandling.UPCASE(row2.REGION_NAME)" type="id_String"/>
+        <mapperTableEntries name="AMOUNT_TAXED" expression="row1.AMOUNT * 1.2" type="id_BigDecimal"/>
+      </outputTables>
+    </nodeData>
+  </node>
+  <node componentName="tAggregateRow" componentVersion="0.102" posX="500" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tAggregateRow_1"/>
+    <metadata connector="FLOW" name="tAggregateRow_1">
+      <column key="false" length="40" name="REGION_NAME" nullable="true" precision="0" type="id_String" usefulColumn="true"/>
+      <column key="false" length="15" name="TOTAL_AMOUNT" nullable="true" precision="2" type="id_BigDecimal" usefulColumn="true"/>
+    </metadata>
+  </node>
+  <node componentName="tMysqlOutput" componentVersion="0.102" posX="700" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tMysqlOutput_1"/>
+    <elementParameter field="TEXT" name="TABLE" value="&quot;SALES_SUMMARY&quot;"/>
+  </node>
+  <node componentName="tLogRow" componentVersion="0.102" posX="700" posY="260">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tLogRow_1"/>
+  </node>
+  <connection connectorName="FLOW" label="row1" lineStyle="0" metaname="tFileInputDelimited_1" offsetLabelX="0" offsetLabelY="0" source="tFileInputDelimited_1" target="tMap_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="row1"/>
+  </connection>
+  <connection connectorName="LOOKUP" label="row2" lineStyle="2" metaname="tMysqlInput_1" source="tMysqlInput_1" target="tMap_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="row2"/>
+  </connection>
+  <connection connectorName="FLOW" label="out1" lineStyle="0" metaname="tMap_1" source="tMap_1" target="tAggregateRow_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="out1"/>
+  </connection>
+  <connection connectorName="FLOW" label="row3" lineStyle="0" metaname="tAggregateRow_1" source="tAggregateRow_1" target="tMysqlOutput_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="row3"/>
+  </connection>
+  <connection connectorName="FLOW" label="row4" lineStyle="0" metaname="tAggregateRow_1" source="tAggregateRow_1" target="tLogRow_1">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="row4"/>
+  </connection>
+</talendfile:ProcessType>

@@ -61,8 +61,9 @@ export default function MapPage({ result, onUpdate }) {
       </header>
       {error && <div className="error">Translation failed: {error}</div>}
       <p className="hint-line">
-        How each Informatica transformation maps to PDI: side-by-side structure, per-step
-        confidence, and a detailed impact analysis of the behavioral differences.
+        How each source component maps to PDI: source structure above its converted
+        counterpart, per-step confidence, and a detailed impact analysis of the
+        behavioral differences.
       </p>
       <StatTiles report={report} />
       <CompareView pipeline={pipeline} />

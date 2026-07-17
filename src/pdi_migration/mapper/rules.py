@@ -9,9 +9,15 @@ from pathlib import Path
 
 import yaml
 
-from pdi_migration.ir import Confidence, Pipeline
+from pdi_migration.ir import Confidence, Pipeline, SourceTool
 
-DEFAULT_RULES = Path(__file__).resolve().parents[3] / "rules" / "powercenter_to_pdi.yaml"
+RULES_DIR = Path(__file__).resolve().parents[3] / "rules"
+DEFAULT_RULES = RULES_DIR / "powercenter_to_pdi.yaml"
+
+RULES_BY_TOOL = {
+    SourceTool.POWERCENTER: RULES_DIR / "powercenter_to_pdi.yaml",
+    SourceTool.TALEND: RULES_DIR / "talend_to_pdi.yaml",
+}
 
 
 class RulesMapper:
@@ -23,6 +29,15 @@ class RulesMapper:
         self.rules: dict[str, dict] = {
             k: v for k, v in loaded.items() if not k.startswith("_")
         }
+
+    @classmethod
+    def for_tool(cls, source_tool: SourceTool) -> "RulesMapper":
+        """The rules library for a given source tool (defaults to PowerCenter)."""
+        return cls(RULES_BY_TOOL.get(source_tool, DEFAULT_RULES))
+
+    @classmethod
+    def for_pipeline(cls, pipeline: Pipeline) -> "RulesMapper":
+        return cls.for_tool(pipeline.source_tool)
 
     def apply(self, pipeline: Pipeline) -> Pipeline:
         for step in pipeline.steps:

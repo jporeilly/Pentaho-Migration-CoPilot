@@ -111,7 +111,7 @@ export default function App() {
           )}
         </h1>
         <span className="links">
-          Informatica PowerCenter → Pentaho Data Integration ·{' '}
+          Informatica · Talend → Pentaho Data Integration ·{' '}
           <a href="/docs" target="_blank" rel="noreferrer">API docs</a> ·{' '}
           <button
             className={`nav${view === 'project' ? ' active' : ''}`}

@@ -23,12 +23,20 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
                  "re-export the folder including mappings.",
         ))
     if source.workflows or source.sessions:
-        warn(SourceWarning(
-            level=WarningLevel.WARNING,
-            text=f"Contains {source.workflows} workflow(s) and {source.sessions} session(s). "
-                 "Orchestration — scheduling, dependencies, error handling, session overrides — "
-                 "is not converted in Phase 0 and must be rebuilt as PDI Jobs (.kjb) manually.",
-        ))
+        if source.tool == "Talend":
+            warn(SourceWarning(
+                level=WarningLevel.WARNING,
+                text=f"{source.workflows} orchestration component(s) (tRunJob/joblets) call other "
+                     "jobs — recreate the calling structure as PDI Job entries (.kjb) and convert "
+                     "the called jobs separately.",
+            ))
+        else:
+            warn(SourceWarning(
+                level=WarningLevel.WARNING,
+                text=f"Contains {source.workflows} workflow(s) and {source.sessions} session(s). "
+                     "Workflows convert to .kjb skeletons; session-level settings (commit intervals, "
+                     "error handling, overrides) are NOT carried over — review every job entry.",
+            ))
     if source.mapplets:
         warn(SourceWarning(
             level=WarningLevel.WARNING,
@@ -43,7 +51,11 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
             text=f"Unrecognized repository version {source.repository_version} — this export "
                  "format has not been tested against the corpus; review results closely.",
         ))
-    elif source.product_version and source.product_version.startswith(("8", "9")):
+    elif (
+        "PowerCenter" in source.tool
+        and source.product_version
+        and source.product_version.startswith(("8", "9"))
+    ):
         warn(SourceWarning(
             level=WarningLevel.INFO,
             text=f"Export from PowerCenter {source.product_version} "

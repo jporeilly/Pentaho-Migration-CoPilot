@@ -137,8 +137,21 @@ class KtrGenerator:
         return out_path
 
 
+def _clean_java_string(value: str) -> str:
+    """Talend stores SQL as a Java string literal: '"select ..."' with escapes."""
+    value = value.strip()
+    if value.startswith('"') and value.endswith('"') and len(value) >= 2:
+        value = value[1:-1]
+    return value.replace('\\"', '"').replace('\\n', '\n')
+
+
 def _emit_table_input(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "connection")  # connection is environment-specific; left for review
+    talend_query = step.properties.get("QUERY")
+    if talend_query:
+        SubElement(el, "sql").text = _clean_java_string(talend_query)
+        SubElement(el, "limit").text = "0"
+        return
     sql = step.properties.get("Sql Query") or (
         "SELECT " + ", ".join(f.name for f in step.fields) + f"\nFROM {step.name}"
         if step.fields
