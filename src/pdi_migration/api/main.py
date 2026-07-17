@@ -7,9 +7,12 @@ Serves the Phase 0 review UI at / and the API under /parse, /convert.
 Interactive API docs at /docs.
 """
 
+import json
 import tempfile
+import threading
 from pathlib import Path
 
+import httpx
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
@@ -17,6 +20,8 @@ from pydantic import BaseModel
 from pdi_migration import __version__
 from pdi_migration.generator import KtrGenerator
 from pdi_migration.ir import Pipeline
+from pdi_migration.llm import LLMSettings, load_settings, save_settings
+from pdi_migration.llm.detect import DetectionReport, detection_report
 from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import PowerCenterParser
 from pdi_migration.parser.powercenter import PowerCenterParseError
@@ -75,6 +80,65 @@ async def convert(export: UploadFile) -> list[ConversionResult]:
             )
         )
     return results
+
+
+class SettingsResponse(BaseModel):
+    settings: LLMSettings
+    detection: DetectionReport
+
+
+@app.get("/settings", response_model=SettingsResponse)
+def get_settings() -> SettingsResponse:
+    """Saved LLM settings plus a live detection report (hardware, env, Ollama)."""
+    return SettingsResponse(settings=load_settings(), detection=detection_report())
+
+
+@app.put("/settings", response_model=LLMSettings)
+def put_settings(settings: LLMSettings) -> LLMSettings:
+    save_settings(settings)
+    return settings
+
+
+# One pull at a time is plenty for a single-user internal tool.
+_pull_state: dict[str, str] = {"status": "idle", "model": "", "detail": ""}
+
+
+def _run_pull(base_url: str, model: str) -> None:
+    try:
+        with httpx.stream(
+            "POST", f"{base_url}/api/pull", json={"name": model}, timeout=None
+        ) as response:
+            for line in response.iter_lines():
+                if not line:
+                    continue
+                event = json.loads(line)
+                if error := event.get("error"):
+                    _pull_state.update(status="error", detail=error)
+                    return
+                detail = event.get("status", "")
+                if total := event.get("total"):
+                    done = event.get("completed", 0)
+                    detail += f" {done / total:.0%}"
+                _pull_state.update(status="pulling", detail=detail)
+        _pull_state.update(status="done", detail="model ready")
+    except Exception as exc:
+        _pull_state.update(status="error", detail=str(exc))
+
+
+@app.post("/settings/ollama/pull")
+def pull_model(model: str) -> dict[str, str]:
+    """Start pulling MODEL on the configured Ollama server (non-blocking)."""
+    if _pull_state["status"] == "pulling":
+        raise HTTPException(status_code=409, detail=f"already pulling {_pull_state['model']}")
+    base_url = load_settings().base_url
+    _pull_state.update(status="pulling", model=model, detail="starting")
+    threading.Thread(target=_run_pull, args=(base_url, model), daemon=True).start()
+    return _pull_state
+
+
+@app.get("/settings/ollama/pull")
+def pull_status() -> dict[str, str]:
+    return _pull_state
 
 
 def _parse_upload(data: bytes) -> list[Pipeline]:

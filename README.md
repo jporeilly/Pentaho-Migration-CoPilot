@@ -60,10 +60,12 @@ and mirrored helper scripts — `scripts\dev.ps1` (Windows 11), `scripts/dev.sh`
 
 ## Real-world corpus
 
-`samples/informatica/` holds 11 genuine PowerCenter 10.x exports (110 mappings,
-1,045 steps) from the public [HHS/Informatica](https://github.com/HHS/Informatica)
-repository — real production payroll ETL, used to measure mapper coverage with
-`pdi-migrate gaps`.
+`samples/informatica/` holds genuine PowerCenter exports (24 files, 118 mappings)
+spanning six repository versions (~9.0 to 10.5), sourced from public repos — the
+[HHS/Informatica](https://github.com/HHS/Informatica) production payroll ETL plus
+production and coursework exports from a dozen other authors. Used to measure
+mapper coverage with `pdi-migrate gaps`. All 24 parse with zero errors, including
+a 7.2 MB export with 11,327 connectors.
 
 ## Tests
 

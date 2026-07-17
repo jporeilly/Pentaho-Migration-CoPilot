@@ -158,3 +158,37 @@ button.version:hover { background: var(--gridline); text-decoration: underline; 
   font: .8rem Consolas, "Cascadia Mono", monospace;
 }
 .modal-body .md a { color: var(--accent); }
+
+/* ---------- settings ---------- */
+button.nav {
+  background: none; border: none; color: var(--accent); cursor: pointer;
+  font: inherit; padding: 0;
+}
+button.nav.active { text-decoration: underline; }
+
+.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+.settings .card { margin-top: 1.25rem; }
+.settings h2 { font-size: 1.05rem; margin-bottom: .8rem; }
+.settings h3 { font-size: .8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin: 1rem 0 .4rem; }
+.settings dl { display: grid; grid-template-columns: auto 1fr; gap: .35rem 1.2rem; font-size: .88rem; }
+.settings dl .pair { display: contents; }
+.settings dt { color: var(--text-muted); }
+.settings dd { color: var(--text-secondary); }
+.settings .ok { color: var(--status-good); }
+.settings .warn { color: var(--status-warning); }
+.rec-model { font-size: 1.45rem; font-weight: 650; color: var(--accent); }
+.rec-reason { color: var(--text-secondary); font-size: .88rem; margin-top: .3rem; }
+.actions { display: flex; gap: .75rem; align-items: center; margin-top: 1.1rem; }
+.pull-status { margin-top: .7rem; font-size: .85rem; color: var(--text-secondary); }
+.pull-status.error { color: var(--status-serious); }
+.pull-status.done { color: var(--status-good); }
+
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.form-grid label { display: flex; flex-direction: column; gap: .35rem; font-size: .82rem; color: var(--text-muted); }
+.form-grid select, .form-grid input {
+  background: var(--surface-2); color: var(--text-primary);
+  border: none; border-radius: 8px; padding: .55rem .75rem;
+  font: .9rem system-ui, "Segoe UI", sans-serif;
+}
+.form-grid select:focus, .form-grid input:focus { outline: 2px solid var(--accent); }
+.form-grid .hint { color: var(--text-muted); font-size: .85rem; align-self: end; }

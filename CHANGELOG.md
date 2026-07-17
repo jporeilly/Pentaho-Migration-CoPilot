@@ -3,6 +3,28 @@
 All notable changes to Migration Copilot are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follows [SemVer](https://semver.org/).
 
+## [0.3.0] — 2026-07-17
+
+### Added
+
+- **Settings page** (⚙ in the masthead): environment detection (platform, RAM, NVIDIA
+  GPU/VRAM via nvidia-smi, `OLLAMA_*` env vars, ANTHROPIC_API_KEY presence-only, live
+  Ollama probe with installed-model list) and an automatic **model recommendation**
+  sized to the hardware (qwen2.5-coder ladder: 1.5b → 32b) with suggested Ollama
+  tuning (`OLLAMA_KEEP_ALIVE`, `OLLAMA_NUM_PARALLEL`, `OLLAMA_FLASH_ATTENTION`).
+  One-click "Apply recommendation"; pull the model from the UI with live progress.
+- API: `GET/PUT /settings`, `POST/GET /settings/ollama/pull`. Settings persist to
+  `config/settings.json` (gitignored).
+- Expanded real corpus: 24 genuine export files across six repository versions
+  (PowerCenter ~9.0 → 10.5), 118 mappings — sources include HHS payroll, a Russian
+  production DWH, a Spanish SEPE export, and the viadee i2t converter fixtures.
+- GitHub repository: <https://github.com/jporeilly/PDI-Migration-CoPilot> (private).
+
+### Fixed
+
+- `OLLAMA_HOST=0.0.0.0` (a listen address) is now mapped to a connectable loopback
+  URL, and a missing port defaults to 11434.
+
 ## [0.2.0] — 2026-07-17
 
 ### Added

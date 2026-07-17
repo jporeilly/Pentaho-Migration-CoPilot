@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import DropZone from './components/DropZone.jsx'
 import PipelineCard from './components/PipelineCard.jsx'
 import ChangelogModal from './components/ChangelogModal.jsx'
+import SettingsPage from './components/SettingsPage.jsx'
 
 export default function App() {
   const [results, setResults] = useState([])
@@ -9,6 +10,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [version, setVersion] = useState('')
   const [showChangelog, setShowChangelog] = useState(false)
+  const [view, setView] = useState('convert')
 
   useEffect(() => {
     fetch('/health')
@@ -59,7 +61,13 @@ export default function App() {
           )}
         </h1>
         <span className="links">
-          Informatica PowerCenter → Pentaho Data Integration · <a href="/docs">API docs</a>
+          Informatica PowerCenter → Pentaho Data Integration · <a href="/docs">API docs</a> ·{' '}
+          <button
+            className={`nav${view === 'settings' ? ' active' : ''}`}
+            onClick={() => setView(view === 'settings' ? 'convert' : 'settings')}
+          >
+            ⚙ Settings
+          </button>
         </span>
       </header>
       {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
@@ -67,13 +75,18 @@ export default function App() {
         Phase 0 internal tool — parse, map, and generate .ktr with per-step confidence.
       </p>
 
-      <DropZone onFile={convert} onSample={loadSample} />
-
-      {error && <div className="error">Conversion failed: {error}</div>}
-      {loading && <p className="loading">Converting…</p>}
-      {results.map((r) => (
-        <PipelineCard key={r.pipeline.name} result={r} />
-      ))}
+      {view === 'settings' ? (
+        <SettingsPage />
+      ) : (
+        <>
+          <DropZone onFile={convert} onSample={loadSample} />
+          {error && <div className="error">Conversion failed: {error}</div>}
+          {loading && <p className="loading">Converting…</p>}
+          {results.map((r) => (
+            <PipelineCard key={r.pipeline.name} result={r} />
+          ))}
+        </>
+      )}
     </div>
   )
 }
