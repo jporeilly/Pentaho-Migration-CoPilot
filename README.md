@@ -28,7 +28,7 @@ never guesses: unknown transformation types are routed to manual handoff explici
 
 ## Setup
 
-See [INSTALL.md](INSTALL.md). Quick version:
+See [docs/INSTALL.md](docs/INSTALL.md). Quick version:
 
 ```powershell
 py -3.13 -m venv .venv
