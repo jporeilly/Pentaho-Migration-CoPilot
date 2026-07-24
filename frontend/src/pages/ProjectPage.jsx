@@ -34,7 +34,7 @@ export default function ProjectPage({ onBack, onOpen }) {
         <p className="hint-line">
           The project store is empty. Batch-convert a folder of exports first:
         </p>
-        <pre className="ktr-pre">pdi-migrate batch samples\informatica</pre>
+        <pre className="ktr-pre">pentaho-migrate batch samples\informatica</pre>
         <p className="hint-line">
           Every mapping lands here with its confidence score and a review status you
           can track through <em>converted → in review → verified</em>.

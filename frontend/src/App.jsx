@@ -150,7 +150,7 @@ export default function App() {
     <div className="app">
       <header className="masthead">
         <h1>
-          Migration <em>Copilot</em>
+          Pentaho Migration <em>Copilot</em>
           {version && (
             <button className="version" onClick={() => setShowChangelog(true)} title="What's new — view the changelog">
               v{version}

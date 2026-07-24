@@ -11,11 +11,11 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.parser import ParseError, detect_parser
-from pdi_migration.reports import load_report_model, write_prpt
-from pdi_migration.reports.formula_translator import translate_formula
-from pdi_migration.reports.prpt_writer import MIMETYPE
+from pentaho_migration.api.main import app
+from pentaho_migration.parser import ParseError, detect_parser
+from pentaho_migration.reports import load_report_model, write_prpt
+from pentaho_migration.reports.formula_translator import translate_formula
+from pentaho_migration.reports.prpt_writer import MIMETYPE
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
 

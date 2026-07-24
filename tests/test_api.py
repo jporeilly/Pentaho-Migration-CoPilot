@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
+from pentaho_migration.api.main import app
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
 

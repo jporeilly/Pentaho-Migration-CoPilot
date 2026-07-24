@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from pdi_migration.reports import load_report_model
+from pentaho_migration.reports import load_report_model
 
 CORPUS = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
 DUMPS = sorted(CORPUS.glob("*.xml")) if CORPUS.is_dir() else []
@@ -27,7 +27,7 @@ def test_every_real_dump_parses():
 
 @pytest.mark.skipif(len(DUMPS) < 10, reason="extracted corpus not present")
 def test_no_credentials_left_in_corpus():
-    from pdi_migration.reports.sanitize import scrub_directory
+    from pentaho_migration.reports.sanitize import scrub_directory
 
     files_changed, attrs = scrub_directory(CORPUS)
     assert attrs == 0, f"{attrs} credential attribute(s) still present - scrub before committing"

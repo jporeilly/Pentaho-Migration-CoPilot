@@ -4,11 +4,11 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.ir import FieldDef
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.sandbox import build_sandbox_kit, generate_csv, sql_type
+from pentaho_migration.api.main import app
+from pentaho_migration.ir import FieldDef
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.sandbox import build_sandbox_kit, generate_csv, sql_type
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
 

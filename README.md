@@ -70,17 +70,17 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 
 | Layer | Where | Status |
 | --- | --- | --- |
-| Parsers (Parse) | `src/pdi_migration/parser/` | PowerCenter XML and Talend .item → one normalized Pydantic IR; content-sniffing auto-detection; source analysis with version detection. Zero failures across both real corpora (90 files) |
-| Rules mappers (Map) | `src/pdi_migration/mapper/` + `rules/*.yaml` | Per-source rules libraries with governance metadata (PowerCenter v3: 18 types; Talend v2: 60+ components); unknown types → explicit manual handoff |
-| LLM (Map) | `src/pdi_migration/llm/` | Expression translation (Informatica + Java prompts, schema-forced JSON, always flagged `review`), per-step solution suggestions, hardware detection with multi-GPU model recommendation |
-| Generators (Generate) | `src/pdi_migration/generator/` | .ktr with real config for 9 step types (incl. Merge Join keys, Stream Lookup with injected lookup source); .kjb jobs from PowerCenter workflows |
-| Validator (Validate) | `src/pdi_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact knowledge base (both sources), confidence score, effort & cost estimate (Copilot vs manual rebuild), CSV diff harness (measured parity) |
-| Sandbox kits | `src/pdi_migration/sandbox.py` | Per-mapping setup guide, inferred DDL, seeded synthetic test data |
-| Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open, portfolio effort/cost totals |
-| PDI runner | `src/pdi_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
-| PDF reports | `src/pdi_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
-| Reports family | `src/pdi_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser (zero failures on the 150-file real corpus), deterministic Crystal→OpenFormula translator + LLM assist for the remainder, engine-verified bundle writer (round-trip validator), guided UI flow, credential scrubbing, extraction kit, environment preflight |
-| API | `src/pdi_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings + reports (inspect/convert) — Swagger at `/docs`; optional API-key auth |
+| Parsers (Parse) | `src/pentaho_migration/parser/` | PowerCenter XML and Talend .item → one normalized Pydantic IR; content-sniffing auto-detection; source analysis with version detection. Zero failures across both real corpora (90 files) |
+| Rules mappers (Map) | `src/pentaho_migration/mapper/` + `rules/*.yaml` | Per-source rules libraries with governance metadata (PowerCenter v3: 18 types; Talend v2: 60+ components); unknown types → explicit manual handoff |
+| LLM (Map) | `src/pentaho_migration/llm/` | Expression translation (Informatica + Java prompts, schema-forced JSON, always flagged `review`), per-step solution suggestions, hardware detection with multi-GPU model recommendation |
+| Generators (Generate) | `src/pentaho_migration/generator/` | .ktr with real config for 9 step types (incl. Merge Join keys, Stream Lookup with injected lookup source); .kjb jobs from PowerCenter workflows |
+| Validator (Validate) | `src/pentaho_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact knowledge base (both sources), confidence score, effort & cost estimate (Copilot vs manual rebuild), CSV diff harness (measured parity) |
+| Sandbox kits | `src/pentaho_migration/sandbox.py` | Per-mapping setup guide, inferred DDL, seeded synthetic test data |
+| Project store | `src/pentaho_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open, portfolio effort/cost totals |
+| PDI runner | `src/pentaho_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
+| PDF reports | `src/pentaho_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
+| Reports family | `src/pentaho_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser (zero failures on the 150-file real corpus), deterministic Crystal→OpenFormula translator + LLM assist for the remainder, engine-verified bundle writer (round-trip validator), guided UI flow, credential scrubbing, extraction kit, environment preflight |
+| API | `src/pentaho_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings + reports (inspect/convert) — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 
 ## Quick start
@@ -106,19 +106,19 @@ parse · gaps · ui-install · ui-build · ui-dev · status · clean · distclea
 ## CLI
 
 ```powershell
-pdi-migrate parse   <export.xml>        # inspect the extracted IR
-pdi-migrate convert <export.xml>        # source analysis + .ktr + report + confidence score
-pdi-migrate sandbox <export.xml>        # sandbox kit: setup guide + DDL + synthetic test CSVs
-pdi-migrate batch   [directory]         # convert a whole corpus into the project store
-pdi-migrate project                     # portfolio view: every mapping, score, review status
-pdi-migrate gaps    [directory]         # corpus coverage: auto/review/manual + gap list
-pdi-migrate diff    old.csv new.csv -k ID  # measured output parity (exit 0 on PASS)
-pdi-migrate run     <file.ktr|.kjb>     # execute in the local PDI install (Pan/Kitchen)
-pdi-migrate report  <rpttoxml.xml> -t   # Crystal dump -> .prpt + report; -t = LLM-assist manual formulas
-pdi-migrate report ... --validate       # load the .prpt through the real Pentaho Reporting engine
-pdi-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
-pdi-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
-pdi-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
+pentaho-migrate parse   <export.xml>        # inspect the extracted IR
+pentaho-migrate convert <export.xml>        # source analysis + .ktr + report + confidence score
+pentaho-migrate sandbox <export.xml>        # sandbox kit: setup guide + DDL + synthetic test CSVs
+pentaho-migrate batch   [directory]         # convert a whole corpus into the project store
+pentaho-migrate project                     # portfolio view: every mapping, score, review status
+pentaho-migrate gaps    [directory]         # corpus coverage: auto/review/manual + gap list
+pentaho-migrate diff    old.csv new.csv -k ID  # measured output parity (exit 0 on PASS)
+pentaho-migrate run     <file.ktr|.kjb>     # execute in the local PDI install (Pan/Kitchen)
+pentaho-migrate report  <rpttoxml.xml> -t   # Crystal dump -> .prpt + report; -t = LLM-assist manual formulas
+pentaho-migrate report ... --validate       # load the .prpt through the real Pentaho Reporting engine
+pentaho-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
+pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
+pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
 ```
 
 Crystal end-to-end (`.rpt` in hand): install the free SAP Crystal .NET runtime and
@@ -138,7 +138,7 @@ payroll ETL, a production DWH framework, converter test fixtures, and coursework
 a dozen authors. All 50 parse with zero errors, including a 7.2 MB export with 11,327
 connectors.
 
-Current coverage measured on that corpus with `pdi-migrate gaps`: **54% auto**,
+Current coverage measured on that corpus with `pentaho-migrate gaps`: **54% auto**,
 45% review (dominated by untranslated expressions — 4,321 of them), and a handful
 of manual steps (Custom Transformation, Transaction Control).
 
@@ -163,7 +163,7 @@ docker build -t migration-copilot .
 docker run -p 8321:8321 migration-copilot
 ```
 
-Optional hardening: set `PDI_MIGRATION_API_KEY` to require an `X-API-Key` header on
+Optional hardening: set `PENTAHO_MIGRATION_API_KEY` to require an `X-API-Key` header on
 all mutating endpoints; uploads are capped at 50 MB.
 
 ## Roadmap
@@ -182,7 +182,7 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] Project mode: batch conversion, SQLite portfolio, review-status tracking
 - [x] Hardening (API key, size limits, logging), CI, Docker packaging, rules governance
 - [x] Remaining step-type config: Merge Join (keys from join conditions), Stream Lookup (with injected lookup-source step), Insert/Update, Call DB Procedure
-- [x] PDI execution: `pdi-migrate run` drives Pan/Kitchen in a local PDI install (auto-detected), log-aware verdicts
+- [x] PDI execution: `pentaho-migrate run` drives Pan/Kitchen in a local PDI install (auto-detected), log-aware verdicts
 - [x] Workflow/Session → PDI Job (.kjb) conversion: sessions wired to sibling .ktr files, placeholders for unconvertible tasks, link conditions preserved
 - [x] PDF migration report (branded, per mapping)
 

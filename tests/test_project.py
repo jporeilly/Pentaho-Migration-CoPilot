@@ -3,13 +3,13 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import MAX_UPLOAD_BYTES, app
-from pdi_migration.project import MappingRecord, list_mappings, record_mapping, set_status
+from pentaho_migration.api.main import MAX_UPLOAD_BYTES, app
+from pentaho_migration.project import MappingRecord, list_mappings, record_mapping, set_status
 
 
 @pytest.fixture(autouse=True)
 def isolated_config(tmp_path, monkeypatch):
-    monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+    monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
 
 
 def _record(name="m_test", file="test.xml", score=72):
@@ -90,7 +90,7 @@ class TestProjectOpen:
 
 class TestHardening:
     def test_api_key_enforced_when_configured(self, monkeypatch):
-        monkeypatch.setenv("PDI_MIGRATION_API_KEY", "sekret")
+        monkeypatch.setenv("PENTAHO_MIGRATION_API_KEY", "sekret")
         client = TestClient(app)
         res = client.post("/convert", files={"export": ("x.xml", b"<POWERMART/>", "text/xml")})
         assert res.status_code == 401
@@ -108,7 +108,7 @@ class TestHardening:
         assert res.status_code == 413
 
     def test_health_reports_rules_version(self):
-        from pdi_migration.mapper import RulesMapper
+        from pentaho_migration.mapper import RulesMapper
 
         client = TestClient(app)
         body = client.get("/health").json()

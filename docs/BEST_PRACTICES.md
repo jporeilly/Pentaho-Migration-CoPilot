@@ -5,7 +5,7 @@ Copilot works. Read this before your first real conversion.
 
 ## 1. Inventory before you migrate
 
-- Export **everything** first and run `pdi-migrate gaps` across the whole folder — the
+- Export **everything** first and run `pentaho-migrate gaps` across the whole folder — the
   coverage report tells you the true auto-conversion rate and every unmapped construct
   *before* you commit to a timeline.
 - Rank mappings by business criticality × conversion confidence. Migrate high-confidence,
@@ -69,9 +69,9 @@ Copilot works. Read this before your first real conversion.
 Reports are documents, not dataflows — different risks, different checklist:
 
 - **Extract, scrub, then share.** RptToXml copies connection credentials out
-  of `.rpt` files into the dumps. Always run `pdi-migrate report-scrub` on a
+  of `.rpt` files into the dumps. Always run `pentaho-migrate report-scrub` on a
   dump folder before committing it to a corpus or attaching it anywhere.
-- **Baseline the whole estate first**: `pdi-migrate report-gaps <dir>` gives
+- **Baseline the whole estate first**: `pentaho-migrate report-gaps <dir>` gives
   parse coverage, formula auto/review/manual rates, and the portfolio effort
   number before you commit to a timeline.
 - **Validate every generated bundle** with `--validate` (real engine load),

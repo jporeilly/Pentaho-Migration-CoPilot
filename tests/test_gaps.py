@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import build_gap_report
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.validator import build_gap_report
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
 

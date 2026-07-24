@@ -2,8 +2,8 @@
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.llm.detect import ollama_base_url, parse_nvidia_smi, recommend
+from pentaho_migration.api.main import app
+from pentaho_migration.llm.detect import ollama_base_url, parse_nvidia_smi, recommend
 
 client = TestClient(app)
 
@@ -66,7 +66,7 @@ class TestRecommend:
 
 class TestSettingsAPI:
     def test_roundtrip(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+        monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
         payload = {
             "provider": "ollama",
             "base_url": "http://127.0.0.1:11434",

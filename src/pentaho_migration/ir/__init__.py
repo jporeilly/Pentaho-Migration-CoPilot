@@ -1,0 +1,31 @@
+from pentaho_migration.ir.models import (
+    Confidence,
+    Expression,
+    FieldDef,
+    Hop,
+    Job,
+    JobEntry,
+    JobHop,
+    Pipeline,
+    SourceInfo,
+    SourceTool,
+    SourceWarning,
+    Step,
+    WarningLevel,
+)
+
+__all__ = [
+    "Confidence",
+    "Expression",
+    "FieldDef",
+    "Hop",
+    "Job",
+    "JobEntry",
+    "JobHop",
+    "Pipeline",
+    "SourceInfo",
+    "SourceTool",
+    "SourceWarning",
+    "Step",
+    "WarningLevel",
+]

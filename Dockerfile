@@ -27,4 +27,4 @@ COPY --from=ui /app/frontend/dist frontend/dist
 
 EXPOSE 8321
 ENV PYTHONUNBUFFERED=1
-CMD ["uvicorn", "pdi_migration.api.main:app", "--host", "0.0.0.0", "--port", "8321"]
+CMD ["uvicorn", "pentaho_migration.api.main:app", "--host", "0.0.0.0", "--port", "8321"]

@@ -4,11 +4,11 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.ir import Confidence
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import build_impact_analysis, build_score
+from pentaho_migration.api.main import app
+from pentaho_migration.ir import Confidence
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.validator import build_impact_analysis, build_score
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
 

@@ -11,10 +11,10 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.llm import ExpressionTranslator, LLMSettings, TranslationError
-from pdi_migration.reports import load_report_model
-from pdi_migration.reports.llm_assist import translate_manual_formulas
+from pentaho_migration.api.main import app
+from pentaho_migration.llm import ExpressionTranslator, LLMSettings, TranslationError
+from pentaho_migration.reports import load_report_model
+from pentaho_migration.reports.llm_assist import translate_manual_formulas
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
 
@@ -110,7 +110,7 @@ def test_api_translate_job(monkeypatch):
 
 def test_api_translate_requires_provider(monkeypatch):
     # force "no provider configured" regardless of this machine's settings file
-    import pdi_migration.llm.translate as translate_mod
+    import pentaho_migration.llm.translate as translate_mod
 
     monkeypatch.setattr(
         translate_mod, "load_settings", lambda: LLMSettings(provider="none"))

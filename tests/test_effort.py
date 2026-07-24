@@ -6,12 +6,12 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.reports import load_report_model
-from pdi_migration.reports.effort import build_report_effort
-from pdi_migration.validator import build_effort, build_report
+from pentaho_migration.api.main import app
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.reports import load_report_model
+from pentaho_migration.reports.effort import build_report_effort
+from pentaho_migration.validator import build_effort, build_report
 
 ETL_SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
 CRYSTAL_SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
@@ -81,10 +81,10 @@ def test_effort_in_reports_api():
 
 
 def test_effort_from_counts_approximation_is_conservative():
-    from pdi_migration.validator.effort import effort_from_counts
+    from pentaho_migration.validator.effort import effort_from_counts
 
     pipeline, full = _etl_estimate()
-    from pdi_migration.validator import build_report
+    from pentaho_migration.validator import build_report
     report = build_report(pipeline)
     approx = effort_from_counts(
         steps=report.total_steps, auto=report.auto, review=report.review,
@@ -95,8 +95,8 @@ def test_effort_from_counts_approximation_is_conservative():
 
 
 def test_project_rows_carry_effort(tmp_path, monkeypatch):
-    monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
-    from pdi_migration.project import MappingRecord, record_mapping
+    monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
+    from pentaho_migration.project import MappingRecord, record_mapping
 
     record_mapping(MappingRecord(
         mapping="m_test", file="t.xml", source_path="", steps=10, auto=6,
@@ -109,8 +109,8 @@ def test_project_rows_carry_effort(tmp_path, monkeypatch):
 
 
 def test_pdf_includes_effort():
-    from pdi_migration.report_pdf import build_pdf_report
-    from pdi_migration.validator import build_impact_analysis, build_score
+    from pentaho_migration.report_pdf import build_pdf_report
+    from pentaho_migration.validator import build_impact_analysis, build_score
 
     pipeline, effort = _etl_estimate()
     report = build_report(pipeline)

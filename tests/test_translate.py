@@ -6,14 +6,14 @@ from xml.etree import ElementTree
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.generator import KtrGenerator
-from pdi_migration.ir import Confidence
-from pdi_migration.llm import ExpressionTranslator, LLMSettings
-from pdi_migration.llm.translate import translate_deterministic
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import build_report
+from pentaho_migration.api.main import app
+from pentaho_migration.generator import KtrGenerator
+from pentaho_migration.ir import Confidence
+from pentaho_migration.llm import ExpressionTranslator, LLMSettings
+from pentaho_migration.llm.translate import translate_deterministic
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.validator import build_report
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
 
@@ -92,7 +92,7 @@ class TestPipelineTranslation:
 
 class TestTranslateAPI:
     def test_disabled_provider_returns_503(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+        monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
         client = TestClient(app)
         client.put("/settings", json={"provider": "none", "base_url": "", "model": None, "env": {}})
         pipeline = _mapped_pipeline()
@@ -101,7 +101,7 @@ class TestTranslateAPI:
         assert "disabled" in res.json()["detail"]
 
     def test_missing_model_returns_503(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+        monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
         client = TestClient(app)
         pipeline = _mapped_pipeline()
         res = client.post("/translate", json=pipeline.model_dump())
@@ -111,9 +111,9 @@ class TestTranslateAPI:
     def test_job_flow_start_poll_done(self, tmp_path, monkeypatch):
         import time
 
-        monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+        monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
         monkeypatch.setattr(
-            "pdi_migration.llm.translate.ExpressionTranslator._chat",
+            "pentaho_migration.llm.translate.ExpressionTranslator._chat",
             FakeTranslator._chat,
         )
         client = TestClient(app)
@@ -140,9 +140,9 @@ class TestTranslateAPI:
         assert client.get("/translate/status?job=nope").status_code == 404
 
     def test_translate_returns_updated_result(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+        monkeypatch.setenv("PENTAHO_MIGRATION_CONFIG_DIR", str(tmp_path))
         monkeypatch.setattr(
-            "pdi_migration.llm.translate.ExpressionTranslator._chat",
+            "pentaho_migration.llm.translate.ExpressionTranslator._chat",
             FakeTranslator._chat,
         )
         client = TestClient(app)

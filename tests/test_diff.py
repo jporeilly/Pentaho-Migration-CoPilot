@@ -3,8 +3,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.validator.diff import DiffError, compare_csv
+from pentaho_migration.api.main import app
+from pentaho_migration.validator.diff import DiffError, compare_csv
 
 EXPECTED = "REGION,TOTAL\nnorth,100.50\nsouth,200.00\neast,50.25\n"
 

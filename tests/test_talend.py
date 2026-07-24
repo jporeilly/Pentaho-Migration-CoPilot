@@ -5,11 +5,11 @@ from xml.etree import ElementTree
 
 from fastapi.testclient import TestClient
 
-from pdi_migration.api.main import app
-from pdi_migration.generator import KtrGenerator
-from pdi_migration.ir import SourceTool
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser, TalendParser, detect_parser
+from pentaho_migration.api.main import app
+from pentaho_migration.generator import KtrGenerator
+from pentaho_migration.ir import SourceTool
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser, TalendParser, detect_parser
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "demo_orders_0.1.item"
 PC_SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"

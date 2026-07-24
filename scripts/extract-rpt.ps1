@@ -1,6 +1,6 @@
 # Extract Crystal Reports .rpt binaries to RptToXml dumps.
 #
-# Prerequisites (check with: pdi-migrate report-env):
+# Prerequisites (check with: pentaho-migrate report-env):
 #   1. SAP Crystal Reports .NET runtime (free, 64-bit runtime MSI, latest SP):
 #      https://pages.community.sap.com/topics/crystal-reports/visual-studio
 #   2. RptToXml.exe (github.com/ajryan/RptToXml/releases) in tools\RptToXml\
@@ -61,5 +61,5 @@ if ($failures.Count -gt 0) {
     foreach ($name in $failures) { Write-Host "  $name" }
 }
 Write-Host ""
-Write-Host "Next: pdi-migrate report-scrub $OutDir   (removes credentials RptToXml copies from the .rpt files)"
-Write-Host "Then: pdi-migrate report-gaps $OutDir"
+Write-Host "Next: pentaho-migrate report-scrub $OutDir   (removes credentials RptToXml copies from the .rpt files)"
+Write-Host "Then: pentaho-migrate report-gaps $OutDir"

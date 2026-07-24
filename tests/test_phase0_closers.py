@@ -3,11 +3,11 @@
 from pathlib import Path
 from xml.etree import ElementTree
 
-from pdi_migration.generator import KjbGenerator, KtrGenerator
-from pdi_migration.ir import Confidence, FieldDef, Hop, Pipeline, SourceTool, Step
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.pdi_runner import EXIT_CODES, RunResult, find_pdi_home, run_artifact
+from pentaho_migration.generator import KjbGenerator, KtrGenerator
+from pentaho_migration.ir import Confidence, FieldDef, Hop, Pipeline, SourceTool, Step
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.pdi_runner import EXIT_CODES, RunResult, find_pdi_home, run_artifact
 
 HHS = Path(__file__).resolve().parents[1] / "samples" / "informatica" / "hhs_comptime.xml"
 

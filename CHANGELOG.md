@@ -27,7 +27,7 @@ deliberately — not one per work session.
   zero parse failures** — the fork-tolerant parser survived first contact with
   genuine multi-source dumps unchanged. Committed with a corpus regression
   test (every dump must parse; skips where the corpus is absent).
-- **Credential scrubbing** (`reports/sanitize.py`, `pdi-migrate report-scrub`):
+- **Credential scrubbing** (`reports/sanitize.py`, `pentaho-migrate report-scrub`):
   RptToXml copies connection credentials out of .rpt files — the real corpus
   carried **440 credential attributes across 142 of 150 dumps**, all blanked.
   A second regression test asserts the committed corpus stays clean; the
@@ -63,8 +63,8 @@ deliberately — not one per work session.
 - **`scripts/extract-rpt.ps1`**: batch .rpt → RptToXml XML extraction (finds
   RptToXml via RPTTOXML_PATH or tools/RptToXml/, reports per-file failures,
   points at `report-gaps` next). Runs once the free SAP Crystal .NET runtime
-  is installed — see `pdi-migrate report-env` for the preflight.
-- **`pdi-migrate report-gaps [dir]`**: Crystal corpus analyzer — parse
+  is installed — see `pentaho-migrate report-env` for the preflight.
+- **`pentaho-migrate report-gaps [dir]`**: Crystal corpus analyzer — parse
   coverage, formula auto/review/manual rates, TODO placeholders, and
   portfolio effort, mirroring the ETL `gaps` command. The zero-parse-failure
   bar the ETL corpora set now applies to Crystal the moment extraction runs.
@@ -83,9 +83,9 @@ deliberately — not one per work session.
   bundle is correctly rejected — the reverse-engineered bundle format is now
   engine-verified, not sample-inferred.
 - **`reports/prpt_validator.py`**: Python wrapper (finds PRD + Java, parses
-  OK/FAIL verdicts); `pdi-migrate report --validate` validates right after
+  OK/FAIL verdicts); `pentaho-migrate report --validate` validates right after
   conversion.
-- **`reports/environment.py` + `pdi-migrate report-env`**: fresh-install
+- **`reports/environment.py` + `pentaho-migrate report-env`**: fresh-install
   preflight for the whole Crystal pipeline — Pentaho Report Designer (PRD_HOME
   or common paths), Java (suite-bundled JDK preferred), SAP Crystal .NET
   runtime (registry keys the MSI writes + GAC fallback), and RptToXml.exe
@@ -179,7 +179,7 @@ never block.
 - **API**: `/reports/translate/start` (multipart dump + jndi; background
   thread, progress polling via `/reports/translate/status`) returning a full
   conversion response with assisted formulas baked into the regenerated .prpt.
-- **CLI**: `pdi-migrate report --translate/-t`.
+- **CLI**: `pentaho-migrate report --translate/-t`.
 - **UI**: ✨ AI-assist button on the reports Formulas page with n/total
   progress polling (same pattern as the ETL Map page); sample fetches are now
   `cache: no-store`. Formulas step hint updated to "rules + AI".
@@ -226,7 +226,7 @@ never block.
 
 Migration Copilot now covers a second artifact family. Crystal reports are
 documents (bands, elements, formulas), not dataflows, so they get their own
-pipeline (`src/pdi_migration/reports/`) instead of the ETL IR — folded in from
+pipeline (`src/pentaho_migration/reports/`) instead of the ETL IR — folded in from
 the standalone CR-PRPT-Migration prototype.
 
 ### Added
@@ -243,7 +243,7 @@ the standalone CR-PRPT-Migration prototype.
 - **API**: `/reports/inspect`, `/reports/convert` (stateless; .prpt travels
   base64 in the JSON response), `/reports/sample`; wired into the existing
   app with the shared API-key dependency (extracted to `api/security.py`).
-- **CLI**: `pdi-migrate report <dump> --out output/crystal --jndi <name>`.
+- **CLI**: `pentaho-migrate report <dump> --out output/crystal --jndi <name>`.
 - **Source detection**: `detect_parser` now recognizes RptToXml dumps and
   points ETL uploads of them at the Reports pipeline instead of failing as
   PowerCenter; `SourceTool.CRYSTAL` added.
@@ -314,7 +314,7 @@ the standalone CR-PRPT-Migration prototype.
   Insert/Update (target table from downstream, field values; key columns an explicit
   TODO), and Call DB Procedure — `Stored Procedure` now maps (rules v3), clearing the
   corpus's largest unmapped type.
-- **PDI runner**: `pdi-migrate run <file.ktr|.kjb>` executes generated artifacts via
+- **PDI runner**: `pentaho-migrate run <file.ktr|.kjb>` executes generated artifacts via
   Pan/Kitchen in a locally detected PDI install (PDI_HOME or common paths), with
   documented exit-code meanings and a log-aware verdict (Windows .bat wrappers can
   swallow Java's exit code — the log is trusted over a false zero).
@@ -347,7 +347,7 @@ the standalone CR-PRPT-Migration prototype.
   stored source export and drops you into the full stepper workflow (Parse → Map →
   Generate → Validate) with all reports. `GET /project/open`; the store now keeps
   each mapping's source path (auto-migrated).
-- `pdi-migrate batch --translate`: run a whole corpus through the configured LLM.
+- `pentaho-migrate batch --translate`: run a whole corpus through the configured LLM.
 - Swagger /docs shows a "← Back to Migration Copilot" link; the masthead API-docs
   link opens in a new tab.
 - Multi-GPU detection: all NVIDIA cards are counted and VRAM aggregates (Ollama
@@ -368,14 +368,14 @@ the standalone CR-PRPT-Migration prototype.
   per-column mismatch counts and row samples. `POST /diff` and an "Output parity
   check" section on the Validate page with PASS / NEAR / FAIL verdicts. The measured
   counterpart to the static confidence score.
-- **Project mode**: `pdi-migrate batch <dir>` converts a whole corpus (one output
+- **Project mode**: `pentaho-migrate batch <dir>` converts a whole corpus (one output
   subfolder per export file — no more mapping-name collisions), scores every mapping,
-  and records it in a SQLite project store; `pdi-migrate project` and the new
+  and records it in a SQLite project store; `pentaho-migrate project` and the new
   **📁 Project** page show the portfolio with per-mapping review status
   (converted → in review → verified / failed) editable in the UI. First run over the
   real corpus: 148 mappings, avg confidence 64/100.
 - **Hardening**: optional API-key auth on all mutating endpoints (set
-  `PDI_MIGRATION_API_KEY`), 50 MB upload limit (413), structured request logging.
+  `PENTAHO_MIGRATION_API_KEY`), 50 MB upload limit (413), structured request logging.
 - **CI**: GitHub Actions — pytest (Python 3.13) and frontend build (Node 20) on every
   push and PR.
 - **Docker packaging**: multi-stage `Dockerfile` (UI build → slim Python runtime);
@@ -435,7 +435,7 @@ the standalone CR-PRPT-Migration prototype.
   (CREATE TABLE DDL inferred from the export's field metadata; write-side tables
   derived from upstream fields), and `data_<step>.csv` synthetic test data shaped to
   the real column types (seeded — same seed, same data, reproducible runs).
-  Available as `pdi-migrate sandbox <export.xml>` (writes to
+  Available as `pentaho-migrate sandbox <export.xml>` (writes to
   `output/informatica/sandbox/<mapping>/`), `POST /sandbox`, and a
   **🧪 Generate sandbox kit** section on the Validate page with per-file downloads.
 - **Source analysis now warns about database setup**: steps that read/write databases
@@ -464,7 +464,7 @@ the standalone CR-PRPT-Migration prototype.
 - Translated JavaScript is emitted into the generated Modified Java Script step with
   the original Informatica expression and LLM confidence as comments; the .ktr step
   description distinguishes "translated — verify" from TODO.
-- `POST /translate` API; `pdi-migrate convert --translate` CLI flag; **✨ Translate**
+- `POST /translate` API; `pentaho-migrate convert --translate` CLI flag; **✨ Translate**
   button on the Map page showing live progress and updated results.
 - Verified live against local Ollama (qwen2.5-coder:14b):
   `IIF(ISNULL(AMOUNT), 0, AMOUNT * 1.2)` → `(AMOUNT == null) ? 0 : AMOUNT * 1.2`.
@@ -519,7 +519,7 @@ the standalone CR-PRPT-Migration prototype.
 - Expanded real corpus: 24 genuine export files across six repository versions
   (PowerCenter ~9.0 → 10.5), 118 mappings — sources include HHS payroll, a Russian
   production DWH, a Spanish SEPE export, and the viadee i2t converter fixtures.
-- GitHub repository: <https://github.com/jporeilly/PDI-Migration-CoPilot> (private).
+- GitHub repository: <https://github.com/jporeilly/Pentaho-Migration-CoPilot> (private).
 
 ### Fixed
 
@@ -537,7 +537,7 @@ the standalone CR-PRPT-Migration prototype.
 - **Real-world corpus**: 11 genuine PowerCenter 10.x exports from the public
   HHS/Informatica GitHub repo in `samples/informatica/` — 110 real mappings, 1,045 steps.
   All parse cleanly (including a 522 KB mapping with 589 connectors).
-- **Gap analysis**: `pdi-migrate gaps <dir>` batch-converts a corpus and reports mapper
+- **Gap analysis**: `pentaho-migrate gaps <dir>` batch-converts a corpus and reports mapper
   coverage — auto/review/manual rates and per-source-type gap list, unmapped types first.
   First run on the real corpus: 53% auto, 1 unmapped type.
 - `GET /sample` endpoint; `ConversionResult` API model (pipeline + report + ktr).
@@ -568,7 +568,7 @@ the standalone CR-PRPT-Migration prototype.
 - KTR generator: step types, hops, layout, and confidence/TODO annotations in step
   descriptions.
 - Static migration report: auto/review/manual step counts and untranslated-expression count.
-- CLI `pdi-migrate` with `parse` and `convert` commands.
+- CLI `pentaho-migrate` with `parse` and `convert` commands.
 - FastAPI layer with dark-themed review UI at `/`: drag-and-drop a PowerCenter export,
   inspect steps with confidence badges, download the generated .ktr. Swagger at `/docs`.
 - Sample PowerCenter export (`samples/m_load_sales.xml`); 17 tests.

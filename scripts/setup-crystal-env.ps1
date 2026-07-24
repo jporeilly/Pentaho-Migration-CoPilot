@@ -65,4 +65,4 @@ if (Test-Path (Join-Path $rptDir "RptToXml.exe")) {
 
 Write-Host ""
 Write-Host "Verifying:"
-& "$repoRoot\.venv\Scripts\python.exe" -m pdi_migration.cli report-env
+& "$repoRoot\.venv\Scripts\python.exe" -m pentaho_migration.cli report-env

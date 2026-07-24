@@ -27,8 +27,8 @@ The short way — helper scripts do everything below:
 Manually:
 
 ```powershell
-git clone <repo-url> PDI-Migration
-cd PDI-Migration
+git clone <repo-url> Pentaho-Migration
+cd Pentaho-Migration
 py -3.13 -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev,api]"
 cd frontend; npm install; npm run build; cd ..
@@ -44,13 +44,13 @@ Extras:
 
 ```powershell
 .venv\Scripts\python -m pytest
-.venv\Scripts\pdi-migrate convert samples\m_load_sales.xml -o output
+.venv\Scripts\pentaho-migrate convert samples\m_load_sales.xml -o output
 ```
 
 ## Run the review UI
 
 ```powershell
-.venv\Scripts\uvicorn pdi_migration.api.main:app --port 8321
+.venv\Scripts\uvicorn pentaho_migration.api.main:app --port 8321
 ```
 
 Then open <http://127.0.0.1:8321> (UI) or <http://127.0.0.1:8321/docs> (Swagger).
@@ -72,7 +72,7 @@ the official steps below.
 
 The Crystal pipeline converts RptToXml dumps out of the box. To *extract* dumps
 from customer `.rpt` files and to *round-trip validate* generated `.prpt`
-bundles, set up the following (then confirm with `pdi-migrate report-env`):
+bundles, set up the following (then confirm with `pentaho-migrate report-env`):
 
 1. **SAP Crystal Reports .NET runtime** (free) — register and download at
    <https://www.sap.com/registration/trial.9a4afb3b-7eaa-42af-98ce-abeae5deb784.html>
@@ -93,11 +93,11 @@ bundles, set up the following (then confirm with `pdi-migrate report-env`):
 Then the corpus/engagement workflow is:
 
 ```powershell
-pdi-migrate report-env                       # preflight: all four checks green?
+pentaho-migrate report-env                       # preflight: all four checks green?
 .\scripts\extract-rpt.ps1 -InDir C:\customer\rpts -OutDir C:\customer\xml
-pdi-migrate report-scrub C:\customer\xml     # blank credentials RptToXml copies from .rpt files
-pdi-migrate report-gaps  C:\customer\xml     # parse coverage, formula rates, portfolio effort
-pdi-migrate report C:\customer\xml\Foo.xml --jndi MyDS -t --validate
+pentaho-migrate report-scrub C:\customer\xml     # blank credentials RptToXml copies from .rpt files
+pentaho-migrate report-gaps  C:\customer\xml     # parse coverage, formula rates, portfolio effort
+pentaho-migrate report C:\customer\xml\Foo.xml --jndi MyDS -t --validate
 ```
 
 ## Optional: Docker
@@ -109,6 +109,6 @@ docker run -p 8321:8321 migration-copilot
 
 ## Optional: hardening
 
-- `PDI_MIGRATION_API_KEY=<secret>` — requires an `X-API-Key` header on all mutating
+- `PENTAHO_MIGRATION_API_KEY=<secret>` — requires an `X-API-Key` header on all mutating
   endpoints (unset by default for frictionless local use).
 - Uploads are capped at 50 MB.

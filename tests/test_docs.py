@@ -8,7 +8,7 @@ import re
 import tomllib
 from pathlib import Path
 
-from pdi_migration import __version__
+from pentaho_migration import __version__
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -54,3 +54,19 @@ def test_readme_references_version_and_changelog():
         f"README says version {stamped.group(1)}, code says {__version__} — "
         "update the README masthead line"
     )
+
+def test_no_stray_pre_rename_references():
+    """The 2026-07 rename (old module name -> pentaho_migration) must not
+    regress. Legacy compat is explicit and allowed: the pdi-migrate CLI alias
+    and the PDI_MIGRATION_* env-var fallbacks (uppercase, so not matched)."""
+    needle = "pdi" + "_migration"  # built dynamically so this file never matches
+    strays = []
+    for pattern in ("**/*.py", "**/*.toml", "**/*.md", "**/*.ps1", "**/*.sh"):
+        for path in ROOT.glob(pattern):
+            parts = set(path.parts)
+            if parts & {".venv", "node_modules", "__pycache__", "dist", ".git"}:
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            if needle in text:
+                strays.append(str(path.relative_to(ROOT)))
+    assert not strays, f"stray pre-rename module references: {strays}"

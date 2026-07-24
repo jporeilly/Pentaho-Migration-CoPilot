@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from pdi_migration.ir import WarningLevel
-from pdi_migration.mapper import RulesMapper
-from pdi_migration.parser import PowerCenterParser
-from pdi_migration.validator import assess_source
+from pentaho_migration.ir import WarningLevel
+from pentaho_migration.mapper import RulesMapper
+from pentaho_migration.parser import PowerCenterParser
+from pentaho_migration.validator import assess_source
 
 SAMPLES = Path(__file__).resolve().parents[1] / "samples"
 HHS_COMPTIME = SAMPLES / "informatica" / "hhs_comptime.xml"

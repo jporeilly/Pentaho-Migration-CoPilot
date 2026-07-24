@@ -7,9 +7,9 @@ import zipfile
 
 import pytest
 
-from pdi_migration.reports import load_report_model, write_prpt
-from pdi_migration.reports.environment import environment_report, find_java, find_prd_home
-from pdi_migration.reports.prpt_validator import validate_prpts, validator_available
+from pentaho_migration.reports import load_report_model, write_prpt
+from pentaho_migration.reports.environment import environment_report, find_java, find_prd_home
+from pentaho_migration.reports.prpt_validator import validate_prpts, validator_available
 
 from pathlib import Path
 

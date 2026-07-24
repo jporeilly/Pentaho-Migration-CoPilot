@@ -59,7 +59,7 @@ cmd_setup() {
 
 cmd_install() {
     assert_venv
-    step "Installing pdi-migration (editable) with dev+api extras"
+    step "Installing pentaho-migration (editable) with dev+api extras"
     "$PYTHON" -m pip install --upgrade pip --quiet
     "$PYTHON" -m pip install -e "$ROOT[dev,api]"
     ok "Dependencies installed"
@@ -84,28 +84,28 @@ case "${1:-help}" in
         assert_venv
         step "Review UI:  http://127.0.0.1:$PORT    (Ctrl+C to stop)"
         step "API docs:   http://127.0.0.1:$PORT/docs"
-        "$PYTHON" -m uvicorn pdi_migration.api.main:app --port "$PORT"
+        "$PYTHON" -m uvicorn pentaho_migration.api.main:app --port "$PORT"
         ;;
     run-dev)
         assert_venv
         step "Review UI (auto-reload):  http://127.0.0.1:$PORT"
-        "$PYTHON" -m uvicorn pdi_migration.api.main:app --port "$PORT" --reload
+        "$PYTHON" -m uvicorn pentaho_migration.api.main:app --port "$PORT" --reload
         ;;
     convert)
         assert_venv
         file="${2:-$SAMPLE}"
         step "Converting $file -> $ROOT/output/informatica"
-        "$PYTHON" -m pdi_migration.cli convert "$file" -o "$ROOT/output/informatica"
+        "$PYTHON" -m pentaho_migration.cli convert "$file" -o "$ROOT/output/informatica"
         ;;
     parse)
         assert_venv
-        "$PYTHON" -m pdi_migration.cli parse "${2:-$SAMPLE}"
+        "$PYTHON" -m pentaho_migration.cli parse "${2:-$SAMPLE}"
         ;;
     gaps)
         assert_venv
         dir="${2:-$ROOT/samples/informatica}"
         step "Coverage/gap analysis over $dir"
-        "$PYTHON" -m pdi_migration.cli gaps "$dir"
+        "$PYTHON" -m pentaho_migration.cli gaps "$dir"
         ;;
     ui-install)
         step "Installing frontend dependencies (Node 18+ required)"
@@ -124,8 +124,8 @@ case "${1:-help}" in
         step "Environment status"
         if [[ -x "$PYTHON" ]]; then
             ok "Python:  $("$PYTHON" --version)"
-            version="$("$PYTHON" -m pip show pdi-migration 2>/dev/null | awk '/^Version/{print $2}')"
-            if [[ -n "$version" ]]; then ok "Package: pdi-migration $version"
+            version="$("$PYTHON" -m pip show pentaho-migration 2>/dev/null | awk '/^Version/{print $2}')"
+            if [[ -n "$version" ]]; then ok "Package: pentaho-migration $version"
             else warn "Package not installed - run: ./scripts/dev.sh install"; fi
         else
             warn "No venv - run: ./scripts/dev.sh setup"

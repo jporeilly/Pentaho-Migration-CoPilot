@@ -1,0 +1,3 @@
+from pentaho_migration.mapper.rules import RulesMapper
+
+__all__ = ["RulesMapper"]

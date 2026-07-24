@@ -51,19 +51,19 @@ test-verbose: ## Run tests with full output
 	$(PYTHON) -m pytest -v
 
 run: ## Start the review UI + API on http://127.0.0.1:$(PORT)
-	$(PYTHON) -m uvicorn pdi_migration.api.main:app --port $(PORT)
+	$(PYTHON) -m uvicorn pentaho_migration.api.main:app --port $(PORT)
 
 run-dev: ## Start the UI with auto-reload (development)
-	$(PYTHON) -m uvicorn pdi_migration.api.main:app --port $(PORT) --reload
+	$(PYTHON) -m uvicorn pentaho_migration.api.main:app --port $(PORT) --reload
 
 convert: ## Convert SAMPLE (default: sample export) into OUT/
-	$(PYTHON) -m pdi_migration.cli convert $(SAMPLE) -o $(OUT)
+	$(PYTHON) -m pentaho_migration.cli convert $(SAMPLE) -o $(OUT)
 
 parse: ## Parse SAMPLE and print the extracted IR
-	$(PYTHON) -m pdi_migration.cli parse $(SAMPLE)
+	$(PYTHON) -m pentaho_migration.cli parse $(SAMPLE)
 
 gaps: ## Coverage/gap analysis over samples/informatica (real corpus)
-	$(PYTHON) -m pdi_migration.cli gaps samples/informatica
+	$(PYTHON) -m pentaho_migration.cli gaps samples/informatica
 
 ui-install: ## Install frontend dependencies (requires Node 18+)
 	cd frontend && npm install --no-fund --no-audit
@@ -76,7 +76,7 @@ ui-dev: ## Frontend dev server with hot reload (backend must be running)
 
 status: ## Show environment status (python, venv, deps, git)
 	@echo "Python:    " && $(PYTHON) --version || echo "  venv missing - run: make setup"
-	@echo "Package:   " && $(PYTHON) -m pip show pdi-migration | grep -E "^(Name|Version|Location)" || true
+	@echo "Package:   " && $(PYTHON) -m pip show pentaho-migration | grep -E "^(Name|Version|Location)" || true
 	@echo "Git:       " && git log --oneline -1
 
 clean: ## Remove build artifacts, caches, and generated output

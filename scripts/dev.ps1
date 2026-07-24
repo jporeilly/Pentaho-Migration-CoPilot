@@ -66,7 +66,7 @@ function Invoke-Setup {
 
 function Invoke-Install {
     Assert-Venv
-    Write-Step "Installing pdi-migration (editable) with dev+api extras"
+    Write-Step "Installing pentaho-migration (editable) with dev+api extras"
     & $Python -m pip install --upgrade pip --quiet
     & $Python -m pip install -e (Join-Path $Root ".[dev,api]")
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -94,32 +94,32 @@ switch ($Command) {
         Assert-Venv
         Write-Step "Review UI:  http://127.0.0.1:$Port    (Ctrl+C to stop)"
         Write-Step "API docs:   http://127.0.0.1:$Port/docs"
-        & $Python -m uvicorn pdi_migration.api.main:app --port $Port
+        & $Python -m uvicorn pentaho_migration.api.main:app --port $Port
     }
     "run-dev" {
         Assert-Venv
         Write-Step "Review UI (auto-reload):  http://127.0.0.1:$Port"
-        & $Python -m uvicorn pdi_migration.api.main:app --port $Port --reload
+        & $Python -m uvicorn pentaho_migration.api.main:app --port $Port --reload
     }
     "convert" {
         Assert-Venv
         $file = if ($Target) { $Target } else { $Sample }
         $out  = Join-Path $Root "output\informatica"
         Write-Step "Converting $file -> $out"
-        & $Python -m pdi_migration.cli convert $file -o $out
+        & $Python -m pentaho_migration.cli convert $file -o $out
         exit $LASTEXITCODE
     }
     "parse" {
         Assert-Venv
         $file = if ($Target) { $Target } else { $Sample }
-        & $Python -m pdi_migration.cli parse $file
+        & $Python -m pentaho_migration.cli parse $file
         exit $LASTEXITCODE
     }
     "gaps" {
         Assert-Venv
         $dir = if ($Target) { $Target } else { Join-Path $Root "samples\informatica" }
         Write-Step "Coverage/gap analysis over $dir"
-        & $Python -m pdi_migration.cli gaps $dir
+        & $Python -m pentaho_migration.cli gaps $dir
         exit $LASTEXITCODE
     }
     "ui-install" {
@@ -139,8 +139,8 @@ switch ($Command) {
         Write-Step "Environment status"
         if (Test-Path $Python) {
             Write-Ok ("Python:  " + (& $Python --version))
-            $pkg = & $Python -m pip show pdi-migration 2>$null | Select-String "^Version"
-            if ($pkg) { Write-Ok "Package: pdi-migration $($pkg -replace 'Version: ','')" }
+            $pkg = & $Python -m pip show pentaho-migration 2>$null | Select-String "^Version"
+            if ($pkg) { Write-Ok "Package: pentaho-migration $($pkg -replace 'Version: ','')" }
             else      { Write-Warn2 "Package not installed - run: .\scripts\dev.ps1 install" }
         } else {
             Write-Warn2 "No venv - run: .\scripts\dev.ps1 setup"
