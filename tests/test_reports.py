@@ -67,7 +67,7 @@ def test_untranslatable_is_flagged_manual_never_guessed(crystal):
 
 def test_parse_sample_model():
     model = load_report_model(SAMPLE)
-    assert model.name == "Branch Transaction Summary"
+    assert model.name == "Branch Transaction Summary - Prompt"
     assert model.sql.startswith("SELECT")
     assert [g.column for g in model.groups] == ["BRANCH_NAME"]
     assert [p.name for p in model.parameters] == ["Branch"]
@@ -129,7 +129,7 @@ def test_reports_inspect():
         files={"dump": ("branch.xml", SAMPLE.read_bytes(), "text/xml")})
     assert res.status_code == 200
     summary = res.json()
-    assert summary["name"] == "Branch Transaction Summary"
+    assert summary["name"] == "Branch Transaction Summary - Prompt"
     assert summary["jndi"] == "CSCU"
     assert summary["counts"] == {
         "sections": 7, "elements": 31, "groups": 1, "parameters": 1,
@@ -142,7 +142,7 @@ def test_reports_convert_full_flow():
         files={"dump": ("branch.xml", SAMPLE.read_bytes(), "text/xml")})
     assert res.status_code == 200
     body = res.json()
-    assert body["filename"] == "Branch Transaction Summary.prpt"
+    assert body["filename"] == "Branch Transaction Summary - Prompt.prpt"
     assert body["report_markdown"].startswith("# Conversion Report")
     assert "RunningBalance" in body["report_markdown"]
 

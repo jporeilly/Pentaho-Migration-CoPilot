@@ -7,6 +7,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.16.2] — 2026-07-24
+
+### Changed
+
+- **Demo reports are feature-tagged**: each CSCU report's name now states
+  what it demonstrates — *Member Roster - Basic Layout*, *Accounts by Branch -
+  Groups & Chart*, *Transaction Register - Formulas*, *Member Statement -
+  Nested Groups & Running Total*, *Loan Portfolio - Conditional Formatting*,
+  *Suspicious Activity - Subreport & Cross-tab*, and the flagship *Branch
+  Transaction Summary - Prompt*. The tag flows everywhere the name goes:
+  .prpt filename, PRD title bar, report masthead subtitle ("Demo: …"),
+  conversion report, and the Project page.
+
 ## [1.16.1] — 2026-07-24
 
 ### Changed

@@ -10,14 +10,19 @@ These are authored dumps, not extracted from `.rpt` binaries — the converter
 consumes RptToXml XML, so no Crystal Reports Designer is needed to test it.
 Regenerate with `python samples/cr_demo/build_ladder.py`.
 
-| # | Report | Introduces | Convert outcome |
-|---|--------|-----------|-----------------|
-| 1 | Member Roster | single table, page header/footer | all auto |
-| 2 | Accounts by Branch | one join, one group, Sum summary | all auto |
-| 3 | Transaction Register | multi-join via `accounts`, formulas | 2 formulas auto |
-| 4 | Member Statement | parameter, **nested groups**, running total | running total → manual (report-function advice) |
-| 5 | Loan Portfolio | **conditional formatting**, StdDev aggregate | conditional format + StdDev flagged (no PRD function) |
-| 6 | Suspicious Activity | **subreport, image, cross-tab** | three TODO placeholders |
+| # | Report (name = demo feature) | Demonstrates | Convert outcome |
+|---|------------------------------|--------------|-----------------|
+| 1 | Member Roster **- Basic Layout** | single table, page bands, footer | all auto |
+| 2 | Accounts by Branch **- Groups & Chart** | join, group, Sum totals, **migrated bar chart** | all auto |
+| 3 | Transaction Register **- Formulas** | multi-join via `accounts`, translated formulas | formulas auto |
+| 4 | Member Statement **- Nested Groups & Running Total** | parameter, nested groups | running total → manual (report-function advice) |
+| 5 | Loan Portfolio **- Conditional Formatting** | conditional font color, StdDev aggregate | both flagged honestly |
+| 6 | Suspicious Activity **- Subreport & Cross-tab** | subreport, image, cross-tab | three TODO placeholders |
+
+The flagship UI sample **Branch Transaction Summary - Prompt**
+(`../crystal/branch_transactions.xml`) demonstrates the working parameter
+prompt: the record selection folds into the SQL WHERE, so changing the Branch
+prompt in Report Designer re-filters the report live.
 
 Rungs 1–4 convert cleanly on the auto/review path; 5–6 deliberately exercise
 the honest-flagging path (manual formulas and TODO placeholders) — the tool

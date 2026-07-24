@@ -205,13 +205,13 @@ def r1():
             ("City", "{Command.CITY}", 150, None, "StringField"),
             ("State", "{Command.ST}", 70, "HorizontalCenterAlign", "StringField"),
             ("Status", "{Command.MBR_STATUS}", 100, None, "StringField")]
-    build("CSCU Member Roster", "01_member_roster.xml",
+    build("CSCU Member Roster - Basic Layout", "01_member_roster.xml",
           'SELECT mbr_no AS "MBR_NO", first_nm AS "FIRST_NM", last_nm AS "LAST_NM",\n'
           '       city AS "CITY", st AS "ST", mbr_status AS "MBR_STATUS"\n'
           'FROM cscu_core.members\nORDER BY last_nm, first_nm',
           [("MBR_NO","StringField"),("FIRST_NM","StringField"),("LAST_NM","StringField"),
            ("CITY","StringField"),("ST","StringField"),("MBR_STATUS","StringField")],
-          areas=[masthead("Member Roster", "All active and inactive members"),
+          areas=[masthead("Member Roster", "Demo: basic layout, page bands"),
                  column_header(cols), detail(cols), page_footer()])
 
 
@@ -220,7 +220,7 @@ def r2():
             ("Type", "{Command.ACCT_TYPE_CD}", 120, None, "StringField"),
             ("Status", "{Command.ACCT_STATUS}", 120, None, "StringField"),
             ("Balance", "{Command.BAL_AMT}", 150, "RightAlign", "CurrencyField")]
-    build("Accounts by Branch", "02_accounts_by_branch.xml",
+    build("Accounts by Branch - Groups & Chart", "02_accounts_by_branch.xml",
           'SELECT b.br_name AS "BR_NAME", a.acct_no AS "ACCT_NO", a.acct_type_cd AS "ACCT_TYPE_CD",\n'
           '       a.acct_status AS "ACCT_STATUS", a.bal_amt AS "BAL_AMT"\n'
           'FROM cscu_core.accounts a JOIN cscu_core.branches b ON b.br_id = a.br_id\n'
@@ -230,7 +230,7 @@ def r2():
           groups=["BR_NAME"],
           summaries=[("Sum of BAL_AMT","Sum","BAL_AMT","BR_NAME"),
                      ("Grand Total BAL_AMT","Sum","BAL_AMT",None)],
-          areas=[masthead("Accounts by Branch", "Balances grouped by branch"),
+          areas=[masthead("Accounts by Branch", "Demo: groups, totals and a migrated chart"),
                  column_header(cols), group_header("{Command.BR_NAME}"), detail(cols),
                  totals_footer("GroupFooter","GF","Branch total:","{#Sum of BAL_AMT}"),
                  section("ReportFooter", "RF", 262, [
@@ -253,7 +253,7 @@ def r3():
             ("Amount", "{Command.TXN_AMT}", 120, "RightAlign", "CurrencyField")]
     extra = [field("Flow", "{@FlowType}", 760, 0, 50, 15, size=9,
                    align="HorizontalCenterAlign", color=SLATE)]
-    build("Transaction Register", "03_transaction_register.xml",
+    build("Transaction Register - Formulas", "03_transaction_register.xml",
           'SELECT b.br_name AS "BR_NAME", t.txn_dt AS "TXN_DT", a.acct_no AS "ACCT_NO",\n'
           '       m.first_nm AS "FIRST_NM", m.last_nm AS "LAST_NM", t.txn_type_cd AS "TXN_TYPE_CD",\n'
           '       t.merch_nm AS "MERCH_NM", t.txn_amt AS "TXN_AMT"\n'
@@ -270,7 +270,7 @@ def r3():
                     ("FlowType","StringField",'If {Command.TXN_AMT} < 0 Then "DR" Else "CR"')],
           summaries=[("Sum of TXN_AMT","Sum","TXN_AMT","BR_NAME"),
                      ("Grand Total TXN_AMT","Sum","TXN_AMT",None)],
-          areas=[masthead("Transaction Register", "Member transactions by branch"),
+          areas=[masthead("Transaction Register", "Demo: multi-join SQL and translated formulas"),
                  column_header(cols), group_header("{Command.BR_NAME}"), detail(cols, extra),
                  totals_footer("GroupFooter","GF","Branch net:","{#Sum of TXN_AMT}"),
                  totals_footer("ReportFooter","RF","Net movement:","{#Grand Total TXN_AMT}",size=10,big=True),
@@ -290,7 +290,7 @@ def r4():
     gh2 = section("GroupHeader", "GH2", 20, [
         text("AcctLbl", "Account", 20, 2, 70, 16, size=9, bold=True, color=SLATE),
         field("AcctNo", "{Command.ACCT_NO}", 90, 2, 160, 16, size=9, bold=True, color=NAVY)])
-    build("Member Statement", "04_member_statement.xml",
+    build("Member Statement - Nested Groups & Running Total", "04_member_statement.xml",
           'SELECT m.mbr_no AS "MBR_NO", m.first_nm AS "FIRST_NM", m.last_nm AS "LAST_NM",\n'
           '       a.acct_no AS "ACCT_NO", t.txn_dt AS "TXN_DT", t.txn_type_cd AS "TXN_TYPE_CD",\n'
           '       t.merch_nm AS "MERCH_NM", t.txn_amt AS "TXN_AMT"\n'
@@ -308,7 +308,7 @@ def r4():
                     ("RunningBalance","NumberField",
                      "WhilePrintingRecords;\nShared NumberVar bal;\nbal := bal + {Command.TXN_AMT};\nbal")],
           summaries=[("Sum of TXN_AMT","Sum","TXN_AMT","ACCT_NO")],
-          areas=[masthead("Member Account Statement", "Statement of account activity"),
+          areas=[masthead("Member Account Statement", "Demo: nested groups and a running-total manual flag"),
                  column_header(cols), gh1, gh2, detail(cols),
                  totals_footer("GroupFooter","GF2","Account total:","{#Sum of TXN_AMT}",size=8),
                  page_footer()])
@@ -342,7 +342,7 @@ def r5():
         field("AvgApr", "{#Average of APR_RT}", 460, 20, 130, 14, size=8, color=SLATE, align="RightAlign"),
         text("SdLbl", "APR std dev:", 620, 20, 100, 14, size=8, color=SLATE),
         field("SdApr", "{#StdDev of APR_RT}", 720, 20, 90, 14, size=8, color=SLATE, align="RightAlign")])
-    build("Loan Portfolio", "05_loan_portfolio.xml",
+    build("Loan Portfolio - Conditional Formatting", "05_loan_portfolio.xml",
           'SELECT b.br_name AS "BR_NAME", l.ln_no AS "LN_NO", l.ln_type_cd AS "LN_TYPE_CD",\n'
           '       l.orig_amt AS "ORIG_AMT", l.prin_bal_amt AS "PRIN_BAL_AMT",\n'
           '       l.apr_rt AS "APR_RT", l.ln_status AS "LN_STATUS"\n'
@@ -355,7 +355,7 @@ def r5():
           summaries=[("Sum of PRIN_BAL_AMT","Sum","PRIN_BAL_AMT","BR_NAME"),
                      ("Average of APR_RT","Average","APR_RT","BR_NAME"),
                      ("StdDev of APR_RT","StdDeviation","APR_RT","BR_NAME")],
-          areas=[masthead("Loan Portfolio", "Outstanding loans by branch"),
+          areas=[masthead("Loan Portfolio", "Demo: conditional formatting and unsupported-aggregate flags"),
                  column_header(cols), group_header("{Command.BR_NAME}"),
                  section("Detail", "D", 17, det), gf, page_footer()])
 
@@ -373,7 +373,7 @@ def r6():
         '<CrossTabObject Name="ActivityPivot" Left="0" Top="200" Width="8060" Height="1000"/>',
         text("Note", "Activity type x status pivot (rebuild as PRD crosstab)", 0, 4, 500, 14,
              size=8, color=SLATE)])
-    build("Suspicious Activity Report", "06_suspicious_activity.xml",
+    build("Suspicious Activity - Subreport & Cross-tab", "06_suspicious_activity.xml",
           'SELECT s.filed_dt AS "FILED_DT", m.first_nm AS "FIRST_NM", m.last_nm AS "LAST_NM",\n'
           '       s.activity_type_cd AS "ACTIVITY_TYPE_CD", s.sar_amt AS "SAR_AMT",\n'
           '       s.sar_status AS "SAR_STATUS", s.narrative_txt AS "NARRATIVE_TXT"\n'
@@ -383,7 +383,7 @@ def r6():
            ("ACTIVITY_TYPE_CD","StringField"),("SAR_AMT","CurrencyField"),
            ("SAR_STATUS","StringField"),("NARRATIVE_TXT","StringField")],
           formulas=[("FullName","StringField","{Command.FIRST_NM} + ' ' + {Command.LAST_NM}")],
-          areas=[masthead("Suspicious Activity Report (SAR)", "BSA/AML compliance filing"),
+          areas=[masthead("Suspicious Activity Report (SAR)", "Demo: subreport, image and cross-tab TODO placeholders"),
                  column_header(cols), detail(cols, extra), rf, page_footer()])
 
 
@@ -402,7 +402,7 @@ def flagship():
     prev, OUT = OUT, OUT.parent / "crystal"
     try:
         _NAME_TO_FILE.clear()
-        build("Branch Transaction Summary", "branch_transactions.xml",
+        build("Branch Transaction Summary - Prompt", "branch_transactions.xml",
               'SELECT\n  branches.br_name         AS "BRANCH_NAME",\n'
               '  transactions.txn_dt      AS "TXN_DATE",\n'
               '  transactions.acct_id     AS "ACCOUNT_ID",\n'
@@ -429,7 +429,7 @@ def flagship():
                          'Select {Command.TXN_TYPE}\nCase "WIRE": "High risk"\nCase "ATM": "Low risk"\nDefault: "Standard"')],
               summaries=[("Sum of Command.AMOUNT","Sum","AMOUNT","BRANCH_NAME"),
                          ("Grand Total AMOUNT","Sum","AMOUNT",None)],
-              areas=[masthead("Branch Transaction Summary", "Member transactions grouped by branch"),
+              areas=[masthead("Branch Transaction Summary", "Demo: working prompt - change the Branch parameter"),
                      column_header(cols), group_header("{Command.BRANCH_NAME}"), detail(cols),
                      totals_footer("GroupFooter","GF","Branch total:","{#Sum of Command.AMOUNT}"),
                      totals_footer("ReportFooter","RF","Grand total:","{#Grand Total AMOUNT}",size=10,big=True),
