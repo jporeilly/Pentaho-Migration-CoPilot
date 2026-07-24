@@ -100,13 +100,13 @@ export default function App() {
   }
 
   async function loadSample() {
-    const res = await fetch('/sample')
+    const res = await fetch('/sample', { cache: 'no-store' })
     const blob = await res.blob()
     convert(new File([blob], 'm_load_sales.xml', { type: 'text/xml' }))
   }
 
   async function loadCrystalSample() {
-    const res = await fetch('/reports/sample')
+    const res = await fetch('/reports/sample', { cache: 'no-store' })
     const blob = await res.blob()
     convertReport(new File([blob], 'branch_transactions.xml', { type: 'text/xml' }), 'CSCU_Bank')
   }
@@ -259,7 +259,13 @@ export default function App() {
           {report ? (
             <>
               {step === 1 && <ReportsInspectPage summary={report.summary} />}
-              {step === 2 && <ReportsFormulasPage summary={report.summary} />}
+              {step === 2 && (
+                <ReportsFormulasPage
+                  summary={report.summary}
+                  file={reportFile}
+                  onUpdate={setReport}
+                />
+              )}
               {step === 3 && (
                 <ReportsDownloadPage
                   report={report}

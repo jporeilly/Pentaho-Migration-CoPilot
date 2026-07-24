@@ -7,6 +7,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.2] — 2026-07-24
+
+**Reports family, part 3: LLM assist for manual formulas.**
+
+The same hybrid contract as ETL expression translation, now for Crystal: the
+LLM only sees formulas the deterministic translator could not prove, every
+LLM output is flagged `review` for mandatory human verification, and failures
+never block.
+
+### Added
+
+- **`CRYSTAL_PROMPT`**: Crystal formula syntax → Pentaho OpenFormula, with an
+  authoritative cheat sheet (field refs, `;` argument separators, IF nesting,
+  AND()/OR(), function mappings) and explicit no-fake rules: running-total
+  variables and aggregates must return an empty translation plus the correct
+  PRD rebuild advice (ItemSumFunction et al.); local single-formula aliases
+  may be inlined at `medium` confidence.
+- **`reports/llm_assist.py`** — `translate_manual_formulas()`: manual → review
+  on success (translation prefixed `=`, "AI-translated — verify" note);
+  untranslatable formulas keep `manual` but gain the LLM's rebuild advice in
+  their notes and the conversion report.
+- **API**: `/reports/translate/start` (multipart dump + jndi; background
+  thread, progress polling via `/reports/translate/status`) returning a full
+  conversion response with assisted formulas baked into the regenerated .prpt.
+- **CLI**: `pdi-migrate report --translate/-t`.
+- **UI**: ✨ AI-assist button on the reports Formulas page with n/total
+  progress polling (same pattern as the ETL Map page); sample fetches are now
+  `cache: no-store`. Formulas step hint updated to "rules + AI".
+- Sample gains `{@TxnRiskBand}` (Select Case) so the demo shows both assist
+  outcomes. **Verified live against qwen2.5-coder:32b**: Select Case →
+  perfect nested `IF([TXN_TYPE] = "WIRE"; …)` flagged review; the shared-variable
+  running total correctly stayed manual with ItemSumFunction advice.
+- 6 new tests (136 total): mocked-LLM unit flow, advice-only path, provider
+  gating, background-job API round-trip.
+
 ## [1.11.1] — 2026-07-24
 
 **Reports family, part 2: the guided React flow.**

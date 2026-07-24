@@ -133,7 +133,7 @@ def test_reports_inspect():
     assert summary["jndi"] == "CSCU_Bank"
     assert summary["counts"] == {
         "sections": 7, "elements": 21, "groups": 1, "parameters": 1,
-        "summaries": 2, "auto": 2, "review": 0, "manual": 1}
+        "summaries": 2, "auto": 2, "review": 0, "manual": 2}
 
 
 def test_reports_convert_full_flow():

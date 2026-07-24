@@ -16,8 +16,8 @@ export const REPORT_STEPS = [
     tip: 'Drop a Crystal Reports RptToXml .xml dump (extracted from the .rpt with the free SAP .NET runtime).' },
   { label: 'Inspect', hint: 'deterministic',
     tip: 'Real XML parsing — no AI. Report structure, bands, data source SQL, parameters, and summaries.' },
-  { label: 'Formulas', hint: 'rules-based',
-    tip: 'Crystal formulas translated deterministically to OpenFormula. Anything the translator cannot prove is flagged manual with the original preserved — never guessed.' },
+  { label: 'Formulas', hint: 'rules + AI',
+    tip: 'Crystal formulas translated deterministically to OpenFormula; the LLM assists only with what rules cannot prove, always flagged for review. The original text is preserved — never guessed.' },
   { label: 'Download', hint: 'PRD .prpt',
     tip: 'A native Pentaho Report Designer bundle that opens in PRD, plus a conversion report listing every item that still needs a human.' },
 ]

@@ -305,6 +305,10 @@ def report(
     jndi: str = typer.Option(
         "", "--jndi", help="JNDI datasource name on the Pentaho server",
     ),
+    translate: bool = typer.Option(
+        False, "--translate", "-t",
+        help="LLM-assist formulas the deterministic translator flagged manual",
+    ),
 ) -> None:
     """Convert a Crystal Reports RptToXml dump to a Pentaho .prpt bundle."""
     from pdi_migration.reports import (
@@ -314,6 +318,15 @@ def report(
     )
 
     model = load_report_model(dump, jndi or None)
+    if translate:
+        from pdi_migration.llm import TranslationError
+        from pdi_migration.reports.llm_assist import translate_manual_formulas
+
+        try:
+            count = translate_manual_formulas(model)
+            typer.echo(f"AI-assisted {count} manual formula(s) — all flagged review")
+        except TranslationError as exc:
+            typer.echo(f"translation unavailable: {exc}", err=True)
     out_dir.mkdir(parents=True, exist_ok=True)
     safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
     out_path = out_dir / f"{safe}.prpt"

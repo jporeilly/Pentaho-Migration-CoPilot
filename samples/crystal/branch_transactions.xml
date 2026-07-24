@@ -41,6 +41,10 @@ ORDER BY BRANCHES.BRANCH_NAME, TRANSACTIONS.TXN_DATE</Command>
 Shared NumberVar balance;
 balance := balance + {Command.AMOUNT};
 balance</FormulaFieldDefinition>
+      <FormulaFieldDefinition Name="TxnRiskBand" FormulaName="{@TxnRiskBand}" ValueType="StringField">Select {Command.TXN_TYPE}
+Case "WIRE": "High risk"
+Case "ATM": "Low risk"
+Default: "Standard"</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <ParameterFieldDefinitions>
       <ParameterFieldDefinition Name="Branch" ParameterFieldName="{?Branch}" ValueType="StringField" PromptText="Branch name" DefaultValue="Downtown"/>

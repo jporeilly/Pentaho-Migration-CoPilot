@@ -11,8 +11,11 @@ const TIPS = {
   manual: 'Not mechanically translatable — rebuild by hand in PRD (the original Crystal text is preserved below).',
 }
 
-export default function ReportsFormulasPage({ summary }) {
+export default function ReportsFormulasPage({ summary, file, onUpdate }) {
   const [filter, setFilter] = useState('all')
+  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState('')
+  const [error, setError] = useState(null)
   const formulas = summary.formulas
   const counts = formulas.reduce((acc, f) => {
     acc[f.status] = (acc[f.status] || 0) + 1
@@ -20,9 +23,57 @@ export default function ReportsFormulasPage({ summary }) {
   }, {})
   const visible = filter === 'all' ? formulas : formulas.filter((f) => f.status === filter)
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+  async function translate() {
+    setBusy(true)
+    setError(null)
+    setProgress('starting…')
+    try {
+      const form = new FormData()
+      form.append('dump', file)
+      const start = await fetch(`/reports/translate/start?jndi=${encodeURIComponent(summary.jndi)}`, {
+        method: 'POST',
+        body: form,
+      })
+      const started = await start.json()
+      if (!start.ok) throw new Error(started.detail || start.statusText)
+
+      // poll the background job — each poll is its own short request,
+      // so long local-LLM runs can never hit a browser fetch timeout
+      for (;;) {
+        await sleep(1500)
+        const res = await fetch(`/reports/translate/status?job=${started.job}`)
+        const state = await res.json()
+        if (!res.ok) throw new Error(state.detail || res.statusText)
+        if (state.status === 'error') throw new Error(state.detail || 'translation failed')
+        if (state.status === 'done') {
+          onUpdate(state.result)
+          break
+        }
+        if (state.total) setProgress(`${state.done}/${state.total}`)
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+      setProgress('')
+    }
+  }
+
   return (
     <>
-      <h2 className="subhead">Formula translation</h2>
+      <div className="reports-formulas-head">
+        <h2 className="subhead">Formula translation</h2>
+        {counts.manual > 0 && file && (
+          <button className="primary" onClick={translate} disabled={busy}>
+            {busy
+              ? `Translating ${progress}… (local LLM)`
+              : `✨ AI-assist ${counts.manual} manual formula${counts.manual > 1 ? 's' : ''}`}
+          </button>
+        )}
+      </div>
+      {error && <div className="error">Translation failed: {error}</div>}
 
       {formulas.length > 0 ? (
         <>

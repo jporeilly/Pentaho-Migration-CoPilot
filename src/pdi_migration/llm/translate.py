@@ -106,7 +106,52 @@ context.NAME                         -> getVariable("NAME", "") — confidence "
 globalMap.get("key")                 -> no direct equivalent — confidence "low"
 """
 
-PROMPTS = {"informatica": SYSTEM_PROMPT, "java": JAVA_PROMPT}
+CRYSTAL_PROMPT = """\
+You translate SAP Crystal Reports formulas into Pentaho OpenFormula for
+Pentaho Report Designer. The deterministic translator has already handled the
+simple formulas; you only see the hard ones (variables, evaluation-time
+directives, Select Case, arrays).
+
+Syntax rules (authoritative):
+- Field references: {Table.FIELD} -> [FIELD]; {@FormulaName} -> [FormulaName]; {?Param} -> [Param]
+- Function arguments are separated by ';' not ',' — e.g. IF(c;a;b)
+- If c Then a Else b            -> IF(c;a;b)   (nest for ElseIf chains)
+- Select Case                   -> nested IF(...)
+- and / or / not are NOT infix operators -> AND(x;y), OR(x;y), NOT(x)
+- String concat & or +          -> &
+- a Mod b                       -> MOD(a;b)
+- Comparisons = <> < > <= >=    -> unchanged
+- ToText(x) -> TEXT(x); ToNumber(x) -> VALUE(x); UpperCase/LowerCase -> UPPER/LOWER
+- Trim -> TRIM; Left/Right/Mid -> LEFT/RIGHT/MID; Length -> LEN
+- InStr(s, sub) -> FIND(sub; s)  (arguments swap)
+- IsNull({f}) -> ISBLANK([f]); CurrentDate -> TODAY(); CurrentDateTime -> NOW()
+- Reply with JSON only: {"translation": "<openformula WITHOUT leading =>", "confidence": "high"|"medium"|"low", "notes": "<caveats or empty>"}
+
+Constructs with NO OpenFormula equivalent — do not fake them:
+- Variables (Shared/Global/Local ...Var) that accumulate across records
+  (running totals, counters): set translation to "" and confidence "low", and
+  say in notes which PRD report function to use instead (ItemSumFunction,
+  ItemCountFunction, or a custom function) and where to place it.
+- WhilePrintingRecords / WhileReadingRecords / EvaluateAfter are evaluation-time
+  directives: if the remaining body is a pure expression, translate the body and
+  note that PRD's evaluation model differs; otherwise treat as above.
+- Aggregates like Sum({f}, {group}): translation "" + note to use the
+  matching Item*Function with the field and group.
+- A variable used only as a local alias within one formula CAN be inlined:
+  substitute the expression and translate normally (confidence "medium").
+
+Example:
+Input:  Local StringVar s := {Cust.FIRST} + " " + {Cust.LAST}; UpperCase(s)
+Output: {"translation": "UPPER([FIRST] & \\" \\" & [LAST])", "confidence": "medium", "notes": "local alias inlined"}
+"""
+
+PROMPTS = {"informatica": SYSTEM_PROMPT, "java": JAVA_PROMPT, "crystal": CRYSTAL_PROMPT}
+
+LANG_LABELS = {
+    "informatica": "Informatica expression (output port '{field}')",
+    "java": "Talend Java expression (target field '{field}')",
+    "crystal": "Crystal Reports formula ({{@{field}}})",
+}
 
 RESPONSE_SCHEMA = {
     "type": "object",
@@ -202,8 +247,9 @@ class ExpressionTranslator:
                     {"role": "system", "content": PROMPTS.get(expr.language, SYSTEM_PROMPT)},
                     {
                         "role": "user",
-                        "content": f"Translate this Informatica expression "
-                                   f"(output port '{expr.field}'):\n{expr.raw}",
+                        "content": "Translate this "
+                                   + LANG_LABELS.get(expr.language, LANG_LABELS["informatica"]).format(field=expr.field)
+                                   + f":\n{expr.raw}",
                     },
                 ],
                 "stream": False,

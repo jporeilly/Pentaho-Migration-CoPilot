@@ -8,7 +8,9 @@ JSON response; the UI turns it into a Blob download.
 import base64
 import logging
 import tempfile
+import threading
 import time
+import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
@@ -16,7 +18,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from pdi_migration.api.security import require_api_key
+from pdi_migration.llm import ExpressionTranslator, TranslationError
 from pdi_migration.reports import build_conversion_report, load_report_model, write_prpt
+from pdi_migration.reports.llm_assist import translate_manual_formulas
 
 logger = logging.getLogger("pdi_migration.api.reports")
 
@@ -168,6 +172,21 @@ async def inspect(dump: UploadFile, jndi: str = "") -> ReportSummary:
     return _summarize(model, dump.filename or "upload.xml")
 
 
+def _build_response(model, source_name: str) -> ReportConversionResponse:
+    safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / f"{safe}.prpt"
+        write_prpt(model, out)
+        prpt_bytes = out.read_bytes()
+    markdown = build_conversion_report(model, source_name, f"{safe}.prpt")
+    return ReportConversionResponse(
+        summary=_summarize(model, source_name),
+        report_markdown=markdown,
+        prpt_base64=base64.b64encode(prpt_bytes).decode("ascii"),
+        filename=f"{safe}.prpt",
+    )
+
+
 @router.post("/convert", response_model=ReportConversionResponse,
              dependencies=[Depends(require_api_key)])
 async def convert(dump: UploadFile, jndi: str = "") -> ReportConversionResponse:
@@ -176,18 +195,60 @@ async def convert(dump: UploadFile, jndi: str = "") -> ReportConversionResponse:
     data = await dump.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
-    safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
-    with tempfile.TemporaryDirectory() as td:
-        out = Path(td) / f"{safe}.prpt"
-        write_prpt(model, out)
-        prpt_bytes = out.read_bytes()
-    markdown = build_conversion_report(model, source_name, f"{safe}.prpt")
+    response = _build_response(model, source_name)
     logger.info("reports/convert file=%s bytes=%d formulas=%d elapsed_ms=%d",
                 source_name, len(data), len(model.formulas),
                 (time.monotonic() - started) * 1000)
-    return ReportConversionResponse(
-        summary=_summarize(model, source_name),
-        report_markdown=markdown,
-        prpt_base64=base64.b64encode(prpt_bytes).decode("ascii"),
-        filename=f"{safe}.prpt",
-    )
+    return response
+
+
+_assist_jobs: dict[str, dict] = {}
+
+
+@router.post("/translate/start", dependencies=[Depends(require_api_key)])
+async def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
+    """LLM-assist the formulas the deterministic translator flagged manual.
+
+    Runs in the background (local models can take minutes); poll
+    /reports/translate/status. The finished job carries a full conversion
+    response with the assisted formulas baked into the .prpt."""
+    try:
+        translator = ExpressionTranslator()
+        translator._check_provider()
+    except TranslationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    data = await dump.read()
+    source_name = dump.filename or "upload.xml"
+    model = _load_upload(data, source_name, jndi)
+
+    job_id = uuid.uuid4().hex[:12]
+    job: dict = {"status": "running", "done": 0, "total": 0,
+                 "translated": 0, "detail": "", "result": None}
+    _assist_jobs[job_id] = job
+
+    def run() -> None:
+        try:
+            def progress(done: int, total: int) -> None:
+                job["done"], job["total"] = done, total
+
+            job["translated"] = translate_manual_formulas(
+                model, translator=translator, progress=progress)
+            job["result"] = _build_response(model, source_name).model_dump()
+            job["status"] = "done"
+        except Exception as exc:
+            job["status"] = "error"
+            job["detail"] = str(exc)
+            logger.exception("reports translate job %s failed", job_id)
+
+    threading.Thread(target=run, daemon=True).start()
+    return {"job": job_id}
+
+
+@router.get("/translate/status")
+def translate_status(job: str) -> dict:
+    """Progress of a formula-assist job; includes the full result when done."""
+    state = _assist_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown translation job")
+    return state
