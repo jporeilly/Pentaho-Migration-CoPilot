@@ -6,17 +6,18 @@
     <Tables>
       <Table Name="Command" Alias="Command" ClassName="CommandTable">
         <Command>SELECT
-  BRANCHES.BRANCH_NAME,
-  TRANSACTIONS.TXN_DATE,
-  TRANSACTIONS.ACCOUNT_ID,
-  CUSTOMERS.FIRST_NAME,
-  CUSTOMERS.LAST_NAME,
-  TRANSACTIONS.TXN_TYPE,
-  TRANSACTIONS.AMOUNT
-FROM TRANSACTIONS
-JOIN CUSTOMERS ON CUSTOMERS.CUSTOMER_ID = TRANSACTIONS.CUSTOMER_ID
-JOIN BRANCHES ON BRANCHES.BRANCH_ID = TRANSACTIONS.BRANCH_ID
-ORDER BY BRANCHES.BRANCH_NAME, TRANSACTIONS.TXN_DATE</Command>
+  branches.br_name         AS "BRANCH_NAME",
+  transactions.txn_dt      AS "TXN_DATE",
+  transactions.acct_id     AS "ACCOUNT_ID",
+  members.first_nm         AS "FIRST_NAME",
+  members.last_nm          AS "LAST_NAME",
+  transactions.txn_type_cd AS "TXN_TYPE",
+  transactions.txn_amt     AS "AMOUNT"
+FROM cscu_core.transactions
+JOIN cscu_core.accounts ON accounts.acct_id = transactions.acct_id
+JOIN cscu_core.members  ON members.mbr_id  = accounts.mbr_id
+JOIN cscu_core.branches ON branches.br_id  = accounts.br_id
+ORDER BY branches.br_name, transactions.txn_dt</Command>
         <Fields>
           <Field Name="BRANCH_NAME" ValueType="StringField"/>
           <Field Name="TXN_DATE" ValueType="DateField"/>
@@ -30,7 +31,7 @@ ORDER BY BRANCHES.BRANCH_NAME, TRANSACTIONS.TXN_DATE</Command>
     </Tables>
   </Database>
   <DataDefinition>
-    <RecordSelectionFormula>{BRANCHES.BRANCH_NAME} = {?Branch} and {TRANSACTIONS.AMOUNT} &gt; 0</RecordSelectionFormula>
+    <RecordSelectionFormula>{BRANCHES.BR_NAME} = {?Branch} and {TRANSACTIONS.TXN_AMT} &lt;&gt; 0</RecordSelectionFormula>
     <Groups>
       <Group ConditionField="{Command.BRANCH_NAME}"/>
     </Groups>

@@ -84,7 +84,7 @@ def test_api_translate_job(monkeypatch):
         lambda self, expr: {"translation": "[AMOUNT] * 1", "confidence": "high", "notes": ""})
 
     res = client.post(
-        "/reports/translate/start?jndi=CSCU_Bank",
+        "/reports/translate/start?jndi=CSCU",
         files={"dump": ("branch.xml", SAMPLE.read_bytes(), "text/xml")})
     assert res.status_code == 200
     job = res.json()["job"]

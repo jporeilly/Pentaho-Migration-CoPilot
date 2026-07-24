@@ -34,7 +34,7 @@ def test_find_java_tolerates_missing_prd():
 
 @needs_engine
 def test_generated_bundle_loads_in_real_engine(tmp_path):
-    model = load_report_model(SAMPLE, jndi="CSCU_Bank")
+    model = load_report_model(SAMPLE, jndi="CSCU")
     out = tmp_path / "branch.prpt"
     write_prpt(model, out)
     (result,) = validate_prpts([out])

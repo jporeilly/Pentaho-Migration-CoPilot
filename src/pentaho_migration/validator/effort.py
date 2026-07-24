@@ -16,20 +16,34 @@ from pentaho_migration.validator.report import MigrationReport
 
 DEFAULT_RATE = 150.0  # USD per hour; UI/CLI override
 
-# Remaining-work heuristics with Copilot output (hours)
-COPILOT_BASE = 0.5          # connections, import, publish
-COPILOT_AUTO_STEP = 0.1     # eyeball an auto-converted step
-COPILOT_REVIEW_STEP = 0.75  # verify an assumption/AI-translated step
-COPILOT_MANUAL_STEP = 3.0   # hand-convert an unmapped step
-COPILOT_UNTRANSLATED = 0.25 # translate + wire one expression by hand
-COPILOT_REVIEW_EXPR = 0.1   # verify one AI-translated expression
-COPILOT_TEST_OVERHEAD = 0.25
+# Repeated work inside one artifact is cheaper than the first instance —
+# the 40th expression is usually a variant of an earlier one, steps repeat
+# patterns, layouts are copy-adjusted. Volume therefore scales sub-linearly:
+# effective(n) = n ** SCALE. At 0.8, 10 items cost ~6.3x one item (not 10x)
+# and 100 items ~40x — matching how consultants actually quote (a 100-step
+# monster is ~2 weeks, not 4 months).
+SCALE = 0.8
 
-# From-scratch rebuild heuristics (hours)
+
+def _vol(n: int) -> float:
+    return float(n) ** SCALE if n > 0 else 0.0
+
+
+# Remaining-work heuristics with Copilot output (hours per first-instance;
+# volume discounted by SCALE)
+COPILOT_BASE = 0.5          # connections, import, publish
+COPILOT_AUTO_STEP = 0.05    # eyeball an auto-converted step
+COPILOT_REVIEW_STEP = 0.4   # verify an assumption/AI-translated step
+COPILOT_MANUAL_STEP = 2.0   # hand-convert an unmapped step
+COPILOT_UNTRANSLATED = 0.15 # translate + wire one expression by hand
+COPILOT_REVIEW_EXPR = 0.05  # verify one AI-translated expression
+COPILOT_TEST_OVERHEAD = 0.20
+
+# From-scratch rebuild heuristics (hours per first-instance; SCALE-discounted)
 MANUAL_BASE = 1.0
-MANUAL_STEP = 1.5           # analyze + rebuild one transformation step
-MANUAL_EXPR = 0.33          # re-derive one expression
-MANUAL_TEST_OVERHEAD = 0.30
+MANUAL_STEP = 1.2           # analyze + rebuild one transformation step
+MANUAL_EXPR = 0.2           # re-derive one expression
+MANUAL_TEST_OVERHEAD = 0.25
 
 
 def _round_half(x: float) -> float:
@@ -65,16 +79,16 @@ def effort_from_counts(
     reviewed_exprs = total_exprs - untranslated_exprs
 
     copilot = COPILOT_BASE \
-        + auto * COPILOT_AUTO_STEP \
-        + review * COPILOT_REVIEW_STEP \
-        + manual * COPILOT_MANUAL_STEP \
-        + untranslated_exprs * COPILOT_UNTRANSLATED \
-        + reviewed_exprs * COPILOT_REVIEW_EXPR
+        + _vol(auto) * COPILOT_AUTO_STEP \
+        + _vol(review) * COPILOT_REVIEW_STEP \
+        + _vol(manual) * COPILOT_MANUAL_STEP \
+        + _vol(untranslated_exprs) * COPILOT_UNTRANSLATED \
+        + _vol(reviewed_exprs) * COPILOT_REVIEW_EXPR
     copilot *= 1 + COPILOT_TEST_OVERHEAD
 
     rebuild = MANUAL_BASE \
-        + steps * MANUAL_STEP \
-        + total_exprs * MANUAL_EXPR
+        + _vol(steps) * MANUAL_STEP \
+        + _vol(total_exprs) * MANUAL_EXPR
     rebuild *= 1 + MANUAL_TEST_OVERHEAD
 
     copilot_h = _round_half(copilot)
@@ -113,6 +127,9 @@ def _assumptions() -> list[str]:
             f"expression {COPILOT_REVIEW_EXPR}h, +{COPILOT_TEST_OVERHEAD:.0%} testing.",
             f"Manual rebuild: {MANUAL_STEP}h per step, {MANUAL_EXPR}h per expression, "
             f"+{MANUAL_TEST_OVERHEAD:.0%} testing.",
+            f"Volume scales sub-linearly (n^{SCALE}): repeated items within one "
+            "artifact reuse patterns, so 10 similar items cost ~6x one item, "
+            "not 10x - first instances carry the full rate.",
             "Typical blended consultant rate $125-$175/h ($1,000-$1,400 per 8h day); "
             "adjust the rate to your engagement.",
         ]

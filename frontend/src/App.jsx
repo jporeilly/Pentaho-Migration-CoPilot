@@ -108,7 +108,7 @@ export default function App() {
   async function loadCrystalSample() {
     const res = await fetch('/reports/sample', { cache: 'no-store' })
     const blob = await res.blob()
-    convertReport(new File([blob], 'branch_transactions.xml', { type: 'text/xml' }), 'CSCU_Bank')
+    convertReport(new File([blob], 'branch_transactions.xml', { type: 'text/xml' }), 'CSCU')
   }
 
   async function openFromProject(row) {

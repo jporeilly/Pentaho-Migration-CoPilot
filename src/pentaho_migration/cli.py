@@ -476,6 +476,11 @@ def report_batch(
     directory: Path = typer.Argument(Path("samples/crystal/real")),
     out_dir: Path = typer.Option(Path("output/crystal"), "--out", "-o"),
     jndi: str = typer.Option("", "--jndi", help="JNDI datasource for every report"),
+    translate: bool = typer.Option(
+        False, "--translate", "-t",
+        help="LLM-assist manual formulas via the configured provider (slow: one "
+             "call per formula - plan an hour+ for a large corpus)",
+    ),
 ) -> None:
     """Convert every RptToXml dump in DIRECTORY and record each report in the
     migration project store (Crystal counterpart of `batch`)."""
@@ -491,11 +496,32 @@ def report_batch(
         raise typer.Exit(code=1)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    translator = None
+    if translate:
+        from pentaho_migration.llm import ExpressionTranslator, TranslationError
+
+        try:
+            translator = ExpressionTranslator()
+            translator._check_provider()
+        except TranslationError as exc:
+            typer.echo(f"translation unavailable: {exc}", err=True)
+            raise typer.Exit(code=2)
+
     total = failures = 0
+    assisted = still_manual = 0
     copilot_h = manual_h = 0.0
     for xml in files:
         try:
             model = load_report_model(xml, jndi or None)
+            if translator is not None:
+                from pentaho_migration.reports.llm_assist import translate_manual_formulas
+
+                flipped = translate_manual_formulas(model, translator=translator)
+                remaining = sum(1 for f in model.formulas.values() if f.status == "manual")
+                assisted += flipped
+                still_manual += remaining
+                if flipped or remaining:
+                    typer.echo(f"  {xml.name}: AI-assisted {flipped}, still manual {remaining}")
             safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or xml.stem
             out_path = out_dir / f"{safe}.prpt"
             write_prpt(model, out_path)
@@ -527,6 +553,10 @@ def report_batch(
     typer.echo(
         f"reports effort: ~{copilot_h:,.0f}h with Copilot vs ~{manual_h:,.0f}h "
         f"manual - saves {saved:,.0f}h ({pct}%)")
+    if translate:
+        typer.echo(
+            f"LLM assist: {assisted} formula(s) flipped manual -> review, "
+            f"{still_manual} remain manual")
 
 
 @app.command("report-scrub")

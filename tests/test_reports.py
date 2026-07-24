@@ -87,7 +87,7 @@ def test_summary_resolves_to_function_reference():
 # ---------------------------------------------------------------- writer
 
 def test_prpt_bundle_shape(tmp_path):
-    model = load_report_model(SAMPLE, jndi="CSCU_Bank")
+    model = load_report_model(SAMPLE, jndi="CSCU")
     out = tmp_path / "branch.prpt"
     write_prpt(model, out)
     zf = zipfile.ZipFile(out)
@@ -105,7 +105,7 @@ def test_prpt_bundle_shape(tmp_path):
     assert "ItemSumFunction" in dd
     assert 'name="PageofPages"' in dd
     assert "RunningBalance" not in dd  # blocked formula stays out of the bundle
-    assert "CSCU_Bank" in zf.read("datasources/sql-ds.xml").decode()
+    assert "CSCU" in zf.read("datasources/sql-ds.xml").decode()
 
 
 # ---------------------------------------------------------------- routing
@@ -125,12 +125,12 @@ def test_reports_sample_served():
 
 def test_reports_inspect():
     res = client.post(
-        "/reports/inspect?jndi=CSCU_Bank",
+        "/reports/inspect?jndi=CSCU",
         files={"dump": ("branch.xml", SAMPLE.read_bytes(), "text/xml")})
     assert res.status_code == 200
     summary = res.json()
     assert summary["name"] == "Branch Transaction Summary"
-    assert summary["jndi"] == "CSCU_Bank"
+    assert summary["jndi"] == "CSCU"
     assert summary["counts"] == {
         "sections": 7, "elements": 21, "groups": 1, "parameters": 1,
         "summaries": 2, "auto": 2, "review": 0, "manual": 2}
