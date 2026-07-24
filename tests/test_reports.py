@@ -192,3 +192,52 @@ def test_chr_maps_to_char():
     f = translate_formula("t", "Chr(13)")
     assert f.status == "review"
     assert f.translation == "=CHAR(13)"
+
+
+def test_string_plus_uses_field_types():
+    types = {"FIRST": "StringField", "LAST": "StringField", "A": "NumberField"}
+    f = translate_formula("t", "{C.FIRST} + {C.LAST}", field_types=types)
+    assert f.translation == "=[FIRST] & [LAST]"
+    f = translate_formula("t", "{C.A} + {C.A}", field_types=types)
+    assert f.translation == "=[A] + [A]"
+
+
+def test_percent_operator_is_not_silently_mistranslated():
+    f = translate_formula("t", "{O.A} % {O.B}")
+    assert f.status == "manual"
+
+
+def test_unsupported_summary_becomes_todo_not_broken_reference(tmp_path):
+    dump = tmp_path / "r.xml"
+    dump.write_text(SAMPLE.read_text(encoding="utf-8").replace(
+        'Operation="Sum" SummarizedField="{Command.AMOUNT}"/>',
+        'Operation="StdDeviation" SummarizedField="{Command.AMOUNT}"/>'),
+        encoding="utf-8")
+    model = load_report_model(dump)
+    assert any("StdDeviation" in issue for issue in model.issues)
+    footer = model.sections_of("ReportFooter")[0]
+    el = next(e for e in footer.elements if e.name == "GrandTotal")
+    assert el.kind == "unknown"  # rendered as TODO placeholder, not number-field
+    out = tmp_path / "r.prpt"
+    write_prpt(model, out)
+    dd = zipfile.ZipFile(out).read("datadefinition.xml").decode()
+    assert "StdDeviation" not in dd
+
+
+def test_real_dump_suppression_and_margins():
+    real = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+    dumps = sorted(real.glob("*.xml"))
+    if len(dumps) < 10:
+        pytest.skip("extracted corpus not present")
+    suppressed = margins = conditional = 0
+    for xml in dumps:
+        model = load_report_model(xml)
+        suppressed += sum(1 for s in model.sections if s.suppressed)
+        if model.page.margin_top != 18.0:  # default means "not parsed"
+            margins += 1
+        conditional += len(model.issues) + sum(
+            1 for s in model.sections for e in s.elements
+            for n in e.notes if "conditional" in n)
+    assert suppressed > 100     # corpus has 201 EnableSuppress="True" formats
+    assert margins > 50         # real dumps carry PageMargins children
+    assert conditional > 50     # conditional formatting surfaced, not dropped

@@ -207,6 +207,18 @@ async def convert(dump: UploadFile, jndi: str = "") -> ReportConversionResponse:
 
 
 _assist_jobs: dict[str, dict] = {}
+_MAX_JOBS = 50
+
+
+def _evict_old_jobs(jobs: dict) -> None:
+    """Keep the job registry bounded: drop the oldest finished entries."""
+    while len(jobs) > _MAX_JOBS:
+        for job_id, state in list(jobs.items()):
+            if state.get("status") != "running":
+                del jobs[job_id]
+                break
+        else:
+            break  # everything still running — do not evict live jobs
 
 
 @router.post("/translate/start", dependencies=[Depends(require_api_key)])
@@ -230,6 +242,7 @@ async def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
     job: dict = {"status": "running", "done": 0, "total": 0,
                  "translated": 0, "detail": "", "result": None}
     _assist_jobs[job_id] = job
+    _evict_old_jobs(_assist_jobs)
 
     def run() -> None:
         try:

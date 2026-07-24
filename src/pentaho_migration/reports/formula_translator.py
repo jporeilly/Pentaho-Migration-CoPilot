@@ -134,13 +134,28 @@ def _string_to_openformula(raw):
     return f'"{body}"'
 
 
+STRING_TYPES = {"StringField", "MemoField", "PersistentMemoField"}
+_FIELD_REF_ONLY = re.compile(r"^\[(\w+)\]$")
+
+
 class _Parser:
     """Recursive-descent translator emitting OpenFormula text."""
 
-    def __init__(self, tokens):
+    def __init__(self, tokens, field_types=None):
         self.tokens = tokens
         self.pos = 0
         self.notes = []
+        self.field_types = field_types or {}
+
+    def _is_stringish(self, operand):
+        """True when an emitted operand is knowably a string: a literal at
+        either end (covers concat chains), or a field reference whose
+        database type says so."""
+        s = operand.strip()
+        if s.startswith('"') or s.endswith('"'):
+            return True
+        m = _FIELD_REF_ONLY.match(s)
+        return bool(m) and self.field_types.get(m.group(1)) in STRING_TYPES
 
     def peek(self):
         return self.tokens[self.pos] if self.pos < len(self.tokens) else (None, None)
@@ -200,17 +215,23 @@ class _Parser:
             if kind == "op" and val in ("+", "-", "&"):
                 self.next()
                 right = self.mul_expr()
-                if val == "+" and (out.rstrip().endswith('"') or right.lstrip().startswith('"')):
-                    val = "&"  # string concatenation: Crystal '+' -> OpenFormula '&'
+                # string concatenation: Crystal '+' -> OpenFormula '&'.
+                # OpenFormula '+' fails on strings at runtime, so use the
+                # database field types, not just literals, to decide.
+                if val == "+" and (self._is_stringish(out) or self._is_stringish(right)):
+                    val = "&"
                 out = f"{out} {val} {right}"
             else:
                 return out
 
     def mul_expr(self):
+        # note: '%' is deliberately NOT an operator here — Crystal has no
+        # binary %, and OpenFormula's % is a postfix percent (divide by 100),
+        # so passing it through would silently change semantics
         out = self.unary()
         while True:
             kind, val = self.peek()
-            if kind == "op" and val in ("*", "/", "%"):
+            if kind == "op" and val in ("*", "/"):
                 self.next()
                 out = f"{out} {val} {self.unary()}"
             elif self._is_kw(self.peek(), "mod"):
@@ -331,8 +352,10 @@ class _Parser:
             raise TranslationError(f"expected {symbol!r}, found {val!r}")
 
 
-def translate_formula(name, text):
-    """Translate one Crystal formula. Returns a Formula with status filled in."""
+def translate_formula(name, text, field_types=None):
+    """Translate one Crystal formula. Returns a Formula with status filled in.
+    `field_types` (bare column -> Crystal ValueType) enables type-aware
+    decisions like string '+' -> '&'."""
     f = Formula(name=name, text=text)
     stripped = re.sub(r"//[^\n]*", "", text)
     for pattern, why in BLOCKER_PATTERNS:
@@ -342,7 +365,7 @@ def translate_formula(name, text):
                            "(often as a report function or a pre-computed SQL column).")
             return f
     try:
-        parser = _Parser(_tokenize(text))
+        parser = _Parser(_tokenize(text), field_types=field_types)
         f.translation = "=" + parser.parse()
         f.notes = parser.notes
         f.status = "review" if parser.notes else "auto"
@@ -354,5 +377,6 @@ def translate_formula(name, text):
 
 def translate_all(model):
     for name, formula in model.formulas.items():
-        model.formulas[name] = translate_formula(name, formula.text)
+        model.formulas[name] = translate_formula(
+            name, formula.text, field_types=model.field_types)
     return model

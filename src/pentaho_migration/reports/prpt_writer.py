@@ -41,14 +41,7 @@ PARAM_TYPE_MAP = {
     "BooleanField": "java.lang.Boolean",
 }
 
-SUMMARY_CLASS_MAP = {
-    "Sum": "org.pentaho.reporting.engine.classic.core.function.ItemSumFunction",
-    "Count": "org.pentaho.reporting.engine.classic.core.function.ItemCountFunction",
-    "Average": "org.pentaho.reporting.engine.classic.core.function.ItemAvgFunction",
-    "Maximum": "org.pentaho.reporting.engine.classic.core.function.ItemMaxFunction",
-    "Minimum": "org.pentaho.reporting.engine.classic.core.function.ItemMinFunction",
-    "DistinctCount": "org.pentaho.reporting.engine.classic.core.function.CountDistinctFunction",
-}
+from pentaho_migration.reports.model import SUMMARY_CLASS_MAP
 
 NUMERIC_TYPES = {"NumberField", "CurrencyField", "IntegerField", "Int16sField",
                  "Int32sField", "Int64sField", "DecimalField"}

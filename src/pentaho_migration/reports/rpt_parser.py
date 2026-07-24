@@ -30,8 +30,8 @@ import re
 import xml.etree.ElementTree as ET
 
 from .model import (
-    TWIPS_PER_POINT, Element, Font, Formula, Group, PageSetup,
-    Parameter, ReportModel, Section, Summary,
+    SUMMARY_CLASS_MAP, TWIPS_PER_POINT, Element, Font, Formula, Group,
+    PageSetup, Parameter, ReportModel, Section, Summary,
 )
 
 FIELD_REF_RE = re.compile(r"^\{([^}]+)\}$")
@@ -119,6 +119,27 @@ ALIGN_MAP = {
 }
 
 
+def _conditional_formula_notes(node, context=""):
+    """Conditional-formatting formulas (RptToXml dumps them in
+    *ConditionFormulas elements, sometimes nested under Border/SectionFormat).
+    Not convertible mechanically — but dropping them silently hides real
+    behavior, so surface each as a note. Safe to scan the whole subtree of an
+    object or a SectionFormat: neither contains other report objects."""
+    notes = []
+    for child in node.iter():
+        if not child.tag.endswith("ConditionFormulas"):
+            continue
+        for attr, raw in child.attrib.items():
+            body = "\n".join(
+                line for line in raw.splitlines()
+                if line.strip() and not line.strip().startswith("//"))
+            if body.strip():
+                snippet = " ".join(body.split())[:100]
+                notes.append(
+                    f"conditional {attr} formula not carried{context}: {snippet}")
+    return notes
+
+
 def _parse_object(obj):
     tag = obj.tag
     el = Element(
@@ -153,6 +174,7 @@ def _parse_object(obj):
     else:
         el.kind = "unknown"
         el.text = tag
+    el.notes.extend(_conditional_formula_notes(obj))
     return el
 
 
@@ -231,6 +253,11 @@ def _parse_data_definition(root, model):
         model.summaries.append(Summary(
             name=name.strip("{}#"), operation=op, field_ref=fref,
             group_field=gcolumn, expression_name=expr_name))
+        if op not in SUMMARY_CLASS_MAP:
+            model.issues.append(
+                f"summary '{name.strip('{}#')}' uses operation {op!r}, which has "
+                "no PRD report-function mapping - rebuild by hand (custom "
+                "function or a pre-computed SQL column)")
 
 
 def _parse_print_options(root, model):
@@ -244,13 +271,17 @@ def _parse_print_options(root, model):
             page.paper = "A4"
         elif "legal" in size:
             page.paper = "LEGAL"
+        # margins: real RptToXml emits a <PageMargins> child; older/simulated
+        # dumps carry attributes on PrintOptions itself
+        margins = po.find("PageMargins")
+        source = margins if margins is not None else po
         for attr, names in (
-            ("margin_top", ("PageMarginTop", "MarginTop")),
-            ("margin_left", ("PageMarginLeft", "MarginLeft")),
-            ("margin_bottom", ("PageMarginBottom", "MarginBottom")),
-            ("margin_right", ("PageMarginRight", "MarginRight")),
+            ("margin_top", ("topMargin", "PageMarginTop", "MarginTop")),
+            ("margin_left", ("leftMargin", "PageMarginLeft", "MarginLeft")),
+            ("margin_bottom", ("bottomMargin", "PageMarginBottom", "MarginBottom")),
+            ("margin_right", ("rightMargin", "PageMarginRight", "MarginRight")),
         ):
-            v = _twips(po, *names, default=-1.0)
+            v = _twips(source, *names, default=-1.0)
             if v >= 0:
                 setattr(page, attr, v)
     model.page = page
@@ -268,13 +299,23 @@ def _parse_areas(root, model):
             group_index = group_counters[kind]
             group_counters[kind] += 1
         for sec in area.iter("Section"):
+            # suppression: real RptToXml puts it on a <SectionFormat> child
+            # (EnableSuppress); tolerate a Suppress attribute on Section too
+            fmt = sec.find("SectionFormat")
+            suppressed = _attr(sec, "Suppress", default="false").lower() in ("true", "1")
+            if fmt is not None:
+                suppressed = suppressed or \
+                    _attr(fmt, "EnableSuppress", default="false").lower() in ("true", "1")
             section = Section(
                 area_kind=kind,
                 name=_attr(sec, "Name", default=""),
                 height=_twips(sec, "Height", default=20.0) or 20.0,
                 group_index=group_index,
-                suppressed=_attr(sec, "Suppress", default="false").lower() in ("true", "1"),
+                suppressed=suppressed,
             )
+            if fmt is not None:
+                model.issues.extend(_conditional_formula_notes(
+                    fmt, context=f" (section {section.name or kind})"))
             objects = sec.find("ReportObjects")
             if objects is not None:
                 for obj in objects:
@@ -305,15 +346,30 @@ def _resolve_references(model):
                 el.column = name
             elif kind == "summary":
                 summ = summary_by_name.get(name)
-                el.column = summ.expression_name if summ else name
-                el.value_type = "NumberField"
+                if summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
+                    # the writer will not emit a function for this operation —
+                    # a number-field referencing it would break the bundle
+                    el.kind = "unknown"
+                    el.text = f"summary '{summ.name}' ({summ.operation}) - no PRD function"
+                    el.notes.append(
+                        f"summary operation {summ.operation!r} unsupported - "
+                        "element emitted as TODO placeholder")
+                else:
+                    el.column = summ.expression_name if summ else name
+                    el.value_type = "NumberField"
             elif kind == "special":
                 el.kind = "special"
                 el.column = name.lower()
             else:
                 # maybe it is a summary referenced by display name
                 summ = summary_by_name.get(el.field_ref.strip("{}#"))
-                if summ:
+                if summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
+                    el.kind = "unknown"
+                    el.text = f"summary '{summ.name}' ({summ.operation}) - no PRD function"
+                    el.notes.append(
+                        f"summary operation {summ.operation!r} unsupported - "
+                        "element emitted as TODO placeholder")
+                elif summ:
                     el.column = summ.expression_name
                     el.value_type = "NumberField"
                 else:

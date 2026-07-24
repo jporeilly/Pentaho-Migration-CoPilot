@@ -10,6 +10,18 @@ from typing import Optional
 
 TWIPS_PER_POINT = 20.0
 
+# Crystal summary operation -> PRD report function. Lives here (not in the
+# writer) so the parser can flag unsupported operations at load time instead
+# of the writer silently dropping them.
+SUMMARY_CLASS_MAP = {
+    "Sum": "org.pentaho.reporting.engine.classic.core.function.ItemSumFunction",
+    "Count": "org.pentaho.reporting.engine.classic.core.function.ItemCountFunction",
+    "Average": "org.pentaho.reporting.engine.classic.core.function.ItemAvgFunction",
+    "Maximum": "org.pentaho.reporting.engine.classic.core.function.ItemMaxFunction",
+    "Minimum": "org.pentaho.reporting.engine.classic.core.function.ItemMinFunction",
+    "DistinctCount": "org.pentaho.reporting.engine.classic.core.function.CountDistinctFunction",
+}
+
 
 @dataclass
 class Font:

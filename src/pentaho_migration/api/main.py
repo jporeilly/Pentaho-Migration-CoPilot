@@ -342,6 +342,8 @@ def translate_start(pipeline: Pipeline) -> dict[str, str]:
     job_id = uuid.uuid4().hex[:12]
     job: dict = {"status": "running", "done": 0, "total": 0, "detail": "", "result": None}
     _translate_jobs[job_id] = job
+    from pentaho_migration.reports.api import _evict_old_jobs
+    _evict_old_jobs(_translate_jobs)
 
     def run() -> None:
         try:

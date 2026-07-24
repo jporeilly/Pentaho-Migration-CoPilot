@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.12.1] — 2026-07-24
+
+**Crystal correctness fixes — closing the production-review findings.**
+
+### Fixed
+
+- **Silent summary drop (worst finding)**: unmapped summary operations
+  (StdDev, Median, …) used to be skipped silently while layout elements still
+  referenced the missing function — a broken bundle with no flag. Now: the
+  operation map lives in `model.py`, the parser flags unsupported operations
+  as issues at load time, referencing elements render as TODO placeholders,
+  and a test proves the bundle stays consistent.
+- **Suppressed sections were being rendered**: real RptToXml puts suppression
+  in `SectionFormat@EnableSuppress`, which the parser never read — 201
+  suppressed section formats in the corpus were silently included. Both the
+  real location and the legacy `Suppress` attribute are honored now.
+- **Conditional-formatting formulas surfaced**: font-color / border / section
+  condition formulas (dumped in `*ConditionFormulas` elements — dozens across
+  the corpus) were dropped invisibly. Each is now a note on the element or a
+  model issue, flowing into the conversion report and the effort estimate —
+  which is why corpus effort honestly rose (~1,610h saved, 44%, ~$241k).
+- **String `+` is now type-aware**: `{A.FIRST} + {A.LAST}` on string-typed
+  database fields becomes `&` (OpenFormula `+` fails on strings at runtime);
+  the translator now receives the parsed field-type map.
+- **Real-world page margins**: RptToXml's `<PageMargins>` child element is
+  parsed (previously only attribute-style margins, so real dumps fell back to
+  defaults).
+- **`%` no longer mistranslates**: Crystal has no binary `%`, and OpenFormula's
+  `%` is postfix percent — the token now routes to manual instead of silently
+  changing semantics.
+- **Background job registries are bounded** (assist + translate jobs; oldest
+  finished entries evicted past 50).
+- 4 new tests incl. a real-corpus assertion battery (suppression counts,
+  margins parsed, conditional formulas surfaced). 161 total. Real-corpus
+  report round-tripped through the engine post-fix.
+
 ## [1.12.0] — 2026-07-24
 
 **Project renamed: PDI-Migration → Pentaho-Migration.**
