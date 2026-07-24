@@ -50,6 +50,10 @@ def test_ladder_exercises_increasing_complexity():
 
     accounts = models["02_accounts_by_branch"]
     assert accounts.groups and accounts.summaries
+    chart_els = [el for s in accounts.sections for el in s.elements if el.kind == "chart"]
+    assert chart_els and chart_els[0].chart_type == "bar"          # migrated chart
+    assert chart_els[0].chart_category == "BR_NAME"
+    assert chart_els[0].chart_value == "BAL_AMT"
 
     register = models["03_transaction_register"]
     assert any(f.status == "auto" for f in register.formulas.values())

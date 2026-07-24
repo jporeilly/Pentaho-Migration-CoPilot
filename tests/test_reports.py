@@ -363,3 +363,41 @@ def test_fork_field_formats_resolve_by_type(tmp_path):
     layout = zipfile.ZipFile(out).read("layout.xml").decode()
     assert 'format-string="#,##0.000;-#,##0.000"' in layout
     assert 'format-string="dd/MM/yyyy"' in layout
+
+
+def test_chart_migrates_to_legacy_chart(tmp_path):
+    """A ChartObject with a fork-emitted ChartDefinition becomes a PRD legacy
+    chart (dataset collector + chart expression); unsupported styles stay
+    honest TODO placeholders."""
+    dump = tmp_path / "c.xml"
+    dump.write_text(
+        '<?xml version="1.0"?><Report Name="C" FileName="c.rpt">'
+        '<Database><Tables><Table Name="Command" ClassName="CommandTable">'
+        '<Command>SELECT 1</Command><Fields>'
+        '<Field Name="BR" ValueType="StringField"/><Field Name="AMT" ValueType="CurrencyField"/>'
+        '</Fields></Table></Tables></Database><DataDefinition/>'
+        '<ReportDefinition><Areas><Area Kind="ReportFooter"><Sections><Section Height="4000">'
+        '<ReportObjects>'
+        '<ChartObject Name="Good" Left="0" Top="0" Width="8000" Height="3000">'
+        '<ChartDefinition StyleType="crChartStyleTypePie" ChartType="crChartTypeGroup" Title="Mix">'
+        '<ConditionFields><Field FormulaName="{Command.BR}" Name="BR"/></ConditionFields>'
+        '<DataFields><Field FormulaName="Sum ({Command.AMT})" Name="AMT"/></DataFields>'
+        '</ChartDefinition></ChartObject>'
+        '<ChartObject Name="Weird" Left="0" Top="3200" Width="8000" Height="600">'
+        '<ChartDefinition StyleType="crChartStyleTypeGantt" ChartType="crChartTypeGroup" Title="G"/>'
+        '</ChartObject>'
+        '</ReportObjects></Section></Sections></Area></Areas></ReportDefinition></Report>',
+        encoding="utf-8")
+    model = load_report_model(dump)
+    footer = model.sections_of("ReportFooter")[0]
+    good = next(e for e in footer.elements if e.name == "Good")
+    assert good.kind == "chart" and good.chart_type == "pie"
+    weird = next(e for e in footer.elements if e.name == "Weird")
+    assert weird.kind == "unknown"  # Gantt -> honest TODO
+    out = tmp_path / "c.prpt"
+    write_prpt(model, out)
+    layout = zipfile.ZipFile(out).read("layout.xml").decode()
+    assert "legacy-chart" in layout
+    assert "PieChartExpression" in layout
+    assert "PieDataSetCollector" in layout
+    assert "Gantt" in layout  # TODO placeholder text present

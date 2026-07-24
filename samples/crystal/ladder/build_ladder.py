@@ -78,6 +78,17 @@ def logo(name, x, y, w, h):
             f'Width="{w*TW}" Height="{h*TW}">{data}</PictureObject>')
 
 
+def chart(name, x, y, w, h, style, title, category, value):
+    """A ChartObject shaped like the forked extractor's emission."""
+    return (f'<ChartObject Name={quoteattr(name)} Left="{x*TW}" Top="{y*TW}" '
+            f'Width="{w*TW}" Height="{h*TW}">'
+            f'<ChartDefinition StyleType="crChartStyleType{style}" ChartType="crChartTypeGroup" '
+            f'Title={quoteattr(title)} Subtitle="">'
+            f'<ConditionFields><Field FormulaName="{{Command.{category}}}" Name="{category}"/></ConditionFields>'
+            f'<DataFields><Field FormulaName="Sum ({{Command.{value}}})" Name="{value}"/></DataFields>'
+            f'</ChartDefinition></ChartObject>')
+
+
 def section(kind, name, height, objects, bg=None):
     fill = _color_el("BackgroundColor", bg) if bg else ""
     fmt = f'<SectionFormat EnableSuppress="false">{fill}</SectionFormat>'
@@ -222,7 +233,14 @@ def r2():
           areas=[masthead("Accounts by Branch", "Balances grouped by branch"),
                  column_header(cols), group_header("{Command.BR_NAME}"), detail(cols),
                  totals_footer("GroupFooter","GF","Branch total:","{#Sum of BAL_AMT}"),
-                 totals_footer("ReportFooter","RF","Grand total:","{#Grand Total BAL_AMT}",size=10,big=True),
+                 section("ReportFooter", "RF", 262, [
+                     box("RfRule", 500, 0, 306, 1, GOLD),
+                     text("GtLbl", "Grand total:", 500, 3, 150, 16, size=10, bold=True, color=NAVY),
+                     field("GtVal", "{#Grand Total BAL_AMT}", 660, 3, 130, 16, size=10,
+                           bold=True, color=GOLD, align="RightAlign"),
+                     chart("BalChart", 40, 26, 560, 230, "Bar",
+                           "Deposit balances by branch", "BR_NAME", "BAL_AMT"),
+                 ]),
                  page_footer()])
 
 

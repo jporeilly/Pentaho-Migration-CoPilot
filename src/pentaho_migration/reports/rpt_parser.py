@@ -38,6 +38,14 @@ from .rpt_xml import (
     _parse_font, _text_of, _twips,
 )
 
+CHART_STYLE_MAP = {
+    "crChartStyleTypeBar": "bar",
+    "crChartStyleTypeLine": "line",
+    "crChartStyleTypeArea": "area",
+    "crChartStyleTypePie": "pie",
+    "crChartStyleTypeDoughnut": "pie",
+}
+
 FIELD_REF_RE = re.compile(r"^\{([^}]+)\}$")
 
 SPECIAL_FIELDS = {
@@ -155,6 +163,28 @@ def _parse_object(obj):
                                  else "image/jpeg")
             except (ValueError, Exception):
                 pass
+    elif tag == "ChartObject":
+        chart_def = next((c for c in obj.iter() if _local(c.tag) == "ChartDefinition"), None)
+        style = _attr(chart_def, "StyleType", default="") if chart_def is not None else ""
+        mapped = CHART_STYLE_MAP.get(style, "")
+        if chart_def is not None and mapped:
+            el.kind = "chart"
+            el.chart_type = mapped
+            el.chart_title = _attr(chart_def, "Title", default="")
+            cond = [_attr(f, "FormulaName", default="") or _attr(f, "Name", default="")
+                    for parent in chart_def if _local(parent.tag) == "ConditionFields"
+                    for f in parent]
+            data = [_attr(f, "FormulaName", default="") or _attr(f, "Name", default="")
+                    for parent in chart_def if _local(parent.tag) == "DataFields"
+                    for f in parent]
+            el.chart_category = cond[0] if cond else ""
+            el.chart_value = data[0] if data else ""
+            el.notes.append(
+                "chart migrated as a PRD legacy chart collecting detail rows - "
+                "verify aggregation semantics match the Crystal summary")
+        else:
+            el.kind = "unknown"
+            el.text = f"ChartObject ({style or 'no definition in dump'})"
     elif tag == "SubreportObject":
         el.kind = "subreport"
         el.text = _attr(obj, "SubreportName", "Name", default="subreport")
@@ -340,6 +370,17 @@ def _parse_areas(root, model):
             pass  # index order already matches area order; nothing to do
 
 
+def _chart_column(ref, model):
+    """A chart condition/data field ('{T.F}' or 'Sum ({T.F}, ...)') -> the bare
+    query column name."""
+    if not ref:
+        return ""
+    m = re.search(r"\{(\w+)\.(\w+)\}", ref)
+    if m:
+        return m.group(2)
+    return ref.strip("{}@?#").split(".")[-1]
+
+
 def _resolve_format(el):
     """Pick the explicit format candidate matching the field's value type."""
     if el.format_string:
@@ -357,6 +398,10 @@ def _resolve_references(model):
     summary_by_name = {s.name: s for s in model.summaries}
     for section in model.sections:
         for el in section.elements:
+            if el.kind == "chart":
+                el.chart_category = _chart_column(el.chart_category, model)
+                el.chart_value = _chart_column(el.chart_value, model)
+                continue
             if el.kind != "field":
                 continue
             kind, name = parse_field_ref(el.field_ref)

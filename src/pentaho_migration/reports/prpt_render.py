@@ -124,6 +124,8 @@ def render_element(el, tp="", sp="style:"):
                     f"{_style_block(el, sp)}</{tp}date-field>")
         return (f'<{tp}text-field core:element-type="text-field" core:field={quoteattr(el.column)}>'
                 f"{_style_block(el, sp)}</{tp}text-field>")
+    if el.kind == "chart":
+        return _render_chart(el, tp, sp)
     if el.kind == "subreport":
         return render_element(_todo_label(el, f"[TODO subreport: {el.text} - convert separately]"), tp, sp)
     if el.kind == "image":
@@ -141,6 +143,55 @@ def render_element(el, tp="", sp="style:"):
                     f"</{tp}content>")
         return render_element(_todo_label(el, "[TODO image: re-embed resource]"), tp, sp)
     return render_element(_todo_label(el, f"[TODO unsupported object: {el.text or el.kind}]"), tp, sp)
+
+
+CHART_EXPRESSIONS = {
+    "bar": "org.pentaho.plugin.jfreereport.reportcharts.BarChartExpression",
+    "line": "org.pentaho.plugin.jfreereport.reportcharts.LineChartExpression",
+    "area": "org.pentaho.plugin.jfreereport.reportcharts.AreaChartExpression",
+    "pie": "org.pentaho.plugin.jfreereport.reportcharts.PieChartExpression",
+}
+NS_LEGACY_CHARTS = "http://reporting.pentaho.org/namespaces/engine/classic/legacy/charting/1.0"
+
+
+def _render_chart(el, tp, sp):
+    """A Crystal chart -> PRD legacy chart: a dataset collector over the query
+    columns plus the matching JFreeChart expression. Bar/line/area use the
+    category collector; pie uses the pie collector."""
+    expr_class = CHART_EXPRESSIONS.get(el.chart_type)
+    if not expr_class or not el.chart_value:
+        return render_element(_todo_label(el, f"[TODO chart: {el.chart_type or 'unsupported'}]"), tp, sp)
+    if el.chart_type == "pie":
+        collector = "org.pentaho.plugin.jfreereport.reportcharts.collectors.PieDataSetCollector"
+        dataset_props = (f'<property name="seriesColumn">{escape(el.chart_category)}</property>'
+                         f'<property name="valueColumn">{escape(el.chart_value)}</property>')
+    else:
+        collector = "org.pentaho.plugin.jfreereport.reportcharts.collectors.CategorySetDataCollector"
+        dataset_props = (f'<property name="categoryColumn">{escape(el.chart_category)}</property>'
+                         + (f'<property name="seriesColumn">{escape(el.chart_series)}</property>'
+                            if el.chart_series else '<property name="seriesName">'
+                            + escape(el.chart_value) + "</property>")
+                         + f'<property name="valueColumn">{escape(el.chart_value)}</property>')
+    title = el.chart_title or f"{el.chart_value} by {el.chart_category}"
+    return (
+        f'<legacy-charts:legacy-chart core:element-type="legacy-chart" '
+        f'xmlns:legacy-charts="{NS_LEGACY_CHARTS}">'
+        f"<{sp}element-style>"
+        f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
+        f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
+        f"</{sp}element-style>"
+        f'<expression attribute-namespace="{NS_LEGACY_CHARTS}" '
+        f'attribute-name="primary-dataset-expression" class="{collector}">'
+        f"<properties>{dataset_props}</properties></expression>"
+        f'<attribute-expression namespace="http://reporting.pentaho.org/namespaces/engine/attributes/core" '
+        f'name="value" class="{expr_class}">'
+        f"<properties>"
+        f'<property name="titleText">{escape(title)}</property>'
+        f'<property name="showLegend" class="java.lang.Boolean">true</property>'
+        f'<property name="backgroundColor">#ffffff</property>'
+        f'<property name="showBorder" class="java.lang.Boolean">false</property>'
+        f"</properties></attribute-expression>"
+        f"</legacy-charts:legacy-chart>")
 
 
 def _todo_label(el, text):

@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.16.0] — 2026-07-24
+
+**Charts migrate.**
+
+### Added
+
+- **Fork walks the Crystal chart model** (RAS `ChartObject.ChartDefinition` /
+  `ChartStyle`): emits `<ChartDefinition StyleType ChartType Title>` with
+  `ConditionFields` (categories) and `DataFields` (values). Verified on a
+  real corpus report: bar chart, title, category and value fields extracted.
+- **Converter renders PRD legacy charts**: bar/line/area via
+  `CategorySetDataCollector`, pie/doughnut via `PieDataSetCollector`, each
+  with the matching JFreeChart expression (title, legend). Chart columns
+  resolve through the same field-reference logic as elements; unsupported
+  styles (Gantt, gauge, …) stay honest TODO placeholders. Every migrated
+  chart carries a note that aggregation semantics should be verified.
+- **Live-verified**: ladder rung 2 gained a bar chart ("Deposit balances by
+  branch") that renders real CSCU data through the real engine — title,
+  legend, six branches, correct values. The Jakub-Syrek corpus report's
+  chart now migrates instead of a TODO placeholder.
+- 2 tests (179 total).
+
 ## [1.15.0] — 2026-07-24
 
 **The forked extractor ships — plus working prompts and Crystal-faithful layout.**

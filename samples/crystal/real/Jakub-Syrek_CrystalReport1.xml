@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\Jakub-Syrek_CrystalReport1.rpt" HasSavedData="False">
+<Report Name="" FileName="C:/Projects/Pentaho-Migration/samples/crystal-rpt/Jakub-Syrek_CrystalReport1.rpt" HasSavedData="False">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="False" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -112,6 +112,15 @@
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph1" Kind="ChartObject" Top="40" Left="60" Width="7200" Height="4320">
+                <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeGroup" Title="Sum of Freight / EmployeeID" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Employees.EmployeeID}" Name="EmployeeID" />
+                    <Field FormulaName="{Orders.Freight}" Name="Freight" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({Orders.Freight}, {Orders.Freight})" Name="Freight" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

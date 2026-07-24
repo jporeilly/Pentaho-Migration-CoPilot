@@ -61,6 +61,11 @@ class Element:
     resource_path: str = ""   # bundle path assigned by the writer for the image
     visible: bool = True       # Crystal object-level suppression
     can_grow: bool = False     # Crystal "can grow" -> PRD dynamic height
+    chart_type: str = ""       # bar | line | area | pie (kind="chart")
+    chart_title: str = ""
+    chart_category: str = ""   # resolved category column
+    chart_series: str = ""     # resolved series column (optional)
+    chart_value: str = ""      # resolved value column
     notes: list = field(default_factory=list)
 
 

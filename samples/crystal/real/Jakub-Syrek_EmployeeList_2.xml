@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\Jakub-Syrek_EmployeeList_2.rpt" HasSavedData="False">
+<Report Name="" FileName="C:/Projects/Pentaho-Migration/samples/crystal-rpt/Jakub-Syrek_EmployeeList_2.rpt" HasSavedData="False">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="False" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -105,6 +105,14 @@
                 </SectionFormat>
                 <ReportObjects>
                   <ChartObject Name="Graph1" Kind="ChartObject" Top="40" Left="60" Width="5340" Height="4320">
+                    <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeGroup" Title="Sum of Freight / EmployeeID" Subtitle="">
+                      <ConditionFields>
+                        <Field FormulaName="{Employees.EmployeeID}" Name="EmployeeID" />
+                      </ConditionFields>
+                      <DataFields>
+                        <Field FormulaName="Sum ({Orders.Freight}, {Employees.EmployeeID})" Name="Freight" />
+                      </DataFields>
+                    </ChartDefinition>
                     <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                       <BorderConditionFormulas />
                       <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -114,6 +122,16 @@
                     <ObjectFormatConditionFormulas />
                   </ChartObject>
                   <ChartObject Name="Graph2" Kind="ChartObject" Top="120" Left="5520" Width="5400" Height="4320">
+                    <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                      <ConditionFields>
+                        <Field FormulaName="{Employees.LastName}" Name="LastName" />
+                        <Field FormulaName="{Employees.FirstName}" Name="FirstName" />
+                      </ConditionFields>
+                      <DataFields>
+                        <Field FormulaName="Sum ({Orders.OrderID}, {Employees.FirstName})" Name="OrderID" />
+                        <Field FormulaName="Sum ({Orders.Freight}, {Employees.FirstName})" Name="Freight" />
+                      </DataFields>
+                    </ChartDefinition>
                     <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                       <BorderConditionFormulas />
                       <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

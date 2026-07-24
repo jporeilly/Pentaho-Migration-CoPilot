@@ -1093,6 +1093,10 @@ namespace RptToXml
 					}
 
 				}
+				else if (reportObject is ChartObject chart)
+				{
+					WriteChartDefinition(rasrdm_ro as CRReportDefModel.ChartObject, writer);
+				}
 				else if (reportObject is TextObject tobj)
 				{
                     var rasrdmTobj = (CRReportDefModel.TextObject)rasrdm_ro;
@@ -1132,6 +1136,56 @@ namespace RptToXml
 			}
 
 			writer.WriteEndElement();
+		}
+
+		// ---- fork: chart definition emission (missing from stock RptToXml) ----
+		private void WriteChartDefinition(CRReportDefModel.ChartObject rasChart, XmlWriter writer)
+		{
+			if (rasChart == null) return;
+			try
+			{
+				writer.WriteStartElement("ChartDefinition");
+				try { WriteAttributeString(writer, "StyleType", rasChart.ChartStyle.Type.ToString()); } catch { }
+				try { WriteAttributeString(writer, "ChartType", rasChart.ChartDefinition.ChartType.ToString()); } catch { }
+				try
+				{
+					var text = rasChart.ChartStyle.TextOptions;
+					if (text != null)
+					{
+						WriteAttributeString(writer, "Title", text.Title ?? "");
+						WriteAttributeString(writer, "Subtitle", text.Subtitle ?? "");
+					}
+				}
+				catch { }
+				try
+				{
+					writer.WriteStartElement("ConditionFields");
+					foreach (CRDataDefModel.Field f in rasChart.ChartDefinition.ConditionFields)
+					{
+						writer.WriteStartElement("Field");
+						WriteAttributeString(writer, "FormulaName", f.FormulaForm);
+						WriteAttributeString(writer, "Name", f.Name);
+						writer.WriteEndElement();
+					}
+					writer.WriteEndElement();
+				}
+				catch { }
+				try
+				{
+					writer.WriteStartElement("DataFields");
+					foreach (CRDataDefModel.Field f in rasChart.ChartDefinition.DataFields)
+					{
+						writer.WriteStartElement("Field");
+						WriteAttributeString(writer, "FormulaName", f.FormulaForm);
+						WriteAttributeString(writer, "Name", f.Name);
+						writer.WriteEndElement();
+					}
+					writer.WriteEndElement();
+				}
+				catch { }
+				writer.WriteEndElement();
+			}
+			catch { }
 		}
 
 		// ---- fork: per-field format emission (missing from stock RptToXml) ----
