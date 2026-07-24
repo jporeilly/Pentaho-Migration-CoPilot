@@ -104,7 +104,7 @@ def build_layout_xml(model):
                 body = inner
             return (
                 f'<group core:element-type="relational-group" '
-                f'core:group-fields={quoteattr(g.column)} core:name={quoteattr(g.name or ("Group" + str(i + 1)))}>'
+                f'core:group-fields={quoteattr(g.column)} core:name={quoteattr(g.column)}>'
                 f"<fields><field>{escape(g.column)}</field></fields>"
                 f"<group-header>{_root_band(headers, 'group-header')}</group-header>"
                 f"{body}"
@@ -231,7 +231,18 @@ def build_datadefinition_xml(model):
                  'ref="datasources/compound-ds.xml"/>')
 
     for f in model.formulas.values():
-        if f.status in ("auto", "review") and f.translation:
+        if f.rewrite_class:
+            # blocked Crystal idiom rewritten as a native PRD report function
+            # (e.g. running-total variable -> ItemSumFunction); review-flagged
+            props = []
+            if f.rewrite_field:
+                props.append(f'<property name="field">{escape(f.rewrite_field)}</property>')
+            if f.rewrite_group:
+                props.append(f'<property name="group">{escape(f.rewrite_group)}</property>')
+            body = f"<properties>{''.join(props)}</properties>" if props else ""
+            parts.append(f"<expression name={quoteattr(f.name)} "
+                         f"class=\"{f.rewrite_class}\">{body}</expression>")
+        elif f.status in ("auto", "review") and f.translation:
             parts.append(f"<expression name={quoteattr(f.name)} formula={quoteattr(f.translation)}/>")
 
     for s in model.summaries:

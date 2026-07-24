@@ -21,6 +21,29 @@ _CLAUSE_RE = re.compile(
 _PARAM_RE = re.compile(r"^\{\?(\w+)\}$")
 
 
+def _select_alias_map(sql: str) -> dict:
+    """Map SELECT-list aliases to their source expressions. Crystal Command
+    reports reference fields as {Command.ALIAS}, but SQL WHERE clauses cannot
+    use SELECT aliases - the filter must target the source column."""
+    m = re.search(r"\bSELECT\b(.*?)\bFROM\b", sql, flags=re.IGNORECASE | re.DOTALL)
+    if not m:
+        return {}
+    aliases = {}
+    for expr, alias in re.findall(
+            r'([\w.]+)\s+AS\s+"?(\w+)"?', m.group(1), flags=re.IGNORECASE):
+        aliases[alias.upper()] = expr
+    return aliases
+
+
+def _sql_column(table: str, field: str, alias_map: dict) -> str:
+    if table.lower() == "command":
+        src = alias_map.get(field.upper())
+        if src:
+            return src
+        return field  # bare column - best effort for unaliased Command fields
+    return f"{table}.{field}"
+
+
 def _sql_is_simple(sql: str) -> bool:
     upper = sql.upper()
     return (";" not in sql
@@ -40,12 +63,14 @@ def try_fold_record_selection(model) -> bool:
     if "(" in formula or ")" in formula:
         return False
 
+    alias_map = _select_alias_map(model.sql)
     clauses = []
     for part in re.split(r"\s+and\s+", formula, flags=re.IGNORECASE):
         m = _CLAUSE_RE.match(part.strip())
         if not m:
             return False  # OR / functions / unsupported shape -> stay manual
         table, field, op, rhs = m.group("table", "field", "op", "rhs")
+        column = _sql_column(table, field, alias_map)
         pm = _PARAM_RE.match(rhs)
         if pm:
             name = pm.group(1)
@@ -55,13 +80,13 @@ def try_fold_record_selection(model) -> bool:
             if prm.multi_value:
                 if op != "=":
                     return False
-                clauses.append(f"{table}.{field} IN (${{{name}}})")
+                clauses.append(f"{column} IN (${{{name}}})")
             else:
-                clauses.append(f"{table}.{field} {op} ${{{name}}}")
+                clauses.append(f"{column} {op} ${{{name}}}")
         else:
             if rhs.startswith('"'):
                 rhs = "'" + rhs[1:-1].replace("'", "''") + "'"
-            clauses.append(f"{table}.{field} {op} {rhs}")
+            clauses.append(f"{column} {op} {rhs}")
 
     if not clauses:
         return False

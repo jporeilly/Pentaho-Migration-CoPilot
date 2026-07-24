@@ -85,6 +85,9 @@ class Formula:
     name: str                 # Crystal name without {@}
     text: str                 # original Crystal formula text
     value_type: str = ""      # declared Crystal result type (for formats)
+    rewrite_class: str = ""   # PRD function class when rewritten (e.g. ItemSumFunction)
+    rewrite_field: str = ""   # the field the rewritten function aggregates
+    rewrite_group: str = ""   # optional group scope for the rewritten function
     translation: str = ""     # OpenFormula text (with leading =) when translated
     status: str = "manual"    # auto | review | manual
     notes: list = field(default_factory=list)

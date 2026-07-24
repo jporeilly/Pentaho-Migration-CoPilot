@@ -79,8 +79,16 @@ Reports are documents, not dataflows — different risks, different checklist:
   parses, eyes prove it looks right.
 - **Formulas follow the ETL rule**: deterministic first, LLM assist only for
   what rules cannot prove, every AI translation flagged review. Running
-  totals and aggregates are *report functions* in PRD, not formulas — the
-  conversion report says which function to use.
+  totals and aggregates are *report functions* in PRD, not formulas — when
+  the Crystal formula matches a known idiom (a running-total variable, or a
+  whole-formula `Sum`/`Count`/`Maximum`/`Minimum`), the converter generates
+  the PRD function itself and flags it review; anything less mechanical stays
+  a manual work item with the recommended function named in the report.
+- **Review rewritten running totals for reset semantics**: Crystal shared
+  variables persist across groups and subreports; the generated
+  `ItemSumFunction` runs report-wide by default. If the original balance
+  reset per group, add the group to the function in PRD — a one-property
+  change, which is exactly why it ships review-flagged rather than manual.
 - **Datasources are replaced, not migrated**: the .prpt points at a JNDI name
   on the Pentaho Server. Create the connection there first; report SQL with
   Crystal parameter tokens (`{?Param}`) must be re-expressed as `${Param}`.

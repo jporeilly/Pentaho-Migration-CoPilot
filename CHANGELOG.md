@@ -7,6 +7,49 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.17.0] — 2026-07-24
+
+### Added
+
+- **Blocked Crystal idioms are now rewritten, not just flagged**: when the
+  deterministic translator recognizes an untranslatable formula as a known
+  idiom, it generates the equivalent native PRD report function itself and
+  flags it `review` — answering "it suggests ItemSumFunction, so why doesn't
+  it give it a go?". Recognized today:
+  - the running-total variable idiom (`Shared NumberVar x; x := x + {T.F}; x`)
+    → `ItemSumFunction` over the field (`+ 1` counters → `ItemCountFunction`),
+    with a note to verify reset semantics;
+  - whole-formula aggregates (`Sum({T.F})`, `Sum({T.F}, {T.G})`, `Count`,
+    `Maximum`, `Minimum`) → `TotalGroupSumFunction` / `TotalGroupCountFunction`
+    / `TotalItemMaxFunction` / `TotalItemMinFunction`, group-scoped when the
+    Crystal call is.
+  Elements referencing the formula bind to the generated function
+  automatically — the flagship's `{@RunningBalance}` Balance column now
+  renders live values against CSCU (verified: per-row accumulation matches
+  the account total). All function classes verified present in PRD's
+  classic-core jar. The same rewrite framework is the landing place for
+  further idioms (Select Case chains, `%`, running averages).
+
+### Fixed
+
+- **Record-selection folding now maps `{Command.ALIAS}` to the alias's source
+  column**: SQL cannot reference SELECT aliases in `WHERE` (and there is no
+  real table named `Command`), so `{Command.MBR_NO} = {?MemberNo}` now folds
+  to `WHERE m.mbr_no = ${MemberNo}`. Previously only record selections that
+  referenced real table.column names filtered correctly.
+- **Group functions now actually reset per group**: layout groups are named
+  after their group column, matching the `group` property the generated
+  summary/rewrite functions reference. Before, groups were named `GroupN`
+  while functions referenced the column — so `ItemSumFunction` never reset
+  and multi-group totals silently accumulated across the whole report
+  (invisible in single-group demos filtered by a prompt).
+
+### Changed
+
+- **Member Statement demo defaults to a real member** (`CSCU-100501`, the
+  busiest member — 5 transactions), so the parameterized statement renders
+  meaningful rows and a visible running balance out of the box.
+
 ## [1.16.2] — 2026-07-24
 
 ### Changed

@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.16.2** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.17.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -29,7 +29,14 @@ extension: ETL exports enter **Upload → Parse → Map → Generate → Validat
 Crystal RptToXml dumps enter **Upload → Inspect → Formulas → Download** (report
 structure and datasource SQL, per-formula translation with ✨ LLM assist for
 what rules cannot prove, engine-verifiable .prpt + conversion report, effort &
-cost estimate). The ETL flow in detail:
+cost estimate). Formulas the translator *can* prove but OpenFormula can't
+express are rewritten into native PRD report functions instead of being left
+manual: running-total variables become `ItemSumFunction` / `ItemCountFunction`
+and whole-formula aggregates (`Sum`, `Count`, `Maximum`, `Minimum`) become
+`Total*` functions — generated, wired to their referencing elements, and
+flagged for review. Simple record selections fold into the SQL `WHERE`
+(alias-aware for Command-based reports), so converted parameter prompts filter
+live data. The ETL flow in detail:
 
 1. **Upload** — drag-and-drop a PowerCenter `.xml` or Talend `.item` export (format
    auto-detected by content, never by extension) — or one click on the bundled sample.
@@ -79,7 +86,7 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | Project store | `src/pentaho_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open, portfolio effort/cost totals |
 | PDI runner | `src/pentaho_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
 | PDF reports | `src/pentaho_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
-| Reports family | `src/pentaho_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser (zero failures on the 150-file real corpus), deterministic Crystal→OpenFormula translator + LLM assist for the remainder, engine-verified bundle writer (round-trip validator), guided UI flow, credential scrubbing, extraction kit, environment preflight |
+| Reports family | `src/pentaho_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser (zero failures on the 150-file real corpus), deterministic Crystal→OpenFormula translator with blocked-idiom rewrites (running totals & aggregates become native PRD report functions, review-flagged) + LLM assist for the remainder, alias-aware record-selection → SQL WHERE folding, engine-verified bundle writer (round-trip validator), chart migration, guided UI flow, credential scrubbing, forked extractor, environment preflight |
 | API | `src/pentaho_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings + reports (inspect/convert) — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 
@@ -149,10 +156,19 @@ REST syncs — 763 steps across 104 distinct components, all parsing with zero e
 Rules v2 (extended from this corpus's gap analysis) cut manual steps from 207 to 42;
 avg confidence 62/100.
 
+`samples/crystal-rpt/` holds **150 genuine Crystal Reports `.rpt` binaries**
+harvested from public GitHub repositories, with fork-extracted, credential-scrubbed
+dumps in `samples/crystal/real/`. All 150 parse with zero errors; of their 726
+formulas, **80% translate deterministically** (auto + review, including idiom
+rewrites) before any LLM assist. `samples/cr_demo/` is the demo set: six authored
+CSCU credit-union reports of increasing complexity that convert *and render live*
+against the CSCU Postgres database — including working parameter prompts, a bar
+chart, and a running balance rebuilt as a PRD report function.
+
 ## Tests & CI
 
 ```powershell
-.venv\Scripts\python -m pytest      # 108 tests, incl. docs-consistency enforcement
+.venv\Scripts\python -m pytest      # 187 tests, incl. docs-consistency enforcement
 ```
 
 GitHub Actions runs the suite and the frontend build on every push.
@@ -192,6 +208,10 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] Talend (v1.10.0): .item parser, 60+ component rules validated against a 40-job
   real corpus (versions 5.1 → 8.0.1), Java→JavaScript expression translation,
   Talend impact knowledge, 🤖 per-step AI solution suggestions
+- [x] SAP Crystal Reports → PRD (v1.11 → 1.17): RptToXml parser, formula
+  translator with idiom rewrites, LLM assist, record-selection folding,
+  Crystal-faithful layout, charts, engine round-trip validation, forked
+  extractor, CSCU live-render demo ladder
 - [ ] SSIS (.dtsx)
 - [ ] IBM DataStage (.dsx)
 

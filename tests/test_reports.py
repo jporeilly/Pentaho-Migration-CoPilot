@@ -51,16 +51,39 @@ def test_instr_swaps_args_and_flags_review():
 
 
 @pytest.mark.parametrize("crystal", [
-    "Shared NumberVar balance;\nbalance := balance + {O.AMOUNT};\nbalance",
     "WhilePrintingRecords; {O.A}",
-    "Sum({O.AMOUNT})",              # aggregates must become report functions
-    "BeforeReadingRecords({O.A})",  # unknown function
+    "Shared NumberVar x;\nx := x * 2;\nx",   # variable, but not the accumulator idiom
+    "Sum({O.AMOUNT}) + 5",                   # aggregate inside an expression
+    "BeforeReadingRecords({O.A})",           # unknown function
 ])
 def test_untranslatable_is_flagged_manual_never_guessed(crystal):
     f = translate_formula("t", crystal)
     assert f.status == "manual"
     assert f.translation == ""
     assert f.notes
+
+
+@pytest.mark.parametrize("crystal,cls,field,group", [
+    # running-total accumulator idiom -> running report function
+    ("WhilePrintingRecords;\nShared NumberVar b;\nb := b + {O.AMOUNT};\nb",
+     "ItemSumFunction", "AMOUNT", ""),
+    ("NumberVar n;\nn := n + 1;\nn", "ItemCountFunction", "", ""),
+    # whole-formula aggregates -> total report functions
+    ("Sum({O.AMOUNT})", "TotalGroupSumFunction", "AMOUNT", ""),
+    ("Sum({O.AMOUNT}, {O.BRANCH})", "TotalGroupSumFunction", "AMOUNT", "BRANCH"),
+    ("Count({O.ID}, {O.BRANCH})", "TotalGroupCountFunction", "ID", "BRANCH"),
+    ("Maximum({O.AMOUNT})", "TotalItemMaxFunction", "AMOUNT", ""),
+])
+def test_blocked_idioms_rewritten_as_report_functions(crystal, cls, field, group):
+    """Instead of only advising 'use ItemSumFunction', the translator builds
+    the PRD function itself and flags it for review."""
+    f = translate_formula("t", crystal)
+    assert f.status == "review"
+    assert f.translation == ""                 # never a fake OpenFormula guess
+    assert f.rewrite_class.endswith("." + cls)
+    assert f.rewrite_field == field
+    assert f.rewrite_group == group
+    assert any("rewritten as a PRD" in n for n in f.notes)
 
 
 # ---------------------------------------------------------------- parser
@@ -71,7 +94,9 @@ def test_parse_sample_model():
     assert model.sql.startswith("SELECT")
     assert [g.column for g in model.groups] == ["BRANCH_NAME"]
     assert [p.name for p in model.parameters] == ["Branch"]
-    assert {f.status for f in model.formulas.values()} == {"auto", "manual"}
+    assert {f.status for f in model.formulas.values()} == {"auto", "review", "manual"}
+    # the running total arrives pre-rewritten as a report function
+    assert model.formulas["RunningBalance"].rewrite_class.endswith("ItemSumFunction")
     detail = model.sections_of("Detail")[0]
     assert detail.height == 17.0  # styled detail band
     assert len(detail.elements) == 7
@@ -104,8 +129,46 @@ def test_prpt_bundle_shape(tmp_path):
     dd = zf.read("datadefinition.xml").decode()
     assert "ItemSumFunction" in dd
     assert 'name="PageofPages"' in dd
-    assert "RunningBalance" not in dd  # blocked formula stays out of the bundle
+    # the running total ships as a generated ItemSumFunction, review-flagged
+    assert 'name="RunningBalance"' in dd
+    assert "TxnRiskBand" not in dd  # truly blocked formula stays out of the bundle
     assert "CSCU" in zf.read("datasources/sql-ds.xml").decode()
+
+
+# ------------------------------------------------- record-selection folding
+
+def test_fold_maps_command_aliases_to_source_columns():
+    """{Command.ALIAS} record selections must fold to the alias's SOURCE
+    expression - SQL cannot reference SELECT aliases in WHERE (and there is
+    no real table called Command)."""
+    from pentaho_migration.reports.model import Parameter, ReportModel
+    from pentaho_migration.reports.record_selection import try_fold_record_selection
+
+    model = ReportModel(name="t")
+    model.sql = ('SELECT m.mbr_no AS "MBR_NO", t.txn_amt AS "TXN_AMT"\n'
+                 "FROM cscu_core.transactions t\n"
+                 "JOIN cscu_core.members m ON m.mbr_id = t.mbr_id\n"
+                 "ORDER BY m.mbr_no")
+    model.record_selection = "{Command.MBR_NO} = {?MemberNo}"
+    model.parameters.append(Parameter(name="MemberNo"))
+
+    assert try_fold_record_selection(model)
+    assert "WHERE m.mbr_no = ${MemberNo}" in model.sql
+    assert "Command" not in model.sql
+
+
+def test_fold_keeps_real_table_qualifiers_verbatim():
+    from pentaho_migration.reports.model import Parameter, ReportModel
+    from pentaho_migration.reports.record_selection import try_fold_record_selection
+
+    model = ReportModel(name="t")
+    model.sql = ("SELECT branches.br_name FROM cscu_core.branches "
+                 "ORDER BY branches.br_name")
+    model.record_selection = "{BRANCHES.BR_NAME} = {?Branch}"
+    model.parameters.append(Parameter(name="Branch"))
+
+    assert try_fold_record_selection(model)
+    assert "WHERE BRANCHES.BR_NAME = ${Branch}" in model.sql
 
 
 # ---------------------------------------------------------------- routing
@@ -133,7 +196,7 @@ def test_reports_inspect():
     assert summary["jndi"] == "CSCU"
     assert summary["counts"] == {
         "sections": 7, "elements": 31, "groups": 1, "parameters": 1,
-        "summaries": 2, "auto": 2, "review": 0, "manual": 2}
+        "summaries": 2, "auto": 2, "review": 1, "manual": 1}
 
 
 def test_reports_convert_full_flow():

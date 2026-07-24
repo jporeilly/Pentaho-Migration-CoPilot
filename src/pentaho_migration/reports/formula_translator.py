@@ -352,11 +352,85 @@ class _Parser:
             raise TranslationError(f"expected {symbol!r}, found {val!r}")
 
 
+# the classic Crystal running-total idiom:
+#   [WhilePrintingRecords;] [Shared|Global|Local] NumberVar X; X := X + <term>; X
+_RUNNING_TOTAL_RE = re.compile(
+    r"^(?:whileprintingrecords\s*;\s*)?"
+    r"(?:shared|global|local)?\s*numbervar\s+(?P<var>\w+)\s*;\s*"
+    r"(?P=var)\s*:=\s*(?P=var)\s*\+\s*(?P<term>\{[^}]+\}|1)\s*;\s*"
+    r"(?P=var)\s*;?\s*$",
+    re.IGNORECASE)
+
+
+# a formula whose entire body is one aggregate call: Sum({T.F}) or
+# Sum({T.F}, {T.Group}) - Crystal grand/group totals
+_WHOLE_AGGREGATE_RE = re.compile(
+    r"^(?P<op>sum|count|maximum|minimum)\s*\(\s*\{(?P<field>[^}]+)\}\s*"
+    r"(?:,\s*\{(?P<group>[^}]+)\}\s*)?\)$",
+    re.IGNORECASE)
+
+_FUNC_PKG = "org.pentaho.reporting.engine.classic.core.function."
+_AGGREGATE_CLASS = {              # classes verified against PRD classic-core
+    "sum": _FUNC_PKG + "TotalGroupSumFunction",
+    "count": _FUNC_PKG + "TotalGroupCountFunction",
+    "maximum": _FUNC_PKG + "TotalItemMaxFunction",
+    "minimum": _FUNC_PKG + "TotalItemMinFunction",
+}
+
+
+def _bare_column(field_ref):
+    return field_ref.strip("{}").split(".")[-1].lstrip("@?#")
+
+
+def detect_rewrite(text):
+    """(function_class, field, group, why) when a blocked Crystal idiom maps
+    mechanically onto a native PRD report function; None otherwise.
+
+    Recognized today: the running-total variable idiom (-> ItemSumFunction /
+    ItemCountFunction) and whole-formula aggregates like Sum({T.F}, {T.G})
+    (-> Total*Function). Same principle extends to further idioms over time:
+    generate the function for review instead of only advising."""
+    normalized = re.sub(r"//[^\n]*", "", text)
+    normalized = " ".join(normalized.split())
+
+    m = _RUNNING_TOTAL_RE.match(normalized)
+    if m:
+        term = m.group("term")
+        if term == "1":
+            return (_FUNC_PKG + "ItemCountFunction", "", "", "running-count variable")
+        return (_FUNC_PKG + "ItemSumFunction", _bare_column(term), "",
+                "running-total variable")
+
+    m = _WHOLE_AGGREGATE_RE.match(normalized)
+    if m:
+        cls = _AGGREGATE_CLASS[m.group("op").lower()]
+        group = _bare_column("{%s}" % m.group("group")) if m.group("group") else ""
+        return (cls, _bare_column("{%s}" % m.group("field")), group,
+                f"{m.group('op')} aggregate")
+    return None
+
+
 def translate_formula(name, text, field_types=None):
     """Translate one Crystal formula. Returns a Formula with status filled in.
     `field_types` (bare column -> Crystal ValueType) enables type-aware
     decisions like string '+' -> '&'."""
     f = Formula(name=name, text=text)
+    rewrite = detect_rewrite(text)
+    if rewrite is not None:
+        f.rewrite_class, f.rewrite_field, f.rewrite_group, why = rewrite
+        f.status = "review"
+        kind = f.rewrite_class.rsplit(".", 1)[-1]
+        note = (f"{why} rewritten as a PRD {kind}"
+                + (f" over [{f.rewrite_field}]" if f.rewrite_field else "")
+                + (f" grouped by [{f.rewrite_group}]" if f.rewrite_group else ""))
+        if "running" in why:
+            note += (" - verify reset semantics (Crystal shared variables persist "
+                     "across groups and subreports; add a group to the function "
+                     "to reset per group)")
+        else:
+            note += " - verify scope matches the Crystal placement"
+        f.notes.append(note)
+        return f
     stripped = re.sub(r"//[^\n]*", "", text)
     for pattern, why in BLOCKER_PATTERNS:
         if re.search(pattern, stripped):

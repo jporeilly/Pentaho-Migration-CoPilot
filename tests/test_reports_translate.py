@@ -48,21 +48,24 @@ class AdviceOnlyTranslator(ExpressionTranslator):
 def test_manual_formula_becomes_review():
     model = load_report_model(SAMPLE)
     count = translate_manual_formulas(model, FakeTranslator(OLLAMA_SETTINGS))
-    assert count == 2
-    f = model.formulas["RunningBalance"]
+    assert count == 1                       # only TxnRiskBand is still manual
+    f = model.formulas["TxnRiskBand"]
     assert f.status == "review"
     assert f.translation == "=[AMOUNT] * 1"
     assert any("AI-translated" in n for n in f.notes)
     assert any("LLM confidence: medium" in n for n in f.notes)
     # the auto formulas were never sent to the LLM
     assert model.formulas["FullName"].status == "auto"
+    # the pre-rewritten running total was never sent either
+    rb = model.formulas["RunningBalance"]
+    assert rb.rewrite_class and rb.translation == ""
 
 
 def test_untranslatable_keeps_manual_but_gains_advice():
     model = load_report_model(SAMPLE)
     count = translate_manual_formulas(model, AdviceOnlyTranslator(OLLAMA_SETTINGS))
     assert count == 0
-    f = model.formulas["RunningBalance"]
+    f = model.formulas["TxnRiskBand"]
     assert f.status == "manual"
     assert f.translation == ""
     assert any("ItemSumFunction" in n for n in f.notes)
@@ -95,7 +98,7 @@ def test_api_translate_job(monkeypatch):
             break
         time.sleep(0.1)
     assert state["status"] == "done"
-    assert state["translated"] == 2
+    assert state["translated"] == 1
 
     result = state["result"]
     counts = result["summary"]["counts"]

@@ -61,7 +61,9 @@ def test_ladder_exercises_increasing_complexity():
     statement = models["04_member_statement"]
     assert len(statement.groups) == 2                       # nested groups
     assert statement.parameters                             # parameter
-    assert any(f.status == "manual" for f in statement.formulas.values())  # running total
+    running = statement.formulas["RunningBalance"]        # running total is
+    assert running.status == "review"                     # auto-rewritten as a
+    assert running.rewrite_class.endswith("ItemSumFunction")  # report function
 
     loans = models["05_loan_portfolio"]
     assert any("StdDeviation" in i for i in loans.issues)   # unsupported aggregate flagged
