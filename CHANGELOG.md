@@ -17,7 +17,7 @@ The scope now spans ETL *and* BI reports, not just PDI.
 
 - **GitHub repository**: `jporeilly/Pentaho-Migration-CoPilot` (old URLs
   redirect); local folder `C:\Projects\Pentaho-Migration`.
-- **Python package**: `pdi_migration` → `pentaho_migration`; distribution
+- **Python package**: the old `pdi`-prefixed module → `pentaho_migration`; distribution
   `pentaho-migration` (66-file sweep, guard test keeps it that way).
 - **CLI**: `pentaho-migrate`, with `pdi-migrate` kept as a working legacy
   alias — existing muscle memory and scripts keep working.
