@@ -6,7 +6,7 @@ using the SAME formatting elements real RptToXml emits — nested <Color>,
 the polish is genuinely carried from the "Crystal source" through conversion,
 not injected by the writer.
 
-Run:  python samples/crystal/ladder/build_ladder.py
+Run:  python samples/cr_demo/build_ladder.py
 """
 
 import base64
@@ -399,7 +399,7 @@ def flagship():
             ("Risk", "{@RiskFlag}", 70, "HorizontalCenterAlign", "StringField"),
             ("Band", "{@TxnRiskBand}", 110, None, "StringField")]
     global OUT
-    prev, OUT = OUT, OUT.parent
+    prev, OUT = OUT, OUT.parent / "crystal"
     try:
         _NAME_TO_FILE.clear()
         build("Branch Transaction Summary", "branch_transactions.xml",
@@ -444,4 +444,4 @@ if __name__ == "__main__":
     flagship()
     for f in sorted(OUT.glob("0*.xml")):
         print("wrote", f.name)
-    print("wrote ../branch_transactions.xml")
+    print("wrote ../crystal/branch_transactions.xml (flagship UI sample)")

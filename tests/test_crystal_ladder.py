@@ -15,7 +15,7 @@ import pytest
 from pentaho_migration.reports import load_report_model, write_prpt
 from pentaho_migration.reports.effort import count_todos
 
-LADDER = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "ladder"
+LADDER = Path(__file__).resolve().parents[1] / "samples" / "cr_demo"
 RUNGS = sorted(LADDER.glob("0*.xml"))
 
 

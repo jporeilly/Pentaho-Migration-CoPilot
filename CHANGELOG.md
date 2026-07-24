@@ -7,6 +7,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.16.1] — 2026-07-24
+
+### Changed
+
+- **CSCU demo reports moved to `samples/cr_demo/`** (was
+  `samples/crystal/ladder/`): the six authored Crystal reports that resolve
+  against the live CSCU database — the demo/golden-path set — now live in a
+  clearly-named folder. The flagship UI sample stays at
+  `samples/crystal/branch_transactions.xml` (the `/reports/sample` endpoint
+  serves it); the generator writes both.
+
 ## [1.16.0] — 2026-07-24
 
 **Charts migrate.**

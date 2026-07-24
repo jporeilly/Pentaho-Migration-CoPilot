@@ -1,4 +1,4 @@
-# CSCU migration ladder
+# CSCU Crystal Reports demo set (cr_demo)
 
 Six authored RptToXml dumps of **increasing complexity**, all backed by the
 live `cscu_core` credit-union schema so each one **converts and renders
@@ -8,7 +8,7 @@ stays the parser's real-world *variety* test.
 
 These are authored dumps, not extracted from `.rpt` binaries — the converter
 consumes RptToXml XML, so no Crystal Reports Designer is needed to test it.
-Regenerate with `python samples/crystal/ladder/build_ladder.py`.
+Regenerate with `python samples/cr_demo/build_ladder.py`.
 
 | # | Report | Introduces | Convert outcome |
 |---|--------|-----------|-----------------|
@@ -30,7 +30,7 @@ real data (in Report Designer, or headless):
 
 1. Add a `CSCU` datasource to PRD's JNDI config pointing at the cscu_core
    Postgres database (host, port 5433, database `cscu_core`).
-2. Convert: `pentaho-migrate report samples/crystal/ladder/03_transaction_register.xml --jndi CSCU`
+2. Convert: `pentaho-migrate report samples/cr_demo/03_transaction_register.xml --jndi CSCU`
 3. Open the `.prpt` in Report Designer and Preview, or use `👁 PDF preview`
    in the web UI for an empty-data layout render.
 
