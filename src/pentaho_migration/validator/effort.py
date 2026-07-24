@@ -31,19 +31,19 @@ def _vol(n: int) -> float:
 
 # Remaining-work heuristics with Copilot output (hours per first-instance;
 # volume discounted by SCALE)
-COPILOT_BASE = 0.5          # connections, import, publish
-COPILOT_AUTO_STEP = 0.05    # eyeball an auto-converted step
-COPILOT_REVIEW_STEP = 0.4   # verify an assumption/AI-translated step
-COPILOT_MANUAL_STEP = 2.0   # hand-convert an unmapped step
-COPILOT_UNTRANSLATED = 0.15 # translate + wire one expression by hand
-COPILOT_REVIEW_EXPR = 0.05  # verify one AI-translated expression
-COPILOT_TEST_OVERHEAD = 0.20
+COPILOT_BASE = 0.35         # connections, import, publish
+COPILOT_AUTO_STEP = 0.03    # eyeball an auto-converted step
+COPILOT_REVIEW_STEP = 0.3   # verify an assumption/AI-translated step
+COPILOT_MANUAL_STEP = 1.5   # hand-convert an unmapped step
+COPILOT_UNTRANSLATED = 0.1  # translate + wire one expression by hand
+COPILOT_REVIEW_EXPR = 0.03  # verify one AI-translated expression
+COPILOT_TEST_OVERHEAD = 0.15
 
 # From-scratch rebuild heuristics (hours per first-instance; SCALE-discounted)
-MANUAL_BASE = 1.0
-MANUAL_STEP = 1.2           # analyze + rebuild one transformation step
-MANUAL_EXPR = 0.2           # re-derive one expression
-MANUAL_TEST_OVERHEAD = 0.25
+MANUAL_BASE = 0.75
+MANUAL_STEP = 1.0           # analyze + rebuild one transformation step
+MANUAL_EXPR = 0.15          # re-derive one expression
+MANUAL_TEST_OVERHEAD = 0.20
 
 
 def _round_half(x: float) -> float:

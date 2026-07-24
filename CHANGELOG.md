@@ -7,6 +7,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.13.1] — 2026-07-24
+
+**CSCU end-to-end ladder + recalibrated effort estimates.**
+
+### Added
+
+- **`samples/crystal/ladder/`: six authored CSCU reports of increasing
+  complexity** (member roster → accounts-by-branch → transaction register →
+  member statement → loan portfolio → suspicious-activity), all backed by the
+  live `cscu_core` schema. Unlike the GitHub corpus, these **convert AND
+  render end-to-end against the real database** — the golden-path regression
+  and demo set. Reproducible via `build_ladder.py`; rungs 4-6 deliberately
+  exercise the honest-flagging path (running total → manual, StdDev + no PRD
+  function, subreport/image/cross-tab → TODO placeholders).
+- **`test_crystal_ladder.py`**: converts every rung to a valid bundle,
+  asserts each introduces new complexity and that hard cases are flagged not
+  dropped; opt-in live render (`CSCU_LIVE=1`). **All six verified rendering
+  live CSCU data** through the real Pentaho engine (member names, grouping,
+  totals, formulas — proven, not asserted-in-a-vacuum).
+- Fixed the UI sample's SQL to the real cscu_core schema (transactions link
+  to member/branch only through `accounts`); JNDI `CSCU`.
+
+### Changed
+
+- **Effort estimates recalibrated to real consulting numbers.** Per-artifact
+  costs were too high: a moderate report now estimates ~0.5-1h with Copilot
+  vs ~3-4h manual (was ~2h/6.5h), a simple roster ~0.5h/1.5h, a complex loan
+  report ~1.5h/5.5h. Base/overhead constants lowered on both families
+  (reports and ETL); sub-linear volume scaling retained.
+
 ## [1.13.0] — 2026-07-24
 
 **Reports join the portfolio; previews land; the UI explains itself.**

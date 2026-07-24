@@ -9,24 +9,29 @@ from pentaho_migration.reports.model import ReportModel
 from pentaho_migration.validator.effort import SCALE, EffortEstimate, _round_half, _vol
 
 # Remaining work on a converted .prpt (hours per first-instance; volume
-# discounted sub-linearly — see validator/effort.py SCALE)
-COPILOT_BASE = 0.5          # datasource wiring, layout eyeball, publish
-COPILOT_AUTO_FORMULA = 0.03
-COPILOT_REVIEW_FORMULA = 0.15
-COPILOT_MANUAL_FORMULA = 0.6
-COPILOT_TODO = 0.75         # subreport / image / conditional-format placeholder
-COPILOT_PARAM = 0.1         # wire ${param} into the query, test prompt
-COPILOT_TEST_OVERHEAD = 0.20
+# discounted sub-linearly — see validator/effort.py SCALE). Calibrated so a
+# moderate report (7 fields, 1 group, a few formulas) lands well under an
+# hour: the converter did the layout, the human verifies and wires the JNDI.
+COPILOT_BASE = 0.25         # verify JNDI, eyeball layout, publish
+COPILOT_AUTO_FORMULA = 0.02
+COPILOT_REVIEW_FORMULA = 0.1
+COPILOT_MANUAL_FORMULA = 0.4
+COPILOT_TODO = 0.4          # subreport / image / conditional-format placeholder
+COPILOT_PARAM = 0.05        # wire ${param} into the query, test prompt
+COPILOT_TEST_OVERHEAD = 0.15
 
-# From-scratch rebuild in PRD (hours per first-instance; SCALE-discounted)
-MANUAL_BASE = 2.0           # datasource, page setup, band scaffolding
-MANUAL_ELEMENT = 0.05       # place + style one element
-MANUAL_FORMULA = 0.5
-MANUAL_SUMMARY = 0.3
-MANUAL_GROUP = 0.4
-MANUAL_PARAM = 0.2
-MANUAL_TODO = 1.0
-MANUAL_TEST_OVERHEAD = 0.20
+# From-scratch rebuild in PRD (hours per first-instance; SCALE-discounted).
+# Calibrated so the same moderate report is ~2-3h by hand: build the
+# datasource, lay out the bands, place and style fields, write the formulas,
+# add groups/summaries, and test.
+MANUAL_BASE = 1.0           # datasource, page setup, band scaffolding
+MANUAL_ELEMENT = 0.04       # place + style one element
+MANUAL_FORMULA = 0.35
+MANUAL_SUMMARY = 0.25
+MANUAL_GROUP = 0.3
+MANUAL_PARAM = 0.15
+MANUAL_TODO = 0.75
+MANUAL_TEST_OVERHEAD = 0.15
 
 
 def count_todos(model: ReportModel) -> int:
