@@ -61,8 +61,13 @@ def _needs_page_function(model):
 
 def _style_block(el, sp):
     parts = [f"<{sp}element-style>"]
+    common = []
     if el.align:
-        parts.append(f'<{sp}common-styles alignment="{el.align}"/>')
+        common.append(f'alignment="{el.align}"')
+    if el.valign:
+        common.append(f'vertical-alignment="{el.valign}"')
+    if common:
+        parts.append(f'<{sp}common-styles {" ".join(common)}/>')
     text_attrs = [f'font-face={quoteattr(el.font.name)}', f'font-size="{_num(el.font.size)}"']
     if el.font.bold:
         text_attrs.append('bold="true"')
@@ -73,10 +78,26 @@ def _style_block(el, sp):
     parts.append(f'<{sp}text-styles {" ".join(text_attrs)}/>')
     if el.font.color:
         parts.append(f'<{sp}content-styles color={quoteattr(el.font.color)}/>')
+    border = _border_styles(el, sp)
+    if border:
+        parts.append(border)
     parts.append(f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
                  f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>')
     parts.append(f"</{sp}element-style>")
     return "".join(parts)
+
+
+def _border_styles(el, sp):
+    """A border-styles element carrying background fill and/or a border, when
+    the element defines them. PRD paints element backgrounds this way."""
+    attrs = []
+    if el.bg_color:
+        attrs.append(f"background-color={quoteattr(el.bg_color)}")
+    if el.border_width and el.border_color:
+        attrs.append(f'border-width="{_num(el.border_width)}"')
+        attrs.append(f"border-color={quoteattr(el.border_color)}")
+        attrs.append('border-style="solid"')
+    return f'<{sp}border-styles {" ".join(attrs)}/>' if attrs else ""
 
 
 def _line_style(el, sp):
@@ -108,10 +129,14 @@ def render_element(el, tp="", sp="style:"):
     if el.kind == "line":
         return f'<{tp}horizontal-line core:element-type="horizontal-line">{_line_style(el, sp)}</{tp}horizontal-line>'
     if el.kind == "box":
+        fill = el.bg_color or el.font.color
+        stroke = el.border_color or "black"
         return (f'<{tp}rectangle core:element-type="rectangle" core:arc-width="0.0" core:arc-height="0.0">'
                 f"<{sp}element-style>"
-                f'<{sp}content-styles draw-shape="true" fill-shape="false" scale="true" '
-                f'color="black" stroke-weight="1" stroke-style="solid"/>'
+                f'<{sp}content-styles draw-shape="{str(bool(el.border_width)).lower()}" '
+                f'fill-shape="{str(bool(el.bg_color)).lower()}" scale="true" '
+                f'color={quoteattr(stroke)} fill-color={quoteattr(fill)} '
+                f'stroke-weight="{_num(el.border_width or 1)}" stroke-style="solid"/>'
                 f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
                 f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
                 f"</{sp}element-style></{tp}rectangle>")
@@ -141,6 +166,18 @@ def render_element(el, tp="", sp="style:"):
     if el.kind == "subreport":
         return render_element(_todo_label(el, f"[TODO subreport: {el.text} - convert separately]"), tp, sp)
     if el.kind == "image":
+        if el.image_bytes and el.resource_path:
+            # a real embedded raster carried from the Crystal report
+            key = ("resourcekey:org.pentaho.reporting.libraries.docbundle.bundleloader."
+                   f"RepositoryResourceBundleLoader;{el.resource_path};")
+            return (f'<{tp}content core:element-type="content">'
+                    f"<{sp}element-style>"
+                    f'<{sp}content-styles scale="true" keep-aspect-ratio="true"/>'
+                    f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
+                    f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
+                    f"</{sp}element-style>"
+                    f'<core:value resource-type="resource-key">{escape(key)}</core:value>'
+                    f"</{tp}content>")
         return render_element(_todo_label(el, "[TODO image: re-embed resource]"), tp, sp)
     return render_element(_todo_label(el, f"[TODO unsupported object: {el.text or el.kind}]"), tp, sp)
 
@@ -152,18 +189,22 @@ def _todo_label(el, text):
 
 
 def _band_content(sections, band_type, tp="", sp="style:"):
-    """Merge one or more Crystal sections of an area into a single PRD band."""
-    inner, y_offset = [], 0.0
+    """Merge one or more Crystal sections of an area into a single PRD band.
+    Returns (inner_xml, height, bg_color) — the first styled section supplies
+    the band background."""
+    inner, y_offset, bg = [], 0.0, ""
     for section in sections:
         if section.suppressed:
             continue
+        if section.bg_color and not bg:
+            bg = section.bg_color
         for el in section.elements:
             if y_offset:
                 el = _shifted(el, y_offset)
             inner.append(render_element(el, tp, sp))
         y_offset += section.height
     height = max(y_offset, 20.0)
-    return "".join(inner), height
+    return "".join(inner), height, bg
 
 
 def _shifted(el, dy):
@@ -174,11 +215,16 @@ def _shifted(el, dy):
 
 
 def _root_band(sections, element_type):
-    content, height = _band_content(sections, element_type)
+    content, height, bg = _band_content(sections, element_type)
+    style = ""
+    if bg:
+        style = ("<style:element-style>"
+                 f'<style:border-styles background-color={quoteattr(bg)}/>'
+                 "</style:element-style>")
     return (f'<root-level-content core:element-type="{element_type}" '
             f'xmlns:report-designer="http://reporting.pentaho.org/namespaces/report-designer/2.0" '
             f'report-designer:visual-height="{_num(height)}">'
-            f"{content}</root-level-content>")
+            f"{style}{content}</root-level-content>")
 
 
 # ---------------------------------------------------------------- layout.xml
@@ -236,10 +282,15 @@ def build_layout_xml(model):
 
 # ---------------------------------------------------------------- styles.xml
 
+def _page_band_bg(bg):
+    return (f'<element-style><border-styles background-color={quoteattr(bg)}/></element-style>'
+            if bg else "")
+
+
 def build_styles_xml(model):
     p = model.page
-    ph_content, _ = _band_content(model.sections_of("PageHeader"), "page-header", tp="layout:", sp="")
-    pf_content, _ = _band_content(model.sections_of("PageFooter"), "page-footer", tp="layout:", sp="")
+    ph_content, _, ph_bg = _band_content(model.sections_of("PageHeader"), "page-header", tp="layout:", sp="")
+    pf_content, _, pf_bg = _band_content(model.sections_of("PageFooter"), "page-footer", tp="layout:", sp="")
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<style xmlns="{NS_STYLE}" xmlns:layout="{NS_LAYOUT}" xmlns:core="{NS_CORE}">'
@@ -248,8 +299,8 @@ def build_styles_xml(model):
         f'margin-left="{_num(p.margin_left)}" margin-bottom="{_num(p.margin_bottom)}" '
         f'margin-right="{_num(p.margin_right)}"/>'
         '<layout:watermark core:element-type="watermark"></layout:watermark>'
-        f'<layout:page-header core:element-type="page-header">{ph_content}</layout:page-header>'
-        f'<layout:page-footer core:element-type="page-footer">{pf_content}</layout:page-footer>'
+        f'<layout:page-header core:element-type="page-header">{_page_band_bg(ph_bg)}{ph_content}</layout:page-header>'
+        f'<layout:page-footer core:element-type="page-footer">{_page_band_bg(pf_bg)}{pf_content}</layout:page-footer>'
         "</style>")
 
 
@@ -352,19 +403,36 @@ def build_meta_xml(model):
 
 
 def build_manifest_xml(entries):
+    """entries: {path: media-type}."""
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">',
              f'  <manifest:file-entry manifest:full-path="/" manifest:media-type="{MIMETYPE}"/>']
     for name in sorted(entries):
         lines.append(f'  <manifest:file-entry manifest:full-path="{escape(name)}" '
-                     'manifest:media-type="text/xml"/>')
+                     f'manifest:media-type="{entries[name]}"/>')
     lines.append("</manifest:manifest>")
     return "\n".join(lines)
+
+
+def _collect_images(model):
+    """Assign a bundle resource path to every embedded image and return
+    {path: bytes}. Mutates el.resource_path so the layout can reference it."""
+    resources, idx = {}, 0
+    for section in model.sections:
+        for el in section.elements:
+            if el.kind == "image" and el.image_bytes:
+                idx += 1
+                ext = "png" if "png" in (el.image_mime or "") else "jpg"
+                path = f"resources/image{idx}.{ext}"
+                el.resource_path = path
+                resources[path] = el.image_bytes
+    return resources
 
 
 # ------------------------------------------------------------------ bundle
 
 def write_prpt(model, out_path):
+    images = _collect_images(model)  # assigns resource paths before layout is built
     docs = {
         "content.xml": CONTENT_XML,
         "layout.xml": build_layout_xml(model),
@@ -376,7 +444,10 @@ def write_prpt(model, out_path):
         "datasources/sql-ds.xml": build_sql_ds_xml(model),
         "datasources/compound-ds.xml": build_compound_ds_xml(),
     }
-    manifest = build_manifest_xml(docs.keys())
+    media = {name: "text/xml" for name in docs}
+    for path, data in images.items():
+        media[path] = "image/png" if path.endswith(".png") else "image/jpeg"
+    manifest = build_manifest_xml(media)
 
     with zipfile.ZipFile(out_path, "w") as zf:
         info = zipfile.ZipInfo("mimetype")
@@ -384,4 +455,6 @@ def write_prpt(model, out_path):
         zf.writestr("META-INF/manifest.xml", manifest, compress_type=zipfile.ZIP_DEFLATED)
         for name, doc in docs.items():
             zf.writestr(name, doc, compress_type=zipfile.ZIP_DEFLATED)
+        for path, data in images.items():
+            zf.writestr(path, data, compress_type=zipfile.ZIP_DEFLATED)
     return out_path

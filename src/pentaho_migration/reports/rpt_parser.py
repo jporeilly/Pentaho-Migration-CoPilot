@@ -91,6 +91,59 @@ def parse_field_ref(ref):
     return "unknown", ref
 
 
+def _argb_to_hex(node):
+    """RptToXml dumps colors as <Color/BackgroundColor/... A R G B> children.
+    Return #rrggbb, or "" when fully transparent / absent."""
+    if node is None:
+        return ""
+    try:
+        a = int(_attr(node, "A", default="255"))
+        r = int(_attr(node, "R", default="0"))
+        g = int(_attr(node, "G", default="0"))
+        b = int(_attr(node, "B", default="0"))
+    except ValueError:
+        return ""
+    if a == 0:
+        return ""  # transparent -> no fill
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def _local(tag):
+    return tag.rsplit("}", 1)[-1]
+
+
+def _find_color(obj, tag_name, max_depth=None):
+    """First color child with exactly this local tag name in the subtree
+    (exact match so 'Color' does not catch 'BackgroundColor'/'BorderColor')."""
+    for child in obj.iter():
+        if _local(child.tag) == tag_name:
+            hexval = _argb_to_hex(child)
+            if hexval:
+                return hexval
+    return ""
+
+
+LINE_STYLE_ATTRS = ("TopLineStyle", "BottomLineStyle", "LeftLineStyle", "RightLineStyle")
+
+
+def _parse_border(obj):
+    """(border_color, border_width) from an object's <Border> child. A border
+    exists when any side has a line style other than NoLine."""
+    border = None
+    for child in obj.iter():
+        if child.tag.endswith("Border"):
+            border = child
+            break
+    if border is None:
+        return "", 0.0
+    has_line = any(_attr(border, a, default="NoLine") not in ("NoLine", "", "0")
+                   for a in LINE_STYLE_ATTRS)
+    if not has_line:
+        return "", 0.0
+    color = _find_color(border, "BorderColor") or "#000000"
+    return color, 1.0
+
+
 def _parse_font(obj):
     font = Font()
     fnode = obj.find("Font")
@@ -109,6 +162,12 @@ def _parse_font(obj):
     color = _attr(obj, "Color", "FontColor", default="") or _attr(src, "Color", default="")
     if color.startswith("#"):
         font.color = color
+    else:
+        # real RptToXml dumps the font colour as a <Color A R G B> child of the
+        # object (a sibling of <Font>), so search the object, not the font node
+        nested = _find_color(obj, "Color")
+        if nested:
+            font.color = nested
     return font
 
 
@@ -153,6 +212,11 @@ def _parse_object(obj):
     )
     el.align = ALIGN_MAP.get(
         _attr(obj, "HorizontalAlignment", "Alignment", default="").lower(), "")
+    el.valign = {"top": "top", "middle": "middle", "bottom": "bottom"}.get(
+        _attr(obj, "VerticalAlignment", default="").lower().replace("align", ""), "")
+    # formatting carried from the Crystal object (real RptToXml color children)
+    el.bg_color = _find_color(obj, "BackgroundColor")
+    el.border_color, el.border_width = _parse_border(obj)
 
     if tag == "TextObject":
         el.kind = "label"
@@ -168,6 +232,21 @@ def _parse_object(obj):
         el.kind = "box"
     elif tag == "PictureObject":
         el.kind = "image"
+        # richer RptToXml forks export the raster as base64 (ImageData child or
+        # ImageBase64 attr) — carry it so the logo survives the migration
+        raw_b64 = _attr(obj, "ImageBase64", "ImageData", default="")
+        if not raw_b64:
+            data_node = obj.find("ImageData")
+            if data_node is not None and data_node.text:
+                raw_b64 = data_node.text.strip()
+        if raw_b64:
+            import base64
+            try:
+                el.image_bytes = base64.b64decode(raw_b64)
+                el.image_mime = ("image/png" if el.image_bytes[:8] == b"\x89PNG\r\n\x1a\n"
+                                 else "image/jpeg")
+            except (ValueError, Exception):
+                pass
     elif tag == "SubreportObject":
         el.kind = "subreport"
         el.text = _attr(obj, "SubreportName", "Name", default="subreport")
@@ -306,12 +385,21 @@ def _parse_areas(root, model):
             if fmt is not None:
                 suppressed = suppressed or \
                     _attr(fmt, "EnableSuppress", default="false").lower() in ("true", "1")
+            # band background: SectionFormat's direct <BackgroundColor> child
+            # (skip the fully-transparent white default the corpus emits)
+            band_bg = ""
+            if fmt is not None:
+                for child in fmt:
+                    if _local(child.tag) == "BackgroundColor":
+                        band_bg = _argb_to_hex(child)
+                        break
             section = Section(
                 area_kind=kind,
                 name=_attr(sec, "Name", default=""),
                 height=_twips(sec, "Height", default=20.0) or 20.0,
                 group_index=group_index,
                 suppressed=suppressed,
+                bg_color=band_bg if band_bg not in ("#ffffff",) else "",
             )
             if fmt is not None:
                 model.issues.extend(_conditional_formula_notes(

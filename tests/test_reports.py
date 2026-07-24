@@ -73,14 +73,14 @@ def test_parse_sample_model():
     assert [p.name for p in model.parameters] == ["Branch"]
     assert {f.status for f in model.formulas.values()} == {"auto", "manual"}
     detail = model.sections_of("Detail")[0]
-    assert detail.height == 16.0  # 320 twips -> 16 points
-    assert len(detail.elements) == 6
+    assert detail.height == 17.0  # styled detail band
+    assert len(detail.elements) == 7
 
 
 def test_summary_resolves_to_function_reference():
     model = load_report_model(SAMPLE)
     footer = model.sections_of("GroupFooter")[0]
-    total = next(e for e in footer.elements if e.name == "BranchTotal")
+    total = next(e for e in footer.elements if e.name == "GFVal")
     assert total.column == "Sum_AMOUNT_BRANCH_NAME"
 
 
@@ -132,7 +132,7 @@ def test_reports_inspect():
     assert summary["name"] == "Branch Transaction Summary"
     assert summary["jndi"] == "CSCU"
     assert summary["counts"] == {
-        "sections": 7, "elements": 21, "groups": 1, "parameters": 1,
+        "sections": 7, "elements": 31, "groups": 1, "parameters": 1,
         "summaries": 2, "auto": 2, "review": 0, "manual": 2}
 
 
@@ -216,7 +216,7 @@ def test_unsupported_summary_becomes_todo_not_broken_reference(tmp_path):
     model = load_report_model(dump)
     assert any("StdDeviation" in issue for issue in model.issues)
     footer = model.sections_of("ReportFooter")[0]
-    el = next(e for e in footer.elements if e.name == "GrandTotal")
+    el = next(e for e in footer.elements if e.name == "RFVal")
     assert el.kind == "unknown"  # rendered as TODO placeholder, not number-field
     out = tmp_path / "r.prpt"
     write_prpt(model, out)
@@ -241,3 +241,24 @@ def test_real_dump_suppression_and_margins():
     assert suppressed > 100     # corpus has 201 EnableSuppress="True" formats
     assert margins > 50         # real dumps carry PageMargins children
     assert conditional > 50     # conditional formatting surfaced, not dropped
+
+
+def test_professional_formatting_carries_through(tmp_path):
+    """Colours, borders, band backgrounds and an embedded logo authored in the
+    Crystal source must survive parse -> convert into the .prpt."""
+    model = load_report_model(SAMPLE, jndi="CSCU")
+    mast = model.sections_of("ReportHeader")[0]
+    assert mast.bg_color == "#133346"                       # navy band background
+    title = next(e for e in mast.elements if e.name == "Title")
+    assert title.font.color == "#ffffff" and title.font.bold
+    logo = [e for e in mast.elements if e.kind == "image" and e.image_bytes]
+    assert logo, "embedded logo image not carried from the dump"
+
+    out = tmp_path / "styled.prpt"
+    write_prpt(model, out)
+    zf = zipfile.ZipFile(out)
+    assert "resources/image1.png" in zf.namelist()          # logo bundled
+    assert "image/png" in zf.read("META-INF/manifest.xml").decode()
+    layout = zf.read("layout.xml").decode()
+    assert "#133346" in layout                              # navy carried
+    assert "background-color" in zf.read("styles.xml").decode()  # page-header fill

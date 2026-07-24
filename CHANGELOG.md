@@ -7,6 +7,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.14.0] — 2026-07-24
+
+**Professional report formatting — carried from the Crystal source, not injected.**
+
+### Added
+
+- **Rich formatting is now migrated**, and it is genuinely *read from the
+  Crystal report*: the parser reads RptToXml's real representation — nested
+  `<Color>` / `<BackgroundColor>` / `<BorderColor>` (ARGB) elements, `<Border>`
+  line styles, `SectionFormat` band backgrounds, vertical alignment, and a
+  base64 `<ImageData>` logo. The model carries `bg_color`, `border`, `valign`,
+  and embedded image bytes; the writer emits PRD element/band backgrounds,
+  borders, filled boxes, and **bundles the logo as a real `resources/*.png`**
+  with the correct manifest media type.
+- **The CSCU ladder and the flagship UI sample are now polished, professional
+  reports**: navy masthead with an embedded CSCU logo, white title + gold
+  subtitle, dark column-header row, shaded group bands, gold total rules,
+  right-aligned currency, and a confidential footer — verified rendering live
+  against CSCU through the real Pentaho engine (screenshots reviewed). The
+  `build_ladder.py` generator applies a shared theme using only real RptToXml
+  formatting elements, so the polish survives a genuine round-trip.
+- Formatting-carry regression test (colours, band background, embedded logo →
+  bundled .prpt). 175 tests.
+
+### Notes
+
+- **LLM corpus assist measured**: running the local qwen2.5-coder:32b over the
+  150-report corpus flipped **61 of 152 manual formulas to review (40%)** —
+  the assisted-coverage headline for Crystal formula translation.
+
 ## [1.13.1] — 2026-07-24
 
 **CSCU end-to-end ladder + recalibrated effort estimates.**

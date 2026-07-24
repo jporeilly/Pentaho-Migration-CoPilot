@@ -66,7 +66,7 @@ def test_summary_carries_wireframe_geometry():
     assert res.status_code == 200
     sections = res.json()["sections"]
     detail = next(s for s in sections if s["area"] == "Detail")
-    assert len(detail["items"]) == 6
+    assert len(detail["items"]) == 7
     el = detail["items"][0]
     assert {"kind", "x", "y", "width", "height", "label"} <= set(el)
     assert el["width"] > 0

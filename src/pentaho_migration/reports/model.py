@@ -48,7 +48,14 @@ class Element:
     column: str = ""          # resolved PRD column/expression name
     value_type: str = ""      # Crystal ValueType of the underlying field, if known
     align: str = ""           # left | center | right | justify | ""
+    valign: str = ""          # top | middle | bottom | ""
     font: Font = field(default_factory=Font)
+    bg_color: str = ""        # #rrggbb fill behind the element / box fill
+    border_color: str = ""    # #rrggbb
+    border_width: float = 0.0 # points; 0 = no border
+    image_bytes: bytes = b""  # embedded raster for kind="image"
+    image_mime: str = ""      # image/png | image/jpeg
+    resource_path: str = ""   # bundle path assigned by the writer for the image
     notes: list = field(default_factory=list)
 
 
@@ -60,6 +67,7 @@ class Section:
     group_index: int = -1     # which group a GroupHeader/GroupFooter belongs to
     elements: list = field(default_factory=list)
     suppressed: bool = False
+    bg_color: str = ""        # #rrggbb band background
 
 
 @dataclass
