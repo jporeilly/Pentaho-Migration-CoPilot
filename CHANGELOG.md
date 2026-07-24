@@ -7,6 +7,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+### Changed
+
+- Project renamed **PDI-Migration -> Pentaho-Migration** (the scope now spans
+  ETL *and* BI reports, not just PDI). README masthead, positioning, and app
+  overview updated to present both artifact families; repository/package/CLI
+  renames to follow in a coordinated change.
+
 ## [1.11.7] — 2026-07-24
 
 **Real corpus extracted and measured: 150/150 parse, formula coverage 33% → 79%.**

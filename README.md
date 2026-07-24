@@ -1,16 +1,17 @@
-# PDI Migration Copilot
+# Pentaho Migration Copilot
 
-**AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
-SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
+**AI-assisted migration of legacy data platforms into Pentaho — ETL and BI reports:**
+**Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
+**SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
 Version **1.11.7** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
-Every legacy ETL platform locks customers in with the sunk cost of thousands of
-hand-built pipelines — rebuilding 3,000–10,000 mappings by hand is a multi-year,
-seven-figure engagement. Migration Copilot turns that migration into an assisted
-effort measured in weeks, converting the switching-cost objection into the reason
-a prospect moves to Pentaho.
+Every legacy data platform locks customers in with the sunk cost of thousands of
+hand-built artifacts — ETL mappings and operational reports alike. Rebuilding
+3,000–10,000 of them by hand is a multi-year, seven-figure engagement. Migration
+Copilot turns that migration into an assisted effort measured in weeks, converting
+the switching-cost objection into the reason a prospect moves to Pentaho.
 
 **Design principle:** deterministic where accuracy is non-negotiable, AI only where
 semantic judgment is genuinely required. The tool never guesses — anything it cannot
@@ -22,7 +23,13 @@ PARSE (deterministic) -> MAP (rules + LLM) -> GENERATE (templating) -> VALIDATE 
 
 ## The app
 
-A guided dashboard walks each conversion through the pipeline with a stepper:
+A guided dashboard walks each conversion through the pipeline with a stepper —
+one flow per artifact family. Uploads are routed by content sniffing, never by
+extension: ETL exports enter **Upload → Parse → Map → Generate → Validate**;
+Crystal RptToXml dumps enter **Upload → Inspect → Formulas → Download** (report
+structure and datasource SQL, per-formula translation with ✨ LLM assist for
+what rules cannot prove, engine-verifiable .prpt + conversion report, effort &
+cost estimate). The ETL flow in detail:
 
 1. **Upload** — drag-and-drop a PowerCenter `.xml` or Talend `.item` export (format
    auto-detected by content, never by extension) — or one click on the bundled sample.
