@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.17.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.18.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -36,7 +36,11 @@ and whole-formula aggregates (`Sum`, `Count`, `Maximum`, `Minimum`) become
 `Total*` functions — generated, wired to their referencing elements, and
 flagged for review. Simple record selections fold into the SQL `WHERE`
 (alias-aware for Command-based reports), so converted parameter prompts filter
-live data. The ETL flow in detail:
+live data. The Inspect page carries the **schema-aware SQL agent**: the report
+SQL is `EXPLAIN`-validated against the live JNDI target automatically, and a
+schema-grounded chat answers join/column questions and proposes corrected SQL
+as a reviewable diff — applied only on click, recorded as a review item. The
+ETL flow in detail:
 
 1. **Upload** — drag-and-drop a PowerCenter `.xml` or Talend `.item` export (format
    auto-detected by content, never by extension) — or one click on the bundled sample.
@@ -124,6 +128,7 @@ pentaho-migrate run     <file.ktr|.kjb>     # execute in the local PDI install (
 pentaho-migrate report  <rpttoxml.xml> -t   # Crystal dump -> .prpt + report; -t = LLM-assist manual formulas
 pentaho-migrate report ... --validate       # load the .prpt through the real Pentaho Reporting engine
 pentaho-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
+pentaho-migrate report-sql <dump> --jndi <ds> # validate the report SQL against the live JNDI target (EXPLAIN)
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
 pentaho-migrate report-batch [directory]    # convert a Crystal corpus into the project store (joins the portfolio)
@@ -208,10 +213,11 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] Talend (v1.10.0): .item parser, 60+ component rules validated against a 40-job
   real corpus (versions 5.1 → 8.0.1), Java→JavaScript expression translation,
   Talend impact knowledge, 🤖 per-step AI solution suggestions
-- [x] SAP Crystal Reports → PRD (v1.11 → 1.17): RptToXml parser, formula
+- [x] SAP Crystal Reports → PRD (v1.11 → 1.18): RptToXml parser, formula
   translator with idiom rewrites, LLM assist, record-selection folding,
   Crystal-faithful layout, charts, engine round-trip validation, forked
-  extractor, CSCU live-render demo ladder
+  extractor, CSCU live-render demo ladder, schema-aware SQL agent
+  (live-database validation + grounded chat)
 - [ ] SSIS (.dtsx)
 - [ ] IBM DataStage (.dsx)
 

@@ -7,6 +7,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.18.0] — 2026-07-24
+
+### Added
+
+- **Schema-aware SQL agent** (`reports/schema_agent.py`) — deterministic
+  first, per the product's design principle:
+  - **JNDI resolution**: connections are read from the same simple-jndi
+    `default.properties` files the reporting engine uses (`~/.pentaho` and
+    the PRD install), so the agent validates against exactly the database
+    the report will run on. PostgreSQL targets are introspected
+    (`information_schema`); other drivers get an honest "not supported"
+    instead of a guess.
+  - **Deterministic validation**: the report SQL is `EXPLAIN`ed against the
+    live database with `${Param}` placeholders substituted by their
+    defaults — missing tables, wrong columns, and dialect errors surface on
+    the Inspect page *before* the report ever opens in PRD.
+  - **Schema-grounded chat** on the Inspect page: the LLM sees the real
+    schema, the report SQL, and the validation verdict. Proposed SQL is a
+    reviewable diff — **Apply & re-convert** regenerates the bundle with
+    `sql_override` and records the substitution as a review item; nothing
+    is ever auto-applied. (Live-verified against CSCU + qwen2.5-coder:32b:
+    correctly answered that `transactions` has no `mbr_id` and joins go
+    through `accounts`.)
+  - New API: `GET /reports/schema`, `POST /reports/sql/check`,
+    `POST /reports/sql/chat`; `POST /reports/convert` gains `sql_override`.
+  - New CLI: `pentaho-migrate report-sql <dump> --jndi <name>` — batch-able
+    preflight that exits nonzero when the SQL fails against the target.
+  - Optional dependency: `pip install .[schema]` (psycopg2-binary).
+
 ## [1.17.0] — 2026-07-24
 
 ### Added

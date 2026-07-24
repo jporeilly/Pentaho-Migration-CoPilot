@@ -1,6 +1,6 @@
 [project]
 name = "pentaho-migration"
-version = "1.17.0"
+version = "1.18.0"
 description = "Migration Copilot - AI-assisted migration of legacy ETL (Informatica, SSIS, Talend, DataStage) into Pentaho Data Integration"
 requires-python = ">=3.11"
 dependencies = [
@@ -14,6 +14,7 @@ dependencies = [
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "python-multipart>=0.0.9"]
 llm = ["anthropic>=0.40"]
+schema = ["psycopg2-binary>=2.9"]   # schema-aware SQL agent (PostgreSQL targets)
 dev = ["pytest>=8.0", "httpx>=0.27"]
 
 [project.scripts]

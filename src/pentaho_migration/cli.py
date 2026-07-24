@@ -406,6 +406,34 @@ def report(
             raise typer.Exit(code=1)
 
 
+@app.command("report-sql")
+def report_sql(
+    dump: Path,
+    jndi: str = typer.Option(..., "--jndi", help="JNDI connection to validate against"),
+) -> None:
+    """Validate a Crystal report's SQL against the live JNDI target database
+    (schema-aware: EXPLAIN with parameter defaults substituted)."""
+    from pentaho_migration.reports import load_report_model
+    from pentaho_migration.reports.schema_agent import probe_schema, validate_sql
+
+    model = load_report_model(dump, jndi)
+    params = [{"name": p.name, "default": p.default} for p in model.parameters]
+    try:
+        schema = probe_schema(jndi)
+        typer.echo(f"schema: {len(schema['tables'])} tables introspected from {schema['url']}")
+    except RuntimeError as exc:
+        typer.echo(f"schema introspection unavailable: {exc}", err=True)
+        raise typer.Exit(code=2)
+    result = validate_sql(jndi, model.sql, params)
+    if result["ok"]:
+        typer.echo(f"SQL VALID: EXPLAIN passed against {jndi} ({model.name})")
+    else:
+        typer.echo(f"SQL INVALID: {result['error']}", err=True)
+        typer.echo("checked SQL (parameters substituted):", err=True)
+        typer.echo(result["checked_sql"], err=True)
+        raise typer.Exit(code=1)
+
+
 @app.command("report-gaps")
 def report_gaps(
     directory: Path = typer.Argument(Path("samples/crystal/real")),

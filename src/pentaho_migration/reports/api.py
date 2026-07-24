@@ -13,7 +13,7 @@ import time
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -22,6 +22,8 @@ from pentaho_migration.llm import ExpressionTranslator, TranslationError
 from pentaho_migration.reports import build_conversion_report, load_report_model, write_prpt
 from pentaho_migration.reports.effort import build_report_effort
 from pentaho_migration.reports.llm_assist import translate_manual_formulas
+from pentaho_migration.reports.schema_agent import (
+    SqlAssistant, probe_schema, schema_context, validate_sql)
 from pentaho_migration.validator.effort import EffortEstimate
 
 logger = logging.getLogger("pentaho_migration.api.reports")
@@ -243,17 +245,97 @@ def _build_response(model, source_name: str) -> ReportConversionResponse:
 
 @router.post("/convert", response_model=ReportConversionResponse,
              dependencies=[Depends(require_api_key)])
-async def convert(dump: UploadFile, jndi: str = "") -> ReportConversionResponse:
-    """Full conversion: parse -> translate -> .prpt bundle + conversion report."""
+async def convert(dump: UploadFile, jndi: str = "",
+                  sql_override: str = Form("")) -> ReportConversionResponse:
+    """Full conversion: parse -> translate -> .prpt bundle + conversion report.
+
+    `sql_override` replaces the report SQL (used by the schema assistant's
+    reviewed proposals); the substitution is recorded as a review item."""
     started = time.monotonic()
     data = await dump.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
+    if sql_override.strip():
+        model.sql = sql_override.strip()
+        model.issues.append(
+            "report SQL replaced via the schema assistant - review the query")
     response = _build_response(model, source_name)
     logger.info("reports/convert file=%s bytes=%d formulas=%d elapsed_ms=%d",
                 source_name, len(data), len(model.formulas),
                 (time.monotonic() - started) * 1000)
     return response
+
+
+# ----------------------------------------------------- schema-aware SQL agent
+
+class SqlParameterInfo(BaseModel):
+    name: str
+    default: str = ""
+
+
+class SqlCheckRequest(BaseModel):
+    jndi: str
+    sql: str
+    parameters: list[SqlParameterInfo] = []
+
+
+class SqlChatTurn(BaseModel):
+    role: str              # user | assistant
+    content: str
+
+
+class SqlChatRequest(BaseModel):
+    jndi: str
+    sql: str
+    question: str
+    parameters: list[SqlParameterInfo] = []
+    history: list[SqlChatTurn] = []
+
+
+@router.get("/schema", dependencies=[Depends(require_api_key)])
+def schema(jndi: str) -> dict:
+    """Introspect the JNDI target database (tables + columns). Deterministic:
+    reads the same simple-jndi config the reporting engine uses."""
+    try:
+        return probe_schema(jndi)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@router.post("/sql/check", dependencies=[Depends(require_api_key)])
+def sql_check(req: SqlCheckRequest) -> dict:
+    """Deterministic SQL validation: EXPLAIN the query (parameters
+    substituted with their defaults) against the live JNDI target."""
+    return validate_sql(req.jndi, req.sql,
+                        [p.model_dump() for p in req.parameters])
+
+
+@router.post("/sql/chat", dependencies=[Depends(require_api_key)])
+def sql_chat(req: SqlChatRequest) -> dict:
+    """Schema-grounded SQL chat: the LLM sees the real schema, the report
+    SQL, and the deterministic validation verdict; proposed SQL comes back
+    for review, never auto-applied."""
+    assistant = SqlAssistant()
+    try:
+        assistant.check_provider()
+    except TranslationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    parameters = [p.model_dump() for p in req.parameters]
+    try:
+        schema_text = schema_context(probe_schema(req.jndi))
+        validation = validate_sql(req.jndi, req.sql, parameters)
+    except RuntimeError as exc:
+        schema_text = f"(schema unavailable: {exc})"
+        validation = None
+    try:
+        result = assistant.ask(req.question, req.sql, schema_text,
+                               validation=validation,
+                               history=[t.model_dump() for t in req.history])
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"LLM call failed: {exc}")
+    result["validation"] = validation
+    return result
 
 
 _assist_jobs: dict[str, dict] = {}

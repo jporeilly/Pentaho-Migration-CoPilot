@@ -92,6 +92,12 @@ Reports are documents, not dataflows — different risks, different checklist:
 - **Datasources are replaced, not migrated**: the .prpt points at a JNDI name
   on the Pentaho Server. Create the connection there first; report SQL with
   Crystal parameter tokens (`{?Param}`) must be re-expressed as `${Param}`.
+- **Validate the SQL against the real target before opening PRD**: the
+  schema agent `EXPLAIN`s every report query against the live JNDI database
+  (`pentaho-migrate report-sql`, or automatically on the Inspect page).
+  Source-database column names, alias mistakes, and dialect differences
+  surface in seconds instead of as blank reports in PRD — and the grounded
+  chat can propose the corrected join from the introspected schema.
 - **Analyzer is a re-platform, not a conversion** — use extracted SQL as
   requirements for a Mondrian model when the report is really an analysis.
 

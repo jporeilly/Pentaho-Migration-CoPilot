@@ -3,6 +3,7 @@
 
 import Explain from '../components/Explain.jsx'
 import LayoutPreview from '../components/LayoutPreview.jsx'
+import SqlAssistant from '../components/SqlAssistant.jsx'
 
 const BAND_TIPS = {
   ReportHeader: 'Printed once at the start of the report.',
@@ -14,7 +15,7 @@ const BAND_TIPS = {
   PageFooter: 'Repeated at the bottom of every page (lands in styles.xml in PRD).',
 }
 
-export default function ReportsInspectPage({ summary }) {
+export default function ReportsInspectPage({ summary, file, onUpdate }) {
   const c = summary.counts
   const tiles = [
     { value: c.sections, label: 'bands', tip: 'Report sections parsed from the dump.' },
@@ -118,6 +119,17 @@ export default function ReportsInspectPage({ summary }) {
               <pre className="sql-pre">{summary.record_selection}</pre>
             </div>
           )}
+          <Explain label="Schema assistant — what is this?">
+            The SQL above is checked <b>deterministically</b> against the live
+            JNDI target: the query is <code>EXPLAIN</code>ed with parameter
+            defaults substituted, so missing tables, wrong columns, and dialect
+            errors surface <b>before</b> the report ever opens in PRD. The chat
+            below sees the <b>real database schema</b> and the validation
+            verdict — ask it why a query fails or how tables join. Proposed SQL
+            is a <b>reviewable diff</b>: nothing changes until you click Apply,
+            and applying is recorded as a review item in the conversion report.
+          </Explain>
+          <SqlAssistant summary={summary} file={file} onUpdate={onUpdate} />
         </div>
       </div>
 

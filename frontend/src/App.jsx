@@ -263,7 +263,9 @@ export default function App() {
           )}
           {report ? (
             <>
-              {step === 1 && <ReportsInspectPage summary={report.summary} />}
+              {step === 1 && (
+                <ReportsInspectPage summary={report.summary} file={reportFile} onUpdate={setReport} />
+              )}
               {step === 2 && (
                 <ReportsFormulasPage
                   summary={report.summary}
