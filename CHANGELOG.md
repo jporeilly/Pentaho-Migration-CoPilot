@@ -7,14 +7,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.12.0] — 2026-07-24
+
+**Project renamed: PDI-Migration → Pentaho-Migration.**
+
+The scope now spans ETL *and* BI reports, not just PDI.
 
 ### Changed
 
-- Project renamed **PDI-Migration -> Pentaho-Migration** (the scope now spans
-  ETL *and* BI reports, not just PDI). README masthead, positioning, and app
-  overview updated to present both artifact families; repository/package/CLI
-  renames to follow in a coordinated change.
+- **GitHub repository**: `jporeilly/Pentaho-Migration-CoPilot` (old URLs
+  redirect); local folder `C:\Projects\Pentaho-Migration`.
+- **Python package**: `pdi_migration` → `pentaho_migration`; distribution
+  `pentaho-migration` (66-file sweep, guard test keeps it that way).
+- **CLI**: `pentaho-migrate`, with `pdi-migrate` kept as a working legacy
+  alias — existing muscle memory and scripts keep working.
+- **Env vars**: `PENTAHO_MIGRATION_API_KEY` / `PENTAHO_MIGRATION_CONFIG_DIR`;
+  the old `PDI_MIGRATION_*` names are honored as fallbacks.
+- **Branding**: README masthead, UI masthead, FastAPI title, and CLI help now
+  read "Pentaho Migration Copilot" and present both artifact families.
+- Unchanged on purpose: `config/` (project store + settings), corpora,
+  the `crystal-deps-v1` release (follows the repo), report/PDF outputs.
 
 ## [1.11.7] — 2026-07-24
 

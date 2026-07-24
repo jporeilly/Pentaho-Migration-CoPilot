@@ -1,9 +1,8 @@
 # Version
 
-**1.11.7** — 2026-07-24
+**1.12.0** — 2026-07-24
 
-Phase 0 complete; Phase 2 (multi-source) in progress — Talend shipped; reports
-family (Crystal Reports -> .prpt) with guided UI flow, LLM formula assist,
-effort/cost estimation on every conversion and across the portfolio, and
-engine-verified .prpt output (round-trip validator).
+Project renamed **Pentaho-Migration** (was PDI-Migration): scope is legacy ETL
+*and* BI reports into the Pentaho platform. Phase 2 multi-source in progress —
+Talend shipped; Crystal Reports family complete with real-corpus validation.
 See [CHANGELOG.md](CHANGELOG.md) for history.
