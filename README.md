@@ -1,4 +1,4 @@
-# Migration Copilot (PDI-Migration-CoPilot)
+# PDI Migration Copilot
 
 **AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
 SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
@@ -58,6 +58,8 @@ translation.
 
 Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; React
 (Vite) frontend served by FastAPI at `/`.
+
+<img width="1345" height="560" alt="arch_crop" src="https://github.com/user-attachments/assets/3d4ae800-129e-45fd-85b2-1297bfe2e597" />
 
 | Layer | Where | Status |
 | --- | --- | --- |
