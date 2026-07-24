@@ -114,6 +114,12 @@ def _parse_object(obj):
         el.can_grow = _attr(objfmt, "EnableCanGrow", default="false").lower() in ("true", "1")
         if not el.align:
             el.align = ALIGN_MAP.get(_attr(objfmt, "HorizontalAlignment", default="").lower(), "")
+    # explicit per-field format string (a richer extractor can supply the exact
+    # PRD pattern; stock RptToXml 1.1.7 does not, so we fall back to type defaults)
+    fmt_node = next((c for c in obj if _local(c.tag) in
+                     ("FieldFormat", "NumericFieldFormat", "DateFieldFormat")), None)
+    el.format_string = (_attr(obj, "FormatString", default="")
+                        or (_attr(fmt_node, "FormatString", "Format", default="") if fmt_node is not None else ""))
 
     if tag == "TextObject":
         el.kind = "label"

@@ -7,6 +7,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.14.3] — 2026-07-24
+
+**Context-aware upload tiles + the extractor-readiness hook.**
+
+### Added
+
+- **Upload stage tiles now reflect the loaded file** (no toggle): generic
+  when nothing is loaded, Reports (Inspect/Formulas/Convert/Download) or ETL
+  (Parse/Map/Generate/Validate) once a file of that family is selected —
+  driven by state, matching the content-aware stepper and masthead.
+- **Field format-string hook**: an explicit per-field PRD format
+  (`<FieldFormat FormatString=".."/>` or `<NumericFieldFormat/DateFieldFormat
+  FormatString=".."/>`) is read into `Element.format_string` and used over the
+  type-based default — the converter-side readiness for a richer extractor.
+- **`docs/RPTTOXML-EXTRACTOR.md`**: analysis of what stock RptToXml 1.1.7 does
+  not export (per-field formats, image bytes, group sort), three options with
+  a recommended focused fork, the exact `RptDefinitionWriter.cs` emissions,
+  and confirmation the converter already reads all of them.
+
 ## [1.14.2] — 2026-07-24
 
 **More context-awareness + reports module refactor.**

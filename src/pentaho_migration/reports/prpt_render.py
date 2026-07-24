@@ -113,12 +113,12 @@ def render_element(el, tp="", sp="style:"):
         if not el.column:
             return render_element(_todo_label(el, f"[TODO unresolved: {el.field_ref}]"), tp, sp)
         if el.value_type in NUMERIC_TYPES:
-            fmt = _number_format(el.value_type)
+            fmt = el.format_string or _number_format(el.value_type)
             return (f'<{tp}number-field core:element-type="number-field" '
                     f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}>"
                     f"{_style_block(el, sp)}</{tp}number-field>")
         if el.value_type in DATE_TYPES:
-            fmt = _date_format(el.value_type)
+            fmt = el.format_string or _date_format(el.value_type)
             return (f'<{tp}date-field core:element-type="date-field" '
                     f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}>"
                     f"{_style_block(el, sp)}</{tp}date-field>")

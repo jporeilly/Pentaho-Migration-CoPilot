@@ -257,6 +257,7 @@ export default function App() {
               error={error}
               loading={loading}
               source={results.length === 0 ? source : null}
+              family={report ? 'reports' : results.length ? 'etl' : null}
               onShowPractices={() => setShowPractices(true)}
             />
           )}

@@ -47,6 +47,7 @@ class Element:
     field_ref: str = ""       # raw Crystal DataSource, e.g. {Orders.AMOUNT}, {@FullName}, {?Branch}
     column: str = ""          # resolved PRD column/expression name
     value_type: str = ""      # Crystal ValueType of the underlying field, if known
+    format_string: str = ""   # explicit PRD format override (from a richer extractor)
     align: str = ""           # left | center | right | justify | ""
     valign: str = ""          # top | middle | bottom | ""
     font: Font = field(default_factory=Font)
