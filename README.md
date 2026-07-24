@@ -3,7 +3,7 @@
 **AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
 SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
 
-Version **1.11.5** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.11.6** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy ETL platform locks customers in with the sunk cost of thousands of
@@ -110,6 +110,7 @@ pdi-migrate run     <file.ktr|.kjb>     # execute in the local PDI install (Pan/
 pdi-migrate report  <rpttoxml.xml> -t   # Crystal dump -> .prpt + report; -t = LLM-assist manual formulas
 pdi-migrate report ... --validate       # load the .prpt through the real Pentaho Reporting engine
 pdi-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
+pdi-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 ```
 
 `convert` prints the source analysis first — tool version, database, and warnings —

@@ -7,6 +7,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.6] — 2026-07-24
+
+**Real Crystal corpus + extraction kit.**
+
+### Added
+
+- **`samples/crystal-rpt/`: 150 genuine .rpt binaries from 48 public GitHub
+  repositories** (42 MB) — harvested by repository-tree walking (GitHub code
+  search cannot see binaries), each verified against the OLE2 magic, deduped
+  by content hash, capped at 8 per repo for diversity, with a full provenance
+  manifest (repo, path, size, hash). The Crystal counterpart of the
+  Informatica/Talend corpora; the 150-file cap was reached, more remain.
+- **`scripts/extract-rpt.ps1`**: batch .rpt → RptToXml XML extraction (finds
+  RptToXml via RPTTOXML_PATH or tools/RptToXml/, reports per-file failures,
+  points at `report-gaps` next). Runs once the free SAP Crystal .NET runtime
+  is installed — see `pdi-migrate report-env` for the preflight.
+- **`pdi-migrate report-gaps [dir]`**: Crystal corpus analyzer — parse
+  coverage, formula auto/review/manual rates, TODO placeholders, and
+  portfolio effort, mirroring the ETL `gaps` command. The zero-parse-failure
+  bar the ETL corpora set now applies to Crystal the moment extraction runs.
+
 ## [1.11.5] — 2026-07-24
 
 **Reports round-trip validation — "opens in PRD" is now a measured fact.**

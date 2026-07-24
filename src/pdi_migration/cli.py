@@ -406,6 +406,71 @@ def report(
             raise typer.Exit(code=1)
 
 
+@app.command("report-gaps")
+def report_gaps(
+    directory: Path = typer.Argument(Path("samples/crystal/real")),
+    rate: float = typer.Option(150.0, "--rate", help="Consultant rate per hour"),
+) -> None:
+    """Batch-analyze every RptToXml dump in DIRECTORY: parse coverage, formula
+    translation rates, and portfolio effort - the Crystal counterpart of `gaps`."""
+    from pdi_migration.reports import load_report_model
+    from pdi_migration.reports.effort import build_report_effort
+
+    files = sorted(directory.glob("*.xml"))
+    if not files:
+        typer.echo(f"no RptToXml dumps found in {directory} - run scripts/extract-rpt.ps1 first")
+        raise typer.Exit(code=1)
+
+    failures: list[tuple[str, str]] = []
+    reports = 0
+    counts = {"auto": 0, "review": 0, "manual": 0}
+    todos = elements = params = summaries = 0
+    copilot_h = manual_h = 0.0
+
+    for xml in files:
+        try:
+            model = load_report_model(xml)
+        except Exception as exc:  # a parse failure is a finding, not a crash
+            failures.append((xml.name, str(exc)[:160]))
+            continue
+        reports += 1
+        for formula in model.formulas.values():
+            counts[formula.status] += 1
+        elements += sum(len(s.elements) for s in model.sections)
+        params += len(model.parameters)
+        summaries += len(model.summaries)
+        for section in model.sections:
+            for el in section.elements:
+                if el.kind in ("subreport", "image", "unknown"):
+                    todos += 1
+        effort = build_report_effort(model)
+        copilot_h += effort.copilot_hours
+        manual_h += effort.manual_hours
+
+    total_f = sum(counts.values())
+    auto_rate = counts["auto"] / total_f if total_f else 0.0
+    typer.echo(f"files: {len(files)}  parsed: {reports}  failed: {len(failures)}")
+    typer.echo(
+        f"elements: {elements}  parameters: {params}  summaries: {summaries}  "
+        f"todo-placeholders: {todos}"
+    )
+    typer.echo(
+        f"formulas: {total_f}  auto: {counts['auto']} ({auto_rate:.0%})  "
+        f"review: {counts['review']}  manual: {counts['manual']}"
+    )
+    saved = manual_h - copilot_h
+    pct = round(saved / manual_h * 100) if manual_h else 0
+    typer.echo(
+        f"portfolio effort: ~{copilot_h:,.0f}h with Copilot vs ~{manual_h:,.0f}h manual "
+        f"rebuild - saves {saved:,.0f}h ({pct}%, ~${saved * rate:,.0f} at ${rate:g}/h)"
+    )
+    if failures:
+        typer.echo("")
+        typer.echo("parse failures:")
+        for name, error in failures:
+            typer.echo(f"  {name}: {error}")
+
+
 @app.command("report-env")
 def report_env() -> None:
     """Preflight for the Crystal pipeline: is everything installed?"""
