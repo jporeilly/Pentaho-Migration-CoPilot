@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\workcontrolgit_OrderProcessingEfficiencyDashboard.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\workcontrolgit_OrderProcessingEfficiencyDashboard.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -122,55 +122,55 @@
       <SortField Field="{Orders.Order_ID}" SortDirection="AscendingOrder" SortType="RecordSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@Efficiency}" Kind="FormulaField" Name="Efficiency" NumberOfBytes="666" ValueType="StringField">cdDateTimeDiff ({@Required Date},{@Received Date})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Group 1}" Kind="FormulaField" Name="Group 1" NumberOfBytes="30" ValueType="StringField">whilereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@Efficiency}" Kind="FormulaField" Name="Efficiency" NumberOfBytes="666" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">cdDateTimeDiff ({@Required Date},{@Received Date})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Group 1}" Kind="FormulaField" Name="Group 1" NumberOfBytes="30" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">whilereadingrecords;
 "Report Details"</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Late or On Time}" Kind="FormulaField" Name="Late or On Time" NumberOfBytes="16" ValueType="StringField">if {@Required Date} - {@Received Date} &gt;= 0 
+      <FormulaFieldDefinition FormulaName="{@Late or On Time}" Kind="FormulaField" Name="Late or On Time" NumberOfBytes="16" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if {@Required Date} - {@Received Date} &gt;= 0 
 then "On Time" else "Late"</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Late Order Count}" Kind="FormulaField" Name="Late Order Count" NumberOfBytes="8" ValueType="NumberField">If {@Required Date} - {@Received Date} &lt; 0
+      <FormulaFieldDefinition FormulaName="{@Late Order Count}" Kind="FormulaField" Name="Late Order Count" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">If {@Required Date} - {@Received Date} &lt; 0
 then 1
 else 0</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Late Orders Count}" Kind="FormulaField" Name="Late Orders Count" NumberOfBytes="8" ValueType="NumberField">if {@Required Date} &lt; {@Received Date}
+      <FormulaFieldDefinition FormulaName="{@Late Orders Count}" Kind="FormulaField" Name="Late Orders Count" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if {@Required Date} &lt; {@Received Date}
 then 1</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Late Orders Grand Total}" Kind="FormulaField" Name="Late Orders Grand Total" NumberOfBytes="326" ValueType="StringField">if {@Late Orders} &gt; 10000 
+      <FormulaFieldDefinition FormulaName="{@Late Orders Grand Total}" Kind="FormulaField" Name="Late Orders Grand Total" NumberOfBytes="326" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if {@Late Orders} &gt; 10000 
 then cdCurrencyScalerChoice (sum({@Late Orders}), "K", 0)
 else cdCurrencyScalerChoice (sum({@Late Orders}), "K", 2)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Late Orders Running Total}" Kind="FormulaField" Name="Late Orders Running Total" NumberOfBytes="65534" ValueType="StringField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@Late Orders Running Total}" Kind="FormulaField" Name="Late Orders Running Total" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 if {@Required Date} - {@Received Date} &lt; 0
 then stringvar lateorders:= lateorders + totext({Orders.Order_ID},0,"") + "^";
 lateorders</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Late Orders}" Kind="FormulaField" Name="Late Orders" NumberOfBytes="8" ValueType="NumberField">if {@Required Date} - {@Received Date} &lt; 0 
+      <FormulaFieldDefinition FormulaName="{@Late Orders}" Kind="FormulaField" Name="Late Orders" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if {@Required Date} - {@Received Date} &lt; 0 
 then {Orders.Order_Amount}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@On Time Order Count}" Kind="FormulaField" Name="On Time Order Count" NumberOfBytes="8" ValueType="NumberField">If {@Required Date} - {@Received Date} &gt; 0
+      <FormulaFieldDefinition FormulaName="{@On Time Order Count}" Kind="FormulaField" Name="On Time Order Count" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">If {@Required Date} - {@Received Date} &gt; 0
 then 1
 else 0</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@On-Time Orders Count}" Kind="FormulaField" Name="On-Time Orders Count" NumberOfBytes="8" ValueType="NumberField">if {@Required Date} &gt;= {@Received Date}
+      <FormulaFieldDefinition FormulaName="{@On-Time Orders Count}" Kind="FormulaField" Name="On-Time Orders Count" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if {@Required Date} &gt;= {@Received Date}
 then 1</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@On-Time Orders Grand Total}" Kind="FormulaField" Name="On-Time Orders Grand Total" NumberOfBytes="326" ValueType="StringField">if sum({@On-Time Orders}) &gt; 100000
+      <FormulaFieldDefinition FormulaName="{@On-Time Orders Grand Total}" Kind="FormulaField" Name="On-Time Orders Grand Total" NumberOfBytes="326" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if sum({@On-Time Orders}) &gt; 100000
 then cdCurrencyScalerChoice (sum({@On-Time Orders}), "M", 2)
 else cdCurrencyScalerChoice (sum({@On-Time Orders}), "K", 1)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@On-Time Orders}" Kind="FormulaField" Name="On-Time Orders" NumberOfBytes="8" ValueType="NumberField">if {@Required Date} - {@Received Date} &gt;= 0 
+      <FormulaFieldDefinition FormulaName="{@On-Time Orders}" Kind="FormulaField" Name="On-Time Orders" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if {@Required Date} - {@Received Date} &gt;= 0 
 then {Orders.Order_Amount}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Order Date}" Kind="FormulaField" Name="Order Date" NumberOfBytes="8" ValueType="DateTimeField">// a formula is used to create this DateTime field as the Xtreme sample data contains only 12:00:00 as a time
+      <FormulaFieldDefinition FormulaName="{@Order Date}" Kind="FormulaField" Name="Order Date" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">// a formula is used to create this DateTime field as the Xtreme sample data contains only 12:00:00 as a time
 
 datetimevar orderdate:= 
 date({Orders.Order_Date}) + 
 time((Int(Rnd*24)), (Int(Rnd*59)), (Int(Rnd*59)))</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@OrderID}" Kind="FormulaField" Name="OrderID" NumberOfBytes="65534" ValueType="StringField">//{OrderProcessing.OrderID}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Orders Grand Total}" Kind="FormulaField" Name="Orders Grand Total" NumberOfBytes="326" ValueType="StringField">if Sum ({Orders.Order_Amount}, {@Group 1}) &gt; 10000 
+      <FormulaFieldDefinition FormulaName="{@OrderID}" Kind="FormulaField" Name="OrderID" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">//{OrderProcessing.OrderID}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Orders Grand Total}" Kind="FormulaField" Name="Orders Grand Total" NumberOfBytes="326" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if Sum ({Orders.Order_Amount}, {@Group 1}) &gt; 10000 
 then cdCurrencyScalerChoice (Sum ({Orders.Order_Amount}, {@Group 1}), "K", 0)
 else cdCurrencyScalerChoice (Sum ({Orders.Order_Amount}, {@Group 1}), "K", 2)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Parameter Values Display}" Kind="FormulaField" Name="Parameter Values Display" NumberOfBytes="65534" ValueType="StringField">cdStringParamDisplay ({?Customers}, "Customers Entered via Parameter:")
+      <FormulaFieldDefinition FormulaName="{@Parameter Values Display}" Kind="FormulaField" Name="Parameter Values Display" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">cdStringParamDisplay ({?Customers}, "Customers Entered via Parameter:")
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Received Date}" Kind="FormulaField" Name="Received Date" NumberOfBytes="8" ValueType="DateTimeField">// a formula is used to create this DateTime field as the Xtreme sample data contains only 12:00:00 as a time
+      <FormulaFieldDefinition FormulaName="{@Received Date}" Kind="FormulaField" Name="Received Date" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">// a formula is used to create this DateTime field as the Xtreme sample data contains only 12:00:00 as a time
 
 datetimevar receiveddate:= 
 date(dateadd("d", Int(1.1/Rnd), {Orders.Ship_Date})) + 
 time((Int(Rnd*24)), (Int(Rnd*59)), 0);
 
 if receiveddate &lt;= {@Order Date} then {@Order Date} + 4 else receiveddate</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Report Details}" Kind="FormulaField" Name="Report Details" NumberOfBytes="68" ValueType="StringField">"&gt;&gt; CLICK TO SEE A DETAILED REPORT"</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Required Date}" Kind="FormulaField" Name="Required Date" NumberOfBytes="8" ValueType="DateTimeField">// a formula is used to create this DateTime field as the Xtreme sample data contains only 12:00:00 as a time
+      <FormulaFieldDefinition FormulaName="{@Report Details}" Kind="FormulaField" Name="Report Details" NumberOfBytes="68" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"&gt;&gt; CLICK TO SEE A DETAILED REPORT"</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Required Date}" Kind="FormulaField" Name="Required Date" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">// a formula is used to create this DateTime field as the Xtreme sample data contains only 12:00:00 as a time
 
 datetimevar requireddate:= 
 date({Orders.Required_Date}) + 
@@ -317,6 +317,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="ParameterValuesDisplay1" Kind="FieldObject" Top="0" Left="1956" Width="9148" Height="1008" DataSource="{@Parameter Values Display}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -592,6 +596,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field2" Kind="FieldObject" Top="84" Left="180" Width="4440" Height="240" DataSource="{@Report Details}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="ff1f4399" A="255" R="31" G="67" B="153" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="Arial Unicode MS" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -707,6 +715,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field3" Kind="FieldObject" Top="0" Left="555" Width="819" Height="192" DataSource="{Orders.Order_ID}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="#,##0;(#,##0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -719,6 +731,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field11" Kind="FieldObject" Top="0" Left="1664" Width="2031" Height="192" DataSource="{@Order Date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -731,6 +747,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field12" Kind="FieldObject" Top="0" Left="3960" Width="2016" Height="192" DataSource="{@Required Date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -743,6 +763,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field13" Kind="FieldObject" Top="0" Left="6240" Width="2016" Height="192" DataSource="{@Received Date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -755,6 +779,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field14" Kind="FieldObject" Top="0" Left="8640" Width="1200" Height="225" DataSource="{@Efficiency}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -788,6 +816,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="LateOrder1" Kind="FieldObject" Top="0" Left="2568" Width="768" Height="228" DataSource="{@Late Order Count}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -800,6 +832,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="OnTimeOrderCount1" Kind="FieldObject" Top="0" Left="1572" Width="948" Height="228" DataSource="{@On Time Order Count}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -812,6 +848,10 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="OrderAmount1" Kind="FieldObject" Top="12" Left="3492" Width="1128" Height="228" DataSource="{Orders.Order_Amount}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

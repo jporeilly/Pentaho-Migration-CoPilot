@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\ajryan_AccountBalance.rpt" HasSavedData="False">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\ajryan_AccountBalance.rpt" HasSavedData="False">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
   </Embedinfo>
@@ -454,62 +454,62 @@ END</Command>
       <SortField Field="{Lines.RefDate}" SortDirection="AscendingOrder" SortType="RecordSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@0To30Days_Due}" Kind="FormulaField" Name="0To30Days_Due" NumberOfBytes="8" ValueType="NumberField">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 0) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= -30)
+      <FormulaFieldDefinition FormulaName="{@0To30Days_Due}" Kind="FormulaField" Name="0To30Days_Due" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 0) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= -30)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@0To30Days_NotDue}" Kind="FormulaField" Name="0To30Days_NotDue" NumberOfBytes="8" ValueType="NumberField">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 30) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt; 0)
+      <FormulaFieldDefinition FormulaName="{@0To30Days_NotDue}" Kind="FormulaField" Name="0To30Days_NotDue" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 30) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt; 0)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@31To60Days_Due}" Kind="FormulaField" Name="31To60Days_Due" NumberOfBytes="8" ValueType="NumberField">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= -31) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= -60)
+      <FormulaFieldDefinition FormulaName="{@31To60Days_Due}" Kind="FormulaField" Name="31To60Days_Due" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= -31) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= -60)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@31To60Days_NotDue}" Kind="FormulaField" Name="31To60Days_NotDue" NumberOfBytes="8" ValueType="NumberField">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 60) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= 31)
+      <FormulaFieldDefinition FormulaName="{@31To60Days_NotDue}" Kind="FormulaField" Name="31To60Days_NotDue" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 60) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= 31)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@61+Days_Due}" Kind="FormulaField" Name="61+Days_Due" NumberOfBytes="8" ValueType="NumberField">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= -61) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= -99999)
+      <FormulaFieldDefinition FormulaName="{@61+Days_Due}" Kind="FormulaField" Name="61+Days_Due" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= -61) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= -99999)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@61+Days_NotDue}" Kind="FormulaField" Name="61+Days_NotDue" NumberOfBytes="8" ValueType="NumberField">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 99999) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= 61)
+      <FormulaFieldDefinition FormulaName="{@61+Days_NotDue}" Kind="FormulaField" Name="61+Days_NotDue" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 99999) AND ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt;= 61)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Address}" Kind="FormulaField" Name="Address" NumberOfBytes="656" ValueType="StringField">{@CardName} + chr(13)
+      <FormulaFieldDefinition FormulaName="{@Address}" Kind="FormulaField" Name="Address" NumberOfBytes="656" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@CardName} + chr(13)
 + {BusinessPartner.Address} + chr(13)
 + {BusinessPartner.Country}+ '-' +{BusinessPartner.ZipCode}  + ' ' + {BusinessPartner.City}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@AgingDate}" Kind="FormulaField" Name="AgingDate" NumberOfBytes="4" ValueType="DateField">if({?$[BOY_AB_TODATE]} = DATE(9999,12,31)) THEN 
+      <FormulaFieldDefinition FormulaName="{@AgingDate}" Kind="FormulaField" Name="AgingDate" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">if({?$[BOY_AB_TODATE]} = DATE(9999,12,31)) THEN 
 CurrentDate
 ELSE
 {?$[BOY_AB_TODATE]}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CardCode}" Kind="FormulaField" Name="CardCode" NumberOfBytes="32" ValueType="StringField">{BusinessPartner.CardCode}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CardName}" Kind="FormulaField" Name="CardName" NumberOfBytes="202" ValueType="StringField">{BusinessPartner.CardName}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Block}" Kind="FormulaField" Name="CompanyInfo_Address_Block" NumberOfBytes="202" ValueType="StringField">{CompanyInfo.AddressBlock}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_City}" Kind="FormulaField" Name="CompanyInfo_Address_City" NumberOfBytes="202" ValueType="StringField">{CompanyInfo.AddressCity}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Country}" Kind="FormulaField" Name="CompanyInfo_Address_Country" NumberOfBytes="8" ValueType="StringField">{CompanyInfo.AddressCountry}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_County}" Kind="FormulaField" Name="CompanyInfo_Address_County" NumberOfBytes="202" ValueType="StringField">{CompanyInfo.AddressCounty}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Full}" Kind="FormulaField" Name="CompanyInfo_Address_Full" NumberOfBytes="510" ValueType="StringField">{CompanyInfo.AddressFull}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_State}" Kind="FormulaField" Name="CompanyInfo_Address_State" NumberOfBytes="8" ValueType="StringField">{CompanyInfo.AddressState}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Street}" Kind="FormulaField" Name="CompanyInfo_Address_Street" NumberOfBytes="202" ValueType="StringField">{CompanyInfo.AddressStreet}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Zipcode}" Kind="FormulaField" Name="CompanyInfo_Address_Zipcode" NumberOfBytes="42" ValueType="StringField">{CompanyInfo.AddressZipCode}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankAccount}" Kind="FormulaField" Name="CompanyInfo_BankAccount" NumberOfBytes="102" ValueType="StringField">{CompanyInfo.BankAccount}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankAccountAndBranch}" Kind="FormulaField" Name="CompanyInfo_BankAccountAndBranch" NumberOfBytes="264" ValueType="StringField">{@Title_CompanyInfo_BankBranch}+': '+{CompanyInfo.BankBranch}+' - '+{@Title_CompanyInfo_BankAccount}+': '+{CompanyInfo.BankAccount}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankAddress}" Kind="FormulaField" Name="CompanyInfo_BankAddress" NumberOfBytes="956" ValueType="StringField">{CompanyInfo.BankName}+chr(13)+
+      <FormulaFieldDefinition FormulaName="{@CardCode}" Kind="FormulaField" Name="CardCode" NumberOfBytes="32" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{BusinessPartner.CardCode}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CardName}" Kind="FormulaField" Name="CardName" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{BusinessPartner.CardName}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Block}" Kind="FormulaField" Name="CompanyInfo_Address_Block" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressBlock}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_City}" Kind="FormulaField" Name="CompanyInfo_Address_City" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressCity}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Country}" Kind="FormulaField" Name="CompanyInfo_Address_Country" NumberOfBytes="8" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressCountry}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_County}" Kind="FormulaField" Name="CompanyInfo_Address_County" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressCounty}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Full}" Kind="FormulaField" Name="CompanyInfo_Address_Full" NumberOfBytes="510" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressFull}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_State}" Kind="FormulaField" Name="CompanyInfo_Address_State" NumberOfBytes="8" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressState}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Street}" Kind="FormulaField" Name="CompanyInfo_Address_Street" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressStreet}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Address_Zipcode}" Kind="FormulaField" Name="CompanyInfo_Address_Zipcode" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.AddressZipCode}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankAccount}" Kind="FormulaField" Name="CompanyInfo_BankAccount" NumberOfBytes="102" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.BankAccount}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankAccountAndBranch}" Kind="FormulaField" Name="CompanyInfo_BankAccountAndBranch" NumberOfBytes="264" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@Title_CompanyInfo_BankBranch}+': '+{CompanyInfo.BankBranch}+' - '+{@Title_CompanyInfo_BankAccount}+': '+{CompanyInfo.BankAccount}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankAddress}" Kind="FormulaField" Name="CompanyInfo_BankAddress" NumberOfBytes="956" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.BankName}+chr(13)+
 {CompanyInfo.BankStreet}+chr(13)+
 {CompanyInfo.BankCountry}+'-'+{CompanyInfo.BankZipCode}+' '+{CompanyInfo.BankCity}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankBranch}" Kind="FormulaField" Name="CompanyInfo_BankBranch" NumberOfBytes="102" ValueType="StringField">{CompanyInfo.BankBranch}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankIban}" Kind="FormulaField" Name="CompanyInfo_BankIban" NumberOfBytes="102" ValueType="StringField">{CompanyInfo.BankIban}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankSwift}" Kind="FormulaField" Name="CompanyInfo_BankSwift" NumberOfBytes="102" ValueType="StringField">{CompanyInfo.BankSwift}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Email}" Kind="FormulaField" Name="CompanyInfo_Email" NumberOfBytes="202" ValueType="StringField">{CompanyInfo.Email}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Fax}" Kind="FormulaField" Name="CompanyInfo_Fax" NumberOfBytes="42" ValueType="StringField">{CompanyInfo.Fax}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_FederalTaxId}" Kind="FormulaField" Name="CompanyInfo_FederalTaxId" NumberOfBytes="66" ValueType="StringField">{CompanyInfo.FederalTaxId}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Name}" Kind="FormulaField" Name="CompanyInfo_Name" NumberOfBytes="202" ValueType="StringField">{CompanyInfo.Name}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Phone1}" Kind="FormulaField" Name="CompanyInfo_Phone1" NumberOfBytes="42" ValueType="StringField">{CompanyInfo.Phone1}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Phone2}" Kind="FormulaField" Name="CompanyInfo_Phone2" NumberOfBytes="42" ValueType="StringField">{CompanyInfo.Phone2}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Style1}" Kind="FormulaField" Name="CompanyInfo_Style1" NumberOfBytes="1280" ValueType="StringField">{@CompanyInfo_Name}+
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankBranch}" Kind="FormulaField" Name="CompanyInfo_BankBranch" NumberOfBytes="102" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.BankBranch}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankIban}" Kind="FormulaField" Name="CompanyInfo_BankIban" NumberOfBytes="102" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.BankIban}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_BankSwift}" Kind="FormulaField" Name="CompanyInfo_BankSwift" NumberOfBytes="102" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.BankSwift}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Email}" Kind="FormulaField" Name="CompanyInfo_Email" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.Email}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Fax}" Kind="FormulaField" Name="CompanyInfo_Fax" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.Fax}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_FederalTaxId}" Kind="FormulaField" Name="CompanyInfo_FederalTaxId" NumberOfBytes="66" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.FederalTaxId}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Name}" Kind="FormulaField" Name="CompanyInfo_Name" NumberOfBytes="202" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.Name}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Phone1}" Kind="FormulaField" Name="CompanyInfo_Phone1" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.Phone1}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Phone2}" Kind="FormulaField" Name="CompanyInfo_Phone2" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.Phone2}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Style1}" Kind="FormulaField" Name="CompanyInfo_Style1" NumberOfBytes="1280" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@CompanyInfo_Name}+
 chr(13)+chr(13)+
 {@CompanyInfo_Address_Full}+chr(13)
 +chr(13)+
@@ -519,7 +519,7 @@ chr(13)+chr(13)+
 {@Title_Web}+': '+{@CompanyInfo_Website}+chr(13)+
 chr(13)+
 {@Title_FederalTaxId}+': '+{@CompanyInfo_FederalTaxId}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Style2}" Kind="FormulaField" Name="CompanyInfo_Style2" NumberOfBytes="1244" ValueType="StringField">{@CompanyInfo_Name}+' - '+
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Style2}" Kind="FormulaField" Name="CompanyInfo_Style2" NumberOfBytes="1244" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@CompanyInfo_Name}+' - '+
 {@CompanyInfo_Address_Street}+' - '+
 {@CompanyInfo_Address_Country}+{@CompanyInfo_Address_Zipcode}+' '+{@CompanyInfo_Address_City}+' - '+
 {@Title_Phone}+': '+{@CompanyInfo_Phone1}+' - '+
@@ -527,52 +527,52 @@ chr(13)+
 {@Title_Email}+': '+{@CompanyInfo_Email}+' - '+
 {@Title_Web}+': '+{@CompanyInfo_Website}+' - '+
 {@Title_FederalTaxId}+': '+{@CompanyInfo_FederalTaxId}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Style3}" Kind="FormulaField" Name="CompanyInfo_Style3" NumberOfBytes="1154" ValueType="StringField">{@CompanyInfo_Name}+'  -  '+
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Style3}" Kind="FormulaField" Name="CompanyInfo_Style3" NumberOfBytes="1154" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@CompanyInfo_Name}+'  -  '+
 {@CompanyInfo_Address_Street}+'  -  '+
 {@CompanyInfo_Address_Zipcode}+' '+{@CompanyInfo_Address_City}+'  -  '+
 {@CompanyInfo_Address_Country}+'  -  '+'VAT: '+{@CompanyInfo_FederalTaxId}+chr(13)+
 'Tel: '+{@CompanyInfo_Phone1}+'    '+
 //'F: '+{@CompanyInfo_Fax}+'    '+
 'Mail: '+{@CompanyInfo_Email}+'    '+'Web: '+{@CompanyInfo_Website}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Website}" Kind="FormulaField" Name="CompanyInfo_Website" NumberOfBytes="102" ValueType="StringField">{CompanyInfo.Website}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Date_From}" Kind="FormulaField" Name="Date_From" NumberOfBytes="4" ValueType="DateField">{?$[BOY_AB_FROMDATE]}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Date_To}" Kind="FormulaField" Name="Date_To" NumberOfBytes="4" ValueType="DateField">{?$[BOY_AB_TODATE]}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@DateToAgeBy}" Kind="FormulaField" Name="DateToAgeBy" NumberOfBytes="8" ValueType="DateTimeField">switch(
+      <FormulaFieldDefinition FormulaName="{@CompanyInfo_Website}" Kind="FormulaField" Name="CompanyInfo_Website" NumberOfBytes="102" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CompanyInfo.Website}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Date_From}" Kind="FormulaField" Name="Date_From" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">{?$[BOY_AB_FROMDATE]}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Date_To}" Kind="FormulaField" Name="Date_To" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">{?$[BOY_AB_TODATE]}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@DateToAgeBy}" Kind="FormulaField" Name="DateToAgeBy" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">switch(
     {?$[BOY_AB_AGE_BY]} = 'Document', {Lines.TaxDate},
     {?$[BOY_AB_AGE_BY]} = 'Posting', {Lines.RefDate},
     True, {Lines.DueDate}
 )
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_Credit}" Kind="FormulaField" Name="Line_Credit" NumberOfBytes="8" ValueType="NumberField">if({BusinessPartner.Currency} = {CompanyInfo.LocalCurrency} OR {BusinessPartner.Currency} = '##') then
+      <FormulaFieldDefinition FormulaName="{@Line_Credit}" Kind="FormulaField" Name="Line_Credit" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if({BusinessPartner.Currency} = {CompanyInfo.LocalCurrency} OR {BusinessPartner.Currency} = '##') then
     {Lines.Credit}
 else
     {Lines.FcCredit}
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_Date}" Kind="FormulaField" Name="Line_Date" NumberOfBytes="8" ValueType="DateTimeField">{Lines.RefDate}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_Debit}" Kind="FormulaField" Name="Line_Debit" NumberOfBytes="8" ValueType="NumberField">if({BusinessPartner.Currency} = {CompanyInfo.LocalCurrency} OR {BusinessPartner.Currency} = '##') then
+      <FormulaFieldDefinition FormulaName="{@Line_Date}" Kind="FormulaField" Name="Line_Date" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">{Lines.RefDate}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Line_Debit}" Kind="FormulaField" Name="Line_Debit" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if({BusinessPartner.Currency} = {CompanyInfo.LocalCurrency} OR {BusinessPartner.Currency} = '##') then
     {Lines.Debit}
 else
     {Lines.FcDebit}
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_Document}" Kind="FormulaField" Name="Line_Document" NumberOfBytes="24" ValueType="StringField">{Lines.BaseRef}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_DueDate}" Kind="FormulaField" Name="Line_DueDate" NumberOfBytes="8" ValueType="DateTimeField">{Lines.DueDate}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_Sum}" Kind="FormulaField" Name="Line_Sum" NumberOfBytes="8" ValueType="NumberField">{@Line_Debit}-{@Line_Credit}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Line_Text}" Kind="FormulaField" Name="Line_Text" NumberOfBytes="102" ValueType="StringField">{Lines.LineMemo}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@PageXofY}" Kind="FormulaField" Name="PageXofY" NumberOfBytes="344" ValueType="StringField">ToText(PageNumber,'#') +' '+{@Title_Of}+' '+Totext(TotalPageCount,'#')</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@PaymentDetails}" Kind="FormulaField" Name="PaymentDetails" NumberOfBytes="1450" ValueType="StringField">{@CompanyInfo_BankAddress}+chr(13)+
+      <FormulaFieldDefinition FormulaName="{@Line_Document}" Kind="FormulaField" Name="Line_Document" NumberOfBytes="24" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{Lines.BaseRef}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Line_DueDate}" Kind="FormulaField" Name="Line_DueDate" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">{Lines.DueDate}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Line_Sum}" Kind="FormulaField" Name="Line_Sum" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{@Line_Debit}-{@Line_Credit}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Line_Text}" Kind="FormulaField" Name="Line_Text" NumberOfBytes="102" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{Lines.LineMemo}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@PageXofY}" Kind="FormulaField" Name="PageXofY" NumberOfBytes="344" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">ToText(PageNumber,'#') +' '+{@Title_Of}+' '+Totext(TotalPageCount,'#')</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@PaymentDetails}" Kind="FormulaField" Name="PaymentDetails" NumberOfBytes="1450" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@CompanyInfo_BankAddress}+chr(13)+
 {@Title_CompanyInfo_BankBranch}+': '+{@CompanyInfo_BankBranch}+chr(13)+
 {@Title_CompanyInfo_BankAccount}+': '+{@CompanyInfo_BankAccount}+chr(13)+
 {@Title_CompanyInfo_BankIban}+': '+{@CompanyInfo_BankIban}+chr(13)+
 {@Title_CompanyInfo_BankSwift}+': '+{@CompanyInfo_BankSwift}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Primo}" Kind="FormulaField" Name="Primo" NumberOfBytes="8" ValueType="NumberField">if({BusinessPartner.Currency} = {CompanyInfo.LocalCurrency} OR {BusinessPartner.Currency} = '##') then
+      <FormulaFieldDefinition FormulaName="{@Primo}" Kind="FormulaField" Name="Primo" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if({BusinessPartner.Currency} = {CompanyInfo.LocalCurrency} OR {BusinessPartner.Currency} = '##') then
     {Primo.Primo}
 else
     {Primo.PrimoFc}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@RunningTotal}" Kind="FormulaField" Name="RunningTotal" NumberOfBytes="8" ValueType="NumberField">{@Primo}+{#RTotal0}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_0To30Days}" Kind="FormulaField" Name="Title_0To30Days" NumberOfBytes="24" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@RunningTotal}" Kind="FormulaField" Name="RunningTotal" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{@Primo}+{#RTotal0}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Title_0To30Days}" Kind="FormulaField" Name="Title_0To30Days" NumberOfBytes="24" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', '0-30 dage:',
     {@X_Language} = 'NO', '0-30 dager:',
     {@X_Language} = 'DE', '0-30 Tage',
@@ -582,7 +582,7 @@ else
     {@X_Language} = 'FR', '0-30 jours',
     True, '0-30 days:' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_31To60Days}" Kind="FormulaField" Name="Title_31To60Days" NumberOfBytes="26" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_31To60Days}" Kind="FormulaField" Name="Title_31To60Days" NumberOfBytes="26" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', '31-60 dage:',
     {@X_Language} = 'NO', '31-60 dager:',
     {@X_Language} = 'DE', '31-60 Tage',
@@ -592,7 +592,7 @@ else
     {@X_Language} = 'FR', '31-60 jours',
     True, '31-60 days:' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_61+Days}" Kind="FormulaField" Name="Title_61+Days" NumberOfBytes="22" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_61+Days}" Kind="FormulaField" Name="Title_61+Days" NumberOfBytes="22" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', '61+ dage:',
     {@X_Language} = 'NO', '61+ dager:',
     {@X_Language} = 'DE', '61+ Tage',
@@ -602,12 +602,12 @@ else
     {@X_Language} = 'FR', '61+ jours',
     True, '61+ days:' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Balance}" Kind="FormulaField" Name="Title_Balance" NumberOfBytes="16" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Balance}" Kind="FormulaField" Name="Title_Balance" NumberOfBytes="16" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Balance',
     {@X_Language} = 'NO', 'Saldo',
     True, 'Balance' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankAccount}" Kind="FormulaField" Name="Title_CompanyInfo_BankAccount" NumberOfBytes="34" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankAccount}" Kind="FormulaField" Name="Title_CompanyInfo_BankAccount" NumberOfBytes="34" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Kontonr.',
     {@X_Language} = 'NO', 'Kontonr:',
     {@X_Language} = 'DE', 'Kontonummer',
@@ -617,7 +617,7 @@ else
     {@X_Language} = 'FR', 'Numéro de compte',
     True, 'Account' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankAddress}" Kind="FormulaField" Name="Title_CompanyInfo_BankAddress" NumberOfBytes="42" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankAddress}" Kind="FormulaField" Name="Title_CompanyInfo_BankAddress" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Bankadresse',
     {@X_Language} = 'NO', 'Bankadresse',
     {@X_Language} = 'DE', 'Bankadresse',
@@ -627,7 +627,7 @@ else
     {@X_Language} = 'FR', 'Adresse de la banque',
     True, 'Bank-address' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankBranch}" Kind="FormulaField" Name="Title_CompanyInfo_BankBranch" NumberOfBytes="18" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankBranch}" Kind="FormulaField" Name="Title_CompanyInfo_BankBranch" NumberOfBytes="18" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Regnr.',
     {@X_Language} = 'NO', 'Filial',
     {@X_Language} = 'DE', 'Filiale',
@@ -637,7 +637,7 @@ else
     {@X_Language} = 'FR', 'Branche',
     True, 'Branch' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankIban}" Kind="FormulaField" Name="Title_CompanyInfo_BankIban" NumberOfBytes="12" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankIban}" Kind="FormulaField" Name="Title_CompanyInfo_BankIban" NumberOfBytes="12" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'IBAN',
     {@X_Language} = 'NO', 'IBAN',
     {@X_Language} = 'DE', 'IBAN ',
@@ -650,7 +650,7 @@ else
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankSwift}" Kind="FormulaField" Name="Title_CompanyInfo_BankSwift" NumberOfBytes="14" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_CompanyInfo_BankSwift}" Kind="FormulaField" Name="Title_CompanyInfo_BankSwift" NumberOfBytes="14" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'SWIFT',
     {@X_Language} = 'NO', 'SWIFT',
     {@X_Language} = 'DE', 'SWIFT',
@@ -660,7 +660,7 @@ else
     {@X_Language} = 'FR', 'SWIFT ',
     True, 'SWIFT' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_CustomerNo}" Kind="FormulaField" Name="Title_CustomerNo" NumberOfBytes="152" ValueType="StringField">Switch(
+      <FormulaFieldDefinition FormulaName="{@Title_CustomerNo}" Kind="FormulaField" Name="Title_CustomerNo" NumberOfBytes="152" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">Switch(
 {BusinessPartner.CardType}='C',
 switch(
     {@X_Language} = 'DK', 'Kunde nr............................................................',
@@ -684,7 +684,7 @@ switch(
     True, 'Vendor No............................................................' //Default English
 )
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_DateFrom}" Kind="FormulaField" Name="Title_DateFrom" NumberOfBytes="148" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_DateFrom}" Kind="FormulaField" Name="Title_DateFrom" NumberOfBytes="148" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Dato fra...........................................................',
     {@X_Language} = 'NO', 'Dato fra...........................................................',
     {@X_Language} = 'SE', 'Datum från...........................................................',
@@ -696,7 +696,7 @@ switch(
     True, 'Date from...........................................................' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_DateTo}" Kind="FormulaField" Name="Title_DateTo" NumberOfBytes="148" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_DateTo}" Kind="FormulaField" Name="Title_DateTo" NumberOfBytes="148" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Dato til...........................................................',
     {@X_Language} = 'NO', 'Dato til...........................................................',
     {@X_Language} = 'SE', 'Datum till...........................................................',
@@ -708,7 +708,7 @@ switch(
     True, 'Date to...........................................................' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Email}" Kind="FormulaField" Name="Title_Email" NumberOfBytes="16" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Email}" Kind="FormulaField" Name="Title_Email" NumberOfBytes="16" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Email',
     {@X_Language} = 'NO', 'E-Post',
     {@X_Language} = 'DE', 'Email',
@@ -719,7 +719,7 @@ switch(
     True, 'Email' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Fax}" Kind="FormulaField" Name="Title_Fax" NumberOfBytes="24" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Fax}" Kind="FormulaField" Name="Title_Fax" NumberOfBytes="24" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Fax',
     {@X_Language} = 'NO', 'Fax',
     {@X_Language} = 'DE', 'Fax',
@@ -730,7 +730,7 @@ switch(
     True, 'Fax' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_FederalTaxId}" Kind="FormulaField" Name="Title_FederalTaxId" NumberOfBytes="30" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_FederalTaxId}" Kind="FormulaField" Name="Title_FederalTaxId" NumberOfBytes="30" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'EU-Moms nummer',
     {@X_Language} = 'NO', 'Org.nr',
     {@X_Language} = 'DE', 'EU Ust-ID',
@@ -742,7 +742,7 @@ switch(
 )
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_FutureRemit}" Kind="FormulaField" Name="Title_FutureRemit" NumberOfBytes="44" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_FutureRemit}" Kind="FormulaField" Name="Title_FutureRemit" NumberOfBytes="44" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Fremtidig forfald:',
     {@X_Language} = 'NO', 'Fremtidig forfall:',
     {@X_Language} = 'DE', 'Künftiger Fälligkeit:',
@@ -752,7 +752,7 @@ switch(
     {@X_Language} = 'FR', 'Attributions futures:',
     True, 'Future Remit:' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_Credit}" Kind="FormulaField" Name="Title_Line_Credit" NumberOfBytes="16" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Line_Credit}" Kind="FormulaField" Name="Title_Line_Credit" NumberOfBytes="16" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Kredit',
     {@X_Language} = 'NO', 'Kredit',
     {@X_Language} = 'DE', 'Haben',
@@ -762,7 +762,7 @@ switch(
     {@X_Language} = 'FR', 'Crédit ',
     True, 'Credit' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_Date}" Kind="FormulaField" Name="Title_Line_Date" NumberOfBytes="16" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Line_Date}" Kind="FormulaField" Name="Title_Line_Date" NumberOfBytes="16" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Dato',
     {@X_Language} = 'NO', 'Dato',
     {@X_Language} = 'DE', 'Datum',
@@ -772,7 +772,7 @@ switch(
     {@X_Language} = 'FR', 'Date de',
     True, 'Date' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_Debit}" Kind="FormulaField" Name="Title_Line_Debit" NumberOfBytes="12" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Line_Debit}" Kind="FormulaField" Name="Title_Line_Debit" NumberOfBytes="12" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Debet',
     {@X_Language} = 'NO', 'Debet',
     {@X_Language} = 'DE', 'Soll',
@@ -782,7 +782,7 @@ switch(
     {@X_Language} = 'FR', 'Débit',
     True, 'Debit' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_Document}" Kind="FormulaField" Name="Title_Line_Document" NumberOfBytes="22" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Line_Document}" Kind="FormulaField" Name="Title_Line_Document" NumberOfBytes="22" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Bilag',
     {@X_Language} = 'NO', 'Bilagsnr.',
     {@X_Language} = 'DE', 'Beleg',
@@ -792,7 +792,7 @@ switch(
     {@X_Language} = 'FR', 'Annexe',
     True, 'Doc. No.' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_DueDate}" Kind="FormulaField" Name="Title_Line_DueDate" NumberOfBytes="26" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Line_DueDate}" Kind="FormulaField" Name="Title_Line_DueDate" NumberOfBytes="26" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Forfald',
     {@X_Language} = 'NO', 'Forfallsdato',
     {@X_Language} = 'DE', 'Fälligkeit',
@@ -802,7 +802,7 @@ switch(
     {@X_Language} = 'FR', 'D`expiration',
     True, 'Due date' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_Sum}" Kind="FormulaField" Name="Title_Line_Sum" NumberOfBytes="20" ValueType="StringField">if({BusinessPartner.Currency} = '##') then
+      <FormulaFieldDefinition FormulaName="{@Title_Line_Sum}" Kind="FormulaField" Name="Title_Line_Sum" NumberOfBytes="20" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if({BusinessPartner.Currency} = '##') then
 switch(
     {@X_Language} = 'DK', 'Saldo '+{CompanyInfo.LocalCurrency},
     {@X_Language} = 'NO', 'Saldo '+{CompanyInfo.LocalCurrency},
@@ -824,7 +824,7 @@ switch(
     {@X_Language} = 'FR', 'Saldo '+{BusinessPartner.Currency},
     True, 'Total '+{BusinessPartner.Currency} //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Line_Text}" Kind="FormulaField" Name="Title_Line_Text" NumberOfBytes="14" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Line_Text}" Kind="FormulaField" Name="Title_Line_Text" NumberOfBytes="14" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Tekst',
     {@X_Language} = 'NO', 'Tekst',
     {@X_Language} = 'DE', 'Text',
@@ -834,7 +834,7 @@ switch(
     {@X_Language} = 'FR', 'Texte',
     True, 'Text' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Of}" Kind="FormulaField" Name="Title_Of" NumberOfBytes="8" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Of}" Kind="FormulaField" Name="Title_Of" NumberOfBytes="8" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
 {@X_Language} = 'DK', 'af',
 {@X_Language} = 'NO', 'av',
 {@X_Language} = 'DE', 'von',
@@ -843,7 +843,7 @@ switch(
 {@X_Language} = 'FR', 'de',
 TRUE, 'of'
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Page}" Kind="FormulaField" Name="Title_Page" NumberOfBytes="132" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Page}" Kind="FormulaField" Name="Title_Page" NumberOfBytes="132" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Side...........................................................',
     {@X_Language} = 'NO', 'Side...........................................................',
     {@X_Language} = 'DE', 'Seite...........................................................',
@@ -852,7 +852,7 @@ TRUE, 'of'
     {@X_Language} = 'FR', 'Page...........................................................',
     TRUE, 'Page...........................................................'
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_PaymentDetails}" Kind="FormulaField" Name="Title_PaymentDetails" NumberOfBytes="46" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_PaymentDetails}" Kind="FormulaField" Name="Title_PaymentDetails" NumberOfBytes="46" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Betalings-information:',
     {@X_Language} = 'NO', 'Betalingsinformasjon:',
     {@X_Language} = 'DE', 'Zahlungsinformation:',
@@ -863,7 +863,7 @@ TRUE, 'of'
     True, 'Payment details:' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Phone}" Kind="FormulaField" Name="Title_Phone" NumberOfBytes="8" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Phone}" Kind="FormulaField" Name="Title_Phone" NumberOfBytes="8" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Tlf',        
     {@X_Language} = 'NO', 'Tlf',        
     {@X_Language} = 'DE', 'Tel',       
@@ -874,11 +874,11 @@ TRUE, 'of'
     True, 'Tel' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Primo}" Kind="FormulaField" Name="Title_Primo" NumberOfBytes="28" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Primo}" Kind="FormulaField" Name="Title_Primo" NumberOfBytes="28" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Primosaldo:',
     True, 'Primo amount:' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Printed}" Kind="FormulaField" Name="Title_Printed" NumberOfBytes="142" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Printed}" Kind="FormulaField" Name="Title_Printed" NumberOfBytes="142" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Udskrevet...........................................................',
     {@X_Language} = 'NO', 'Skrevet ut...........................................................',
     {@X_Language} = 'DE', 'Ausgedruckt...........................................................',
@@ -889,7 +889,7 @@ TRUE, 'of'
     True, 'Printed...........................................................' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_TotalAmountDue}" Kind="FormulaField" Name="Title_TotalAmountDue" NumberOfBytes="56" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_TotalAmountDue}" Kind="FormulaField" Name="Title_TotalAmountDue" NumberOfBytes="56" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Samlet beløb over forfald:',
     {@X_Language} = 'NO', 'Saldo forfalt: ',
     {@X_Language} = 'DE', 'Gesamter Fälligkeitsbetrag',
@@ -899,7 +899,7 @@ TRUE, 'of'
     {@X_Language} = 'FR', 'Montant total dû' ,
     True, 'Total amount due:' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title_Web}" Kind="FormulaField" Name="Title_Web" NumberOfBytes="20" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title_Web}" Kind="FormulaField" Name="Title_Web" NumberOfBytes="20" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Web',
     {@X_Language} = 'NO', 'Web',
     {@X_Language} = 'DE', 'Webseite',
@@ -910,7 +910,7 @@ TRUE, 'of'
     True, 'Web' //Default English
 )
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Title}" Kind="FormulaField" Name="Title" NumberOfBytes="38" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@Title}" Kind="FormulaField" Name="Title" NumberOfBytes="38" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
     {@X_Language} = 'DK', 'Kontoudtog',
     {@X_Language} = 'NO', 'Kontoutskrift',
     {@X_Language} = 'DE', 'Kontoauszug',
@@ -920,18 +920,18 @@ TRUE, 'of'
     {@X_Language} = 'FR', 'Solde du compte',
     True, 'Account Balance' //Default English
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Total}" Kind="FormulaField" Name="Total" NumberOfBytes="8" ValueType="NumberField">SUM({@Line_Sum})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@TotalDueAmount}" Kind="FormulaField" Name="TotalDueAmount" NumberOfBytes="8" ValueType="NumberField">IF (
+      <FormulaFieldDefinition FormulaName="{@Total}" Kind="FormulaField" Name="Total" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">SUM({@Line_Sum})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@TotalDueAmount}" Kind="FormulaField" Name="TotalDueAmount" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (
 ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &lt;= 0)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@TotalNotAmount}" Kind="FormulaField" Name="TotalNotAmount" NumberOfBytes="8" ValueType="NumberField">IF (
+      <FormulaFieldDefinition FormulaName="{@TotalNotAmount}" Kind="FormulaField" Name="TotalNotAmount" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">IF (
 ((DateDiff ("d", {@AgingDate}, {@DateToAgeBy})) &gt; 0)
 )THEN
 {@Line_Sum}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@X_Language}" Kind="FormulaField" Name="X_Language" NumberOfBytes="6" ValueType="StringField">switch(
+      <FormulaFieldDefinition FormulaName="{@X_Language}" Kind="FormulaField" Name="X_Language" NumberOfBytes="6" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">switch(
 {BusinessPartner.LangCode} = 1, 'HE', //Hebrew
 {BusinessPartner.LangCode} = 3, 'EN', //English
 {BusinessPartner.LangCode} = 5, 'PL', //Polish
@@ -1062,6 +1062,10 @@ True, 'EN' //Unknown (English)
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="adresse1" Kind="FieldObject" Top="1800" Left="1095" Width="3360" Height="1185" DataSource="{@Address}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1074,6 +1078,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Title1" Kind="FieldObject" Top="390" Left="1095" Width="5433" Height="480" DataSource="{@Title}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="25" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="16" SizeinPoints="16" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1095,6 +1103,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </PictureObject>
               <FieldObject Name="PrintDate2" Kind="FieldObject" Top="2115" Left="9300" Width="1560" Height="221" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1107,6 +1119,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="TitlePrinted1" Kind="FieldObject" Top="2115" Left="7425" Width="1665" Height="221" DataSource="{@Title_Printed}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1119,6 +1135,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="TitleCustomerNo1" Kind="FieldObject" Top="2443" Left="7425" Width="1665" Height="221" DataSource="{@Title_CustomerNo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1131,6 +1151,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="CardCode2" Kind="FieldObject" Top="2443" Left="9300" Width="1560" Height="221" DataSource="{@CardCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1143,6 +1167,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PageXofY1" Kind="FieldObject" Top="2771" Left="9300" Width="1560" Height="221" DataSource="{@PageXofY}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1155,6 +1183,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="TitlePage2" Kind="FieldObject" Top="2771" Left="7425" Width="1665" Height="221" DataSource="{@Title_Page}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1206,6 +1238,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="DateFrom1" Kind="FieldObject" Top="3109" Left="9300" Width="1560" Height="221" DataSource="{@Date_From}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1218,6 +1254,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="{?$[BOY_AB_FROMDATE]} = Date(1753,01,01)" />
               </FieldObject>
               <FieldObject Name="DateTo1" Kind="FieldObject" Top="3437" Left="9300" Width="1560" Height="221" DataSource="{@Date_To}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1230,6 +1270,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="{?$[BOY_AB_TODATE]} = Date(9999,12,31)" />
               </FieldObject>
               <FieldObject Name="TitleDateFrom1" Kind="FieldObject" Top="3109" Left="7425" Width="1665" Height="221" DataSource="{@Title_DateFrom}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1242,6 +1286,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="{?$[BOY_AB_FROMDATE]} = Date(1753,01,01)" />
               </FieldObject>
               <FieldObject Name="TitleDateTo1" Kind="FieldObject" Top="3437" Left="7425" Width="1665" Height="221" DataSource="{@Title_DateTo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1293,6 +1341,10 @@ True, 'EN' //Unknown (English)
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="LineCreditTitle1" Kind="FieldObject" Top="315" Left="8306" Width="1272" Height="221" DataSource="{@Title_Line_Credit}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1305,6 +1357,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="//SUM({@Line_Credit}) =0" />
               </FieldObject>
               <FieldObject Name="LineDebitTitle1" Kind="FieldObject" Top="315" Left="7034" Width="1272" Height="221" DataSource="{@Title_Line_Debit}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1317,6 +1373,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="//SUM({@Line_Debit}) =0" />
               </FieldObject>
               <FieldObject Name="LineDueDateTitle1" Kind="FieldObject" Top="315" Left="6020" Width="1014" Height="221" DataSource="{@Title_Line_DueDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1329,6 +1389,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LineTextTitle1" Kind="FieldObject" Top="315" Left="2949" Width="3071" Height="221" DataSource="{@Title_Line_Text}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1341,6 +1405,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LineDocumentTitle1" Kind="FieldObject" Top="315" Left="1764" Width="1055" Height="221" DataSource="{@Title_Line_Document}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1353,6 +1421,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LineDateTitle1" Kind="FieldObject" Top="315" Left="840" Width="924" Height="221" DataSource="{@Title_Line_Date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1375,6 +1447,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </BoxObject>
               <FieldObject Name="TitleBalance1" Kind="FieldObject" Top="315" Left="9578" Width="1282" Height="221" DataSource="{@Title_Balance}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1395,6 +1471,10 @@ True, 'EN' //Unknown (English)
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="TitlePrimo1" Kind="FieldObject" Top="0" Left="2949" Width="3071" Height="240" DataSource="{@Title_Primo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Gray" A="255" R="128" G="128" B="128" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1407,6 +1487,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Primo1" Kind="FieldObject" Top="22" Left="9578" Width="1282" Height="240" DataSource="{@Primo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Gray" A="255" R="128" G="128" B="128" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1442,6 +1526,10 @@ True, 'EN' //Unknown (English)
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="LineCredit1" Kind="FieldObject" Top="17" Left="8306" Width="1272" Height="234" DataSource="{@Line_Credit}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1454,6 +1542,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="currentfieldvalue = 0" />
               </FieldObject>
               <FieldObject Name="LineDebit1" Kind="FieldObject" Top="17" Left="7034" Width="1272" Height="234" DataSource="{@Line_Debit}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1466,6 +1558,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="currentfieldvalue = 0" />
               </FieldObject>
               <FieldObject Name="LineDate1" Kind="FieldObject" Top="17" Left="840" Width="924" Height="234" DataSource="{@Line_Date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1478,6 +1574,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LineDocument1" Kind="FieldObject" Top="17" Left="1764" Width="1055" Height="234" DataSource="{@Line_Document}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1490,6 +1590,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LineText1" Kind="FieldObject" Top="17" Left="2949" Width="3071" Height="234" DataSource="{@Line_Text}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1502,6 +1606,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LineDueDate1" Kind="FieldObject" Top="17" Left="6020" Width="1014" Height="234" DataSource="{@Line_DueDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas Color="IF {Lines.DueDate}&lt; {@AgingDate} THEN&#13;&#10;crRed&#13;&#10;ELSE&#13;&#10;crGreen" />
@@ -1514,6 +1622,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="RunningTotal1" Kind="FieldObject" Top="17" Left="9578" Width="1282" Height="234" DataSource="{@RunningTotal}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1539,6 +1651,10 @@ True, 'EN' //Unknown (English)
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Sumofdebitkredit30days1" Kind="FieldObject" Top="1130" Left="7034" Width="1272" Height="221" DataSource="Sum ({@0To30Days_NotDue})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1551,6 +1667,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumofdebitkredit3160days1" Kind="FieldObject" Top="1130" Left="8306" Width="1272" Height="221" DataSource="Sum ({@31To60Days_NotDue})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1563,6 +1683,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumofdebitkredit90days1" Kind="FieldObject" Top="1130" Left="9578" Width="1282" Height="221" DataSource="Sum ({@61+Days_NotDue})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1575,6 +1699,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumofdebitkredit0days1" Kind="FieldObject" Top="1970" Left="4809" Width="2225" Height="221" DataSource="Sum ({@TotalDueAmount})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1587,6 +1715,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumofoverduedebitkredit90days1" Kind="FieldObject" Top="1970" Left="9578" Width="1282" Height="221" DataSource="Sum ({@61+Days_Due})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1599,6 +1731,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumofoverduedebitkredit3160days1" Kind="FieldObject" Top="1970" Left="8306" Width="1272" Height="221" DataSource="Sum ({@31To60Days_Due})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1611,6 +1747,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumofoverduedebitkredit030days1" Kind="FieldObject" Top="1970" Left="7034" Width="1272" Height="221" DataSource="Sum ({@0To30Days_Due})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1623,6 +1763,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="SumofLineDebit1" Kind="FieldObject" Top="240" Left="7034" Width="1272" Height="240" DataSource="Sum ({@Line_Debit})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1635,6 +1779,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="currentFieldValue =0" />
               </FieldObject>
               <FieldObject Name="SumofLineCredit1" Kind="FieldObject" Top="240" Left="8306" Width="1272" Height="240" DataSource="Sum ({@Line_Credit})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1647,6 +1795,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="currentfieldvalue =0" />
               </FieldObject>
               <FieldObject Name="FutureDue1" Kind="FieldObject" Top="770" Left="4809" Width="2225" Height="221" DataSource="{@Title_FutureRemit}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1659,6 +1811,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="daysTitle1" Kind="FieldObject" Top="770" Left="7034" Width="1272" Height="221" DataSource="{@Title_0To30Days}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1671,6 +1827,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="daysTitle2" Kind="FieldObject" Top="770" Left="8306" Width="1272" Height="221" DataSource="{@Title_31To60Days}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1683,6 +1843,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="daysTitle3" Kind="FieldObject" Top="770" Left="9578" Width="1282" Height="221" DataSource="{@Title_61+Days}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1695,6 +1859,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="daysTitle4" Kind="FieldObject" Top="1610" Left="7034" Width="1272" Height="221" DataSource="{@Title_0To30Days}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1707,6 +1875,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="daysTitle5" Kind="FieldObject" Top="1610" Left="8306" Width="1272" Height="221" DataSource="{@Title_31To60Days}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1719,6 +1891,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="daysTitle6" Kind="FieldObject" Top="1610" Left="9578" Width="1282" Height="221" DataSource="{@Title_61+Days}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1731,6 +1907,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="totalAmountDue1" Kind="FieldObject" Top="1610" Left="4809" Width="2225" Height="221" DataSource="{@Title_TotalAmountDue}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1743,6 +1923,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PaymentDetails1" Kind="FieldObject" Top="1065" Left="840" Width="3780" Height="1525" DataSource="{@PaymentDetails}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1755,6 +1939,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="{BusinessPartner.CardType}='S'" />
               </FieldObject>
               <FieldObject Name="Payment1" Kind="FieldObject" Top="725" Left="840" Width="3560" Height="266" DataSource="{@Title_PaymentDetails}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1767,6 +1955,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas EnableSuppress="{BusinessPartner.CardType}='S'" />
               </FieldObject>
               <FieldObject Name="TitleLineSum1" Kind="FieldObject" Top="240" Left="6020" Width="1014" Height="240" DataSource="{@Title_Line_Sum}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1799,6 +1991,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </LineObject>
               <FieldObject Name="RunningTotal2" Kind="FieldObject" Top="240" Left="9578" Width="1282" Height="240" DataSource="{@RunningTotal}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1811,6 +2007,10 @@ True, 'EN' //Unknown (English)
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Sumof0To30DaysNotDue1" Kind="FieldObject" Top="1130" Left="4860" Width="2174" Height="221" DataSource="Sum ({@TotalNotAmount})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1836,6 +2036,10 @@ True, 'EN' //Unknown (English)
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="CompanyInfoStyle31" Kind="FieldObject" Top="213" Left="840" Width="10020" Height="473" DataSource="{@CompanyInfo_Style3}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

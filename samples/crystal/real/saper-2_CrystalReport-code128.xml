@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\saper-2_CrystalReport-code128.rpt" HasSavedData="False">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\saper-2_CrystalReport-code128.rpt" HasSavedData="False">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="False" EnableSavePreviewPicture="False" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -18,11 +18,11 @@
     <Groups />
     <SortFields />
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@UnboundString1}" Kind="FormulaField" Name="UnboundString1" NumberOfBytes="65534" ValueType="StringField">MyBarcode128 ({@UnboundString3})
+      <FormulaFieldDefinition FormulaName="{@UnboundString1}" Kind="FormulaField" Name="UnboundString1" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">MyBarcode128 ({@UnboundString3})
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@UnboundString2}" Kind="FormulaField" Name="UnboundString2" NumberOfBytes="44" ValueType="StringField">MyBarcode128("-THE-CODE-CONETNT-")</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@UnboundString3}" Kind="FormulaField" Name="UnboundString3" NumberOfBytes="58" ValueType="StringField">"And-This*IS?-Code128128128!!"</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@UnboundString4}" Kind="FormulaField" Name="UnboundString4" NumberOfBytes="38" ValueType="StringField">"-THE-CODE-CONETNT-"</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@UnboundString2}" Kind="FormulaField" Name="UnboundString2" NumberOfBytes="44" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">MyBarcode128("-THE-CODE-CONETNT-")</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@UnboundString3}" Kind="FormulaField" Name="UnboundString3" NumberOfBytes="58" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"And-This*IS?-Code128128128!!"</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@UnboundString4}" Kind="FormulaField" Name="UnboundString4" NumberOfBytes="38" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"-THE-CODE-CONETNT-"</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions />
     <ParameterFieldDefinitions />
@@ -170,6 +170,10 @@ End Function </Text>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="UnboundString2" Kind="FieldObject" Top="0" Left="1560" Width="3000" Height="360" DataSource="{@UnboundString2}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="34" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="Code 128" Size="22" SizeinPoints="22" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -182,6 +186,10 @@ End Function </Text>
                 <ObjectFormatConditionFormulas ToolTipText="formula = MyBarcode128(&quot;The-Text&quot;)" />
               </FieldObject>
               <FieldObject Name="UnboundString4" Kind="FieldObject" Top="360" Left="1560" Width="3000" Height="221" DataSource="{@UnboundString4}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -219,6 +227,10 @@ End Function </Text>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="UnboundString1" Kind="FieldObject" Top="360" Left="1560" Width="4920" Height="480" DataSource="{@UnboundString1}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="43" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="Code 128" Size="28" SizeinPoints="28" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -231,6 +243,10 @@ End Function </Text>
                 <ObjectFormatConditionFormulas ToolTipText="MyBarcode128(&quot;Ala&quot;)" />
               </FieldObject>
               <FieldObject Name="UnboundString3" Kind="FieldObject" Top="960" Left="1560" Width="4920" Height="221" DataSource="{@UnboundString3}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

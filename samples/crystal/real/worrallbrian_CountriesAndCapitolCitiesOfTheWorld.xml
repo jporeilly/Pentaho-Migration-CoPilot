@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\worrallbrian_CountriesAndCapitolCitiesOfTheWorld.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\worrallbrian_CountriesAndCapitolCitiesOfTheWorld.rpt" HasSavedData="True">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="BW" ReportComments="Sorted by Country ASC" ReportSubject="Geography, Capitol Cities of Countries" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -32,7 +32,7 @@
       <SortField Field="{@CountryCustom}" SortDirection="AscendingOrder" SortType="RecordSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@CapitolsFixed}" Kind="FormulaField" Name="CapitolsFixed" NumberOfBytes="65534" ValueType="StringField">Local StringVar capi := {vw_all_countries_with_capitals.capitals};
+      <FormulaFieldDefinition FormulaName="{@CapitolsFixed}" Kind="FormulaField" Name="CapitolsFixed" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">Local StringVar capi := {vw_all_countries_with_capitals.capitals};
 
 If capi = 'Chi?inau'
 Then
@@ -43,7 +43,7 @@ Then
 Else
 capi
 ;</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@CountryCustom}" Kind="FormulaField" Name="CountryCustom" NumberOfBytes="65534" ValueType="StringField">{vw_all_countries_with_capitals.name};</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@CountryCustom}" Kind="FormulaField" Name="CountryCustom" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{vw_all_countries_with_capitals.name};</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions />
     <ParameterFieldDefinitions />
@@ -88,6 +88,10 @@ capi
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="id1" Kind="FieldObject" Top="960" Left="240" Width="10920" Height="468" DataSource="{vw_all_countries_with_capitals.id}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="31" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="20" SizeinPoints="20" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -149,6 +153,10 @@ capi
                 <ObjectFormatConditionFormulas />
               </BoxObject>
               <FieldObject Name="CapitolsFixed1" Kind="FieldObject" Top="3480" Left="360" Width="10800" Height="600" DataSource="{@CapitolsFixed}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="31" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="20" SizeinPoints="20" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -161,6 +169,10 @@ capi
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="CountryFixed1" Kind="FieldObject" Top="2160" Left="360" Width="10800" Height="600" DataSource="{@CountryCustom}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="31" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="20" SizeinPoints="20" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -198,6 +210,10 @@ capi
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="PageNofM1" Kind="FieldObject" Top="0" Left="8880" Width="2554" Height="461" DataSource="PageNofM">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="25" IsSystemFont="False" Italic="True" Name="Times New Roman" OriginalFontName="Times New Roman" Size="16" SizeinPoints="16" Strikeout="False" Style="Italic" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

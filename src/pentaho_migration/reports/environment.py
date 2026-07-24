@@ -86,6 +86,7 @@ def find_rpttoxml() -> Path | None:
     env = os.environ.get("RPTTOXML_PATH")
     candidates = [env] if env else []
     candidates += [
+        str(REPO_ROOT / "tools" / "RptToXml" / "RptToXmlFork.exe"),  # fork: formats + redaction
         str(REPO_ROOT / "tools" / "RptToXml" / "RptToXml.exe"),
         r"C:\Tools\RptToXml\RptToXml.exe",
     ]

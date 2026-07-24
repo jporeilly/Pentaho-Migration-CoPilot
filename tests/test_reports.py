@@ -261,7 +261,10 @@ def test_professional_formatting_carries_through(tmp_path):
     assert "image/png" in zf.read("META-INF/manifest.xml").decode()
     layout = zf.read("layout.xml").decode()
     assert "#133346" in layout                              # navy carried
-    assert "background-color" in zf.read("styles.xml").decode()  # page-header fill
+    # Crystal PageHeader lives in the layout as a repeating details-header
+    # (below the masthead on page 1), carrying its band background
+    assert 'page-band-styles repeat="true"' in layout
+    assert layout.count("#133346") >= 2  # masthead + column-header band fills
 
 
 def test_rich_parameters_become_list_parameters(tmp_path):
@@ -320,3 +323,43 @@ def test_object_suppress_and_can_grow(tmp_path):
     layout = zipfile.ZipFile(out).read("layout.xml").decode()
     assert 'dynamic-height="true"' in layout
     assert 'visible="false"' in layout
+
+
+def test_fork_field_formats_resolve_by_type(tmp_path):
+    """The forked extractor emits <FieldFormat><NumericFieldFormat/DateFieldFormat
+    FormatString=..> for EVERY field; the right candidate must be picked by the
+    field's (or formula's declared) value type and carried into the .prpt."""
+    dump = tmp_path / "f.xml"
+    dump.write_text(
+        '<?xml version="1.0"?><Report Name="F" FileName="f.rpt">'
+        '<Database><Tables><Table Name="Command" ClassName="CommandTable">'
+        '<Command>SELECT 1</Command><Fields>'
+        '<Field Name="AMT" ValueType="CurrencyField"/>'
+        '<Field Name="DT" ValueType="DateField"/>'
+        '<Field Name="NM" ValueType="StringField"/></Fields>'
+        '</Table></Tables></Database>'
+        '<DataDefinition><FormulaFieldDefinitions>'
+        '<FormulaFieldDefinition Name="Total" FormulaName="{@Total}" ValueType="NumberField">{Command.AMT} * 2</FormulaFieldDefinition>'
+        '</FormulaFieldDefinitions></DataDefinition>'
+        '<ReportDefinition><Areas><Area Kind="Detail"><Sections><Section Height="300"><ReportObjects>'
+        + "".join(
+            f'<FieldObject Name="o{i}" DataSource="{ref}" Left="0" Top="{i*300}" Width="2000" Height="240">'
+            '<FieldFormat>'
+            '<NumericFieldFormat DecimalPlaces="3" FormatString="#,##0.000;-#,##0.000"/>'
+            '<DateFieldFormat FormatString="dd/MM/yyyy"/>'
+            '</FieldFormat></FieldObject>'
+            for i, ref in enumerate(["{Command.AMT}", "{Command.DT}", "{Command.NM}", "{@Total}"]))
+        + '</ReportObjects></Section></Sections></Area></Areas></ReportDefinition></Report>',
+        encoding="utf-8")
+    model = load_report_model(dump)
+    det = model.sections_of("Detail")[0]
+    by_name = {e.name: e for e in det.elements}
+    assert by_name["o0"].format_string == "#,##0.000;-#,##0.000"   # currency -> numeric
+    assert by_name["o1"].format_string == "dd/MM/yyyy"             # date -> date
+    assert by_name["o2"].format_string == ""                       # string -> neither
+    assert by_name["o3"].format_string == "#,##0.000;-#,##0.000"   # formula w/ declared NumberField
+    out = tmp_path / "f.prpt"
+    write_prpt(model, out)
+    layout = zipfile.ZipFile(out).read("layout.xml").decode()
+    assert 'format-string="#,##0.000;-#,##0.000"' in layout
+    assert 'format-string="dd/MM/yyyy"' in layout

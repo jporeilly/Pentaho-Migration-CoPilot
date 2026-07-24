@@ -83,12 +83,29 @@ fork's output lands with **no converter change**:
 So the improvement is **isolated to the C# fork**; the moment it emits these
 elements, fidelity improves end-to-end.
 
-## Build notes
+## Status: the fork is BUILT and shipped
 
-The fork targets **.NET Framework 4.x** (VS/MSBuild + the SAP Crystal .NET
-runtime assemblies, both present on the demo box). Deliverable ordering:
+Source lives in `tools/RptToXml-fork/` (patched from upstream, license
+preserved); `build.ps1` compiles it with Roslyn csc (VS Build Tools) directly
+against the machine .NET Framework + the Crystal assemblies in
+`tools/RptToXml/` — no MSBuild project or targeting packs needed. The output
+`RptToXmlFork.exe` is preferred automatically by `extract-rpt.ps1` and
+`report-env`.
 
-1. Patch `RptDefinitionWriter.cs` with the four emissions above.
-2. Build against the Crystal assemblies in `tools/RptToXml/`.
-3. Re-extract the corpus; confirm formats/images/sort now populate, and that
-   the ladder + flagship pick up authored formats verbatim.
+What the fork adds over stock 1.1.7:
+
+- **`<FieldFormat><NumericFieldFormat .../><DateFieldFormat .../>`** per
+  FieldObject, with raw Crystal properties *and* a computed PRD-ready
+  `FormatString` (`#,##0.00;-#,##0.00`, `MM/dd/yy`, …). Verified against real
+  corpus reports; the converter resolves the right candidate by field type
+  (formula fields use their declared result type) and carries it into the
+  .prpt.
+- **`RPTTOXML_REDACT=1`** blanks `ConnectionInfo` UserName/Password at
+  extraction — dumps are clean at the source (extract-rpt.ps1 sets it).
+
+Still open (smaller): embedded image bytes (the engine API does not expose
+them; needs the RAS picture controller — investigate), currency symbol *text*
+(engine exposes only the No/Fixed/FloatingSymbol enum; "$" assumed when
+enabled), and group sort direction — which turned out to already be in stock
+dumps as `SortField SortType="GroupSortField"` (parser consumption is a
+converter-side follow-up).

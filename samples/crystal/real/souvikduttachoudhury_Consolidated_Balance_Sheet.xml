@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\souvikduttachoudhury_Consolidated_Balance_Sheet.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\souvikduttachoudhury_Consolidated_Balance_Sheet.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole10Native" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -54,23 +54,23 @@
     <Groups />
     <SortFields />
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@current liabilities}" Kind="FormulaField" Name="current liabilities" NumberOfBytes="8" ValueType="NumberField">
+      <FormulaFieldDefinition FormulaName="{@current liabilities}" Kind="FormulaField" Name="current liabilities" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">
 {FINANCIALS.ACCOUNTS_PAYABLE} +
 {FINANCIALS.ACCRUED_LIABILITIES} +
 {FINANCIALS.ACCRUED_INCOME_TAXES}
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@long term liabilities}" Kind="FormulaField" Name="long term liabilities" NumberOfBytes="8" ValueType="NumberField">{FINANCIALS.NOTES_PAYABLE} +
+      <FormulaFieldDefinition FormulaName="{@long term liabilities}" Kind="FormulaField" Name="long term liabilities" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{FINANCIALS.NOTES_PAYABLE} +
 {FINANCIALS.DEFERRED_INCOME_TAXES_PAYABLE}
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@net fixed assets}" Kind="FormulaField" Name="net fixed assets" NumberOfBytes="8" ValueType="NumberField">{FINANCIALS.LAND} + 
+      <FormulaFieldDefinition FormulaName="{@net fixed assets}" Kind="FormulaField" Name="net fixed assets" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{FINANCIALS.LAND} + 
 {FINANCIALS.BUILDINGS} + 
 {FINANCIALS.MACHINERY_ETC}- 
 {FINANCIALS.ACCUMULATED_DEPRECIATION}
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Quarter}" Kind="FormulaField" Name="Quarter" NumberOfBytes="12" ValueType="StringField">if Month({FINANCIALS.STATEMENT})=3 then "Qtr1"
+      <FormulaFieldDefinition FormulaName="{@Quarter}" Kind="FormulaField" Name="Quarter" NumberOfBytes="12" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if Month({FINANCIALS.STATEMENT})=3 then "Qtr1"
 else
 if Month({FINANCIALS.STATEMENT})=6 then "Qtr2"
 else
@@ -79,34 +79,34 @@ else
 if Month({FINANCIALS.STATEMENT})=12 then "Qtr4 "
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@total assets}" Kind="FormulaField" Name="total assets" NumberOfBytes="8" ValueType="NumberField">{@total current assets} + 
+      <FormulaFieldDefinition FormulaName="{@total assets}" Kind="FormulaField" Name="total assets" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{@total current assets} + 
 {@total fixed and other assets}
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@total current assets}" Kind="FormulaField" Name="total current assets" NumberOfBytes="8" ValueType="NumberField">{FINANCIALS.CASH} + 
+      <FormulaFieldDefinition FormulaName="{@total current assets}" Kind="FormulaField" Name="total current assets" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{FINANCIALS.CASH} + 
 {FINANCIALS.ACCOUNT_RECEIVABLE} + 
 {FINANCIALS.INVENTORIES} + 
 {FINANCIALS.OTHER_CURRENT_ASSETS}
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@total equity and liabilities}" Kind="FormulaField" Name="total equity and liabilities" NumberOfBytes="8" ValueType="NumberField">{@total equity}+{@total liabilities}
+      <FormulaFieldDefinition FormulaName="{@total equity and liabilities}" Kind="FormulaField" Name="total equity and liabilities" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{@total equity}+{@total liabilities}
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@total equity}" Kind="FormulaField" Name="total equity" NumberOfBytes="8" ValueType="NumberField">{FINANCIALS.COMMON_STOCK} +
+      <FormulaFieldDefinition FormulaName="{@total equity}" Kind="FormulaField" Name="total equity" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{FINANCIALS.COMMON_STOCK} +
 {FINANCIALS.PREFERRED_STOCK} +
 {FINANCIALS.RETAINED_EARNINGS}
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@total fixed and other assets}" Kind="FormulaField" Name="total fixed and other assets" NumberOfBytes="8" ValueType="NumberField">{@net fixed assets} + 
+      <FormulaFieldDefinition FormulaName="{@total fixed and other assets}" Kind="FormulaField" Name="total fixed and other assets" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{@net fixed assets} + 
 {FINANCIALS.OTHER_ASSETS}
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@total liabilities}" Kind="FormulaField" Name="total liabilities" NumberOfBytes="8" ValueType="NumberField">{@current liabilities} +
+      <FormulaFieldDefinition FormulaName="{@total liabilities}" Kind="FormulaField" Name="total liabilities" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{@current liabilities} +
 {@long term liabilities}
 
 
@@ -163,6 +163,10 @@ if Month({FINANCIALS.STATEMENT})=12 then "Qtr4 "
                 <ObjectFormatConditionFormulas />
               </LineObject>
               <FieldObject Name="PrintDate" Kind="FieldObject" Top="645" Left="0" Width="1050" Height="210" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -175,6 +179,10 @@ if Month({FINANCIALS.STATEMENT})=12 then "Qtr4 "
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PrintTime" Kind="FieldObject" Top="645" Left="1065" Width="1890" Height="210" DataSource="PrintTime">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

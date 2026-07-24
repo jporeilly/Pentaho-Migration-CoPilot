@@ -12,26 +12,26 @@ from pentaho_migration.validator.effort import SCALE, EffortEstimate, _round_hal
 # discounted sub-linearly — see validator/effort.py SCALE). Calibrated so a
 # moderate report (7 fields, 1 group, a few formulas) lands well under an
 # hour: the converter did the layout, the human verifies and wires the JNDI.
-COPILOT_BASE = 0.25         # verify JNDI, eyeball layout, publish
-COPILOT_AUTO_FORMULA = 0.02
-COPILOT_REVIEW_FORMULA = 0.1
-COPILOT_MANUAL_FORMULA = 0.4
-COPILOT_TODO = 0.4          # subreport / image / conditional-format placeholder
-COPILOT_PARAM = 0.05        # wire ${param} into the query, test prompt
-COPILOT_TEST_OVERHEAD = 0.15
+COPILOT_BASE = 0.1          # verify JNDI, eyeball layout, publish
+COPILOT_AUTO_FORMULA = 0.01
+COPILOT_REVIEW_FORMULA = 0.04
+COPILOT_MANUAL_FORMULA = 0.15
+COPILOT_TODO = 0.1          # subreport / image / conditional-format placeholder
+COPILOT_PARAM = 0.02        # prompts fold into the query automatically now
+COPILOT_TEST_OVERHEAD = 0.10
 
 # From-scratch rebuild in PRD (hours per first-instance; SCALE-discounted).
 # Calibrated so the same moderate report is ~2-3h by hand: build the
 # datasource, lay out the bands, place and style fields, write the formulas,
 # add groups/summaries, and test.
-MANUAL_BASE = 1.0           # datasource, page setup, band scaffolding
-MANUAL_ELEMENT = 0.04       # place + style one element
-MANUAL_FORMULA = 0.35
-MANUAL_SUMMARY = 0.25
-MANUAL_GROUP = 0.3
-MANUAL_PARAM = 0.15
-MANUAL_TODO = 0.75
-MANUAL_TEST_OVERHEAD = 0.15
+MANUAL_BASE = 0.4           # datasource, page setup, band scaffolding
+MANUAL_ELEMENT = 0.02       # place + style one element
+MANUAL_FORMULA = 0.12
+MANUAL_SUMMARY = 0.1
+MANUAL_GROUP = 0.15
+MANUAL_PARAM = 0.08
+MANUAL_TODO = 0.25
+MANUAL_TEST_OVERHEAD = 0.10
 
 
 def count_todos(model: ReportModel) -> int:

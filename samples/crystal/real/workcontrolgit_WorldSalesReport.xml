@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\workcontrolgit_WorldSalesReport.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\workcontrolgit_WorldSalesReport.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -85,7 +85,7 @@
       <SortField Field="{Orders.Order_Amount}" SortDirection="AscendingOrder" SortType="RecordSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@ddgl}" Kind="FormulaField" Name="ddgl" NumberOfBytes="8" ValueType="NumberField">drilldowngrouplevel
+      <FormulaFieldDefinition FormulaName="{@ddgl}" Kind="FormulaField" Name="ddgl" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">drilldowngrouplevel
 </FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions>
@@ -438,6 +438,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field9" Kind="FieldObject" Top="0" Left="0" Width="1312" Height="228" DataSource="GroupName ({Customer.City})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -450,6 +454,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field10" Kind="FieldObject" Top="0" Left="1296" Width="1314" Height="228" DataSource="Sum ({Customer.Last_Years_Sales}, {Customer.City})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="$ #,##0;($ #,##0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -462,6 +470,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PercentageofSumofLastYearsSales2" Kind="FieldObject" Top="0" Left="2856" Width="834" Height="228" DataSource="PercentOfSum ({Customer.Last_Years_Sales}, {Customer.City}, {Customer.Region})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="1" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToTenth" FormatString="$ #,##0.0;($ #,##0.0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -487,6 +499,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field6" Kind="FieldObject" Top="0" Left="3804" Width="1849" Height="228" DataSource="{Orders.Order_Date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -499,6 +515,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="OrderAmount1" Kind="FieldObject" Top="0" Left="5748" Width="1071" Height="228" DataSource="{Orders.Order_Amount}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -511,6 +531,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="CustomerName1" Kind="FieldObject" Top="0" Left="276" Width="2508" Height="228" DataSource="{Customer.Customer_Name}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -523,6 +547,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="OrderID1" Kind="FieldObject" Top="0" Left="2808" Width="828" Height="228" DataSource="{Orders.Order_ID}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -560,6 +588,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field12" Kind="FieldObject" Top="0" Left="360" Width="952" Height="228" DataSource="GroupName ({Customer.Region})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -572,6 +604,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field13" Kind="FieldObject" Top="0" Left="1296" Width="1314" Height="228" DataSource="Sum ({Customer.Last_Years_Sales}, {Customer.Region})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="$ #,##0;($ #,##0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -584,6 +620,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PercentageofSumofLastYearsSales1" Kind="FieldObject" Top="0" Left="2856" Width="680" Height="228" DataSource="PercentOfSum ({Customer.Last_Years_Sales}, {Customer.Region}, {Customer.Country})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="1" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToTenth" FormatString="$ #,##0.0;($ #,##0.0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -609,6 +649,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field15" Kind="FieldObject" Top="0" Left="0" Width="1312" Height="228" DataSource="GroupName ({Customer.Country})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -621,6 +665,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field3" Kind="FieldObject" Top="0" Left="1296" Width="1314" Height="228" DataSource="Sum ({Customer.Last_Years_Sales}, {Customer.Country})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="$ #,##0;($ #,##0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -633,6 +681,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PercentageofSumofOrderAmount1" Kind="FieldObject" Top="0" Left="2856" Width="680" Height="228" DataSource="PercentOfSum ({Customer.Last_Years_Sales}, {Customer.Country})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="1" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToTenth" FormatString="$ #,##0.0;($ #,##0.0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

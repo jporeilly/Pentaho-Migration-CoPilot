@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\rjoseph757-vs_World_Sales_Report.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\rjoseph757-vs_World_Sales_Report.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -57,13 +57,13 @@
       <SortField Field="{Customer.Customer Name}" SortDirection="AscendingOrder" SortType="GroupSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@header1}" Kind="FormulaField" Name="header1" NumberOfBytes="8" ValueType="NumberField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@header1}" Kind="FormulaField" Name="header1" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 numbervar header:=1</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@headercheck}" Kind="FormulaField" Name="headercheck" NumberOfBytes="8" ValueType="NumberField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@headercheck}" Kind="FormulaField" Name="headercheck" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 numbervar header</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@notshowgraph}" Kind="FormulaField" Name="notshowgraph" NumberOfBytes="8" ValueType="NumberField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@notshowgraph}" Kind="FormulaField" Name="notshowgraph" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 numbervar test:=1</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@showgraph}" Kind="FormulaField" Name="showgraph" NumberOfBytes="8" ValueType="NumberField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@showgraph}" Kind="FormulaField" Name="showgraph" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 numbervar test:=2</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions>
@@ -127,6 +127,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </LineObject>
               <FieldObject Name="Field1" Kind="FieldObject" Top="720" Left="0" Width="1080" Height="216" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -139,6 +143,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field2" Kind="FieldObject" Top="720" Left="1100" Width="1080" Height="216" DataSource="PrintTime">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -292,6 +300,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </ChartObject>
               <FieldObject Name="Field3" Kind="FieldObject" Top="45" Left="645" Width="675" Height="210" DataSource="{@notshowgraph}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -362,6 +374,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas EnableSuppress="whileprintingrecords;&#13;&#10;numbervar test=1" />
               </ChartObject>
               <FieldObject Name="Field4" Kind="FieldObject" Top="2910" Left="6015" Width="675" Height="210" DataSource="{@header1}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -516,6 +532,10 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field5" Kind="FieldObject" Top="227" Left="7095" Width="1440" Height="210" DataSource="{Customer.Last Year's Sales}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -528,6 +548,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field6" Kind="FieldObject" Top="227" Left="4005" Width="3075" Height="210" DataSource="{Customer.Customer Name}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -553,6 +577,10 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field7" Kind="FieldObject" Top="0" Left="8280" Width="1455" Height="227" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.Customer Name})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -565,6 +593,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field8" Kind="FieldObject" Top="0" Left="4305" Width="4230" Height="210" DataSource="{Customer.Customer Name}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -590,6 +622,10 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field9" Kind="FieldObject" Top="55" Left="6480" Width="1800" Height="230" DataSource="GroupName ({Customer.City})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -602,6 +638,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field10" Kind="FieldObject" Top="55" Left="8310" Width="1425" Height="238" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.City})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -614,6 +654,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field11" Kind="FieldObject" Top="45" Left="728" Width="675" Height="210" DataSource="{@showgraph}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -639,6 +683,10 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field12" Kind="FieldObject" Top="85" Left="6480" Width="1890" Height="230" DataSource="GroupName ({Customer.Region})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -651,6 +699,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field13" Kind="FieldObject" Top="85" Left="8415" Width="1320" Height="238" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.Region})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -676,6 +728,10 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field14" Kind="FieldObject" Top="55" Left="8355" Width="1379" Height="238" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.Country})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -688,6 +744,10 @@ numbervar test:=2</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field15" Kind="FieldObject" Top="34" Left="6480" Width="1875" Height="232" DataSource="GroupName ({Customer.Country})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -896,6 +956,10 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Field16" Kind="FieldObject" Top="480" Left="9787" Width="878" Height="228" DataSource="PageNumber">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

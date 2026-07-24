@@ -40,7 +40,12 @@ def build_conversion_report(model, source_path, output_path):
     add(model.sql)
     add("```")
     add("")
-    if model.record_selection:
+    if model.record_selection and model.record_selection_folded:
+        add("### Record selection formula (folded automatically)")
+        add("")
+        add("Folded into the SQL WHERE clause - parameter prompts now filter "
+            "the report. Verify the clause against the original:")
+    elif model.record_selection:
         add("### Record selection formula (MANUAL)")
         add("")
         add("Crystal's record selection must be folded into the SQL WHERE clause "

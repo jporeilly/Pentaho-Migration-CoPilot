@@ -47,7 +47,9 @@ class Element:
     field_ref: str = ""       # raw Crystal DataSource, e.g. {Orders.AMOUNT}, {@FullName}, {?Branch}
     column: str = ""          # resolved PRD column/expression name
     value_type: str = ""      # Crystal ValueType of the underlying field, if known
-    format_string: str = ""   # explicit PRD format override (from a richer extractor)
+    format_string: str = ""   # explicit PRD format override (resolved by field type)
+    format_numeric: str = ""  # candidate numeric format from the extractor
+    format_date: str = ""     # candidate date format from the extractor
     align: str = ""           # left | center | right | justify | ""
     valign: str = ""          # top | middle | bottom | ""
     font: Font = field(default_factory=Font)
@@ -77,6 +79,7 @@ class Section:
 class Formula:
     name: str                 # Crystal name without {@}
     text: str                 # original Crystal formula text
+    value_type: str = ""      # declared Crystal result type (for formats)
     translation: str = ""     # OpenFormula text (with leading =) when translated
     status: str = "manual"    # auto | review | manual
     notes: list = field(default_factory=list)
@@ -126,6 +129,7 @@ class ReportModel:
     sql_generated: bool = False
     jndi: str = "SampleData"
     record_selection: str = ""
+    record_selection_folded: bool = False  # True when folded into the SQL WHERE
     tables: dict = field(default_factory=dict)       # table name -> {field name -> ValueType}
     field_types: dict = field(default_factory=dict)  # bare column name -> ValueType
     sections: list = field(default_factory=list)

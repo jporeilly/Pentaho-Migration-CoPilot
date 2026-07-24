@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\LarsBusk_InstrumentCheckSample2Weeks.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\LarsBusk_InstrumentCheckSample2Weeks.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -65,8 +65,8 @@ FROM fnIsRepGetCheckSampleInstrument({?@SystemID}, {?@InstrumentLogicalID}, 5)</
           <SortField Field="{Command.Parametername}" SortDirection="AscendingOrder" SortType="GroupSortField" />
         </SortFields>
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@MaxProductLimitsStatus}" Kind="FormulaField" Name="MaxProductLimitsStatus" NumberOfBytes="8" ValueType="NumberField">MAXIMUM({Command.ProductLimitsStatus},{Command.Parametername})</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@WarningOrErrorText}" Kind="FormulaField" Name="WarningOrErrorText" NumberOfBytes="16" ValueType="StringField">IF ({@MaxProductLimitsStatus} = 1)
+          <FormulaFieldDefinition FormulaName="{@MaxProductLimitsStatus}" Kind="FormulaField" Name="MaxProductLimitsStatus" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">MAXIMUM({Command.ProductLimitsStatus},{Command.Parametername})</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@WarningOrErrorText}" Kind="FormulaField" Name="WarningOrErrorText" NumberOfBytes="16" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">IF ({@MaxProductLimitsStatus} = 1)
 THEN "warning"
 ELSE "error"</FormulaFieldDefinition>
         </FormulaFieldDefinitions>
@@ -124,6 +124,10 @@ ELSE "error"</FormulaFieldDefinition>
                 </SectionFormat>
                 <ReportObjects>
                   <FieldObject Name="GroupNameParametername1" Kind="FieldObject" Top="0" Left="0" Width="1995" Height="240" DataSource="GroupName ({Command.Parametername})">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -149,6 +153,10 @@ ELSE "error"</FormulaFieldDefinition>
                 </SectionFormat>
                 <ReportObjects>
                   <FieldObject Name="Parametername1" Kind="FieldObject" Top="58" Left="180" Width="1447" Height="240" DataSource="{Command.Parametername}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -161,6 +169,10 @@ ELSE "error"</FormulaFieldDefinition>
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="DoubleResult1" Kind="FieldObject" Top="58" Left="1819" Width="1155" Height="240" DataSource="{Command.DoubleResult}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -173,6 +185,10 @@ ELSE "error"</FormulaFieldDefinition>
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="LowerWarning1" Kind="FieldObject" Top="58" Left="3214" Width="915" Height="240" DataSource="{Command.LowerWarning}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -185,6 +201,10 @@ ELSE "error"</FormulaFieldDefinition>
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="UpperWarning1" Kind="FieldObject" Top="58" Left="4693" Width="915" Height="240" DataSource="{Command.UpperWarning}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -197,6 +217,10 @@ ELSE "error"</FormulaFieldDefinition>
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="RedArrowLower1" Kind="FieldObject" Top="405" Left="1627" Width="915" Height="240" DataSource="{Command.RedArrowLower}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -209,6 +233,10 @@ ELSE "error"</FormulaFieldDefinition>
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="RedArrowUpper1" Kind="FieldObject" Top="390" Left="360" Width="915" Height="240" DataSource="{Command.RedArrowUpper}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -349,15 +377,15 @@ WHERE
       <SortField Field="{Command.AnalysisEndUTC}" SortDirection="AscendingOrder" SortType="RecordSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@MaxChartDate}" Kind="FormulaField" Name="MaxChartDate" NumberOfBytes="8" ValueType="DateTimeField">ShiftDateTime(Maximum({Command.AnalysisEndUTC}, {Command.Parametername}), "UTC,0", {?TimeZone})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@MaxProductLimitsStatus}" Kind="FormulaField" Name="MaxProductLimitsStatus" NumberOfBytes="8" ValueType="NumberField">MAXIMUM({Command.ProductLimitsStatus})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@MiddleChartDate1}" Kind="FormulaField" Name="MiddleChartDate1" NumberOfBytes="8" ValueType="DateTimeField">DateAdd("s", Int(Datediff("s", {@MinChartDate}, {@MaxChartDate})/3), {@MinChartDate})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@MiddleChartDate2}" Kind="FormulaField" Name="MiddleChartDate2" NumberOfBytes="8" ValueType="DateTimeField">DateAdd("s", -Int(Datediff("s", {@MinChartDate}, {@MaxChartDate})/3), {@MaxChartDate})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@MinChartDate}" Kind="FormulaField" Name="MinChartDate" NumberOfBytes="8" ValueType="DateTimeField">ShiftDateTime(Minimum({Command.AnalysisEndUTC}, {Command.Parametername}), "UTC,0", {?TimeZone})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@ParameterText}" Kind="FormulaField" Name="ParameterText" NumberOfBytes="206" ValueType="StringField">{Command.ProductName} + ", " + 
+      <FormulaFieldDefinition FormulaName="{@MaxChartDate}" Kind="FormulaField" Name="MaxChartDate" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">ShiftDateTime(Maximum({Command.AnalysisEndUTC}, {Command.Parametername}), "UTC,0", {?TimeZone})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@MaxProductLimitsStatus}" Kind="FormulaField" Name="MaxProductLimitsStatus" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">MAXIMUM({Command.ProductLimitsStatus})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@MiddleChartDate1}" Kind="FormulaField" Name="MiddleChartDate1" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">DateAdd("s", Int(Datediff("s", {@MinChartDate}, {@MaxChartDate})/3), {@MinChartDate})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@MiddleChartDate2}" Kind="FormulaField" Name="MiddleChartDate2" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">DateAdd("s", -Int(Datediff("s", {@MinChartDate}, {@MaxChartDate})/3), {@MaxChartDate})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@MinChartDate}" Kind="FormulaField" Name="MinChartDate" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">ShiftDateTime(Minimum({Command.AnalysisEndUTC}, {Command.Parametername}), "UTC,0", {?TimeZone})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@ParameterText}" Kind="FormulaField" Name="ParameterText" NumberOfBytes="206" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{Command.ProductName} + ", " + 
 {Command.Parametername}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@PredictionModelText}" Kind="FormulaField" Name="PredictionModelText" NumberOfBytes="194" ValueType="StringField">"Part number: " + ToText({Command.PartNumber},'#',0)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@TimeZoneCorrected}" Kind="FormulaField" Name="TimeZoneCorrected" NumberOfBytes="65534" ValueType="StringField">local StringVar Array ptzFields := Split(PrintTimeZone,",");
+      <FormulaFieldDefinition FormulaName="{@PredictionModelText}" Kind="FormulaField" Name="PredictionModelText" NumberOfBytes="194" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"Part number: " + ToText({Command.PartNumber},'#',0)</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@TimeZoneCorrected}" Kind="FormulaField" Name="TimeZoneCorrected" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">local StringVar Array ptzFields := Split(PrintTimeZone,",");
 local numberVar i;
 local numberVar j:=1;
 local stringVar ptzCorrected;
@@ -369,8 +397,8 @@ FOR i:= 1 TO Count(ptzFields) DO(
 );
 
 ptzCorrected;</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@TimeZoneDateTime}" Kind="FormulaField" Name="TimeZoneDateTime" NumberOfBytes="8" ValueType="DateTimeField">ShiftDateTime (PrintDate+PrintTime,{@TimeZoneCorrected} ,{?TimeZone} )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@TimeZonePrintDate}" Kind="FormulaField" Name="TimeZonePrintDate" NumberOfBytes="8" ValueType="DateTimeField">ShiftDateTime (PrintDate+PrintTime,{@TimeZoneCorrected} ,{?TimeZone} )</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@TimeZoneDateTime}" Kind="FormulaField" Name="TimeZoneDateTime" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">ShiftDateTime (PrintDate+PrintTime,{@TimeZoneCorrected} ,{?TimeZone} )</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@TimeZonePrintDate}" Kind="FormulaField" Name="TimeZonePrintDate" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">ShiftDateTime (PrintDate+PrintTime,{@TimeZoneCorrected} ,{?TimeZone} )</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions>
       <GroupNameFieldDefinition FormulaName="GroupName ({Command.ProductLogicalID})" Group="CrystalDecisions.CrystalReports.Engine.Group" GroupNameFieldName="Group #1 Name: Command.ProductLogicalID" Kind="GroupNameField" Name="GroupName ({Command.ProductLogicalID})" NumberOfBytes="65534" ValueType="StringField" />
@@ -458,6 +486,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </BoxObject>
               <FieldObject Name="InstrumentName2" Kind="FieldObject" Top="600" Left="1995" Width="3135" Height="258" DataSource="{GetInstrumentInformation.InstrumentName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -483,6 +515,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="SerialNumber1" Kind="FieldObject" Top="1129" Left="7015" Width="3950" Height="228" DataSource="{GetInstrumentInformation.SerialNumber}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -521,6 +557,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="InstrumentGroupName1" Kind="FieldObject" Top="867" Left="7015" Width="3950" Height="228" DataSource="{GetInstrumentInformation.InstrumentGroupName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -533,6 +573,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="NetworkName1" Kind="FieldObject" Top="600" Left="7015" Width="3950" Height="240" DataSource="{GetInstrumentInformation.NetworkName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -685,6 +729,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="NetworkName2" Kind="FieldObject" Top="600" Left="7017" Width="3948" Height="240" DataSource="{GetInstrumentInformation.NetworkName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -697,6 +745,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="InstrumentGroupName2" Kind="FieldObject" Top="859" Left="7017" Width="3948" Height="228" DataSource="{GetInstrumentInformation.InstrumentGroupName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -709,6 +761,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="SerialNumber2" Kind="FieldObject" Top="1129" Left="7017" Width="3948" Height="228" DataSource="{GetInstrumentInformation.SerialNumber}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -721,6 +777,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="InstrumentName1" Kind="FieldObject" Top="600" Left="1995" Width="3135" Height="240" DataSource="{GetInstrumentInformation.InstrumentName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -965,6 +1025,10 @@ ptzCorrected;</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="GroupNameProductLogicalID1" Kind="FieldObject" Top="0" Left="342" Width="2554" Height="221" DataSource="GroupName ({Command.ProductLogicalID})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1004,6 +1068,10 @@ ptzCorrected;</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="DoubleResult2" Kind="FieldObject" Top="0" Left="342" Width="915" Height="240" DataSource="{Command.DoubleResult}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1016,6 +1084,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LowerMD2" Kind="FieldObject" Top="30" Left="1425" Width="915" Height="240" DataSource="{Command.LowerMD}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1028,6 +1100,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="UpperMD2" Kind="FieldObject" Top="15" Left="2640" Width="915" Height="240" DataSource="{Command.UpperMD}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1040,6 +1116,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="LowerWarning2" Kind="FieldObject" Top="30" Left="3735" Width="915" Height="240" DataSource="{Command.LowerWarning}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1052,6 +1132,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="UpperWarning2" Kind="FieldObject" Top="30" Left="4785" Width="915" Height="240" DataSource="{Command.UpperWarning}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1064,6 +1148,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="MaxGrafDraw2" Kind="FieldObject" Top="15" Left="5865" Width="915" Height="240" DataSource="{Command.MaxGrafDraw}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1076,6 +1164,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="MinGrafDraw2" Kind="FieldObject" Top="15" Left="6960" Width="915" Height="240" DataSource="{Command.MinGrafDraw}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1101,6 +1193,10 @@ ptzCorrected;</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="PredictionMIDText1" Kind="FieldObject" Top="30" Left="5575" Width="4970" Height="285" DataSource="{@PredictionModelText}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1113,6 +1209,10 @@ ptzCorrected;</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ParamterText1" Kind="FieldObject" Top="30" Left="270" Width="5255" Height="280" DataSource="{@ParameterText}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1209,6 +1309,10 @@ Showing: Upper Action+Lower Action</Text>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="MinChartDate1" Kind="FieldObject" Top="3762" Left="904" Width="1360" Height="285" DataSource="{@MinChartDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1221,6 +1325,10 @@ Showing: Upper Action+Lower Action</Text>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="MaxChartDate1" Kind="FieldObject" Top="3764" Left="8231" Width="2167" Height="285" DataSource="{@MaxChartDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1233,6 +1341,10 @@ Showing: Upper Action+Lower Action</Text>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="MiddleDate21" Kind="FieldObject" Top="3764" Left="6248" Width="1795" Height="285" DataSource="{@MiddleChartDate2}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1245,6 +1357,10 @@ Showing: Upper Action+Lower Action</Text>
                 <ObjectFormatConditionFormulas EnableSuppress="DistinctCount({Command.AnalysisEndUTC}, {Command.Parametername}) &lt; 2" />
               </FieldObject>
               <FieldObject Name="MiddleDate11" Kind="FieldObject" Top="3762" Left="3006" Width="1830" Height="285" DataSource="{@MiddleChartDate1}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1471,6 +1587,10 @@ Showing: Definition value (Target)</Text>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="TimeZonePrintDate1" Kind="FieldObject" Top="120" Left="181" Width="2840" Height="267" DataSource="{@TimeZonePrintDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1496,6 +1616,10 @@ Showing: Definition value (Target)</Text>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="PageNofM2" Kind="FieldObject" Top="120" Left="3720" Width="2840" Height="276" DataSource="PageNofM">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\morellanand_PrecioPromedio_00.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\morellanand_PrecioPromedio_00.rpt" HasSavedData="True">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -37,12 +37,12 @@
     <Groups />
     <SortFields />
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@PPromedio}" Kind="FormulaField" Name="PPromedio" NumberOfBytes="8" ValueType="NumberField">if {vw_OrderCrystal1.Pagina}=0
+      <FormulaFieldDefinition FormulaName="{@PPromedio}" Kind="FormulaField" Name="PPromedio" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if {vw_OrderCrystal1.Pagina}=0
 then
     0 
 else 
  {vw_OrderCrystal1.subtotal}/{vw_OrderCrystal1.Pagina}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@ProdPos}" Kind="FormulaField" Name="ProdPos" NumberOfBytes="244" ValueType="StringField">{vw_OrderCrystal1.Producto} &amp; "-" &amp; {vw_OrderCrystal1.Posicion}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@ProdPos}" Kind="FormulaField" Name="ProdPos" NumberOfBytes="244" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{vw_OrderCrystal1.Producto} &amp; "-" &amp; {vw_OrderCrystal1.Posicion}</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions />
     <ParameterFieldDefinitions>

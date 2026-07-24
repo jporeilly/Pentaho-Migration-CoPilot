@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\souvikduttachoudhury_Customer_Profile_Report.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\souvikduttachoudhury_Customer_Profile_Report.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole10Native" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -85,7 +85,7 @@
           <SortField Field="{ORDERS.ORDER_ID}" SortDirection="AscendingOrder" SortType="GroupSortField" />
         </SortFields>
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@description}" Kind="FormulaField" Name="description" NumberOfBytes="94" ValueType="StringField">if (isnull({Product.Color}) and isnull({Product.Size})) then {Product.M_F}
+          <FormulaFieldDefinition FormulaName="{@description}" Kind="FormulaField" Name="description" NumberOfBytes="94" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if (isnull({Product.Color}) and isnull({Product.Size})) then {Product.M_F}
 else
 if (isnull({Product.Size}) and isnull({Product.M_F})) then {Product.Color}
 else
@@ -104,20 +104,20 @@ else
 
 
 </FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@order total}" Kind="FormulaField" Name="order total" NumberOfBytes="8" ValueType="NumberField">Sum ({@total}, {Orders.Order_ID})+{@tax}+{@shipping cost}
+          <FormulaFieldDefinition FormulaName="{@order total}" Kind="FormulaField" Name="order total" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">Sum ({@total}, {Orders.Order_ID})+{@tax}+{@shipping cost}
 
 
 </FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@shipping cost}" Kind="FormulaField" Name="shipping cost" NumberOfBytes="8" ValueType="NumberField">//enter either field or use formula to calculate an order's shipping cost
+          <FormulaFieldDefinition FormulaName="{@shipping cost}" Kind="FormulaField" Name="shipping cost" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">//enter either field or use formula to calculate an order's shipping cost
 //for this example $100.00 is used for all cases
 100.00
 
 </FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@tax}" Kind="FormulaField" Name="tax" NumberOfBytes="8" ValueType="NumberField">Sum ({@total}, {Orders.Order_ID})*.1
+          <FormulaFieldDefinition FormulaName="{@tax}" Kind="FormulaField" Name="tax" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">Sum ({@total}, {Orders.Order_ID})*.1
 
 
 </FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@total}" Kind="FormulaField" Name="total" NumberOfBytes="8" ValueType="NumberField">{ORDERS_DETAILS.UNIT_PRICE}*{ORDERS_DETAILS.QUANTITY}
+          <FormulaFieldDefinition FormulaName="{@total}" Kind="FormulaField" Name="total" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{ORDERS_DETAILS.UNIT_PRICE}*{ORDERS_DETAILS.QUANTITY}
 
 
 </FormulaFieldDefinition>
@@ -325,6 +325,10 @@ else
                 </SectionFormat>
                 <ReportObjects>
                   <FieldObject Name="PRODUCTPRODUCT_ID" Kind="FieldObject" Top="0" Left="1955" Width="1224" Height="210" DataSource="{PRODUCT.PRODUCT_ID}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -337,6 +341,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="PRODUCTPRODUCT_NAME" Kind="FieldObject" Top="0" Left="3200" Width="2480" Height="205" DataSource="{PRODUCT.PRODUCT_NAME}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -349,6 +357,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="description" Kind="FieldObject" Top="0" Left="5730" Width="1890" Height="210" DataSource="{@description}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -361,6 +373,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="ORDERS_DETAILSUNIT_PRICE" Kind="FieldObject" Top="0" Left="7625" Width="1100" Height="205" DataSource="{ORDERS_DETAILS.UNIT_PRICE}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -373,6 +389,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="ORDERS_DETAILSQUANTITY" Kind="FieldObject" Top="0" Left="8775" Width="1410" Height="210" DataSource="{ORDERS_DETAILS.QUANTITY}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -385,6 +405,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="total" Kind="FieldObject" Top="0" Left="10140" Width="1229" Height="210" DataSource="{@total}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -472,6 +496,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </TextObject>
                   <FieldObject Name="Field" Kind="FieldObject" Top="180" Left="10290" Width="1049" Height="210" DataSource="Sum ({@total}, {ORDERS.ORDER_ID})">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FixedSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -484,6 +512,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="tax" Kind="FieldObject" Top="405" Left="10290" Width="1049" Height="210" DataSource="{@tax}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -496,6 +528,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="shippingcost" Kind="FieldObject" Top="614" Left="10290" Width="1049" Height="210" DataSource="{@shipping cost}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="9" SizeinPoints="9" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -538,6 +574,10 @@ else
                     <ObjectFormatConditionFormulas />
                   </LineObject>
                   <FieldObject Name="ordertotal" Kind="FieldObject" Top="974" Left="10290" Width="1049" Height="210" DataSource="{@order total}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FixedSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -653,45 +693,45 @@ else
       <SortField Field="{ORDERS.ORDER_ID}" SortDirection="AscendingOrder" SortType="GroupSortField" />
     </SortFields>
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@contact name}" Kind="FormulaField" Name="contact name" NumberOfBytes="136" ValueType="StringField">{CUSTOMER.CONTACT_TITLE}+" "+{CUSTOMER.CONTACT_FIRST_NAME}+" "+{CUSTOMER.CONTACT_LAST_NAME}
+      <FormulaFieldDefinition FormulaName="{@contact name}" Kind="FormulaField" Name="contact name" NumberOfBytes="136" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CUSTOMER.CONTACT_TITLE}+" "+{CUSTOMER.CONTACT_FIRST_NAME}+" "+{CUSTOMER.CONTACT_LAST_NAME}
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@customer city/region}" Kind="FormulaField" Name="customer city/region" NumberOfBytes="106" ValueType="StringField">if IsNull({CUSTOMER.REGION}) then {CUSTOMER.CITY} 
+      <FormulaFieldDefinition FormulaName="{@customer city/region}" Kind="FormulaField" Name="customer city/region" NumberOfBytes="106" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if IsNull({CUSTOMER.REGION}) then {CUSTOMER.CITY} 
 else {CUSTOMER.CITY} +", "+{CUSTOMER.REGION}
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@due date}" Kind="FormulaField" Name="due date" NumberOfBytes="4" ValueType="DateField">//when order payment is due
+      <FormulaFieldDefinition FormulaName="{@due date}" Kind="FormulaField" Name="due date" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">//when order payment is due
 {ORDERS.SHIPPED_DATE}+30
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@fax}" Kind="FormulaField" Name="fax" NumberOfBytes="56" ValueType="StringField">"("+{CUSTOMER.FAX}[1 to 3]+") "+{CUSTOMER.FAX}[4 to 6]+"-"+{CUSTOMER.FAX}[7 to 10]
+      <FormulaFieldDefinition FormulaName="{@fax}" Kind="FormulaField" Name="fax" NumberOfBytes="56" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"("+{CUSTOMER.FAX}[1 to 3]+") "+{CUSTOMER.FAX}[4 to 6]+"-"+{CUSTOMER.FAX}[7 to 10]
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@first letter}" Kind="FormulaField" Name="first letter" NumberOfBytes="6" ValueType="StringField">if {CUSTOMER.CUSTOMER_NAME}[1 to 3]="The" then
+      <FormulaFieldDefinition FormulaName="{@first letter}" Kind="FormulaField" Name="first letter" NumberOfBytes="6" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if {CUSTOMER.CUSTOMER_NAME}[1 to 3]="The" then
 {CUSTOMER.CUSTOMER_NAME}[5]
 else
 {CUSTOMER.CUSTOMER_NAME}[1]
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@OrderHeaderCheck}" Kind="FormulaField" Name="OrderHeaderCheck" NumberOfBytes="8" ValueType="NumberField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@OrderHeaderCheck}" Kind="FormulaField" Name="OrderHeaderCheck" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 numbervar OrderHead:=OrderHead+1
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@OrderHeaderInitialize}" Kind="FormulaField" Name="OrderHeaderInitialize" NumberOfBytes="8" ValueType="NumberField">whileprintingrecords;
+      <FormulaFieldDefinition FormulaName="{@OrderHeaderInitialize}" Kind="FormulaField" Name="OrderHeaderInitialize" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">whileprintingrecords;
 numbervar OrderHead:=0;
 
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@phone}" Kind="FormulaField" Name="phone" NumberOfBytes="60" ValueType="StringField">{CUSTOMER.PHONE}[1 to 5] + " " + {CUSTOMER.PHONE}[6 to 13]
+      <FormulaFieldDefinition FormulaName="{@phone}" Kind="FormulaField" Name="phone" NumberOfBytes="60" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{CUSTOMER.PHONE}[1 to 5] + " " + {CUSTOMER.PHONE}[6 to 13]
 
 
 </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@region}" Kind="FormulaField" Name="region" NumberOfBytes="62" ValueType="StringField">if {CUSTOMER.REGION} in 
+      <FormulaFieldDefinition FormulaName="{@region}" Kind="FormulaField" Name="region" NumberOfBytes="62" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if {CUSTOMER.REGION} in 
 ["DE", "DC", "CT", "IA", "IL", "IN" ,"ME", "MA", "MD", "MI", "MN", "MO", "ND", "NE", "NH", "NJ", "NY", "OH", "PA", "RI", "SD", "VT", "WI"]
 then  "North East, USA"
 else
@@ -863,6 +903,10 @@ else
                 <ObjectFormatConditionFormulas />
               </LineObject>
               <FieldObject Name="PrintDate2" Kind="FieldObject" Top="645" Left="0" Width="1050" Height="210" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -875,6 +919,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="PrintTime2" Kind="FieldObject" Top="645" Left="1065" Width="1890" Height="210" DataSource="PrintTime">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1042,6 +1090,10 @@ else
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="GroupNameField2" Kind="FieldObject" Top="0" Left="0" Width="945" Height="420" DataSource="GroupName ({@first letter})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1069,6 +1121,10 @@ else
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="CUSTOMERCUSTOMER_NAME" Kind="FieldObject" Top="135" Left="216" Width="2361" Height="210" DataSource="{CUSTOMER.CUSTOMER_NAME}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="ffbfa57d" A="255" R="191" G="165" B="125" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1081,6 +1137,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="contactname" Kind="FieldObject" Top="135" Left="3030" Width="2160" Height="210" DataSource="{@contact name}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1132,6 +1192,10 @@ else
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="CUSTOMEREMAIL" Kind="FieldObject" Top="720" Left="5790" Width="2715" Height="210" DataSource="{CUSTOMER.EMAIL}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Blue" A="255" R="0" G="0" B="255" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1171,6 +1235,10 @@ else
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="OrderHeaderInitialize" Kind="FieldObject" Top="1170" Left="60" Width="450" Height="210" DataSource="{@OrderHeaderInitialize}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1302,6 +1370,10 @@ else
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="OrderHeaderCheck" Kind="FieldObject" Top="90" Left="4860" Width="225" Height="210" DataSource="{@OrderHeaderCheck}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1322,6 +1394,10 @@ else
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="ORDERSORDER_ID" Kind="FieldObject" Top="105" Left="660" Width="1710" Height="210" DataSource="{ORDERS.ORDER_ID}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1334,6 +1410,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSORDER_DATE" Kind="FieldObject" Top="105" Left="2370" Width="1500" Height="210" DataSource="{ORDERS.ORDER_DATE}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="NumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/d/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1346,6 +1426,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="duedate" Kind="FieldObject" Top="90" Left="3885" Width="1305" Height="210" DataSource="{@due date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1358,6 +1442,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSSHIPPED_DATE" Kind="FieldObject" Top="105" Left="5190" Width="1470" Height="210" DataSource="{ORDERS.SHIPPED_DATE}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1370,6 +1458,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSSHIP_VIA" Kind="FieldObject" Top="90" Left="6615" Width="1470" Height="210" DataSource="{ORDERS.SHIP_VIA}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1382,6 +1474,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSORDER_AMOUNT2" Kind="FieldObject" Top="90" Left="8085" Width="1590" Height="210" DataSource="{ORDERS.ORDER_AMOUNT}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1415,6 +1511,10 @@ else
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="ORDERSORDER_ID2" Kind="FieldObject" Top="105" Left="660" Width="1710" Height="210" DataSource="{ORDERS.ORDER_ID}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1427,6 +1527,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSORDER_DATE2" Kind="FieldObject" Top="105" Left="2370" Width="1500" Height="210" DataSource="{ORDERS.ORDER_DATE}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="NumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/d/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1439,6 +1543,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="duedate2" Kind="FieldObject" Top="90" Left="3885" Width="1305" Height="210" DataSource="{@due date}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1451,6 +1559,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSSHIPPED_DATE2" Kind="FieldObject" Top="105" Left="5190" Width="1470" Height="210" DataSource="{ORDERS.SHIPPED_DATE}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1463,6 +1575,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSSHIP_VIA2" Kind="FieldObject" Top="90" Left="6615" Width="1470" Height="210" DataSource="{ORDERS.SHIP_VIA}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1475,6 +1591,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSORDER_AMOUNT22" Kind="FieldObject" Top="90" Left="8085" Width="1590" Height="210" DataSource="{ORDERS.ORDER_AMOUNT}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1523,6 +1643,10 @@ else
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="CUSTOMERCUSTOMER_NAME2" Kind="FieldObject" Top="180" Left="405" Width="1890" Height="210" DataSource="{CUSTOMER.CUSTOMER_NAME}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1535,6 +1659,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="ORDERSORDER_AMOUNT" Kind="FieldObject" Top="195" Left="3435" Width="1890" Height="210" DataSource="{ORDERS.ORDER_AMOUNT}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1615,6 +1743,10 @@ else
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="Field8" Kind="FieldObject" Top="120" Left="5100" Width="1890" Height="210" DataSource="Sum ({ORDERS.ORDER_AMOUNT}, {CUSTOMER.CUSTOMER_NAME})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1627,6 +1759,10 @@ else
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Field7" Kind="FieldObject" Top="375" Left="5115" Width="1890" Height="210" DataSource="PercentOfSum ({ORDERS.ORDER_AMOUNT}, {CUSTOMER.CUSTOMER_NAME}, {@region})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

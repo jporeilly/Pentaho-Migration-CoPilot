@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\mkaleemahmad_CashFlowReport.rpt" HasSavedData="False">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\mkaleemahmad_CashFlowReport.rpt" HasSavedData="False">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="False" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -35,11 +35,11 @@
           <SortField Field="{spCashFlow;1.GroupName}" SortDirection="AscendingOrder" SortType="GroupSortField" />
         </SortFields>
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@fmGroupName}" Kind="FormulaField" Name="fmGroupName" NumberOfBytes="42" ValueType="StringField">If isNull({spCashFlow;1.GroupName}) THEN
+          <FormulaFieldDefinition FormulaName="{@fmGroupName}" Kind="FormulaField" Name="fmGroupName" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">If isNull({spCashFlow;1.GroupName}) THEN
   "G/L Accounts"
 else
 {spCashFlow;1.GroupName}</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@returnSumOfCredit}" Kind="FormulaField" Name="returnSumOfCredit" NumberOfBytes="8" ValueType="CurrencyField">WhilePrintingRecords; 
+          <FormulaFieldDefinition FormulaName="{@returnSumOfCredit}" Kind="FormulaField" Name="returnSumOfCredit" NumberOfBytes="8" ValueType="CurrencyField" Syntax="crFormulaSyntaxCrystal">WhilePrintingRecords; 
 Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFieldDefinition>
         </FormulaFieldDefinitions>
         <GroupNameFieldDefinitions>
@@ -223,6 +223,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldHeadingObject>
                   <FieldObject Name="fmGroupName1" Kind="FieldObject" Top="33" Left="1749" Width="3828" Height="341" DataSource="{@fmGroupName}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -258,6 +262,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                 </SectionFormat>
                 <ReportObjects>
                   <FieldObject Name="ContraAct1" Kind="FieldObject" Top="33" Left="33" Width="1620" Height="221" DataSource="{spCashFlow;1.ContraAct}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -283,6 +291,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </TextObject>
                   <FieldObject Name="sumofcredit1" Kind="FieldObject" Top="33" Left="5544" Width="1767" Height="221" DataSource="{spCashFlow;1.sumofcredit}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -341,6 +353,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </LineObject>
                   <FieldObject Name="fmGroupName2" Kind="FieldObject" Top="99" Left="1683" Width="2376" Height="341" DataSource="{@fmGroupName}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -353,6 +369,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="Sumofsumofcredit2" Kind="FieldObject" Top="165" Left="5544" Width="1767" Height="230" DataSource="Sum ({spCashFlow;1.sumofcredit}, {spCashFlow;1.GroupName})">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -391,6 +411,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldHeadingObject>
                   <FieldObject Name="Sumofsumofcredit1" Kind="FieldObject" Top="66" Left="5544" Width="1767" Height="230" DataSource="Sum ({spCashFlow;1.sumofcredit})">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -403,6 +427,10 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="returnSumOfCredit1" Kind="FieldObject" Top="66" Left="528" Width="1050" Height="221" DataSource="{@returnSumOfCredit}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;(#,##0.00)" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -455,11 +483,11 @@ Shared CurrencyVar myCreditTotal := sum({spCashFlow;1.sumofcredit})</FormulaFiel
           <SortField Field="{spCashFlow;1.GroupName}" SortDirection="AscendingOrder" SortType="GroupSortField" />
         </SortFields>
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@fmGroupName}" Kind="FormulaField" Name="fmGroupName" NumberOfBytes="42" ValueType="StringField">If isNull({spCashFlow;1.GroupName}) THEN
+          <FormulaFieldDefinition FormulaName="{@fmGroupName}" Kind="FormulaField" Name="fmGroupName" NumberOfBytes="42" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">If isNull({spCashFlow;1.GroupName}) THEN
   "G/L Accounts"
 else
 {spCashFlow;1.GroupName}</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@returnSumOfDebit}" Kind="FormulaField" Name="returnSumOfDebit" NumberOfBytes="8" ValueType="CurrencyField">WhilePrintingRecords; 
+          <FormulaFieldDefinition FormulaName="{@returnSumOfDebit}" Kind="FormulaField" Name="returnSumOfDebit" NumberOfBytes="8" ValueType="CurrencyField" Syntax="crFormulaSyntaxCrystal">WhilePrintingRecords; 
 Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFieldDefinition>
         </FormulaFieldDefinitions>
         <GroupNameFieldDefinitions>
@@ -643,6 +671,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldHeadingObject>
                   <FieldObject Name="fmGroupName1" Kind="FieldObject" Top="33" Left="1749" Width="3828" Height="341" DataSource="{@fmGroupName}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -678,6 +710,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                 </SectionFormat>
                 <ReportObjects>
                   <FieldObject Name="ContraAct1" Kind="FieldObject" Top="33" Left="33" Width="1620" Height="221" DataSource="{spCashFlow;1.ContraAct}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -703,6 +739,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </TextObject>
                   <FieldObject Name="sumofdebit1" Kind="FieldObject" Top="33" Left="5511" Width="1758" Height="245" DataSource="{spCashFlow;1.sumofdebit}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -728,6 +768,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                 </SectionFormat>
                 <ReportObjects>
                   <FieldObject Name="Sumofsumofdebit1" Kind="FieldObject" Top="132" Left="5577" Width="1701" Height="230" DataSource="Sum ({spCashFlow;1.sumofdebit}, {spCashFlow;1.GroupName})">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -773,6 +817,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </LineObject>
                   <FieldObject Name="fmGroupName2" Kind="FieldObject" Top="99" Left="1683" Width="2376" Height="341" DataSource="{@fmGroupName}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -811,6 +859,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldHeadingObject>
                   <FieldObject Name="Sumofsumofdebit2" Kind="FieldObject" Top="0" Left="5535" Width="1761" Height="263" DataSource="Sum ({spCashFlow;1.sumofdebit})">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -823,6 +875,10 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <FieldObject Name="returnSumOfDebit1" Kind="FieldObject" Top="33" Left="462" Width="1050" Height="221" DataSource="{@returnSumOfDebit}">
+                    <FieldFormat>
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;(#,##0.00)" />
+                      <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                    </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
                     <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                     <FontColorConditionFormulas />
@@ -871,20 +927,20 @@ Shared CurrencyVar myDebitTotal := Sum ({spCashFlow;1.sumofdebit}) </FormulaFiel
     <Groups />
     <SortFields />
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@fmClosingBalance}" Kind="FormulaField" Name="fmClosingBalance" NumberOfBytes="8" ValueType="CurrencyField">{?pmOpeningBalance} + {@returnSumOfDebit} - {@returnSumOfCredit}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@fmFromAcc}" Kind="FormulaField" Name="fmFromAcc" NumberOfBytes="65534" ValueType="StringField">if {?@FromAccount} = '' then
+      <FormulaFieldDefinition FormulaName="{@fmClosingBalance}" Kind="FormulaField" Name="fmClosingBalance" NumberOfBytes="8" ValueType="CurrencyField" Syntax="crFormulaSyntaxCrystal">{?pmOpeningBalance} + {@returnSumOfDebit} - {@returnSumOfCredit}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@fmFromAcc}" Kind="FormulaField" Name="fmFromAcc" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if {?@FromAccount} = '' then
 'ALL'
 else {?@FromAccount}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@fmFromDate}" Kind="FormulaField" Name="fmFromDate" NumberOfBytes="44" ValueType="StringField">ToText(cDate({?@FromDate}),"dd/MM/yyyy")</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@fmToAccount}" Kind="FormulaField" Name="fmToAccount" NumberOfBytes="65534" ValueType="StringField">if {?@ToAccount} = '' then
+      <FormulaFieldDefinition FormulaName="{@fmFromDate}" Kind="FormulaField" Name="fmFromDate" NumberOfBytes="44" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">ToText(cDate({?@FromDate}),"dd/MM/yyyy")</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@fmToAccount}" Kind="FormulaField" Name="fmToAccount" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">if {?@ToAccount} = '' then
 'ALL'
 else
 {?@ToAccount}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@fmToDate}" Kind="FormulaField" Name="fmToDate" NumberOfBytes="44" ValueType="StringField">ToText(cDate({?@ToDate}),"dd/MM/yyyy")</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@returnSumOfCredit}" Kind="FormulaField" Name="returnSumOfCredit" NumberOfBytes="8" ValueType="CurrencyField">WhilePrintingRecords; 
+      <FormulaFieldDefinition FormulaName="{@fmToDate}" Kind="FormulaField" Name="fmToDate" NumberOfBytes="44" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">ToText(cDate({?@ToDate}),"dd/MM/yyyy")</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@returnSumOfCredit}" Kind="FormulaField" Name="returnSumOfCredit" NumberOfBytes="8" ValueType="CurrencyField" Syntax="crFormulaSyntaxCrystal">WhilePrintingRecords; 
 Shared CurrencyVar myCreditTotal; 
 myCreditTotal </FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@returnSumOfDebit}" Kind="FormulaField" Name="returnSumOfDebit" NumberOfBytes="8" ValueType="CurrencyField">WhilePrintingRecords; 
+      <FormulaFieldDefinition FormulaName="{@returnSumOfDebit}" Kind="FormulaField" Name="returnSumOfDebit" NumberOfBytes="8" ValueType="CurrencyField" Syntax="crFormulaSyntaxCrystal">WhilePrintingRecords; 
 Shared CurrencyVar myDebitTotal; 
 myDebitTotal </FormulaFieldDefinition>
     </FormulaFieldDefinitions>
@@ -978,6 +1034,10 @@ myDebitTotal </FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="pmCompany1" Kind="FieldObject" Top="19" Left="4389" Width="6435" Height="345" DataSource="{?pmCompany}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="22" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="14" SizeinPoints="14" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1003,6 +1063,10 @@ myDebitTotal </FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="PageNofM2" Kind="FieldObject" Top="171" Left="12654" Width="1995" Height="221" DataSource="PageNofM">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1028,6 +1092,10 @@ myDebitTotal </FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <FieldObject Name="pmOpeningBalance1" Kind="FieldObject" Top="1026" Left="12901" Width="2079" Height="284" DataSource="{?pmOpeningBalance}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="#,##0;(#,##0)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -1172,6 +1240,10 @@ myDebitTotal </FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="fmClosingBalance1" Kind="FieldObject" Top="209" Left="12787" Width="2166" Height="284" DataSource="{@fmClosingBalance}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;(#,##0.00)" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

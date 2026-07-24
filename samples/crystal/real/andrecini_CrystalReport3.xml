@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\andrecini_CrystalReport3.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\andrecini_CrystalReport3.rpt" HasSavedData="True">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="False" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -32,14 +32,14 @@
     <Groups />
     <SortFields />
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@Data-Hora}" Kind="FormulaField" Name="Data-Hora" NumberOfBytes="8" ValueType="DateTimeField">CurrentDateTime()</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Desconto}" Kind="FormulaField" Name="Desconto" NumberOfBytes="8" ValueType="NumberField">{TesteFormulas.Bruto} - {TesteFormulas.Liquido}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Localização}" Kind="FormulaField" Name="Localização" NumberOfBytes="38" ValueType="StringField">"Cursino, São Paulo"</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Média Descontos}" Kind="FormulaField" Name="Média Descontos" NumberOfBytes="8" ValueType="NumberField">Average ({@Desconto})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Média Salarios}" Kind="FormulaField" Name="Média Salarios" NumberOfBytes="8" ValueType="NumberField">Average ({TesteFormulas.Liquido})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Nome}" Kind="FormulaField" Name="Nome" NumberOfBytes="512" ValueType="StringField">UpperCase ({TesteFormulas.Nome})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Saldo}" Kind="FormulaField" Name="Saldo" NumberOfBytes="8" ValueType="NumberField">{TesteFormulas.Deposito} - {TesteFormulas.Saque}</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@Título}" Kind="FormulaField" Name="Título" NumberOfBytes="34" ValueType="StringField">"CRYSTAL REPORT 3"</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Data-Hora}" Kind="FormulaField" Name="Data-Hora" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">CurrentDateTime()</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Desconto}" Kind="FormulaField" Name="Desconto" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{TesteFormulas.Bruto} - {TesteFormulas.Liquido}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Localização}" Kind="FormulaField" Name="Localização" NumberOfBytes="38" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"Cursino, São Paulo"</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Média Descontos}" Kind="FormulaField" Name="Média Descontos" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">Average ({@Desconto})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Média Salarios}" Kind="FormulaField" Name="Média Salarios" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">Average ({TesteFormulas.Liquido})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Nome}" Kind="FormulaField" Name="Nome" NumberOfBytes="512" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">UpperCase ({TesteFormulas.Nome})</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Saldo}" Kind="FormulaField" Name="Saldo" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">{TesteFormulas.Deposito} - {TesteFormulas.Saque}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Título}" Kind="FormulaField" Name="Título" NumberOfBytes="34" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">"CRYSTAL REPORT 3"</FormulaFieldDefinition>
     </FormulaFieldDefinitions>
     <GroupNameFieldDefinitions />
     <ParameterFieldDefinitions />
@@ -60,6 +60,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Título1" Kind="FieldObject" Top="15" Left="0" Width="11475" Height="493" DataSource="{@Título}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
                 <Font Bold="True" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="31" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="20" SizeinPoints="20" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -137,6 +141,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="Nome1" Kind="FieldObject" Top="0" Left="2940" Width="1920" Height="226" DataSource="{@Nome}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -149,6 +157,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Saldo1" Kind="FieldObject" Top="0" Left="5130" Width="2115" Height="226" DataSource="{@Saldo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -161,6 +173,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="Desconto1" Kind="FieldObject" Top="0" Left="7485" Width="1911" Height="226" DataSource="{@Desconto}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -186,6 +202,10 @@
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="MédiaSalarios1" Kind="FieldObject" Top="135" Left="7485" Width="1911" Height="226" DataSource="{@Média Salarios}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -198,6 +218,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="MédiaDescontos1" Kind="FieldObject" Top="312" Left="7485" Width="1911" Height="226" DataSource="{@Média Descontos}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -259,6 +283,10 @@
                 <ObjectFormatConditionFormulas />
               </LineObject>
               <FieldObject Name="Localização1" Kind="FieldObject" Top="105" Left="9510" Width="1860" Height="240" DataSource="{@Localização}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -271,6 +299,10 @@
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="DataHora1" Kind="FieldObject" Top="390" Left="9510" Width="1860" Height="240" DataSource="{@Data-Hora}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="True" FontFamily="Times New Roman" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Times New Roman" OriginalFontName="Times New Roman" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />

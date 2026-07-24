@@ -20,11 +20,16 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 if ($InDir -eq "") { $InDir = Join-Path $repoRoot "samples\crystal-rpt" }
 if ($OutDir -eq "") { $OutDir = Join-Path $repoRoot "samples\crystal\real" }
 
-# locate RptToXml.exe
+# locate the extractor: prefer the fork (per-field formats + redaction),
+# fall back to stock RptToXml.exe
 $rptToXml = $env:RPTTOXML_PATH
 if (-not $rptToXml -or -not (Test-Path $rptToXml)) {
+    $rptToXml = Join-Path $repoRoot "tools\RptToXml\RptToXmlFork.exe"
+}
+if (-not (Test-Path $rptToXml)) {
     $rptToXml = Join-Path $repoRoot "tools\RptToXml\RptToXml.exe"
 }
+$env:RPTTOXML_REDACT = "1"
 if (-not (Test-Path $rptToXml)) {
     Write-Host "ERROR: RptToXml.exe not found. Place it in tools\RptToXml\ or set RPTTOXML_PATH."
     Write-Host "Binaries: https://github.com/ajryan/RptToXml/releases"

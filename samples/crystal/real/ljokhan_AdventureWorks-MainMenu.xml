@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\ljokhan_AdventureWorks-MainMenu.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\ljokhan_AdventureWorks-MainMenu.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -81,10 +81,10 @@
         <Groups />
         <SortFields />
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@MonthOfShipDate}" Kind="FormulaField" Name="MonthOfShipDate" NumberOfBytes="166" ValueType="StringField">IIf (Month({SalesOrderHeader.ShipDate}) &lt; 10, "0" + ToText(Month({SalesOrderHeader.ShipDate}), 0, ""), ToText(Month({SalesOrderHeader.ShipDate}), 0, ""))</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@Week}" Kind="FormulaField" Name="Week" NumberOfBytes="65534" ValueType="StringField" />
-          <FormulaFieldDefinition FormulaName="{@YearMonth}" Kind="FormulaField" Name="YearMonth" NumberOfBytes="330" ValueType="StringField">{@YearOfShipDate} + "-" + {@MonthOfShipDate}</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@MonthOfShipDate}" Kind="FormulaField" Name="MonthOfShipDate" NumberOfBytes="166" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">IIf (Month({SalesOrderHeader.ShipDate}) &lt; 10, "0" + ToText(Month({SalesOrderHeader.ShipDate}), 0, ""), ToText(Month({SalesOrderHeader.ShipDate}), 0, ""))</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@Week}" Kind="FormulaField" Name="Week" NumberOfBytes="65534" ValueType="StringField" Syntax="crFormulaSyntaxCrystal" />
+          <FormulaFieldDefinition FormulaName="{@YearMonth}" Kind="FormulaField" Name="YearMonth" NumberOfBytes="330" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@YearOfShipDate} + "-" + {@MonthOfShipDate}</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
         </FormulaFieldDefinitions>
         <GroupNameFieldDefinitions />
         <ParameterFieldDefinitions />
@@ -236,9 +236,9 @@
         <Groups />
         <SortFields />
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@MonthOfShipDate}" Kind="FormulaField" Name="MonthOfShipDate" NumberOfBytes="166" ValueType="StringField">IIf (Month({SalesOrderHeader.ShipDate}) &lt; 10, "0" + ToText(Month({SalesOrderHeader.ShipDate}), 0, ""), ToText(Month({SalesOrderHeader.ShipDate}), 0, ""))</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@YearMonth}" Kind="FormulaField" Name="YearMonth" NumberOfBytes="330" ValueType="StringField">{@YearOfShipDate} + "-" + {@MonthOfShipDate}</FormulaFieldDefinition>
-          <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@MonthOfShipDate}" Kind="FormulaField" Name="MonthOfShipDate" NumberOfBytes="166" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">IIf (Month({SalesOrderHeader.ShipDate}) &lt; 10, "0" + ToText(Month({SalesOrderHeader.ShipDate}), 0, ""), ToText(Month({SalesOrderHeader.ShipDate}), 0, ""))</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@YearMonth}" Kind="FormulaField" Name="YearMonth" NumberOfBytes="330" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{@YearOfShipDate} + "-" + {@MonthOfShipDate}</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
         </FormulaFieldDefinitions>
         <GroupNameFieldDefinitions />
         <ParameterFieldDefinitions />
@@ -390,7 +390,7 @@
         <Groups />
         <SortFields />
         <FormulaFieldDefinitions>
-          <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
+          <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
         </FormulaFieldDefinitions>
         <GroupNameFieldDefinitions />
         <ParameterFieldDefinitions />

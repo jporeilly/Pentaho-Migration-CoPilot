@@ -114,12 +114,17 @@ def _parse_object(obj):
         el.can_grow = _attr(objfmt, "EnableCanGrow", default="false").lower() in ("true", "1")
         if not el.align:
             el.align = ALIGN_MAP.get(_attr(objfmt, "HorizontalAlignment", default="").lower(), "")
-    # explicit per-field format string (a richer extractor can supply the exact
-    # PRD pattern; stock RptToXml 1.1.7 does not, so we fall back to type defaults)
-    fmt_node = next((c for c in obj if _local(c.tag) in
-                     ("FieldFormat", "NumericFieldFormat", "DateFieldFormat")), None)
-    el.format_string = (_attr(obj, "FormatString", default="")
-                        or (_attr(fmt_node, "FormatString", "Format", default="") if fmt_node is not None else ""))
+    # explicit per-field format strings (the forked extractor emits
+    # <FieldFormat><NumericFieldFormat FormatString=../><DateFieldFormat ../>;
+    # Crystal reports both for every field, so capture both candidates and
+    # resolve by the field's value type later)
+    el.format_string = _attr(obj, "FormatString", default="")
+    for node in obj.iter():
+        fmt_tag = _local(node.tag)
+        if fmt_tag == "NumericFieldFormat" and not el.format_numeric:
+            el.format_numeric = _attr(node, "FormatString", default="")
+        elif fmt_tag in ("DateFieldFormat", "DateTimeFieldFormat") and not el.format_date:
+            el.format_date = _attr(node, "FormatString", default="")
 
     if tag == "TextObject":
         el.kind = "label"
@@ -211,7 +216,9 @@ def _parse_data_definition(root, model):
         name = _attr(f, "Name", "FormulaName", default="").strip("{}@")
         text = _text_of(f, "Text", "Formula")
         if name:
-            model.formulas[name] = Formula(name=name, text=text)
+            model.formulas[name] = Formula(
+                name=name, text=text,
+                value_type=_attr(f, "ValueType", default=""))
 
     for p in dd.iter("ParameterFieldDefinition"):
         name = _attr(p, "Name", "ParameterFieldName", default="").strip("{}?")
@@ -333,6 +340,18 @@ def _parse_areas(root, model):
             pass  # index order already matches area order; nothing to do
 
 
+def _resolve_format(el):
+    """Pick the explicit format candidate matching the field's value type."""
+    if el.format_string:
+        return
+    vt = el.value_type
+    if vt in ("NumberField", "CurrencyField", "IntegerField", "DecimalField",
+              "Int16sField", "Int32sField", "Int64sField"):
+        el.format_string = el.format_numeric
+    elif vt in ("DateField", "DateTimeField", "TimeField"):
+        el.format_string = el.format_date
+
+
 def _resolve_references(model):
     """Resolve element field refs to PRD column/expression names."""
     summary_by_name = {s.name: s for s in model.summaries}
@@ -346,6 +365,10 @@ def _resolve_references(model):
                 el.value_type = model.field_types.get(name, "StringField")
             elif kind in ("formula", "parameter"):
                 el.column = name
+                if kind == "formula" and not el.value_type:
+                    formula = model.formulas.get(name)
+                    if formula is not None:
+                        el.value_type = formula.value_type
             elif kind == "summary":
                 summ = summary_by_name.get(name)
                 if summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
@@ -376,6 +399,7 @@ def _resolve_references(model):
                     el.value_type = "NumberField"
                 else:
                     el.notes.append(f"Unresolved field reference: {el.field_ref!r}")
+            _resolve_format(el)
 
 
 def generate_sql(model):

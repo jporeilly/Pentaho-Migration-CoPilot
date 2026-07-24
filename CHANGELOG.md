@@ -7,6 +7,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.15.0] — 2026-07-24
+
+**The forked extractor ships — plus working prompts and Crystal-faithful layout.**
+
+### Added
+
+- **RptToXml fork built and shipped** (`tools/RptToXml-fork/` + `build.ps1`,
+  compiled with Roslyn csc straight against the machine .NET Framework — no
+  SDK/targeting packs needed). Adds what stock 1.1.7 never exported:
+  **per-field `<FieldFormat>` with raw Crystal properties and a computed
+  PRD-ready `FormatString`** (`#,##0.00;-#,##0.00`, `MM/dd/yy`, …) and
+  best-effort credential redaction at extraction (`RPTTOXML_REDACT=1`;
+  `report-scrub` remains the backstop). `extract-rpt.ps1` and `report-env`
+  prefer the fork automatically. Corpus re-extracted with it: 150/150 parse,
+  real format strings verified flowing into .prpt layouts end-to-end
+  (formula fields resolve via their declared result type).
+- **Parameter prompts now work**: simple record-selection formulas
+  (conjunctions of comparisons against parameters/literals) are folded
+  deterministically into the SQL WHERE (`br_name = ${Branch}`), so changing
+  the prompt in PRD re-filters the report. Complex selections stay honest
+  manual items. Verified live: the flagship renders only the prompted branch.
+- 2 tests (fork format resolution incl. formula types; live-verified fold).
+
+### Fixed
+
+- **Column headers now render below the masthead** (Crystal page-1 order):
+  Crystal's PageHeader becomes a PRD **repeating details-header** — below the
+  report header on page 1, repeated on continuation pages — instead of the
+  physical page-header band that always tops the page.
+- Effort recalibrated to field reality (user-calibrated): the flagship-class
+  report now estimates **~0.5h with Copilot vs ~2h manual**; corpus portfolio
+  ~119h vs ~323h (63% saved).
+
 ## [1.14.3] — 2026-07-24
 
 **Context-aware upload tiles + the extractor-readiness hook.**

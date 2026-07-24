@@ -37,4 +37,6 @@ def load_report_model(source: str | Path, jndi: str | None = None) -> ReportMode
     if not model.sql:
         model.sql = generate_sql(model)
         model.sql_generated = True
+    from pentaho_migration.reports.record_selection import try_fold_record_selection
+    try_fold_record_selection(model)
     return model

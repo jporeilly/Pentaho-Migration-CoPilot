@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\workcontrolgit_RollingQuarterIncomeStatement.rpt" HasSavedData="False">
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\workcontrolgit_RollingQuarterIncomeStatement.rpt" HasSavedData="False">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -37,29 +37,29 @@
     <Groups />
     <SortFields />
     <FormulaFieldDefinitions>
-      <FormulaFieldDefinition FormulaName="{@date}" Kind="FormulaField" Name="date" NumberOfBytes="4" ValueType="DateField">cdate({variance_xtab.Year}, {variance_xtab.Month}, 1)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@month1}" Kind="FormulaField" Name="month1" NumberOfBytes="8" ValueType="NumberField">beforereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@date}" Kind="FormulaField" Name="date" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">cdate({variance_xtab.Year}, {variance_xtab.Month}, 1)</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@month1}" Kind="FormulaField" Name="month1" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">beforereadingrecords;
 month({?end_date})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@month2}" Kind="FormulaField" Name="month2" NumberOfBytes="8" ValueType="NumberField">beforereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@month2}" Kind="FormulaField" Name="month2" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">beforereadingrecords;
 iif(
 month({?end_date}) = 1,
 12,
 month({?end_date}) - 1)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@month3}" Kind="FormulaField" Name="month3" NumberOfBytes="8" ValueType="NumberField">beforereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@month3}" Kind="FormulaField" Name="month3" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">beforereadingrecords;
 Switch(
   month({?end_date}) = 1, 11,
   month({?end_date}) = 2, 12,
   true, month({?end_date}) -1
 )</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@start_date}" Kind="FormulaField" Name="start_date" NumberOfBytes="4" ValueType="DateField">cdate(year({?end_date}),1,1)</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@year1}" Kind="FormulaField" Name="year1" NumberOfBytes="8" ValueType="NumberField">beforereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@start_date}" Kind="FormulaField" Name="start_date" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">cdate(year({?end_date}),1,1)</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@year1}" Kind="FormulaField" Name="year1" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">beforereadingrecords;
 year({?end_date})</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@year2}" Kind="FormulaField" Name="year2" NumberOfBytes="8" ValueType="NumberField">beforereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@year2}" Kind="FormulaField" Name="year2" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">beforereadingrecords;
 iif(
 month({?end_date}) = 1,
 year({?end_date}) -1,
 year({?end_date}))</FormulaFieldDefinition>
-      <FormulaFieldDefinition FormulaName="{@year3}" Kind="FormulaField" Name="year3" NumberOfBytes="8" ValueType="NumberField">beforereadingrecords;
+      <FormulaFieldDefinition FormulaName="{@year3}" Kind="FormulaField" Name="year3" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">beforereadingrecords;
 iif(
 month({?end_date}) in [1,2],
 year({?end_date}) -1,
@@ -90,6 +90,10 @@ year({?end_date}))</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <FieldObject Name="month11" Kind="FieldObject" Top="90" Left="585" Width="955" Height="226" DataSource="{@month1}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -102,6 +106,10 @@ year({?end_date}))</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="month21" Kind="FieldObject" Top="90" Left="1650" Width="955" Height="226" DataSource="{@month2}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -114,6 +122,10 @@ year({?end_date}))</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="month31" Kind="FieldObject" Top="90" Left="2760" Width="955" Height="226" DataSource="{@month3}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -126,6 +138,10 @@ year({?end_date}))</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="year11" Kind="FieldObject" Top="90" Left="4950" Width="955" Height="226" DataSource="{@year1}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -138,6 +154,10 @@ year({?end_date}))</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="year21" Kind="FieldObject" Top="75" Left="6150" Width="955" Height="226" DataSource="{@year2}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
@@ -150,6 +170,10 @@ year({?end_date}))</FormulaFieldDefinition>
                 <ObjectFormatConditionFormulas />
               </FieldObject>
               <FieldObject Name="year31" Kind="FieldObject" Top="105" Left="7260" Width="955" Height="226" DataSource="{@year3}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
                 <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
                 <FontColorConditionFormulas />
