@@ -566,3 +566,16 @@ th.num { text-align: right; }
 .wf-legend { display: flex; gap: 1rem; flex-wrap: wrap; color: var(--text-muted); font-size: .78rem; margin-top: .5rem; }
 .wf-legend span { display: inline-flex; align-items: center; gap: .35rem; }
 .wf-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* ---------- upload-page family toggle ---------- */
+.family-tabs { display: flex; gap: .6rem; margin: 1.4rem 0 .8rem; }
+.family-tab {
+  flex: 1; display: flex; flex-direction: column; gap: .15rem; text-align: left;
+  background: var(--surface-2); border: 1px solid var(--gridline); border-radius: 10px;
+  padding: .7rem 1rem; cursor: pointer; color: var(--text-muted); transition: all .15s;
+}
+.family-tab:hover { border-color: var(--baseline); }
+.family-tab.active { border-color: var(--accent); background: var(--surface-1); }
+.family-tab .family-label { font-weight: 650; font-size: .95rem; color: var(--text-secondary); }
+.family-tab.active .family-label { color: var(--accent); }
+.family-tab .family-hint { font-size: .78rem; }

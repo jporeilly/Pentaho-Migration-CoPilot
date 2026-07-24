@@ -1,6 +1,6 @@
 # Version
 
-**1.14.1** — 2026-07-24
+**1.14.2** — 2026-07-24
 
 Project renamed **Pentaho-Migration** (was PDI-Migration): scope is legacy ETL
 *and* BI reports into the Pentaho platform. Phase 2 multi-source in progress —

@@ -7,6 +7,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.14.2] — 2026-07-24
+
+**More context-awareness + reports module refactor.**
+
+### Added
+
+- **Upload-page family toggle**: an ETL ↔ Reports switch previews either
+  pipeline's stages with family-specific descriptions before anything is
+  loaded — the landing page now teaches both flows.
+- **Context-aware masthead**: the engine line shows all families when idle,
+  and narrows to just the loaded one (`Crystal → PRD` / `Informatica · Talend
+  → PDI`) once a file is converted — matching the content-aware stepper.
+
+### Changed
+
+- **Reports module refactored** ahead of the extractor work: `rpt_parser.py`
+  507→398 + new `rpt_xml.py` (attribute/colour/border/font readers);
+  `prpt_writer.py` 491→349 + new `prpt_render.py` (element/style rendering).
+  Public API unchanged, 177 tests green.
+
 ## [1.14.1] — 2026-07-24
 
 **Parameter and object fidelity — the achievable half of format fidelity.**

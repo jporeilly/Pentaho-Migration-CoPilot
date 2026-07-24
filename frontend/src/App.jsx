@@ -158,7 +158,11 @@ export default function App() {
           )}
         </h1>
         <span className="links">
-          Informatica · Talend → PDI · Crystal → PRD ·{' '}
+          {(report
+            ? 'Crystal → PRD'
+            : results.length
+              ? 'Informatica · Talend → PDI'
+              : 'Informatica · Talend → PDI · Crystal → PRD')}{' '}·{' '}
           <a href="/docs" target="_blank" rel="noreferrer">API docs</a> ·{' '}
           <button
             className={`nav${view === 'project' ? ' active' : ''}`}
