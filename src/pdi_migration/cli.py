@@ -295,5 +295,45 @@ def gaps(directory: Path = typer.Argument(Path("samples/informatica"))) -> None:
             typer.echo(f"  {name}: {error}")
 
 
+@app.command()
+def report(
+    dump: Path,
+    out_dir: Path = typer.Option(
+        Path("output/crystal"), "--out", "-o",
+        help="Directory for the .prpt bundle and its conversion report",
+    ),
+    jndi: str = typer.Option(
+        "", "--jndi", help="JNDI datasource name on the Pentaho server",
+    ),
+) -> None:
+    """Convert a Crystal Reports RptToXml dump to a Pentaho .prpt bundle."""
+    from pdi_migration.reports import (
+        build_conversion_report,
+        load_report_model,
+        write_prpt,
+    )
+
+    model = load_report_model(dump, jndi or None)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
+    out_path = out_dir / f"{safe}.prpt"
+    write_prpt(model, out_path)
+    report_path = out_path.with_suffix(".conversion.md")
+    report_path.write_text(
+        build_conversion_report(model, dump, out_path), encoding="utf-8"
+    )
+
+    counts = {"auto": 0, "review": 0, "manual": 0}
+    for formula in model.formulas.values():
+        counts[formula.status] += 1
+    typer.echo(f"{model.name} -> {out_path}")
+    typer.echo(
+        f"  formulas: {counts['auto']} auto, {counts['review']} review, "
+        f"{counts['manual']} manual  |  report: {report_path}"
+    )
+    if counts["manual"]:
+        typer.echo("  manual formulas need hand conversion - see the report.")
+
+
 if __name__ == "__main__":
     app()

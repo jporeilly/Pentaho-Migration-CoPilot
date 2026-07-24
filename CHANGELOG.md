@@ -7,6 +7,46 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.0] — 2026-07-24
+
+**Reports family: SAP Crystal Reports → Pentaho Report Designer (backend).**
+
+Migration Copilot now covers a second artifact family. Crystal reports are
+documents (bands, elements, formulas), not dataflows, so they get their own
+pipeline (`src/pdi_migration/reports/`) instead of the ETL IR — folded in from
+the standalone CR-PRPT-Migration prototype.
+
+### Added
+
+- **Reports pipeline**: RptToXml dump (SAP .NET SDK) → intermediate ReportModel
+  (twips→points, fork-tolerant attributes) → deterministic Crystal→OpenFormula
+  translator (recursive descent; statuses auto/review/manual — variables,
+  `WhilePrintingRecords`, loops, arrays, and inline aggregates are hard-blocked
+  and preserved verbatim, never guessed) → native .prpt bundle writer
+  (stored-mimetype ZIP, nested relational groups, page bands in styles.xml,
+  parameters + ItemSum/Count/Avg/Max/Min functions + PageOfPagesFunction, JNDI
+  SQL datasource; format reverse-engineered from the PRD CE sample reports) →
+  markdown conversion report listing every item needing a human.
+- **API**: `/reports/inspect`, `/reports/convert` (stateless; .prpt travels
+  base64 in the JSON response), `/reports/sample`; wired into the existing
+  app with the shared API-key dependency (extracted to `api/security.py`).
+- **CLI**: `pdi-migrate report <dump> --out output/crystal --jndi <name>`.
+- **Source detection**: `detect_parser` now recognizes RptToXml dumps and
+  points ETL uploads of them at the Reports pipeline instead of failing as
+  PowerCenter; `SourceTool.CRYSTAL` added.
+- **Sample corpus seed**: `samples/crystal/branch_transactions.xml`
+  (bank-themed simulated RptToXml dump).
+- 22 tests (`tests/test_reports.py`): translator contract, parser, bundle
+  shape, detection routing, full API flow.
+
+### Not yet (tracked for the next releases)
+
+- React UI flow for reports (source card + stepper pages).
+- LLM translation of `manual` formulas via the existing hybrid pipeline
+  (`CRYSTAL_PROMPT` targeting OpenFormula).
+- Report-flavored confidence score and PDF report; project-store integration.
+- Real-PRD round-trip validation of generated bundles.
+
 ## [1.10.0] — 2026-07-17
 
 **Phase 2 begins: multi-source. Talend is the second supported source.**

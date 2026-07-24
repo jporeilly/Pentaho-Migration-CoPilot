@@ -17,7 +17,7 @@ import uuid
 from pathlib import Path
 
 import httpx
-from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
@@ -27,12 +27,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024  # generous: largest real export seen is ~7 MB
 
 
-def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
-    """Optional shared-secret auth: set PDI_MIGRATION_API_KEY to enforce it on
-    mutating endpoints. Unset (the default) keeps local single-user use frictionless."""
-    expected = os.environ.get("PDI_MIGRATION_API_KEY")
-    if expected and x_api_key != expected:
-        raise HTTPException(status_code=401, detail="invalid or missing X-API-Key header")
+from pdi_migration.api.security import require_api_key
 
 from pdi_migration import __version__
 from pdi_migration.generator import KtrGenerator
@@ -419,6 +414,10 @@ def _parse_upload(data: bytes, filename: str | None = None) -> tuple[list[Pipeli
         except (ParseError, SyntaxError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+
+from pdi_migration.reports.api import router as reports_router
+
+app.include_router(reports_router)
 
 # Serve the built React UI for every non-API path. Mounted last so the API
 # routes above always win. Requires `npm run build` in frontend/ (see

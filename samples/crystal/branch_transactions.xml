@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simulated RptToXml dump of "Branch Transaction Summary.rpt".
+     Shape matches https://github.com/ajryan/RptToXml output (twip units). -->
+<Report Name="Branch Transaction Summary" FileName="C:\Reports\Branch Transaction Summary.rpt" HasSavedData="false">
+  <Database>
+    <Tables>
+      <Table Name="Command" Alias="Command" ClassName="CommandTable">
+        <Command>SELECT
+  BRANCHES.BRANCH_NAME,
+  TRANSACTIONS.TXN_DATE,
+  TRANSACTIONS.ACCOUNT_ID,
+  CUSTOMERS.FIRST_NAME,
+  CUSTOMERS.LAST_NAME,
+  TRANSACTIONS.TXN_TYPE,
+  TRANSACTIONS.AMOUNT
+FROM TRANSACTIONS
+JOIN CUSTOMERS ON CUSTOMERS.CUSTOMER_ID = TRANSACTIONS.CUSTOMER_ID
+JOIN BRANCHES ON BRANCHES.BRANCH_ID = TRANSACTIONS.BRANCH_ID
+ORDER BY BRANCHES.BRANCH_NAME, TRANSACTIONS.TXN_DATE</Command>
+        <Fields>
+          <Field Name="BRANCH_NAME" ValueType="StringField"/>
+          <Field Name="TXN_DATE" ValueType="DateField"/>
+          <Field Name="ACCOUNT_ID" ValueType="StringField"/>
+          <Field Name="FIRST_NAME" ValueType="StringField"/>
+          <Field Name="LAST_NAME" ValueType="StringField"/>
+          <Field Name="TXN_TYPE" ValueType="StringField"/>
+          <Field Name="AMOUNT" ValueType="CurrencyField"/>
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <RecordSelectionFormula>{BRANCHES.BRANCH_NAME} = {?Branch} and {TRANSACTIONS.AMOUNT} &gt; 0</RecordSelectionFormula>
+    <Groups>
+      <Group ConditionField="{Command.BRANCH_NAME}"/>
+    </Groups>
+    <FormulaFieldDefinitions>
+      <FormulaFieldDefinition Name="FullName" FormulaName="{@FullName}" ValueType="StringField">{Command.FIRST_NAME} + ' ' + {Command.LAST_NAME}</FormulaFieldDefinition>
+      <FormulaFieldDefinition Name="RiskFlag" FormulaName="{@RiskFlag}" ValueType="StringField">If {Command.AMOUNT} &gt; 10000 Then "REVIEW" Else "OK"</FormulaFieldDefinition>
+      <FormulaFieldDefinition Name="RunningBalance" FormulaName="{@RunningBalance}" ValueType="NumberField">WhilePrintingRecords;
+Shared NumberVar balance;
+balance := balance + {Command.AMOUNT};
+balance</FormulaFieldDefinition>
+    </FormulaFieldDefinitions>
+    <ParameterFieldDefinitions>
+      <ParameterFieldDefinition Name="Branch" ParameterFieldName="{?Branch}" ValueType="StringField" PromptText="Branch name" DefaultValue="Downtown"/>
+    </ParameterFieldDefinitions>
+    <SummaryFields>
+      <SummaryFieldDefinition Name="Sum of Command.AMOUNT" Operation="Sum" SummarizedField="{Command.AMOUNT}" Group="{Command.BRANCH_NAME}"/>
+      <SummaryFieldDefinition Name="Grand Total AMOUNT" Operation="Sum" SummarizedField="{Command.AMOUNT}"/>
+    </SummaryFields>
+  </DataDefinition>
+  <PrintOptions PaperOrientation="Portrait" PaperSize="PaperLetter" PageMarginTop="360" PageMarginLeft="360" PageMarginBottom="800" PageMarginRight="360"/>
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea">
+        <Sections>
+          <Section Name="ReportHeaderSection1" Height="800">
+            <ReportObjects>
+              <TextObject Name="TitleText" Text="Branch Transaction Summary" Left="0" Top="100" Width="8000" Height="400">
+                <Font FontName="Arial" Size="18" Bold="true"/>
+              </TextObject>
+              <LineObject Name="TitleRule" Left="0" Top="600" Width="10800" Height="20"/>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea">
+        <Sections>
+          <Section Name="PageHeaderSection1" Height="400">
+            <ReportObjects>
+              <TextObject Name="HdrDate" Text="Date" Left="0" Top="0" Width="1600" Height="320">
+                <Font FontName="Arial" Size="9" Bold="true"/>
+              </TextObject>
+              <TextObject Name="HdrAccount" Text="Account" Left="1700" Top="0" Width="1800" Height="320">
+                <Font FontName="Arial" Size="9" Bold="true"/>
+              </TextObject>
+              <TextObject Name="HdrCustomer" Text="Customer" Left="3600" Top="0" Width="3000" Height="320">
+                <Font FontName="Arial" Size="9" Bold="true"/>
+              </TextObject>
+              <TextObject Name="HdrType" Text="Type" Left="6700" Top="0" Width="1400" Height="320">
+                <Font FontName="Arial" Size="9" Bold="true"/>
+              </TextObject>
+              <TextObject Name="HdrAmount" Text="Amount" Left="8200" Top="0" Width="1600" Height="320" HorizontalAlignment="RightAlign">
+                <Font FontName="Arial" Size="9" Bold="true"/>
+              </TextObject>
+              <TextObject Name="HdrRisk" Text="Risk" Left="9900" Top="0" Width="900" Height="320">
+                <Font FontName="Arial" Size="9" Bold="true"/>
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="GroupHeader" Name="GroupHeaderArea1">
+        <Sections>
+          <Section Name="GroupHeaderSection1" Height="440">
+            <ReportObjects>
+              <FieldObject Name="BranchField" DataSource="{Command.BRANCH_NAME}" Left="0" Top="40" Width="6000" Height="360">
+                <Font FontName="Arial" Size="12" Bold="true"/>
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea">
+        <Sections>
+          <Section Name="DetailSection1" Height="320">
+            <ReportObjects>
+              <FieldObject Name="TxnDate" DataSource="{Command.TXN_DATE}" Left="0" Top="0" Width="1600" Height="280"/>
+              <FieldObject Name="Account" DataSource="{Command.ACCOUNT_ID}" Left="1700" Top="0" Width="1800" Height="280"/>
+              <FieldObject Name="Customer" DataSource="{@FullName}" Left="3600" Top="0" Width="3000" Height="280"/>
+              <FieldObject Name="TxnType" DataSource="{Command.TXN_TYPE}" Left="6700" Top="0" Width="1400" Height="280"/>
+              <FieldObject Name="Amount" DataSource="{Command.AMOUNT}" Left="8200" Top="0" Width="1600" Height="280" HorizontalAlignment="RightAlign"/>
+              <FieldObject Name="Risk" DataSource="{@RiskFlag}" Left="9900" Top="0" Width="900" Height="280"/>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="GroupFooter" Name="GroupFooterArea1">
+        <Sections>
+          <Section Name="GroupFooterSection1" Height="400">
+            <ReportObjects>
+              <TextObject Name="LblBranchTotal" Text="Branch total:" Left="6700" Top="40" Width="1400" Height="320">
+                <Font FontName="Arial" Size="10" Bold="true"/>
+              </TextObject>
+              <FieldObject Name="BranchTotal" DataSource="{#Sum of Command.AMOUNT}" Left="8200" Top="40" Width="1600" Height="320" HorizontalAlignment="RightAlign">
+                <Font FontName="Arial" Size="10" Bold="true"/>
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea">
+        <Sections>
+          <Section Name="ReportFooterSection1" Height="500">
+            <ReportObjects>
+              <TextObject Name="LblGrandTotal" Text="Grand total:" Left="6700" Top="80" Width="1400" Height="360">
+                <Font FontName="Arial" Size="11" Bold="true"/>
+              </TextObject>
+              <FieldObject Name="GrandTotal" DataSource="{#Grand Total AMOUNT}" Left="8200" Top="80" Width="1600" Height="360" HorizontalAlignment="RightAlign">
+                <Font FontName="Arial" Size="11" Bold="true"/>
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea">
+        <Sections>
+          <Section Name="PageFooterSection1" Height="360">
+            <ReportObjects>
+              <SpecialVarFieldObject Name="PageNum" DataSource="PageNumber" Left="9000" Top="0" Width="1800" Height="280" HorizontalAlignment="RightAlign">
+                <Font FontName="Arial" Size="8"/>
+              </SpecialVarFieldObject>
+              <SpecialVarFieldObject Name="PrintDateFld" DataSource="PrintDate" Left="0" Top="0" Width="2400" Height="280">
+                <Font FontName="Arial" Size="8"/>
+              </SpecialVarFieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

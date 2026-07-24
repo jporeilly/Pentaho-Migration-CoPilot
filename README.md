@@ -3,7 +3,7 @@
 **AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
 SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
 
-Version **1.10.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.11.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy ETL platform locks customers in with the sunk cost of thousands of
@@ -70,7 +70,8 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open |
 | PDI runner | `src/pdi_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
 | PDF reports | `src/pdi_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
-| API | `src/pdi_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings — Swagger at `/docs`; optional API-key auth |
+| Reports family | `src/pdi_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser, deterministic Crystal→OpenFormula translator (auto/review/manual, never guessed), native bundle writer, markdown conversion report. Backend + CLI + API shipped; UI flow and LLM formula assist planned |
+| API | `src/pdi_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings + reports (inspect/convert) — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 
 ## Quick start
@@ -104,6 +105,7 @@ pdi-migrate project                     # portfolio view: every mapping, score, 
 pdi-migrate gaps    [directory]         # corpus coverage: auto/review/manual + gap list
 pdi-migrate diff    old.csv new.csv -k ID  # measured output parity (exit 0 on PASS)
 pdi-migrate run     <file.ktr|.kjb>     # execute in the local PDI install (Pan/Kitchen)
+pdi-migrate report  <rpttoxml.xml>      # Crystal Reports dump -> .prpt + conversion report
 ```
 
 `convert` prints the source analysis first — tool version, database, and warnings —

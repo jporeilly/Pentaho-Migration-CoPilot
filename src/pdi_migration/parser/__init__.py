@@ -13,4 +13,10 @@ def detect_parser(path: str | Path):
     head = Path(path).read_bytes()[:4096].decode("utf-8", errors="replace")
     if "talendfile:ProcessType" in head or "<talendfile:" in head:
         return TalendParser()
+    if "<Report" in head and (".rpt" in head or "RptToXml" in head or "<ReportDefinition" in head):
+        raise ParseError(
+            "This looks like a Crystal Reports RptToXml dump — a report, not an "
+            "ETL pipeline. Use the Reports pipeline instead: POST /reports/convert "
+            "or `pdi-migrate report <file>`."
+        )
     return PowerCenterParser()

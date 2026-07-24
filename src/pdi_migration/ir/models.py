@@ -15,6 +15,7 @@ class SourceTool(str, Enum):
     SSIS = "ssis"
     TALEND = "talend"
     DATASTAGE = "datastage"
+    CRYSTAL = "crystal"  # reports family — converted by pdi_migration.reports, not this IR
 
 
 class Confidence(str, Enum):
