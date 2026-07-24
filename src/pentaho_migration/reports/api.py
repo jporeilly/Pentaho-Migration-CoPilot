@@ -56,11 +56,25 @@ class ReportSummaryField(BaseModel):
     expression: str
 
 
+class ReportElementInfo(BaseModel):
+    """Geometry + identity of one placed element — enough for the UI's
+    layout wireframe (positions are points, straight from the .rpt)."""
+
+    kind: str
+    x: float
+    y: float
+    width: float
+    height: float
+    label: str = ""   # label text, field/expression name, or TODO text
+
+
 class ReportSection(BaseModel):
     area: str
     group: int | None = None
     height: float
     elements: int
+    suppressed: bool = False
+    items: list[ReportElementInfo] = []
 
 
 class ReportCounts(BaseModel):
@@ -125,10 +139,17 @@ def _summarize(model, source_name: str) -> ReportSummary:
                                       field=s.field_ref, group=s.group_field,
                                       expression=s.expression_name)
                    for s in model.summaries],
-        sections=[ReportSection(area=s.area_kind,
-                                group=s.group_index if s.group_index >= 0 else None,
-                                height=round(s.height, 1), elements=len(s.elements))
-                  for s in model.sections],
+        sections=[ReportSection(
+            area=s.area_kind,
+            group=s.group_index if s.group_index >= 0 else None,
+            height=round(s.height, 1), elements=len(s.elements),
+            suppressed=s.suppressed,
+            items=[ReportElementInfo(
+                kind=el.kind, x=round(el.x, 1), y=round(el.y, 1),
+                width=round(el.width, 1), height=round(el.height, 1),
+                label=(el.text or el.column or el.field_ref or "")[:60])
+                for el in s.elements])
+            for s in model.sections],
         formulas=[ReportFormula(name=f.name, status=f.status, translation=f.translation,
                                 original=f.text, notes=f.notes)
                   for f in model.formulas.values()],
@@ -160,6 +181,35 @@ def _load_upload(data: bytes, filename: str, jndi: str):
                             detail=f"could not parse RptToXml file: {exc}")
     finally:
         tmp.unlink(missing_ok=True)
+
+
+@router.post("/preview", dependencies=[Depends(require_api_key)])
+async def preview(dump: UploadFile, jndi: str = ""):
+    """Design-time PDF preview: convert, then render the .prpt through the
+    real Pentaho Reporting engine with an empty dataset (layout, labels,
+    bands - no database needed). 503 when no local PRD install exists."""
+    from fastapi.responses import Response as RawResponse
+
+    from pentaho_migration.reports.prpt_validator import render_prpt_pdf, validator_available
+
+    if not validator_available():
+        raise HTTPException(
+            status_code=503,
+            detail="PDF preview needs a local Pentaho Report Designer + Java - "
+                   "see `pentaho-migrate report-env`")
+    data = await dump.read()
+    source_name = dump.filename or "upload.xml"
+    model = _load_upload(data, source_name, jndi)
+    safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
+    with tempfile.TemporaryDirectory() as td:
+        prpt = Path(td) / f"{safe}.prpt"
+        write_prpt(model, prpt)
+        try:
+            pdf = render_prpt_pdf(prpt)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+    return RawResponse(pdf, media_type="application/pdf",
+                       headers={"Content-Disposition": f'inline; filename="{safe}.preview.pdf"'})
 
 
 @router.get("/sample", include_in_schema=False)

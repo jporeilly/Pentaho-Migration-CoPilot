@@ -542,3 +542,27 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
 .effort-assumptions li { margin-top: .25rem; }
 
 .saved-cell { color: var(--status-good); font-weight: 600; white-space: nowrap; }
+
+/* numeric header cells align with their numeric values */
+th.num { text-align: right; }
+
+/* ---------- expandable section explanations ---------- */
+.explain { margin: .35rem 0 .6rem; }
+.explain-toggle {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--text-muted); font-size: .8rem;
+}
+.explain-toggle:hover { color: var(--accent); }
+.explain-body {
+  color: var(--text-muted); font-size: .82rem; line-height: 1.55;
+  background: var(--surface-2); border-left: 3px solid var(--baseline);
+  border-radius: 0 8px 8px 0; padding: .6rem .9rem; margin-top: .4rem;
+}
+.explain-body b { color: var(--text-secondary); }
+
+/* ---------- layout wireframe preview ---------- */
+.wireframe { overflow-x: auto; }
+.wireframe svg { display: block; max-width: 100%; }
+.wf-legend { display: flex; gap: 1rem; flex-wrap: wrap; color: var(--text-muted); font-size: .78rem; margin-top: .5rem; }
+.wf-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.wf-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }

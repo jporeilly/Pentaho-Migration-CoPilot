@@ -2,16 +2,16 @@ import DropZone from '../components/DropZone.jsx'
 import SourceCard from '../components/SourceCard.jsx'
 
 const STAGES = [
-  { n: 1, name: 'Parse', kind: 'deterministic', text: 'Real XML parsers extract steps, fields, expressions, and hops into a normalized model. No AI, no hallucination risk.' },
-  { n: 2, name: 'Map', kind: 'rules + AI', text: 'A rules library maps the clean majority 1:1 to PDI steps; the LLM only translates expressions and ambiguous idioms.' },
-  { n: 3, name: 'Generate', kind: 'deterministic', text: 'Emits editable .ktr transformations that open in Spoon — never a black box. Unconverted pieces become explicit TODOs.' },
-  { n: 4, name: 'Validate', kind: 'review & report', text: 'Every step gets a confidence level: auto, review, or manual. You always see an honest map of what remains.' },
+  { n: 1, name: 'Parse', kind: 'deterministic', text: 'Real parsers, no AI: ETL exports become a normalized step/hop model; Crystal RptToXml dumps become a banded report model. Zero failures across all three real corpora.' },
+  { n: 2, name: 'Map', kind: 'rules + AI', text: 'Rules libraries map the clean majority 1:1 — PDI steps for ETL, OpenFormula for Crystal formulas. The LLM only translates what rules cannot prove, always flagged for review.' },
+  { n: 3, name: 'Generate', kind: 'deterministic', text: 'Editable, native output: .ktr/.kjb that open in Spoon, .prpt bundles verified by loading them through the real Pentaho Reporting engine. Unconverted pieces become explicit TODOs.' },
+  { n: 4, name: 'Validate', kind: 'review & report', text: 'Confidence levels on every artifact, effort & cost vs a manual rebuild, output-parity diffs, empty-data PDF previews, and honest review lists of what remains.' },
 ]
 
 const PHASES = [
-  { name: 'Phase 0 — Internal tool', text: 'Informatica PowerCenter, top transformation types; used by Pentaho’s own services team. You are here.', current: true },
+  { name: 'Phase 0 — Internal tool', text: 'Informatica PowerCenter end-to-end, used by Pentaho’s own services team. Complete.' },
   { name: 'Phase 1 — Assisted product', text: 'Exposed to customers with confidence scoring and mandatory human review.' },
-  { name: 'Phase 2 — Multi-source', text: 'Add SSIS, then Talend / DataStage; broaden transformation coverage.' },
+  { name: 'Phase 2 — Multi-source', text: 'Talend and SAP Crystal Reports shipped (real-corpus validated); SSIS and DataStage next. You are here.', current: true },
 ]
 
 export default function UploadPage({ onFile, onSample, onCrystalSample, error, loading, source, onShowPractices }) {

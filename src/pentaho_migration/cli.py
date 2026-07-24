@@ -471,6 +471,64 @@ def report_gaps(
             typer.echo(f"  {name}: {error}")
 
 
+@app.command("report-batch")
+def report_batch(
+    directory: Path = typer.Argument(Path("samples/crystal/real")),
+    out_dir: Path = typer.Option(Path("output/crystal"), "--out", "-o"),
+    jndi: str = typer.Option("", "--jndi", help="JNDI datasource for every report"),
+) -> None:
+    """Convert every RptToXml dump in DIRECTORY and record each report in the
+    migration project store (Crystal counterpart of `batch`)."""
+    from pentaho_migration.project import ReportRecord, record_report
+    from pentaho_migration.reports import (
+        build_conversion_report, load_report_model, write_prpt,
+    )
+    from pentaho_migration.reports.effort import build_report_effort, count_todos
+
+    files = sorted(directory.glob("*.xml"))
+    if not files:
+        typer.echo(f"no RptToXml dumps found in {directory}")
+        raise typer.Exit(code=1)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    total = failures = 0
+    copilot_h = manual_h = 0.0
+    for xml in files:
+        try:
+            model = load_report_model(xml, jndi or None)
+            safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or xml.stem
+            out_path = out_dir / f"{safe}.prpt"
+            write_prpt(model, out_path)
+            out_path.with_suffix(".conversion.md").write_text(
+                build_conversion_report(model, xml, out_path), encoding="utf-8")
+        except Exception as exc:  # a conversion failure is a finding, not a crash
+            failures += 1
+            typer.echo(f"{xml.name}: FAILED - {str(exc)[:140]}", err=True)
+            continue
+        counts = {"auto": 0, "review": 0, "manual": 0}
+        for formula in model.formulas.values():
+            counts[formula.status] += 1
+        effort = build_report_effort(model)
+        record_report(ReportRecord(
+            file=xml.name, name=model.name, source_path=str(xml.resolve()),
+            formulas_auto=counts["auto"], formulas_review=counts["review"],
+            formulas_manual=counts["manual"], todos=count_todos(model),
+            copilot_hours=effort.copilot_hours, manual_hours=effort.manual_hours,
+            status="converted", updated_at="",
+        ))
+        copilot_h += effort.copilot_hours
+        manual_h += effort.manual_hours
+        total += 1
+    saved = manual_h - copilot_h
+    pct = round(saved / manual_h * 100) if manual_h else 0
+    typer.echo(
+        f"converted {total} report(s), {failures} failed -> {out_dir} "
+        f"(recorded in the project store)")
+    typer.echo(
+        f"reports effort: ~{copilot_h:,.0f}h with Copilot vs ~{manual_h:,.0f}h "
+        f"manual - saves {saved:,.0f}h ({pct}%)")
+
+
 @app.command("report-scrub")
 def report_scrub(directory: Path = typer.Argument(Path("samples/crystal/real"))) -> None:
     """Blank credentials (UserName/Password/logon properties) that RptToXml

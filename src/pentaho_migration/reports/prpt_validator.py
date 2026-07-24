@@ -57,3 +57,32 @@ def validate_prpts(paths: list[Path | str], timeout: float = 300.0) -> list[Prpt
         raise RuntimeError(
             "validator produced no verdicts - stderr: " + completed.stderr[-800:])
     return results
+
+
+RENDERER_SOURCE = REPO_ROOT / "tools" / "PrptRenderer.java"
+
+
+def render_prpt_pdf(prpt_path: Path | str, timeout: float = 300.0) -> bytes:
+    """Design-time PDF preview of a .prpt through the real engine: the data
+    factory is swapped for an empty table, so layout/labels/bands render
+    without any database. Raises RuntimeError when PRD/Java are missing or
+    the render fails."""
+    import tempfile
+
+    prd = find_prd_home()
+    java = find_java(prd)
+    if prd is None or java is None:
+        raise RuntimeError(
+            "PDF preview needs Pentaho Report Designer and Java - "
+            "run `pentaho-migrate report-env` for setup hints")
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "preview.pdf"
+        completed = subprocess.run(
+            [str(java), "-cp", str(prd / "lib" / "*"), str(RENDERER_SOURCE),
+             str(Path(prpt_path).resolve()), str(out)],
+            capture_output=True, text=True, timeout=timeout,
+        )
+        if not out.exists() or out.stat().st_size == 0:
+            raise RuntimeError(
+                "PDF preview failed - stderr: " + completed.stderr[-800:])
+        return out.read_bytes()

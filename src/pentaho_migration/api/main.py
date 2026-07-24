@@ -45,8 +45,11 @@ from pentaho_migration.parser import ParseError, detect_parser
 from pentaho_migration.project import (
     STATUSES,
     MappingRecord,
+    ReportRecord,
     get_mapping,
     list_mappings,
+    list_reports,
+    set_report_status,
     set_status,
 )
 from pentaho_migration.sandbox import SandboxKit, build_sandbox_kit
@@ -310,6 +313,27 @@ def project_status(update: StatusUpdate) -> dict[str, bool]:
         raise HTTPException(status_code=422, detail=f"status must be one of {STATUSES}")
     if not set_status(update.file, update.mapping, update.status):
         raise HTTPException(status_code=404, detail="mapping not found in project store")
+    return {"ok": True}
+
+
+@app.get("/project/reports", response_model=list[ReportRecord])
+def project_reports() -> list[ReportRecord]:
+    """The Crystal side of the project: every batch-converted report with its
+    formula counts, effort hours, and review status."""
+    return list_reports()
+
+
+class ReportStatusUpdate(BaseModel):
+    file: str
+    status: str
+
+
+@app.post("/project/report-status", dependencies=[Depends(require_api_key)])
+def project_report_status(update: ReportStatusUpdate) -> dict[str, bool]:
+    if update.status not in STATUSES:
+        raise HTTPException(status_code=422, detail=f"status must be one of {STATUSES}")
+    if not set_report_status(update.file, update.status):
+        raise HTTPException(status_code=404, detail="report not found in project store")
     return {"ok": True}
 
 

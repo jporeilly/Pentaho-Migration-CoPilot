@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.12.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.13.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -119,6 +119,7 @@ pentaho-migrate report ... --validate       # load the .prpt through the real Pe
 pentaho-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
+pentaho-migrate report-batch [directory]    # convert a Crystal corpus into the project store (joins the portfolio)
 ```
 
 Crystal end-to-end (`.rpt` in hand): install the free SAP Crystal .NET runtime and

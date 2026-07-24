@@ -269,6 +269,7 @@ export default function App() {
               {step === 3 && (
                 <ReportsDownloadPage
                   report={report}
+                  file={reportFile}
                   loading={loading}
                   onReconvert={(jndi) => convertReport(reportFile, jndi)}
                 />

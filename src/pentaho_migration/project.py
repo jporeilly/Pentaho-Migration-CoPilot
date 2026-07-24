@@ -110,3 +110,79 @@ def set_status(file: str, mapping: str, status: str) -> bool:
             (status, file, mapping),
         )
     return cursor.rowcount > 0
+
+
+# ---------------------------------------------------------------- reports
+
+REPORTS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS reports (
+    file            TEXT NOT NULL PRIMARY KEY,
+    name            TEXT NOT NULL,
+    source_path     TEXT NOT NULL DEFAULT '',
+    formulas_auto   INTEGER NOT NULL,
+    formulas_review INTEGER NOT NULL,
+    formulas_manual INTEGER NOT NULL,
+    todos           INTEGER NOT NULL,
+    copilot_hours   REAL NOT NULL,
+    manual_hours    REAL NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'converted',
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+"""
+
+
+class ReportRecord(BaseModel):
+    file: str
+    name: str
+    source_path: str = ""
+    formulas_auto: int
+    formulas_review: int
+    formulas_manual: int
+    todos: int
+    copilot_hours: float
+    manual_hours: float
+    status: str = "converted"
+    updated_at: str = ""
+
+
+def record_report(record: ReportRecord) -> None:
+    with _connect() as conn:
+        conn.execute(REPORTS_SCHEMA)
+        conn.execute(
+            """INSERT INTO reports
+               (file, name, source_path, formulas_auto, formulas_review,
+                formulas_manual, todos, copilot_hours, manual_hours, status)
+               VALUES (?,?,?,?,?,?,?,?,?,?)
+               ON CONFLICT(file) DO UPDATE SET
+                 name=excluded.name, source_path=excluded.source_path,
+                 formulas_auto=excluded.formulas_auto,
+                 formulas_review=excluded.formulas_review,
+                 formulas_manual=excluded.formulas_manual,
+                 todos=excluded.todos, copilot_hours=excluded.copilot_hours,
+                 manual_hours=excluded.manual_hours,
+                 updated_at=datetime('now')""",
+            (record.file, record.name, record.source_path, record.formulas_auto,
+             record.formulas_review, record.formulas_manual, record.todos,
+             record.copilot_hours, record.manual_hours, record.status),
+        )
+
+
+def list_reports() -> list[ReportRecord]:
+    with _connect() as conn:
+        conn.execute(REPORTS_SCHEMA)
+        rows = conn.execute(
+            "SELECT * FROM reports ORDER BY formulas_manual DESC, file"
+        ).fetchall()
+    return [ReportRecord(**dict(row)) for row in rows]
+
+
+def set_report_status(file: str, status: str) -> bool:
+    if status not in STATUSES:
+        raise ValueError(f"status must be one of {STATUSES}")
+    with _connect() as conn:
+        conn.execute(REPORTS_SCHEMA)
+        cursor = conn.execute(
+            "UPDATE reports SET status=?, updated_at=datetime('now') WHERE file=?",
+            (status, file),
+        )
+    return cursor.rowcount > 0

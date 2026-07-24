@@ -2,6 +2,7 @@
 // language as the ETL Map page: auto / review / manual, never guessed.
 
 import { useState } from 'react'
+import Explain from '../components/Explain.jsx'
 
 const BADGES = { auto: '✓', review: '⚠', manual: '✋' }
 
@@ -74,6 +75,17 @@ export default function ReportsFormulasPage({ summary, file, onUpdate }) {
         )}
       </div>
       {error && <div className="error">Translation failed: {error}</div>}
+      <Explain>
+        Crystal formulas are translated to PRD&apos;s <b>OpenFormula</b> language.
+        <b> ✓ auto</b> = translated deterministically by rules, no review
+        expected. <b>⚠ review</b> = translated, but a mapping deserves a human
+        glance (the note says why) — every ✨ AI translation lands here, never
+        higher. <b>✋ manual</b> = not mechanically translatable (variables,
+        running totals, arrays); the original Crystal text is preserved and the
+        notes say what to build instead — running totals, for example, are
+        <b> report functions</b> in PRD, not formulas. The tool never guesses:
+        anything uncertain is flagged, not hidden.
+      </Explain>
 
       {formulas.length > 0 ? (
         <>

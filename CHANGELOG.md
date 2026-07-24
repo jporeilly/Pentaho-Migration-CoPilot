@@ -7,6 +7,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.13.0] — 2026-07-24
+
+**Reports join the portfolio; previews land; the UI explains itself.**
+
+### Added
+
+- **Reports in the project store**: `reports` table (auto-created),
+  `pentaho-migrate report-batch` converts a corpus and records every report
+  (formula counts, TODOs, effort hours, review status), `/project/reports` +
+  `/project/report-status` API, and a Crystal reports table on the Project
+  page with per-report status tracking. **The portfolio effort banner now
+  sums both families** — with the real corpora loaded: 148 mappings + 150
+  reports ≈ 8,300h manual vs ~4,240h with Copilot, ~49% saved.
+- **Layout wireframe preview** (Inspect page): every band with its elements
+  at their true positions/sizes (points from the .rpt) as an SVG — the same
+  geometry the .prpt receives, so one wireframe previews source and target.
+  Kind-colored, hover for element names, suppressed bands hidden. Backed by
+  element geometry now included in `ReportSummary.sections[].items`.
+- **Engine PDF preview** (Download page + `/reports/preview`): the .prpt
+  rendered through the real Pentaho Reporting engine with an empty dataset
+  (tools/PrptRenderer.java) — page setup, bands, and labels exactly as PRD
+  shows them, no database needed. 503 with a hint when no local PRD exists.
+- **Expandable "What am I looking at?" explanations** on every reports card
+  (structure, datasource, parameters, summaries, formulas, download) and the
+  Project page — collapsed by default, plain-language when opened.
+- Upload-page stage cards and phase strip updated to cover both artifact
+  families (Phase 2 marked current: Talend + Crystal shipped).
+- 5 new tests (166 total).
+
+### Fixed
+
+- Numeric table headers now right-align with their values (`th.num` had no
+  alignment rule while `td.num` was right-aligned).
+
 ## [1.12.1] — 2026-07-24
 
 **Crystal correctness fixes — closing the production-review findings.**
