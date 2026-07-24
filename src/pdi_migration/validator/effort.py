@@ -46,32 +46,67 @@ class EffortEstimate(BaseModel):
     assumptions: list[str]
 
 
-def build_effort(pipeline: Pipeline, report: MigrationReport) -> EffortEstimate:
-    total_exprs = sum(len(s.expressions) for s in pipeline.steps)
-    reviewed_exprs = total_exprs - report.untranslated_expressions
+def effort_from_counts(
+    steps: int,
+    auto: int,
+    review: int,
+    manual: int,
+    untranslated_exprs: int,
+    total_exprs: int | None = None,
+) -> EffortEstimate:
+    """Estimate from the counts alone — usable both for a live pipeline and
+    for records in the project store. When the true expression total is
+    unknown (stored records only keep the untranslated count), it is
+    approximated by the untranslated count, which errs conservative on both
+    scenarios."""
+    approximated = total_exprs is None
+    if total_exprs is None:
+        total_exprs = untranslated_exprs
+    reviewed_exprs = total_exprs - untranslated_exprs
 
     copilot = COPILOT_BASE \
-        + report.auto * COPILOT_AUTO_STEP \
-        + report.review * COPILOT_REVIEW_STEP \
-        + report.manual * COPILOT_MANUAL_STEP \
-        + report.untranslated_expressions * COPILOT_UNTRANSLATED \
+        + auto * COPILOT_AUTO_STEP \
+        + review * COPILOT_REVIEW_STEP \
+        + manual * COPILOT_MANUAL_STEP \
+        + untranslated_exprs * COPILOT_UNTRANSLATED \
         + reviewed_exprs * COPILOT_REVIEW_EXPR
     copilot *= 1 + COPILOT_TEST_OVERHEAD
 
-    manual = MANUAL_BASE \
-        + report.total_steps * MANUAL_STEP \
+    rebuild = MANUAL_BASE \
+        + steps * MANUAL_STEP \
         + total_exprs * MANUAL_EXPR
-    manual *= 1 + MANUAL_TEST_OVERHEAD
+    rebuild *= 1 + MANUAL_TEST_OVERHEAD
 
     copilot_h = _round_half(copilot)
-    manual_h = max(_round_half(manual), copilot_h)
+    manual_h = max(_round_half(rebuild), copilot_h)
     saved = manual_h - copilot_h
+    assumptions = _assumptions()
+    if approximated:
+        assumptions.append(
+            "Expression total approximated by the untranslated count "
+            "(stored records) — conservative on both scenarios.")
     return EffortEstimate(
         copilot_hours=copilot_h,
         manual_hours=manual_h,
         saved_hours=saved,
         saved_pct=round(saved / manual_h * 100) if manual_h else 0,
-        assumptions=[
+        assumptions=assumptions,
+    )
+
+
+def build_effort(pipeline: Pipeline, report: MigrationReport) -> EffortEstimate:
+    return effort_from_counts(
+        steps=report.total_steps,
+        auto=report.auto,
+        review=report.review,
+        manual=report.manual,
+        untranslated_exprs=report.untranslated_expressions,
+        total_exprs=sum(len(s.expressions) for s in pipeline.steps),
+    )
+
+
+def _assumptions() -> list[str]:
+    return [
             f"With Copilot: verify auto step {COPILOT_AUTO_STEP}h, review step "
             f"{COPILOT_REVIEW_STEP}h, hand-convert manual step {COPILOT_MANUAL_STEP}h, "
             f"hand-translate expression {COPILOT_UNTRANSLATED}h, verify AI-translated "
@@ -80,5 +115,4 @@ def build_effort(pipeline: Pipeline, report: MigrationReport) -> EffortEstimate:
             f"+{MANUAL_TEST_OVERHEAD:.0%} testing.",
             "Typical blended consultant rate $125-$175/h ($1,000-$1,400 per 8h day); "
             "adjust the rate to your engagement.",
-        ],
-    )
+        ]

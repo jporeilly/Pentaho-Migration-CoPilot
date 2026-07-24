@@ -195,6 +195,7 @@ def suggest(payload: SuggestRequest) -> dict[str, str]:
 class PdfRequest(BaseModel):
     source: SourceInfo | None = None
     result: "ConversionResult"
+    rate: float = 150.0
 
 
 @app.post("/report/pdf", dependencies=[Depends(require_api_key)])
@@ -205,6 +206,7 @@ def report_pdf(payload: PdfRequest) -> Response:
     result = payload.result
     pdf_bytes = build_pdf_report(
         payload.source, result.pipeline, result.report, result.score, result.impact,
+        effort=result.effort, rate=payload.rate,
     )
     return Response(
         content=pdf_bytes,
@@ -272,10 +274,34 @@ class StatusUpdate(BaseModel):
     status: str
 
 
-@app.get("/project", response_model=list[MappingRecord])
-def project() -> list[MappingRecord]:
-    """The migration project: every batch-converted mapping with its status."""
-    return list_mappings()
+class ProjectRow(MappingRecord):
+    """A stored mapping plus its effort estimate (computed at read time from
+    the stored counts, so pre-existing project databases need no migration)."""
+
+    copilot_hours: float = 0.0
+    manual_hours: float = 0.0
+    saved_hours: float = 0.0
+
+
+def _project_row(record: MappingRecord) -> ProjectRow:
+    from pdi_migration.validator.effort import effort_from_counts
+
+    effort = effort_from_counts(
+        steps=record.steps, auto=record.auto, review=record.review,
+        manual=record.manual, untranslated_exprs=record.expressions)
+    return ProjectRow(
+        **record.model_dump(),
+        copilot_hours=effort.copilot_hours,
+        manual_hours=effort.manual_hours,
+        saved_hours=effort.saved_hours,
+    )
+
+
+@app.get("/project", response_model=list[ProjectRow])
+def project() -> list[ProjectRow]:
+    """The migration project: every batch-converted mapping with its status
+    and per-mapping effort estimate."""
+    return [_project_row(r) for r in list_mappings()]
 
 
 @app.post("/project/status", dependencies=[Depends(require_api_key)])

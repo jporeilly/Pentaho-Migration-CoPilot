@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import EffortPanel from '../components/EffortPanel.jsx'
 
 const STATUSES = ['converted', 'in_review', 'verified', 'failed']
 const STATUS_ICON = { converted: '·', in_review: '⚠', verified: '✓', failed: '✋' }
@@ -45,6 +46,19 @@ export default function ProjectPage({ onBack, onOpen }) {
 
   const counts = rows.reduce((acc, r) => ({ ...acc, [r.status]: (acc[r.status] || 0) + 1 }), {})
   const avg = Math.round(rows.reduce((n, r) => n + r.score, 0) / rows.length)
+  const copilotH = Math.round(rows.reduce((n, r) => n + (r.copilot_hours || 0), 0))
+  const manualH = Math.round(rows.reduce((n, r) => n + (r.manual_hours || 0), 0))
+  const portfolioEffort = manualH > 0 ? {
+    copilot_hours: copilotH,
+    manual_hours: manualH,
+    saved_hours: manualH - copilotH,
+    saved_pct: Math.round(((manualH - copilotH) / manualH) * 100),
+    assumptions: [
+      `Sum of per-mapping estimates across ${rows.length} mappings (expression totals approximated from stored counts — conservative).`,
+      'Per-mapping assumptions are listed on each mapping’s Validate page.',
+      'Typical blended consultant rate $125–$175/h ($1,000–$1,400 per 8h day); adjust the rate to your engagement.',
+    ],
+  } : null
 
   return (
     <>
@@ -58,6 +72,7 @@ export default function ProjectPage({ onBack, onOpen }) {
         {STATUSES.map((s) => `${STATUS_ICON[s]} ${s.replace('_', ' ')}: ${counts[s] || 0}`).join(' · ')}
         {' — '}click a mapping to walk through its conversion and reports
       </p>
+      {portfolioEffort && <EffortPanel effort={portfolioEffort} />}
       <div className="table-scroll">
         <table className="project-table">
           <thead>
@@ -65,7 +80,7 @@ export default function ProjectPage({ onBack, onOpen }) {
               <th className="num">Score</th><th>Mapping</th><th>Export file</th>
               <th className="num">Steps</th><th className="num">Auto</th>
               <th className="num">Review</th><th className="num">Manual</th>
-              <th>Status</th><th>Updated</th>
+              <th className="num" title="Estimated hours saved vs a manual rebuild">Saved</th><th>Status</th><th>Updated</th>
             </tr>
           </thead>
           <tbody>
@@ -85,6 +100,7 @@ export default function ProjectPage({ onBack, onOpen }) {
                 <td className="num">{r.auto}</td>
                 <td className="num">{r.review}</td>
                 <td className="num">{r.manual}</td>
+                <td className="num saved-cell">{r.saved_hours ? `${r.saved_hours}h` : '—'}</td>
                 <td onClick={(e) => e.stopPropagation()}>
                   <select
                     className="status-select"

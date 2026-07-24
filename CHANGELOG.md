@@ -7,6 +7,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.4] — 2026-07-24
+
+**Portfolio effort totals — the engagement-level number.**
+
+### Added
+
+- **`effort_from_counts()`** (refactored out of `build_effort`): estimates from
+  stored counts alone, so pre-existing project databases need no migration.
+  When the true expression total is unknown it is approximated by the
+  untranslated count — conservative on both scenarios, and said so in the
+  assumptions.
+- **`/project` rows** now carry `copilot_hours` / `manual_hours` /
+  `saved_hours` per mapping (computed at read time).
+- **Project page**: portfolio effort & cost banner (sum across the corpus,
+  same editable persisted rate) plus a per-mapping "Saved" column. Measured
+  on the real 148-mapping corpus: ~2,150h with Copilot vs ~4,610h manual
+  rebuild — **saves ~2,460h (53%), ~$369k at $150/h**.
+- **PDF report** gains an "Estimated effort & cost" section (hours, cost at
+  the UI-chosen rate, full assumptions); the Validate page passes the
+  persisted rate with the request.
+- **CLI `project`** prints the portfolio effort line.
+- 3 new tests (145 total): counts-approximation conservatism, /project effort
+  surface, PDF with/without effort.
+
 ## [1.11.3] — 2026-07-24
 
 **Effort & cost estimation — the presales number.**

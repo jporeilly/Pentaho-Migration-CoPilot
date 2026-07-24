@@ -3,7 +3,7 @@
 **AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
 SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
 
-Version **1.11.3** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.11.4** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy ETL platform locks customers in with the sunk cost of thousands of
@@ -69,7 +69,7 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | Generators (Generate) | `src/pdi_migration/generator/` | .ktr with real config for 9 step types (incl. Merge Join keys, Stream Lookup with injected lookup source); .kjb jobs from PowerCenter workflows |
 | Validator (Validate) | `src/pdi_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact knowledge base (both sources), confidence score, effort & cost estimate (Copilot vs manual rebuild), CSV diff harness (measured parity) |
 | Sandbox kits | `src/pdi_migration/sandbox.py` | Per-mapping setup guide, inferred DDL, seeded synthetic test data |
-| Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open |
+| Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open, portfolio effort/cost totals |
 | PDI runner | `src/pdi_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
 | PDF reports | `src/pdi_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
 | Reports family | `src/pdi_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser, deterministic Crystal→OpenFormula translator (auto/review/manual, never guessed), native bundle writer, markdown conversion report. Backend + CLI + API shipped; UI flow and LLM formula assist planned |

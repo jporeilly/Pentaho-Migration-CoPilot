@@ -261,6 +261,23 @@ def project() -> None:
     for r in records:
         by_status[r.status] = by_status.get(r.status, 0) + 1
     typer.echo(f"{len(records)} mappings — " + "  ".join(f"{k}: {v}" for k, v in by_status.items()))
+
+    from pdi_migration.validator.effort import effort_from_counts
+
+    copilot_total = manual_total = 0.0
+    for r in records:
+        effort = effort_from_counts(
+            steps=r.steps, auto=r.auto, review=r.review,
+            manual=r.manual, untranslated_exprs=r.expressions)
+        copilot_total += effort.copilot_hours
+        manual_total += effort.manual_hours
+    saved = manual_total - copilot_total
+    pct = round(saved / manual_total * 100) if manual_total else 0
+    rate = 150.0
+    typer.echo(
+        f"portfolio effort: ~{copilot_total:,.0f}h with Copilot vs ~{manual_total:,.0f}h "
+        f"manual rebuild - saves {saved:,.0f}h ({pct}%, ~${saved * rate:,.0f} at ${rate:g}/h)"
+    )
     typer.echo("")
     for r in records:
         typer.echo(

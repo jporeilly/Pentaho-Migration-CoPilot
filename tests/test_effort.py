@@ -78,3 +78,46 @@ def test_effort_in_reports_api():
     effort = res.json()["summary"]["effort"]
     assert effort["manual_hours"] > effort["copilot_hours"]
     assert effort["saved_pct"] > 0
+
+
+def test_effort_from_counts_approximation_is_conservative():
+    from pdi_migration.validator.effort import effort_from_counts
+
+    pipeline, full = _etl_estimate()
+    from pdi_migration.validator import build_report
+    report = build_report(pipeline)
+    approx = effort_from_counts(
+        steps=report.total_steps, auto=report.auto, review=report.review,
+        manual=report.manual, untranslated_exprs=report.untranslated_expressions)
+    assert approx.copilot_hours <= full.copilot_hours
+    assert approx.manual_hours <= full.manual_hours
+    assert any("approximated" in a for a in approx.assumptions)
+
+
+def test_project_rows_carry_effort(tmp_path, monkeypatch):
+    monkeypatch.setenv("PDI_MIGRATION_CONFIG_DIR", str(tmp_path))
+    from pdi_migration.project import MappingRecord, record_mapping
+
+    record_mapping(MappingRecord(
+        mapping="m_test", file="t.xml", source_path="", steps=10, auto=6,
+        review=3, manual=1, expressions=5, score=60, grade="C",
+        status="converted", updated_at=""))
+    rows = client.get("/project").json()
+    row = next(r for r in rows if r["mapping"] == "m_test")
+    assert row["manual_hours"] > row["copilot_hours"] > 0
+    assert row["saved_hours"] == row["manual_hours"] - row["copilot_hours"]
+
+
+def test_pdf_includes_effort():
+    from pdi_migration.report_pdf import build_pdf_report
+    from pdi_migration.validator import build_impact_analysis, build_score
+
+    pipeline, effort = _etl_estimate()
+    report = build_report(pipeline)
+    impact = build_impact_analysis(pipeline)
+    score = build_score(pipeline, impact)
+    with_effort = build_pdf_report(None, pipeline, report, score, impact,
+                                   effort=effort, rate=175.0)
+    without = build_pdf_report(None, pipeline, report, score, impact)
+    assert with_effort[:4] == b"%PDF" and without[:4] == b"%PDF"
+    assert len(with_effort) > len(without)

@@ -45,7 +45,7 @@ export default function ValidatePage({ result, source, onShowPractices }) {
               const res = await fetch('/report/pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ source, result }),
+                body: JSON.stringify({ source, result, rate: Number(localStorage.getItem('consultantRate')) || 150 }),
               })
               if (!res.ok) return
               const a = document.createElement('a')

@@ -39,7 +39,8 @@ class _ReportPdf(FPDF):
         self.cell(0, 8, f"Migration Copilot - page {self.page_no()}/{{nb}}", align="C")
 
 
-def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, score, impact) -> bytes:
+def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, score, impact,
+                     effort=None, rate: float = 150.0) -> bytes:
     pdf = _ReportPdf(orientation="P", unit="mm", format="A4")
     pdf.alias_nb_pages()
     pdf.set_auto_page_break(auto=True, margin=16)
@@ -211,6 +212,25 @@ def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, scor
                 pdf.multi_cell(0, 4.2, _s(f"   difference: {difference}"), new_x="LMARGIN", new_y="NEXT")
             for action in entry.actions:
                 pdf.multi_cell(0, 4.2, _s(f"   action: {action}"), new_x="LMARGIN", new_y="NEXT")
+
+    # effort & cost
+    if effort is not None:
+        pdf.ln(2)
+        _heading(pdf, "Estimated effort & cost")
+        pdf.set_font("helvetica", "", 8.5)
+        pdf.set_text_color(*INK)
+        pdf.multi_cell(0, 4.6, _s(
+            f"With Copilot: ~{effort.copilot_hours:g}h (~${effort.copilot_hours * rate:,.0f})   |   "
+            f"Manual rebuild: ~{effort.manual_hours:g}h (~${effort.manual_hours * rate:,.0f})   |   "
+            f"Saved: {effort.saved_hours:g}h ({effort.saved_pct}%, ~${effort.saved_hours * rate:,.0f})"
+        ), new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", "", 7.5)
+        pdf.set_text_color(*MUTED)
+        pdf.multi_cell(0, 4, _s(
+            f"At ${rate:g}/h (${rate * 8:,.0f}/day blended consultant rate). Static planning "
+            "estimate - assumptions:"), new_x="LMARGIN", new_y="NEXT")
+        for assumption in effort.assumptions:
+            pdf.multi_cell(0, 3.8, _s(f"   - {assumption}"), new_x="LMARGIN", new_y="NEXT")
 
     # data flow
     if pipeline.hops:
