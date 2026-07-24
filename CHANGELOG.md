@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.3] — 2026-07-24
+
+**Effort & cost estimation — the presales number.**
+
+Every conversion now answers "what does this migration cost?": estimated hours
+of remaining human work with Copilot vs a from-scratch manual rebuild, priced
+at a configurable consultant rate.
+
+### Added
+
+- **`validator/effort.py`** (ETL) and **`reports/effort.py`** (Crystal):
+  transparent static heuristics — per-step/per-formula constants for both the
+  with-Copilot and rebuild scenarios plus testing overhead, every constant
+  surfaced in an `assumptions` list so the numbers can be defended or adjusted
+  in front of a customer. Hours are the server product; money is hours x rate,
+  applied client-side. `EffortEstimate` rides on every `ConversionResult`
+  (ETL) and `ReportSummary` (reports), so `/convert`, `/project/open`,
+  `/reports/convert`, and the assist job all carry it.
+- **UI `EffortPanel`** on the ETL Validate page (under the confidence score)
+  and the reports Download page: with-Copilot / manual-rebuild / saved columns
+  in hours and currency, an editable rate field (default $150/h, shown with
+  the 8-hour day equivalent, persisted in localStorage — typical blended
+  consultant rates $125–$175/h ≈ $1,000–$1,400/day), and a "How is this
+  calculated?" assumptions expander.
+- **CLI**: `convert` and `report` print the effort line
+  (`~3.5h with Copilot vs ~12h manual rebuild — saves 8.5h (71%, ~$1,275 at $150/h)`);
+  `--rate` overrides the rate.
+- 6 new tests (142 total): heuristic sanity, scaling with manual work, effort
+  drop after formula assist (rebuild cost unchanged), API surface for both
+  families.
+
+### Not yet
+
+- Portfolio-level totals on the Project page and effort in the PDF report —
+  the "entire corpus saves $X" number — next.
+
 ## [1.11.2] — 2026-07-24
 
 **Reports family, part 3: LLM assist for manual formulas.**

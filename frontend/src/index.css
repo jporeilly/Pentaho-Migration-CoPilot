@@ -518,3 +518,25 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
 .card .md hr { border: none; border-top: 1px solid var(--gridline); margin: 1rem 0; }
 .reports-formulas-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .75rem; }
 .reports-formulas-head .subhead { margin: 0; }
+
+/* ---------- effort & cost panel ---------- */
+.effort-panel { background: var(--surface-2); border-radius: 10px; padding: 1rem 1.2rem; margin: 1rem 0; }
+.effort-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.rate-field { display: flex; align-items: center; gap: .3rem; font-size: .85rem; color: var(--text-secondary); }
+.rate-field input {
+  width: 4.5rem; background: var(--surface-1); border: none; border-radius: 6px;
+  color: var(--text-primary); padding: .3rem .5rem; font-size: .88rem; outline: none;
+}
+.rate-field input:focus { box-shadow: 0 0 0 2px var(--accent); }
+.effort-cols { display: flex; gap: 1rem; margin-top: .9rem; flex-wrap: wrap; }
+.effort-col { flex: 1; min-width: 120px; background: var(--surface-1); border-radius: 8px; padding: .7rem .9rem; }
+.effort-col .effort-hours { font-size: 1.35rem; font-weight: 700; }
+.effort-col .effort-label { color: var(--text-muted); font-size: .8rem; }
+.effort-col .effort-cost { color: var(--text-secondary); font-size: .92rem; margin-top: .2rem; }
+.effort-col.saved .effort-hours, .effort-col.saved .effort-cost { color: var(--status-good); }
+.effort-why {
+  background: none; border: none; color: var(--accent); cursor: pointer;
+  font-size: .82rem; padding: 0; margin-top: .7rem;
+}
+.effort-assumptions { color: var(--text-muted); font-size: .8rem; margin: .5rem 0 0 1.2rem; }
+.effort-assumptions li { margin-top: .25rem; }

@@ -4,6 +4,7 @@
 
 import { useState } from 'react'
 import Markdown from '../components/Markdown.jsx'
+import EffortPanel from '../components/EffortPanel.jsx'
 
 function downloadBase64(b64, filename) {
   const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
@@ -28,6 +29,7 @@ export default function ReportsDownloadPage({ report, onReconvert, loading }) {
 
   return (
     <>
+      <EffortPanel effort={report.summary.effort} />
       <div className="card">
         <header><h2>Download</h2></header>
         <div className="actions">

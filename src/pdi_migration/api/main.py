@@ -52,10 +52,12 @@ from pdi_migration.project import (
 from pdi_migration.sandbox import SandboxKit, build_sandbox_kit
 from pdi_migration.validator.diff import DiffError, DiffReport, compare_csv
 from pdi_migration.validator import (
+    EffortEstimate,
     ImpactAnalysis,
     MigrationReport,
     MigrationScore,
     assess_source,
+    build_effort,
     build_impact_analysis,
     build_report,
     build_score,
@@ -82,16 +84,19 @@ class ConversionResult(BaseModel):
     ktr: str
     impact: ImpactAnalysis
     score: MigrationScore
+    effort: EffortEstimate | None = None
 
 
 def _build_result(pipeline: Pipeline, generator: KtrGenerator) -> "ConversionResult":
     impact = build_impact_analysis(pipeline)
+    report = build_report(pipeline)
     return ConversionResult(
         pipeline=pipeline,
-        report=build_report(pipeline),
+        report=report,
         ktr=generator.generate(pipeline),
         impact=impact,
         score=build_score(pipeline, impact),
+        effort=build_effort(pipeline, report),
     )
 
 

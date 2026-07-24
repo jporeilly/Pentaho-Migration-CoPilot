@@ -3,6 +3,7 @@ import StatTiles from '../components/StatTiles.jsx'
 import Markdown from '../components/Markdown.jsx'
 import { buildMarkdownReport } from '../lib/report.js'
 import ScorePanel from '../components/ScorePanel.jsx'
+import EffortPanel from '../components/EffortPanel.jsx'
 import DiffRunner from '../components/DiffRunner.jsx'
 
 function downloadText(name, content) {
@@ -71,6 +72,7 @@ export default function ValidatePage({ result, source, onShowPractices }) {
         </div>
       </header>
       <ScorePanel score={result.score} />
+      <EffortPanel effort={result.effort} />
       <StatTiles report={report} />
 
       <h3 className="subhead">

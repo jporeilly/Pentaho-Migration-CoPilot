@@ -20,7 +20,9 @@ from pydantic import BaseModel
 from pdi_migration.api.security import require_api_key
 from pdi_migration.llm import ExpressionTranslator, TranslationError
 from pdi_migration.reports import build_conversion_report, load_report_model, write_prpt
+from pdi_migration.reports.effort import build_report_effort
 from pdi_migration.reports.llm_assist import translate_manual_formulas
+from pdi_migration.validator.effort import EffortEstimate
 
 logger = logging.getLogger("pdi_migration.api.reports")
 
@@ -89,6 +91,7 @@ class ReportSummary(BaseModel):
     formulas: list[ReportFormula]
     todos: list[str]
     counts: ReportCounts
+    effort: EffortEstimate | None = None
 
 
 class ReportConversionResponse(BaseModel):
@@ -130,6 +133,7 @@ def _summarize(model, source_name: str) -> ReportSummary:
                                 original=f.text, notes=f.notes)
                   for f in model.formulas.values()],
         todos=todos,
+        effort=build_report_effort(model),
         counts=ReportCounts(
             sections=len(model.sections),
             elements=sum(len(s.elements) for s in model.sections),

@@ -13,6 +13,7 @@ from pdi_migration.mapper import RulesMapper
 from pdi_migration.parser import detect_parser
 from pdi_migration.validator import (
     assess_source,
+    build_effort,
     build_gap_report,
     build_impact_analysis,
     build_report,
@@ -39,6 +40,9 @@ def convert(
     translate: bool = typer.Option(
         False, "--translate", "-t",
         help="Translate expressions via the configured LLM provider (see Settings)",
+    ),
+    rate: float = typer.Option(
+        150.0, "--rate", help="Consultant rate per hour, for the effort estimate",
     ),
 ) -> None:
     """Convert a source export (PowerCenter/Talend) to PDI .ktr + migration report."""
@@ -80,6 +84,12 @@ def convert(
         )
         typer.echo(
             f"  confidence: {score.score}/100 ({score.grade}, static) — {score.verdict}"
+        )
+        effort = build_effort(pipeline, report)
+        typer.echo(
+            f"  effort: ~{effort.copilot_hours:g}h with Copilot vs "
+            f"~{effort.manual_hours:g}h manual rebuild — saves "
+            f"{effort.saved_hours:g}h ({effort.saved_pct}%, ~${effort.saved_hours * rate:,.0f} at ${rate:g}/h)"
         )
 
     kjb_generator = KjbGenerator()
@@ -309,6 +319,9 @@ def report(
         False, "--translate", "-t",
         help="LLM-assist formulas the deterministic translator flagged manual",
     ),
+    rate: float = typer.Option(
+        150.0, "--rate", help="Consultant rate per hour, for the effort estimate",
+    ),
 ) -> None:
     """Convert a Crystal Reports RptToXml dump to a Pentaho .prpt bundle."""
     from pdi_migration.reports import (
@@ -346,6 +359,15 @@ def report(
     )
     if counts["manual"]:
         typer.echo("  manual formulas need hand conversion - see the report.")
+
+    from pdi_migration.reports.effort import build_report_effort
+
+    effort = build_report_effort(model)
+    typer.echo(
+        f"  effort: ~{effort.copilot_hours:g}h with Copilot vs "
+        f"~{effort.manual_hours:g}h manual rebuild - saves "
+        f"{effort.saved_hours:g}h ({effort.saved_pct}%, ~${effort.saved_hours * rate:,.0f} at ${rate:g}/h)"
+    )
 
 
 if __name__ == "__main__":
