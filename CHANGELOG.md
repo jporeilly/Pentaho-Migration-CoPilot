@@ -7,6 +7,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.5] — 2026-07-24
+
+**Reports round-trip validation — "opens in PRD" is now a measured fact.**
+
+### Added
+
+- **`tools/PrptValidator.java`**: headless loader that parses a .prpt through
+  the REAL Pentaho Reporting engine (the exact code path PRD and the Pentaho
+  Server use), run via the JDK single-file source launcher — no compile step.
+  **The generated sample bundle passed on the first run** (query, group,
+  parameter, and data factory all materialize), and a deliberately corrupted
+  bundle is correctly rejected — the reverse-engineered bundle format is now
+  engine-verified, not sample-inferred.
+- **`reports/prpt_validator.py`**: Python wrapper (finds PRD + Java, parses
+  OK/FAIL verdicts); `pdi-migrate report --validate` validates right after
+  conversion.
+- **`reports/environment.py` + `pdi-migrate report-env`**: fresh-install
+  preflight for the whole Crystal pipeline — Pentaho Report Designer (PRD_HOME
+  or common paths), Java (suite-bundled JDK preferred), SAP Crystal .NET
+  runtime (registry keys the MSI writes + GAC fallback), and RptToXml.exe
+  (RPTTOXML_PATH / tools/RptToXml/ / PATH) — with actionable hints including
+  the official free runtime download page.
+- 4 new tests (149 total): engine round-trip of a generated bundle,
+  corrupted-bundle rejection (both auto-skip without a local PRD), and
+  environment-detection shape/tolerance.
+
 ## [1.11.4] — 2026-07-24
 
 **Portfolio effort totals — the engagement-level number.**

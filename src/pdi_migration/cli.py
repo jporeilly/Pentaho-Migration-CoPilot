@@ -339,6 +339,11 @@ def report(
     rate: float = typer.Option(
         150.0, "--rate", help="Consultant rate per hour, for the effort estimate",
     ),
+    validate: bool = typer.Option(
+        False, "--validate",
+        help="Load the generated .prpt through the real Pentaho Reporting engine "
+             "(needs a local PRD install + Java; see `pdi-migrate report-env`)",
+    ),
 ) -> None:
     """Convert a Crystal Reports RptToXml dump to a Pentaho .prpt bundle."""
     from pdi_migration.reports import (
@@ -385,6 +390,40 @@ def report(
         f"~{effort.manual_hours:g}h manual rebuild - saves "
         f"{effort.saved_hours:g}h ({effort.saved_pct}%, ~${effort.saved_hours * rate:,.0f} at ${rate:g}/h)"
     )
+
+    if validate:
+        from pdi_migration.reports.prpt_validator import validate_prpts, validator_available
+
+        if not validator_available():
+            typer.echo("validator unavailable - run `pdi-migrate report-env` for setup hints", err=True)
+            raise typer.Exit(code=2)
+        typer.echo("  validating through the Pentaho Reporting engine...")
+        (result,) = validate_prpts([out_path])
+        if result.ok:
+            typer.echo(f"  VALIDATED: loads in the real engine ({result.detail})")
+        else:
+            typer.echo(f"  VALIDATION FAILED: {result.detail}", err=True)
+            raise typer.Exit(code=1)
+
+
+@app.command("report-env")
+def report_env() -> None:
+    """Preflight for the Crystal pipeline: is everything installed?"""
+    from pdi_migration.reports.environment import environment_report
+
+    env = environment_report()
+    def line(label: str, value, ok: bool) -> None:
+        typer.echo(f"  [{'OK' if ok else '--'}] {label}: {value or 'not found'}")
+
+    typer.echo("Crystal migration environment:")
+    line("Pentaho Report Designer", env["prd_home"], env["prd_home"] is not None)
+    line("Java", env["java"], env["java"] is not None)
+    line("SAP Crystal .NET runtime", env["crystal_runtime"], env["crystal_runtime"] is not None)
+    line("RptToXml.exe", env["rpttoxml"], env["rpttoxml"] is not None)
+    typer.echo(f"  round-trip validation: {'READY' if env['validator_ready'] else 'NOT READY'}")
+    typer.echo(f"  .rpt extraction:       {'READY' if env['extraction_ready'] else 'NOT READY'}")
+    for hint in env["hints"]:
+        typer.echo(f"  hint: {hint}")
 
 
 if __name__ == "__main__":
