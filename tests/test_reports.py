@@ -262,3 +262,61 @@ def test_professional_formatting_carries_through(tmp_path):
     layout = zf.read("layout.xml").decode()
     assert "#133346" in layout                              # navy carried
     assert "background-color" in zf.read("styles.xml").decode()  # page-header fill
+
+
+def test_rich_parameters_become_list_parameters(tmp_path):
+    dump = tmp_path / "p.xml"
+    dump.write_text(
+        '<?xml version="1.0"?><Report Name="P" FileName="p.rpt">'
+        '<Database><Tables><Table Name="Command" ClassName="CommandTable">'
+        '<Command>SELECT 1 AS "X"</Command><Fields><Field Name="X" ValueType="StringField"/></Fields>'
+        '</Table></Tables></Database><DataDefinition><ParameterFieldDefinitions>'
+        '<ParameterFieldDefinition Name="Region" ValueType="StringField" PromptText="Pick" '
+        'EnableAllowMultipleValue="True" IsOptionalPrompt="False">'
+        '<ParameterDefaultValues><ParameterDefaultValue Value="West"/>'
+        '<ParameterDefaultValue Value="East"/></ParameterDefaultValues>'
+        '</ParameterFieldDefinition>'
+        '<ParameterFieldDefinition Name="AsOf" ValueType="DateField" PromptText="As of" '
+        'IsOptionalPrompt="True"/>'
+        '</ParameterFieldDefinitions></DataDefinition>'
+        '<ReportDefinition><Areas><Area Kind="Detail"><Sections><Section Height="100">'
+        '<ReportObjects/></Section></Sections></Area></Areas></ReportDefinition></Report>',
+        encoding="utf-8")
+    model = load_report_model(dump)
+    region = next(p for p in model.parameters if p.name == "Region")
+    assert region.multi_value and region.default_values == ["West", "East"]
+    asof = next(p for p in model.parameters if p.name == "AsOf")
+    assert asof.optional
+    out = tmp_path / "p.prpt"
+    write_prpt(model, out)
+    dd = zipfile.ZipFile(out).read("datadefinition.xml").decode()
+    assert 'list-parameter name="Region"' in dd
+    assert 'allow-multi-selection="true"' in dd
+    assert 'value="West"' in dd
+    assert 'mandatory="false"' in dd  # AsOf optional prompt
+
+
+def test_object_suppress_and_can_grow(tmp_path):
+    dump = tmp_path / "o.xml"
+    dump.write_text(
+        '<?xml version="1.0"?><Report Name="O" FileName="o.rpt">'
+        '<Database><Tables><Table Name="Command" ClassName="CommandTable">'
+        '<Command>SELECT 1 AS "X"</Command><Fields><Field Name="X" ValueType="StringField"/></Fields>'
+        '</Table></Tables></Database><DataDefinition/>'
+        '<ReportDefinition><Areas><Area Kind="Detail"><Sections><Section Height="200">'
+        '<ReportObjects>'
+        '<FieldObject Name="Memo" DataSource="{Command.X}" Left="0" Top="0" Width="2000" Height="100">'
+        '<ObjectFormat EnableCanGrow="True"/></FieldObject>'
+        '<FieldObject Name="Hidden" DataSource="{Command.X}" Left="0" Top="120" Width="2000" Height="80">'
+        '<ObjectFormat EnableSuppress="True"/></FieldObject>'
+        '</ReportObjects></Section></Sections></Area></Areas></ReportDefinition></Report>',
+        encoding="utf-8")
+    model = load_report_model(dump)
+    det = model.sections_of("Detail")[0]
+    assert next(e for e in det.elements if e.name == "Memo").can_grow
+    assert not next(e for e in det.elements if e.name == "Hidden").visible
+    out = tmp_path / "o.prpt"
+    write_prpt(model, out)
+    layout = zipfile.ZipFile(out).read("layout.xml").decode()
+    assert 'dynamic-height="true"' in layout
+    assert 'visible="false"' in layout

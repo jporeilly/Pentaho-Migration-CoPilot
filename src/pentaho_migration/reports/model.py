@@ -56,6 +56,8 @@ class Element:
     image_bytes: bytes = b""  # embedded raster for kind="image"
     image_mime: str = ""      # image/png | image/jpeg
     resource_path: str = ""   # bundle path assigned by the writer for the image
+    visible: bool = True       # Crystal object-level suppression
+    can_grow: bool = False     # Crystal "can grow" -> PRD dynamic height
     notes: list = field(default_factory=list)
 
 
@@ -85,6 +87,9 @@ class Parameter:
     value_type: str = "StringField"
     prompt: str = ""
     default: str = ""
+    multi_value: bool = False       # Crystal EnableAllowMultipleValue
+    optional: bool = False          # Crystal IsOptionalPrompt (optional => not mandatory)
+    default_values: list = field(default_factory=list)  # LOV / pick-list values
 
 
 @dataclass

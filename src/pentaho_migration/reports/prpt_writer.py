@@ -66,6 +66,10 @@ def _style_block(el, sp):
         common.append(f'alignment="{el.align}"')
     if el.valign:
         common.append(f'vertical-alignment="{el.valign}"')
+    if not el.visible:
+        common.append('visible="false"')
+    if el.can_grow:
+        common.append('dynamic-height="true"')
     if common:
         parts.append(f'<{sp}common-styles {" ".join(common)}/>')
     text_attrs = [f'font-face={quoteattr(el.font.name)}', f'font-size="{_num(el.font.size)}"']
@@ -306,19 +310,46 @@ def build_styles_xml(model):
 
 # ------------------------------------------------------- datadefinition.xml
 
+def _parameter_xml(prm):
+    """A Crystal parameter -> PRD parameter. Multi-value or pick-list (LOV)
+    parameters become list-parameters; simple prompts stay plain textboxes.
+    Optional Crystal prompts map to mandatory=false."""
+    jtype = PARAM_TYPE_MAP.get(prm.value_type, "java.lang.String")
+    mandatory = "false" if prm.optional else "true"
+    label = (f'<attribute namespace="{NS_PARAM}" name="label">'
+             f'{escape(prm.prompt or prm.name)}</attribute>')
+    if prm.multi_value or prm.default_values:
+        # a static pick-list built from the Crystal default-value list
+        items = "".join(
+            f'<value type="{jtype}" value={quoteattr(v)} null="false"/>'
+            for v in prm.default_values)
+        render = "checkbox" if prm.multi_value else "dropdown"
+        default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
+        jtype_list = f"[L{jtype};" if prm.multi_value else jtype
+        return (
+            f'<list-parameter name={quoteattr(prm.name)} '
+            f'allow-multi-selection="{str(prm.multi_value).lower()}" '
+            f'strict-values="false" mandatory="{mandatory}" '
+            f'type={quoteattr(jtype_list)}{default}>'
+            f'{label}'
+            f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">{render}</attribute>'
+            + (f'<value-list>{items}</value-list>' if items else "")
+            + "</list-parameter>")
+    default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
+    return (
+        f'<plain-parameter name={quoteattr(prm.name)} mandatory="{mandatory}" '
+        f'type="{jtype}"{default}>'
+        f'{label}'
+        f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">textbox</attribute>'
+        f"</plain-parameter>")
+
+
 def build_datadefinition_xml(model):
     parts = ['<?xml version="1.0" encoding="UTF-8"?>\n'
              f'<data-definition xmlns="{NS_DATA}">']
     parts.append("<parameter-definition>")
     for prm in model.parameters:
-        jtype = PARAM_TYPE_MAP.get(prm.value_type, "java.lang.String")
-        default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
-        parts.append(
-            f'<plain-parameter name={quoteattr(prm.name)} mandatory="false" '
-            f'type="{jtype}"{default}>'
-            f'<attribute namespace="{NS_PARAM}" name="label">{escape(prm.prompt or prm.name)}</attribute>'
-            f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">textbox</attribute>'
-            f"</plain-parameter>")
+        parts.append(_parameter_xml(prm))
     parts.append("</parameter-definition>")
     parts.append('<data-source report-query="default" limit="-1" timout="0" '
                  'ref="datasources/compound-ds.xml"/>')

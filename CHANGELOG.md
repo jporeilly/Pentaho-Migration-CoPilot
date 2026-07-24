@@ -7,6 +7,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.14.1] — 2026-07-24
+
+**Parameter and object fidelity — the achievable half of format fidelity.**
+
+### Added
+
+- **Rich parameters**: Crystal multi-value / pick-list (LOV) parameters now
+  become PRD **list-parameters** (checkbox for multi-select, dropdown for
+  single) with the static value list carried across; optional Crystal prompts
+  map to `mandatory=false`. Simple prompts stay plain textboxes.
+- **Object-level suppression and can-grow**: a Crystal object's `ObjectFormat`
+  `EnableSuppress` -> PRD `visible=false`, `EnableCanGrow` -> `dynamic-height`
+  (memo/text fields expand). Read from the real RptToXml `<ObjectFormat>`.
+- 2 tests (177 total).
+
+### Known limitation (motivates the extractor work)
+
+- **Per-field number/date/currency format strings** (decimal places, currency
+  symbol, date pattern) and **group sort direction** are *not* exported by
+  RptToXml 1.1.7 — the Crystal SDK has them, the dumper does not. The writer
+  uses sensible type-based defaults; true format fidelity needs a more
+  complete extractor (next).
+
 ## [1.14.0] — 2026-07-24
 
 **Professional report formatting — carried from the Crystal source, not injected.**

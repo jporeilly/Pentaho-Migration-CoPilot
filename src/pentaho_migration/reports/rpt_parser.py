@@ -217,6 +217,12 @@ def _parse_object(obj):
     # formatting carried from the Crystal object (real RptToXml color children)
     el.bg_color = _find_color(obj, "BackgroundColor")
     el.border_color, el.border_width = _parse_border(obj)
+    objfmt = next((c for c in obj if _local(c.tag) == "ObjectFormat"), None)
+    if objfmt is not None:
+        el.visible = _attr(objfmt, "EnableSuppress", default="false").lower() not in ("true", "1")
+        el.can_grow = _attr(objfmt, "EnableCanGrow", default="false").lower() in ("true", "1")
+        if not el.align:
+            el.align = ALIGN_MAP.get(_attr(objfmt, "HorizontalAlignment", default="").lower(), "")
 
     if tag == "TextObject":
         el.kind = "label"
@@ -314,11 +320,22 @@ def _parse_data_definition(root, model):
         name = _attr(p, "Name", "ParameterFieldName", default="").strip("{}?")
         if not name or name in [x.name for x in model.parameters]:
             continue
+        # RptToXml carries the pick-list (LOV) under <ParameterDefaultValues>
+        default_values = []
+        dv = p.find("ParameterDefaultValues")
+        if dv is not None:
+            for v in dv:
+                text = (v.text or _attr(v, "Value", "Description", default="")).strip()
+                if text:
+                    default_values.append(text)
         model.parameters.append(Parameter(
             name=name,
             value_type=_attr(p, "ValueType", default="StringField"),
             prompt=_attr(p, "PromptText", "Prompt", default=""),
-            default=_attr(p, "DefaultValue", default=""),
+            default=_attr(p, "DefaultValue", default="") or (default_values[0] if default_values else ""),
+            multi_value=_attr(p, "EnableAllowMultipleValue", default="false").lower() in ("true", "1"),
+            optional=_attr(p, "IsOptionalPrompt", default="false").lower() in ("true", "1"),
+            default_values=default_values,
         ))
 
     for s in dd.iter("SummaryFieldDefinition"):
