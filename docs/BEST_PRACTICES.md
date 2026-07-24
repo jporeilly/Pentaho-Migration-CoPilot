@@ -64,7 +64,30 @@ Copilot works. Read this before your first real conversion.
 - Every hand-edit to generated output should be visible in a diff — convert, commit,
   then edit; never edit-then-lose-the-baseline.
 
-## 9. Improve the tool as you go
+## 9. Crystal Reports: treat reports as their own family
+
+Reports are documents, not dataflows — different risks, different checklist:
+
+- **Extract, scrub, then share.** RptToXml copies connection credentials out
+  of `.rpt` files into the dumps. Always run `pdi-migrate report-scrub` on a
+  dump folder before committing it to a corpus or attaching it anywhere.
+- **Baseline the whole estate first**: `pdi-migrate report-gaps <dir>` gives
+  parse coverage, formula auto/review/manual rates, and the portfolio effort
+  number before you commit to a timeline.
+- **Validate every generated bundle** with `--validate` (real engine load),
+  and open a sample visually in Report Designer — engine-valid proves it
+  parses, eyes prove it looks right.
+- **Formulas follow the ETL rule**: deterministic first, LLM assist only for
+  what rules cannot prove, every AI translation flagged review. Running
+  totals and aggregates are *report functions* in PRD, not formulas — the
+  conversion report says which function to use.
+- **Datasources are replaced, not migrated**: the .prpt points at a JNDI name
+  on the Pentaho Server. Create the connection there first; report SQL with
+  Crystal parameter tokens (`{?Param}`) must be re-expressed as `${Param}`.
+- **Analyzer is a re-platform, not a conversion** — use extracted SQL as
+  requirements for a Mondrian model when the report is really an analysis.
+
+## 10. Improve the tool as you go
 
 - Every construct you convert by hand is a candidate rule or validated translation
   example. Confirmed conversions compound the tool's accuracy — that's the data moat.

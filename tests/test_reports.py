@@ -164,3 +164,31 @@ def test_etl_convert_gives_helpful_error_for_crystal_upload():
         files={"export": ("branch.xml", SAMPLE.read_bytes(), "text/xml")})
     assert res.status_code == 422
     assert "Reports pipeline" in res.json()["detail"]
+
+
+def test_switch_becomes_nested_if():
+    f = translate_formula("t", 'Switch({O.T} = "W", "High", {O.T} = "A", "Low")')
+    assert f.status == "review"  # NA() fallback note
+    assert f.translation == '=IF([T] = "W";"High";IF([T] = "A";"Low";NA()))'
+
+
+def test_switch_odd_args_manual():
+    f = translate_formula("t", 'Switch({O.T} = "W", "High", "orphan")')
+    assert f.status == "manual"
+
+
+def test_datediff_maps_supported_intervals():
+    f = translate_formula("t", 'DateDiff("d", {O.START}, {O.END})')
+    assert f.status == "review"
+    assert f.translation == '=DATEDIF([START];[END];"d")'
+
+
+def test_datediff_time_interval_stays_manual():
+    f = translate_formula("t", 'DateDiff("h", {O.START}, {O.END})')
+    assert f.status == "manual"
+
+
+def test_chr_maps_to_char():
+    f = translate_formula("t", "Chr(13)")
+    assert f.status == "review"
+    assert f.translation == "=CHAR(13)"

@@ -1,0 +1,323 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\craibuc_Oracle.12.rpt" HasSavedData="False">
+  <Embedinfo />
+  <Summaryinfo KeywordsinReport="" ReportAuthor="Craig Buchanan" ReportComments="Features:&#13;&#10; - Crystal Reports v12&#13;&#10; - Oracle connectivity&#13;&#10; - Command object" ReportSubject="" ReportTitle="Database.Oracle.Command" />
+  <ReportOptions EnableSaveDataWithReport="False" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="15504" PageContentWidth="11904" PaperOrientation="Portrait" PaperSize="DefaultPaperSize" PaperSource="FormSource" PrinterDuplex="Default" PrinterName="">
+    <PageMargins bottomMargin="168" leftMargin="168" rightMargin="168" topMargin="168" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks />
+    <Tables>
+      <Table Alias="Command" ClassName="CrystalReports.CommandTable" Name="Command">
+        <ConnectionInfo Database_DLL="crdb_oracle.dll" QE_DatabaseName="" QE_DatabaseType="" QE_LogonProperties="" QE_ServerDescription="CPRD" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Command>SELECT sysdate FROM dual</Command>
+        <Fields>
+          <Field Description="" FormulaForm="{Command.SYSDATE}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.SYSDATE" Name="SYSDATE" ShortName="SYSDATE" Type="crFieldValueTypeDateTimeField" UseCount="1" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula />
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions />
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions />
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions>
+    <CustomFunction Name="Colorize" Syntax="crFormulaSyntaxCrystal">
+      <Text>// --------------------------------------------------------------------------------
+// Author:      Craig Buchanan
+// Created:     07/27/2011
+// Purpose:     Color every other row as light tan
+// Parameters:  row - supply Crystal Reports' RecordNumber or GroupNumber fuctions
+//                to this parameter
+//              color - a RGB() or Crystal Reports color constant (e.g. crRed)
+//                defaults to light tan
+// Returns:     numeric representation of RGB() or color constant
+// --------------------------------------------------------------------------------
+Function (Numbervar row, Optional Numbervar Color := RGB(239,235,220))
+
+If Remainder(row,2)=0 Then
+    Color
+Else
+    crNoColor</Text>
+    </CustomFunction>
+    <CustomFunction Name="SmartDate" Syntax="crFormulaSyntaxCrystal">
+      <Text>// --------------------------------------------------------------------------------
+// Author:      Craig Buchanan; craig.buchanan@cogniza.com
+// Created:     7/19/2011
+// Purpose:     convert 'smart' values to equivalent date values
+// Parameters:  smartValue - mm/dd/yyyy; yyyy/mm/dd; [T|W|M|MB|ME|Q|Y|YB|YE][+|-][0...?]
+//              dataDate - supply Crystal Reports DataDate function to this parameter
+// Returns:     date
+// --------------------------------------------------------------------------------
+// Modified:    2/5/2013
+// Author:      Craig Buchanan
+// Purpose:     Ensure that Repository has most-recent version of function.
+// --------------------------------------------------------------------------------
+Function (Stringvar smartValue, Datevar dataDate)
+
+    // mm/dd/yyyy; yyyy/mm/dd
+    If smartValue="" Then
+        dataDate
+
+    Else If IsDate (smartValue) Then
+
+        DateValue(smartValue)
+
+    // 'smartdates'
+    Else (
+
+        Local Stringvar oper;
+        Local Numbervar factor;
+
+        // +/-
+        if InStr(smartValue,"+")&gt;0 then (
+            oper:="+";
+            factor:=1
+        )
+        else if InStr(smartValue,"-")&gt;0 then (
+            oper:="-";
+            factor:=-1
+        );
+//        else
+            //error
+    
+        // split M+1 into array of interval (M) and quantity (1)
+        Local Stringvar array kv := Split(smartValue, oper);
+        Local stringvar int:=ucase(kv[1]);
+        Local Numbervar qty:=toNumber(kv[2]);
+        //first day of current month
+        Local Datevar MM_01_YY:=Date(Year(dataDate),Month(dataDate),1);
+
+        select int
+        //today
+        case "T": CDate(DateAdd("d", qty*factor, dataDate))
+
+        //week
+        case "W": CDate(DateAdd("ww", qty*factor, dataDate))
+
+        //month
+        case "M": CDate(DateAdd("m", qty*factor, dataDate))
+        case "MB": CDate( DateAdd("m", qty*factor, MM_01_YY ) )
+        //
+        case "ME": CDate( DateAdd("m", 1, DateAdd("m", qty*factor, MM_01_YY))-1 )
+
+        //quarter
+        case "Q": CDate(DateAdd("q", qty*factor, dataDate))
+
+        //year
+        case "Y": CDate(DateAdd("yyyy", qty*factor, dataDate))
+        case "YB": CDate( DateAdd("yyyy", qty*factor, Date(Year(dataDate),1,1) ) )
+        case "YE": CDate( DateAdd("yyyy", qty*factor, Date(Year(dataDate),12,31) ) )
+
+        //unspecified
+        default: dataDate
+        ;
+
+    )
+</Text>
+    </CustomFunction>
+  </CustomFunctions>
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="1380" Kind="ReportHeader" Name="TSection5">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="Field3" Kind="FieldObject" Top="0" Left="0" Width="11700" Height="360" DataSource="ReportTitle">
+                <Color Name="ffbb0826" A="255" R="187" G="8" B="38" />
+                <Font Bold="False" FontFamily="Georgia" GdiCharSet="1" GdiVerticalFont="False" Height="25" IsSystemFont="False" Italic="False" Name="Georgia" OriginalFontName="Georgia" Size="16" SizeinPoints="16" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Field4" Kind="FieldObject" Top="1188" Left="0" Width="11700" Height="192" DataSource="ReportComments">
+                <Color Name="ff5a5d62" A="255" R="90" G="93" B="98" />
+                <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="True" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Italic" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line3" Kind="LineObject" Top="1128" Left="0" Width="11700" Height="0" Bottom="1128" EnableExtendToBottomOfSection="False" EndSectionName="TSection5" LineStyle="SingleLine" LineThickness="0" Right="11700">
+                <LineColor Name="ff5a5d62" A="255" R="90" G="93" B="98" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ff5a5d62" A="255" R="90" G="93" B="98" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="720" Kind="PageHeader" Name="TSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas EnableSuppress="//PageNumber=1" />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="Field1" Kind="FieldObject" Top="300" Left="0" Width="11700" Height="360" DataSource="ReportTitle">
+                <Color Name="ffbb0826" A="255" R="187" G="8" B="38" />
+                <Font Bold="False" FontFamily="Georgia" GdiCharSet="1" GdiVerticalFont="False" Height="25" IsSystemFont="False" Italic="False" Name="Georgia" OriginalFontName="Georgia" Size="16" SizeinPoints="16" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line1" Kind="LineObject" Top="720" Left="0" Width="11700" Height="0" Bottom="720" EnableExtendToBottomOfSection="False" EndSectionName="TSection1" LineStyle="SingleLine" LineThickness="0" Right="11700">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+            </ReportObjects>
+          </Section>
+          <Section Height="372" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldHeadingObject Name="Text2" Kind="FieldHeadingObject" Top="180" Left="0" Width="1363" Height="192" FieldObjectName="SYSDATE1" MaxNumberOfLines="0">
+                <Text>SYSDATE</Text>
+                <Color Name="ff5a5d62" A="255" R="90" G="93" B="98" />
+                <Font Bold="True" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="192" Kind="Detail" Name="TSection4">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas BackgroundColor="Colorize(RecordNumber)" />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="SYSDATE1" Kind="FieldObject" Top="0" Left="0" Width="1363" Height="192" DataSource="{Command.SYSDATE}">
+                <Color Name="ff5a5d62" A="255" R="90" G="93" B="98" />
+                <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="220" Kind="ReportFooter" Name="TSection6">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="360" Kind="PageFooter" Name="TSection3">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="Field2" Kind="FieldObject" Top="120" Left="0" Width="11700" Height="240" DataSource="PageNofM">
+                <Color Name="ffbb0826" A="255" R="187" G="8" B="38" />
+                <Font Bold="False" FontFamily="Georgia" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Georgia" OriginalFontName="Georgia" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text1" Kind="TextObject" Top="120" Left="8820" Width="2880" Height="240" MaxNumberOfLines="0">
+                <Text>Data: DataDate DataTime</Text>
+                <Color Name="ffbb0826" A="255" R="187" G="8" B="38" />
+                <Font Bold="False" FontFamily="Georgia" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Georgia" OriginalFontName="Georgia" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <LineObject Name="Line2" Kind="LineObject" Top="56" Left="0" Width="11700" Height="0" Bottom="56" EnableExtendToBottomOfSection="False" EndSectionName="TSection3" LineStyle="SingleLine" LineThickness="0" Right="11700">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

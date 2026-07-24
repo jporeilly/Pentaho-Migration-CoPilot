@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\ljokhan_AdventureWorks-TotalSalesByDay.rpt" HasSavedData="True">
+  <Embedinfo>
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+  </Embedinfo>
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="11906" PageContentWidth="15506" PaperOrientation="Landscape" PaperSize="PaperLetter" PaperSource="257" PrinterDuplex="Simplex" PrinterName="">
+    <PageMargins bottomMargin="168" leftMargin="168" rightMargin="168" topMargin="168" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{SalesOrderDetail.SalesOrderID}" Kind="DatabaseField" Name="SalesOrderID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{SalesOrderHeader.SalesOrderID}" Kind="DatabaseField" Name="SalesOrderID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+    </TableLinks>
+    <Tables>
+      <Table Alias="SalesOrderHeader" ClassName="CrystalReports.Table" Name="SalesOrderHeader">
+        <ConnectionInfo Database_DLL="crdb_ado.dll" QE_DatabaseName="AdventureWorks2022" QE_DatabaseType="OLE DB (ADO)" QE_LogonProperties="" QE_ServerDescription="20.246.47.35" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{SalesOrderHeader.SalesOrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.SalesOrderID" Name="SalesOrderID" ShortName="SalesOrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.RevisionNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="1" LongName="SalesOrderHeader.RevisionNumber" Name="RevisionNumber" ShortName="RevisionNumber" Type="crFieldValueTypeInt8uField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.OrderDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.OrderDate" Name="OrderDate" ShortName="OrderDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.DueDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.DueDate" Name="DueDate" ShortName="DueDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.ShipDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.ShipDate" Name="ShipDate" ShortName="ShipDate" Type="crFieldValueTypeDateTimeField" UseCount="3" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.Status}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="1" LongName="SalesOrderHeader.Status" Name="Status" ShortName="Status" Type="crFieldValueTypeInt8uField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.OnlineOrderFlag}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="SalesOrderHeader.OnlineOrderFlag" Name="OnlineOrderFlag" ShortName="OnlineOrderFlag" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.SalesOrderNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="52" LongName="SalesOrderHeader.SalesOrderNumber" Name="SalesOrderNumber" ShortName="SalesOrderNumber" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.PurchaseOrderNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="52" LongName="SalesOrderHeader.PurchaseOrderNumber" Name="PurchaseOrderNumber" ShortName="PurchaseOrderNumber" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.AccountNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="SalesOrderHeader.AccountNumber" Name="AccountNumber" ShortName="AccountNumber" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.CustomerID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.CustomerID" Name="CustomerID" ShortName="CustomerID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.SalesPersonID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.SalesPersonID" Name="SalesPersonID" ShortName="SalesPersonID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.TerritoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.TerritoryID" Name="TerritoryID" ShortName="TerritoryID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.BillToAddressID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.BillToAddressID" Name="BillToAddressID" ShortName="BillToAddressID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.ShipToAddressID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.ShipToAddressID" Name="ShipToAddressID" ShortName="ShipToAddressID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.ShipMethodID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.ShipMethodID" Name="ShipMethodID" ShortName="ShipMethodID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.CreditCardID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.CreditCardID" Name="CreditCardID" ShortName="CreditCardID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.CreditCardApprovalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="SalesOrderHeader.CreditCardApprovalCode" Name="CreditCardApprovalCode" ShortName="CreditCardApprovalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.CurrencyRateID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderHeader.CurrencyRateID" Name="CurrencyRateID" ShortName="CurrencyRateID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.SubTotal}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.SubTotal" Name="SubTotal" ShortName="SubTotal" Type="crFieldValueTypeCurrencyField" UseCount="1" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.TaxAmt}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.TaxAmt" Name="TaxAmt" ShortName="TaxAmt" Type="crFieldValueTypeCurrencyField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.Freight}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.Freight" Name="Freight" ShortName="Freight" Type="crFieldValueTypeCurrencyField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.TotalDue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.TotalDue" Name="TotalDue" ShortName="TotalDue" Type="crFieldValueTypeCurrencyField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.Comment}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="258" LongName="SalesOrderHeader.Comment" Name="Comment" ShortName="Comment" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.rowguid}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="SalesOrderHeader.rowguid" Name="rowguid" ShortName="rowguid" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderHeader.ModifiedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderHeader.ModifiedDate" Name="ModifiedDate" ShortName="ModifiedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="SalesOrderDetail" ClassName="CrystalReports.Table" Name="SalesOrderDetail">
+        <ConnectionInfo Database_DLL="crdb_ado.dll" QE_DatabaseName="AdventureWorks2022" QE_DatabaseType="OLE DB (ADO)" QE_LogonProperties="" QE_ServerDescription="20.246.47.35" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{SalesOrderDetail.SalesOrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderDetail.SalesOrderID" Name="SalesOrderID" ShortName="SalesOrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.SalesOrderDetailID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderDetail.SalesOrderDetailID" Name="SalesOrderDetailID" ShortName="SalesOrderDetailID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.CarrierTrackingNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="52" LongName="SalesOrderDetail.CarrierTrackingNumber" Name="CarrierTrackingNumber" ShortName="CarrierTrackingNumber" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.OrderQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="SalesOrderDetail.OrderQty" Name="OrderQty" ShortName="OrderQty" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderDetail.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.SpecialOfferID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="SalesOrderDetail.SpecialOfferID" Name="SpecialOfferID" ShortName="SpecialOfferID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderDetail.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeCurrencyField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.UnitPriceDiscount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderDetail.UnitPriceDiscount" Name="UnitPriceDiscount" ShortName="UnitPriceDiscount" Type="crFieldValueTypeCurrencyField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.LineTotal}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderDetail.LineTotal" Name="LineTotal" ShortName="LineTotal" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.rowguid}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="SalesOrderDetail.rowguid" Name="rowguid" ShortName="rowguid" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{SalesOrderDetail.ModifiedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="SalesOrderDetail.ModifiedDate" Name="ModifiedDate" ShortName="ModifiedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula />
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions>
+      <FormulaFieldDefinition FormulaName="{@MonthOfShipDate}" Kind="FormulaField" Name="MonthOfShipDate" NumberOfBytes="166" ValueType="StringField">IIf (Month({SalesOrderHeader.ShipDate}) &lt; 10, "0" + ToText(Month({SalesOrderHeader.ShipDate}), 0, ""), ToText(Month({SalesOrderHeader.ShipDate}), 0, ""))</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@Week}" Kind="FormulaField" Name="Week" NumberOfBytes="65534" ValueType="StringField" />
+      <FormulaFieldDefinition FormulaName="{@YearMonth}" Kind="FormulaField" Name="YearMonth" NumberOfBytes="330" ValueType="StringField">{@YearOfShipDate} + "-" + {@MonthOfShipDate}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@YearOfShipDate}" Kind="FormulaField" Name="YearOfShipDate" NumberOfBytes="164" ValueType="StringField">ToText(Year({SalesOrderHeader.ShipDate}), 0, "")</FormulaFieldDefinition>
+    </FormulaFieldDefinitions>
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions />
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="8976" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <ChartObject Name="Graph1" Kind="ChartObject" Top="1560" Left="480" Width="14160" Height="7080">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </ChartObject>
+              <PictureObject Name="Picture1" Kind="PictureObject" Top="20" Left="5508" Width="4321" Height="1440">
+                <Border BottomLineStyle="SingleLine" HasDropShadow="False" LeftLineStyle="SingleLine" RightLineStyle="SingleLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </PictureObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="0" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="0" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="0" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="0" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

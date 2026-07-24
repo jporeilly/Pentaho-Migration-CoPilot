@@ -471,6 +471,16 @@ def report_gaps(
             typer.echo(f"  {name}: {error}")
 
 
+@app.command("report-scrub")
+def report_scrub(directory: Path = typer.Argument(Path("samples/crystal/real"))) -> None:
+    """Blank credentials (UserName/Password/logon properties) that RptToXml
+    copies out of .rpt files into dumps. Run before committing or sharing."""
+    from pdi_migration.reports.sanitize import scrub_directory
+
+    files_changed, attrs = scrub_directory(directory)
+    typer.echo(f"scrubbed {attrs} credential attribute(s) in {files_changed} file(s)")
+
+
 @app.command("report-env")
 def report_env() -> None:
     """Preflight for the Crystal pipeline: is everything installed?"""

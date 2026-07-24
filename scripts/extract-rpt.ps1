@@ -61,4 +61,5 @@ if ($failures.Count -gt 0) {
     foreach ($name in $failures) { Write-Host "  $name" }
 }
 Write-Host ""
-Write-Host "Next: pdi-migrate report-gaps $OutDir"
+Write-Host "Next: pdi-migrate report-scrub $OutDir   (removes credentials RptToXml copies from the .rpt files)"
+Write-Host "Then: pdi-migrate report-gaps $OutDir"

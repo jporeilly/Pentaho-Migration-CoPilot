@@ -7,6 +7,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.7] — 2026-07-24
+
+**Real corpus extracted and measured: 150/150 parse, formula coverage 33% → 79%.**
+
+### Added
+
+- **Corpus extracted**: all 150 harvested .rpt files converted to RptToXml
+  dumps (`samples/crystal/real/`, 9.2 MB) with **zero extraction failures and
+  zero parse failures** — the fork-tolerant parser survived first contact with
+  genuine multi-source dumps unchanged. Committed with a corpus regression
+  test (every dump must parse; skips where the corpus is absent).
+- **Credential scrubbing** (`reports/sanitize.py`, `pdi-migrate report-scrub`):
+  RptToXml copies connection credentials out of .rpt files — the real corpus
+  carried **440 credential attributes across 142 of 150 dumps**, all blanked.
+  A second regression test asserts the committed corpus stays clean; the
+  extract script and docs now point at scrub before share.
+- **Translator upgrades driven by corpus frequency analysis**: `Switch()` →
+  nested `IF(...;NA())` — one function accounted for 282 of 375 manual
+  formulas; `DateDiff("d"/"m"/"yyyy", a, b)` → `DATEDIF`; `Chr`/`ChrW` →
+  `CHAR`, `Asc` → `CODE`. Corpus formula coverage moved from 33% auto+review
+  to **79%** (manual 375 → 152). Corpus portfolio: ~1,615h with Copilot vs
+  ~3,068h manual — saves ~1,454h (47%, ~$218k at $150/h).
+- **`scripts/setup-crystal-env.ps1`**: one-command internal setup — pulls the
+  SAP runtime MSIs + RptToXml from the repo's private `crystal-deps-v1`
+  release (documented license caveat), installs, verifies with `report-env`.
+  `tools/RptToXml/` is now gitignored (binaries come from the release).
+- **Docs**: full Crystal workflow (runtime install with registration link,
+  RptToXml placement, report-env → extract → scrub → gaps → convert
+  --validate) added to README, docs/INSTALL.md, and a new reports section in
+  docs/BEST_PRACTICES.md.
+- 7 new tests (156 total).
+
 ## [1.11.6] — 2026-07-24
 
 **Real Crystal corpus + extraction kit.**

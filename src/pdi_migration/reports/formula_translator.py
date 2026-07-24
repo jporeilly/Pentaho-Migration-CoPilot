@@ -77,6 +77,9 @@ FUNC_MAP = {
     "datevalue":   ("DATEVALUE", None, None),
     "weekday":     ("WEEKDAY", "Verify weekday numbering convention", None),
     "iif":         ("IF", None, None),
+    "chr":         ("CHAR", "Chr mapped to CHAR - verify code page for non-ASCII codes", None),
+    "chrw":        ("CHAR", "ChrW mapped to CHAR", None),
+    "asc":         ("CODE", "Asc mapped to CODE", None),
 }
 
 NOARG_MAP = {
@@ -279,6 +282,10 @@ class _Parser:
             raise TranslationError(
                 f"aggregate {original}() must become a report function "
                 "(ItemSumFunction etc.), not an inline formula")
+        if low == "switch":
+            return self._switch(args)
+        if low == "datediff":
+            return self._datediff(args)
         if low not in FUNC_MAP:
             raise TranslationError(f"no OpenFormula mapping for function {original}()")
         target, note, arg_fn = FUNC_MAP[low]
@@ -287,6 +294,36 @@ class _Parser:
         if arg_fn:
             args = arg_fn(args)
         return f"{target}({';'.join(args)})"
+
+    def _switch(self, args):
+        """Crystal Switch(c1, v1, c2, v2, ...) -> nested IF. Crystal returns
+        Null when nothing matches; NA() is the faithful equivalent."""
+        if len(args) < 2:
+            raise TranslationError("Switch() needs at least one condition/value pair")
+        if len(args) % 2 == 1:
+            raise TranslationError("Switch() with an odd argument count "
+                                   "(condition without value)")
+        out = "NA()"
+        self.notes.append("Switch with no matching condition returns NA() "
+                          "(Crystal returns Null) - verify downstream handling")
+        for i in range(len(args) - 2, -1, -2):
+            out = f"IF({args[i]};{args[i + 1]};{out})"
+        return out
+
+    DATEDIFF_INTERVALS = {'"d"': '"d"', '"m"': '"m"', '"yyyy"': '"y"'}
+
+    def _datediff(self, args):
+        """Crystal DateDiff("d", start, end) -> DATEDIF(start; end; unit)."""
+        if len(args) != 3:
+            raise TranslationError("DateDiff() with other than 3 arguments")
+        unit = self.DATEDIFF_INTERVALS.get(args[0].strip().lower())
+        if unit is None:
+            raise TranslationError(
+                f"DateDiff interval {args[0]} has no DATEDIF equivalent "
+                "(only d/m/yyyy map)")
+        self.notes.append("DateDiff mapped to DATEDIF - verify boundary "
+                          "semantics (Crystal counts interval crossings)")
+        return f"DATEDIF({args[1]};{args[2]};{unit})"
 
     def _expect_op(self, symbol):
         kind, val = self.next()

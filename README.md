@@ -3,7 +3,7 @@
 **AI-assisted migration of legacy ETL — Informatica PowerCenter and Talend today;
 SSIS and DataStage next — into native Pentaho Data Integration pipelines.**
 
-Version **1.11.6** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.11.7** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy ETL platform locks customers in with the sunk cost of thousands of
@@ -72,7 +72,7 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | Project store | `src/pdi_migration/project.py` | SQLite portfolio: batch results, scores, per-mapping review status, click-through re-open, portfolio effort/cost totals |
 | PDI runner | `src/pdi_migration/pdi_runner.py` | Executes .ktr/.kjb via Pan/Kitchen in an auto-detected local PDI install |
 | PDF reports | `src/pdi_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
-| Reports family | `src/pdi_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser, deterministic Crystal→OpenFormula translator (auto/review/manual, never guessed), native bundle writer, markdown conversion report. Backend + CLI + API shipped; UI flow and LLM formula assist planned |
+| Reports family | `src/pdi_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser (zero failures on the 150-file real corpus), deterministic Crystal→OpenFormula translator + LLM assist for the remainder, engine-verified bundle writer (round-trip validator), guided UI flow, credential scrubbing, extraction kit, environment preflight |
 | API | `src/pdi_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings + reports (inspect/convert) — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 
@@ -111,7 +111,13 @@ pdi-migrate report  <rpttoxml.xml> -t   # Crystal dump -> .prpt + report; -t = L
 pdi-migrate report ... --validate       # load the .prpt through the real Pentaho Reporting engine
 pdi-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
 pdi-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
+pdi-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
 ```
+
+Crystal end-to-end (`.rpt` in hand): install the free SAP Crystal .NET runtime and
+RptToXml.exe once (see [docs/INSTALL.md](docs/INSTALL.md)), then
+`report-env` → `scripts/extract-rpt.ps1` → `report-scrub` → `report-gaps` →
+`report --jndi <ds> -t --validate` per report.
 
 `convert` prints the source analysis first — tool version, database, and warnings —
 so you know what you're dealing with before touching the output.

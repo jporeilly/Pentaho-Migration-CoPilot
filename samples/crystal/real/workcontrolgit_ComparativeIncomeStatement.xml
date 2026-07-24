@@ -1,0 +1,340 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="C:\Projects\PDI-Migration\samples\crystal-rpt\workcontrolgit_ComparativeIncomeStatement.rpt" HasSavedData="True">
+  <Embedinfo>
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+  </Embedinfo>
+  <Summaryinfo KeywordsinReport="" ReportAuthor="© 2018 SAP® BusinessObjects™. All rights reserved. " ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="15120" PageContentWidth="11520" PaperOrientation="Portrait" PaperSize="DefaultPaperSize" PaperSource="FormSource" PrinterDuplex="Default" PrinterName="">
+    <PageMargins bottomMargin="360" leftMargin="360" rightMargin="360" topMargin="360" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks />
+    <Tables>
+      <Table Alias="variance_xtab" ClassName="CrystalReports.Procedure" Name="dataroot/variance_xtab">
+        <ConnectionInfo Database_DLL="crdb_xml.dll" QE_DatabaseName="" QE_DatabaseType="" QE_LogonProperties="" QE_ServerDescription="C:\Program Files (x86)\SAP BusinessObjects\SAP BusinessObjects Enterprise XI 4.0\Samples\En\Reports\Report Data\variance_xtab2.xml C:\Program Files (x86)\SAP BusinessObjects\SAP BusinessObjects Enterprise XI 4.0\Samples\En\Reports\Report Data\variance_xtab.xsd" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{variance_xtab.Account_Type}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Type" Name="Account_Type" ShortName="Account_Type" Type="crFieldValueTypeStringField" UseCount="3" />
+          <Field Description="" FormulaForm="{variance_xtab.Account_Heading_Name}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Heading_Name" Name="Account_Heading_Name" ShortName="Account_Heading_Name" Type="crFieldValueTypeStringField" UseCount="3" />
+          <Field Description="" FormulaForm="{variance_xtab.Account_Name}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Name" Name="Account_Name" ShortName="Account_Name" Type="crFieldValueTypeStringField" UseCount="3" />
+          <Field Description="" FormulaForm="{variance_xtab.Account_Number}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Number" Name="Account_Number" ShortName="Account_Number" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{variance_xtab.Type}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Type" Name="Type" ShortName="Type" Type="crFieldValueTypeStringField" UseCount="4" />
+          <Field Description="" FormulaForm="{variance_xtab.Month}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="variance_xtab.Month" Name="Month" ShortName="Month" Type="crFieldValueTypeInt16sField" UseCount="2" />
+          <Field Description="" FormulaForm="{variance_xtab.Year}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="variance_xtab.Year" Name="Year" ShortName="Year" Type="crFieldValueTypeInt16sField" UseCount="2" />
+          <Field Description="" FormulaForm="{variance_xtab.Amount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="variance_xtab.Amount" Name="Amount" ShortName="Amount" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{variance_xtab.Internal_ID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="variance_xtab.Internal_ID" Name="Internal_ID" ShortName="Internal_ID" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula>//{variance_xtab.Type} = "Actuals" //and
+
+</RecordSelectionFormula>
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions>
+      <FormulaFieldDefinition FormulaName="{@date}" Kind="FormulaField" Name="date" NumberOfBytes="4" ValueType="DateField">cdate({variance_xtab.Year}, {variance_xtab.Month}, 1)</FormulaFieldDefinition>
+    </FormulaFieldDefinitions>
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions>
+      <ParameterFieldDefinition AllowCustomCurrentValues="False" EditMask="" EnableAllowEditingDefaultValue="False" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?Column1 - type}" HasCurrentValue="True" IsOptionalPrompt="False" Kind="ParameterField" Name="Column1 - type" NumberOfBytes="65534" ParameterFieldName="Column1 - type" ParameterFieldUsage="InUse, ShowOnPanel, EditableOnPanel" ParameterType="ReportParameter" ParameterValueKind="StringParameter" PromptText="Enter Column1 - type:" ReportName="" ValueType="StringField">
+        <ParameterDefaultValues>
+          <ParameterDefaultValue Description="" Value="Actuals" />
+          <ParameterDefaultValue Description="" Value="Budget" />
+        </ParameterDefaultValues>
+        <ParameterInitialValues />
+        <ParameterCurrentValues>
+          <ParameterCurrentValue Description="" Value="Actuals" />
+        </ParameterCurrentValues>
+      </ParameterFieldDefinition>
+      <ParameterFieldDefinition AllowCustomCurrentValues="True" EditMask="" EnableAllowEditingDefaultValue="True" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?Column1 - mm/yyyy}" HasCurrentValue="True" IsOptionalPrompt="False" Kind="ParameterField" Name="Column1 - mm/yyyy" NumberOfBytes="65534" ParameterFieldName="Column1 - mm/yyyy" ParameterFieldUsage="InUse, ShowOnPanel, EditableOnPanel" ParameterType="ReportParameter" ParameterValueKind="StringParameter" PromptText="Select the month/year for column 1" ReportName="" ValueType="StringField">
+        <ParameterDefaultValues>
+          <ParameterDefaultValue Description="December 2015" Value="122015" />
+          <ParameterDefaultValue Description="January 2016" Value="012016" />
+          <ParameterDefaultValue Description="February 2016" Value="022016" />
+          <ParameterDefaultValue Description="March 2016" Value="032016" />
+          <ParameterDefaultValue Description="April 2016" Value="042016" />
+          <ParameterDefaultValue Description="May 2016" Value="052016" />
+          <ParameterDefaultValue Description="June 2016" Value="062016" />
+          <ParameterDefaultValue Description="July 2016" Value="072016" />
+          <ParameterDefaultValue Description="August 2016" Value="082016" />
+          <ParameterDefaultValue Description="September 2016" Value="092016" />
+          <ParameterDefaultValue Description="October 2016" Value="102016" />
+          <ParameterDefaultValue Description="November 2016" Value="112016" />
+          <ParameterDefaultValue Description="December 2016" Value="122016" />
+          <ParameterDefaultValue Description="January 2017" Value="012017" />
+          <ParameterDefaultValue Description="February 2017" Value="022017" />
+          <ParameterDefaultValue Description="March 2017" Value="032017" />
+          <ParameterDefaultValue Description="April 2017" Value="042017" />
+          <ParameterDefaultValue Description="May 2017" Value="052017" />
+        </ParameterDefaultValues>
+        <ParameterInitialValues>
+          <ParameterInitialValue Value="012016" />
+        </ParameterInitialValues>
+        <ParameterCurrentValues>
+          <ParameterCurrentValue Description="January 2016" Value="012016" />
+        </ParameterCurrentValues>
+      </ParameterFieldDefinition>
+      <ParameterFieldDefinition AllowCustomCurrentValues="False" EditMask="" EnableAllowEditingDefaultValue="False" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?Column2 - type}" HasCurrentValue="True" IsOptionalPrompt="False" Kind="ParameterField" Name="Column2 - type" NumberOfBytes="65534" ParameterFieldName="Column2 - type" ParameterFieldUsage="InUse, ShowOnPanel, EditableOnPanel" ParameterType="ReportParameter" ParameterValueKind="StringParameter" PromptText="Enter Column2 - type:" ReportName="" ValueType="StringField">
+        <ParameterDefaultValues>
+          <ParameterDefaultValue Description="" Value="Actuals" />
+          <ParameterDefaultValue Description="" Value="Budget" />
+        </ParameterDefaultValues>
+        <ParameterInitialValues />
+        <ParameterCurrentValues>
+          <ParameterCurrentValue Description="" Value="Budget" />
+        </ParameterCurrentValues>
+      </ParameterFieldDefinition>
+      <ParameterFieldDefinition AllowCustomCurrentValues="True" EditMask="" EnableAllowEditingDefaultValue="True" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?Column2 - mm/yyyy}" HasCurrentValue="True" IsOptionalPrompt="False" Kind="ParameterField" Name="Column2 - mm/yyyy" NumberOfBytes="65534" ParameterFieldName="Column2 - mm/yyyy" ParameterFieldUsage="InUse, ShowOnPanel, EditableOnPanel" ParameterType="ReportParameter" ParameterValueKind="StringParameter" PromptText="Select the month/year for column 2" ReportName="" ValueType="StringField">
+        <ParameterDefaultValues>
+          <ParameterDefaultValue Description="December 2015" Value="122015" />
+          <ParameterDefaultValue Description="January 2016" Value="012016" />
+          <ParameterDefaultValue Description="February 2016" Value="022016" />
+          <ParameterDefaultValue Description="March 2016" Value="032016" />
+          <ParameterDefaultValue Description="April 2016" Value="042016" />
+          <ParameterDefaultValue Description="May 2016" Value="052016" />
+          <ParameterDefaultValue Description="June 2016" Value="062016" />
+          <ParameterDefaultValue Description="July 2016" Value="072016" />
+          <ParameterDefaultValue Description="August 2016" Value="082016" />
+          <ParameterDefaultValue Description="September 2016" Value="092016" />
+          <ParameterDefaultValue Description="October 2016" Value="102016" />
+          <ParameterDefaultValue Description="November 2016" Value="112016" />
+          <ParameterDefaultValue Description="December 2016" Value="122016" />
+          <ParameterDefaultValue Description="January 2017" Value="012017" />
+          <ParameterDefaultValue Description="February 2017" Value="022017" />
+          <ParameterDefaultValue Description="March 2017" Value="032017" />
+          <ParameterDefaultValue Description="April 2017" Value="042017" />
+          <ParameterDefaultValue Description="May 2017" Value="052017" />
+        </ParameterDefaultValues>
+        <ParameterInitialValues>
+          <ParameterInitialValue Value="022016" />
+        </ParameterInitialValues>
+        <ParameterCurrentValues>
+          <ParameterCurrentValue Description="February 2016" Value="022016" />
+        </ParameterCurrentValues>
+      </ParameterFieldDefinition>
+    </ParameterFieldDefinitions>
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="ReportHeader" Name="ReportHeaderSection2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="Column11" Kind="FieldObject" Top="30" Left="210" Width="2462" Height="226" DataSource="{?Column1 - mm/yyyy}">
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Column21" Kind="FieldObject" Top="360" Left="240" Width="2462" Height="226" DataSource="{?Column2 - mm/yyyy}">
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Column1type1" Kind="FieldObject" Top="30" Left="3915" Width="2462" Height="226" DataSource="{?Column1 - type}">
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Column2type1" Kind="FieldObject" Top="360" Left="3960" Width="2462" Height="226" DataSource="{?Column2 - type}">
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+          <Section Height="1350" Kind="ReportHeader" Name="ReportHeaderSection4">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <PictureObject Name="RO_Header_Fade1" Kind="PictureObject" Top="0" Left="0" Width="11517" Height="1236">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </PictureObject>
+              <LineObject Name="Line1" Kind="LineObject" Top="1320" Left="0" Width="11520" Height="0" Bottom="1320" EnableExtendToBottomOfSection="True" EndSectionName="ReportHeaderSection4" LineStyle="SingleLine" LineThickness="30" Right="11520">
+                <LineColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <TextObject Name="Text4" Kind="TextObject" Top="600" Left="0" Width="6696" Height="456" MaxNumberOfLines="0">
+                <Text>Comparative Income Statement</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="28" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="18" SizeinPoints="18" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+          <Section Height="2056" Kind="ReportHeader" Name="ReportHeaderSection3">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <CrossTabObject Name="CrossTab1" Kind="CrossTabObject" Top="240" Left="465" Width="9461" Height="1786">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </CrossTabObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="902" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="226" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="220" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="1605" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <PictureObject Name="RO_Footer_Fade1" Kind="PictureObject" Top="240" Left="0" Width="11517" Height="1365">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </PictureObject>
+              <TextObject Name="RO_Copyright_Information" Kind="TextObject" Top="360" Left="144" Width="8928" Height="241" MaxNumberOfLines="0">
+                <Text>© 2018 SAP® BusinessObjects™. All rights reserved.</Text>
+                <Color Name="ff6699cc" A="255" R="102" G="153" B="204" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <LineObject Name="Line2" Kind="LineObject" Top="15" Left="15" Width="11520" Height="0" Bottom="15" EnableExtendToBottomOfSection="False" EndSectionName="PageFooterSection1" LineStyle="SingleLine" LineThickness="30" Right="11535">
+                <LineColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <PictureObject Name="Picture2" Kind="PictureObject" Top="240" Left="10504" Width="979" Height="485">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </PictureObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>
