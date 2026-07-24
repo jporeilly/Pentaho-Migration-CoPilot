@@ -1,4 +1,4 @@
-const STEPS = [
+const ETL_STEPS = [
   { label: 'Upload', hint: 'source export',
     tip: 'Drop a PowerCenter .xml or Talend .item export. The source analysis identifies the tool and version and flags migration risks before anything is converted.' },
   { label: 'Parse', hint: 'deterministic',
@@ -11,7 +11,19 @@ const STEPS = [
     tip: 'Migration confidence score, human review checklist, sandbox test kit, and downloadable reports. Nothing auto-deploys.' },
 ]
 
-export default function Stepper({ step, maxStep, onStep }) {
+export const REPORT_STEPS = [
+  { label: 'Upload', hint: 'RptToXml dump',
+    tip: 'Drop a Crystal Reports RptToXml .xml dump (extracted from the .rpt with the free SAP .NET runtime).' },
+  { label: 'Inspect', hint: 'deterministic',
+    tip: 'Real XML parsing — no AI. Report structure, bands, data source SQL, parameters, and summaries.' },
+  { label: 'Formulas', hint: 'rules-based',
+    tip: 'Crystal formulas translated deterministically to OpenFormula. Anything the translator cannot prove is flagged manual with the original preserved — never guessed.' },
+  { label: 'Download', hint: 'PRD .prpt',
+    tip: 'A native Pentaho Report Designer bundle that opens in PRD, plus a conversion report listing every item that still needs a human.' },
+]
+
+export default function Stepper({ step, maxStep, onStep, steps }) {
+  const STEPS = steps ?? ETL_STEPS
   return (
     <ol className="stepper">
       {STEPS.map((s, i) => {

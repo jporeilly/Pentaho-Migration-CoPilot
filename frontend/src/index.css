@@ -482,3 +482,37 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
 .source-warnings li.serious .w-icon, .source-warnings li.serious .w-level { color: var(--status-serious); }
 .source-warnings .w-level { font-size: .72rem; font-weight: 700; text-transform: uppercase; flex: none; }
 .source-warnings .w-text { color: var(--text-secondary); }
+
+/* ---------- reports family (Crystal -> .prpt) ---------- */
+.sample-buttons { display: flex; flex-direction: column; gap: .6rem; justify-content: center; }
+.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; align-items: start; }
+@media (max-width: 900px) { .report-grid { grid-template-columns: 1fr; } }
+.sql-pre {
+  background: var(--surface-2); border-radius: 8px; padding: .7rem .9rem; margin: .6rem 0;
+  font: .8rem/1.5 Consolas, "Cascadia Mono", monospace; color: var(--text-secondary);
+  overflow-x: auto; white-space: pre;
+}
+.formula-original {
+  background: var(--surface-2); border-radius: 6px; padding: .5rem .7rem; margin: .4rem 0 0;
+  font: .78rem/1.45 Consolas, "Cascadia Mono", monospace; color: var(--text-muted);
+  overflow-x: auto; white-space: pre-wrap;
+}
+.formula-note { font-size: .8rem; margin-top: .3rem; }
+.jndi-field { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--text-secondary); }
+.jndi-field input {
+  background: var(--surface-2); border: none; border-radius: 8px; color: var(--text-primary);
+  padding: .45rem .7rem; font-size: .88rem; outline: none; width: 11rem;
+}
+.jndi-field input:focus { box-shadow: 0 0 0 2px var(--accent); }
+.card .md h2 { font-size: 1.05rem; margin-top: 1rem; }
+.card .md h3 { font-size: .95rem; margin-top: .9rem; color: var(--accent); }
+.card .md h4 { font-size: .85rem; margin-top: .8rem; color: var(--text-secondary); }
+.card .md p, .card .md li { color: var(--text-secondary); font-size: .88rem; margin-top: .45rem; }
+.card .md li { margin-left: 1.2rem; }
+.card .md pre {
+  background: var(--surface-2); border-radius: 8px; padding: .7rem .9rem; margin: .5rem 0;
+  font: .8rem/1.5 Consolas, "Cascadia Mono", monospace; color: var(--text-secondary); overflow-x: auto;
+}
+.card .md code { background: var(--surface-2); border-radius: 4px; padding: .05rem .35rem; font: .8rem Consolas, "Cascadia Mono", monospace; }
+.card .md table { margin: .5rem 0; }
+.card .md hr { border: none; border-top: 1px solid var(--gridline); margin: 1rem 0; }

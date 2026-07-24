@@ -1,5 +1,6 @@
-// Minimal markdown rendering — headings, bullets, bold, inline code, links.
-// Only used for our own generated content, so it doesn't need to be a full parser.
+// Minimal markdown rendering — headings, bullets, bold, inline code, links,
+// fenced code blocks, and pipe tables. Only used for our own generated
+// content, so it doesn't need to be a full parser.
 function inline(text, keyBase) {
   const parts = []
   const re = /(\*\*(.+?)\*\*|`(.+?)`|\[(.+?)\]\((.+?)\))/g
@@ -18,14 +19,48 @@ function inline(text, keyBase) {
   return parts
 }
 
+const cells = (row) => row.replace(/^\||\|$/g, '').split('|').map((c) => c.trim())
+
 export default function Markdown({ text }) {
   const blocks = []
-  text.split('\n').forEach((line, n) => {
+  const lines = text.split('\n')
+  let n = 0
+  while (n < lines.length) {
+    const line = lines[n]
+    if (line.startsWith('```')) {
+      const code = []
+      n++
+      while (n < lines.length && !lines[n].startsWith('```')) code.push(lines[n++])
+      n++ // closing fence
+      blocks.push(<pre key={`c${n}`}>{code.join('\n')}</pre>)
+      continue
+    }
+    if (line.startsWith('|') && lines[n + 1]?.match(/^\|[\s:|-]+\|?$/)) {
+      const head = cells(line)
+      n += 2
+      const rows = []
+      while (n < lines.length && lines[n].startsWith('|')) rows.push(cells(lines[n++]))
+      blocks.push(
+        <div className="table-scroll" key={`t${n}`}>
+          <table>
+            <thead><tr>{head.map((h, i) => <th key={i}>{inline(h, `th${n}-${i}`)}</th>)}</tr></thead>
+            <tbody>
+              {rows.map((r, ri) => (
+                <tr key={ri}>{r.map((c, ci) => <td key={ci}>{inline(c, `td${n}-${ri}-${ci}`)}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
+      )
+      continue
+    }
     if (line.startsWith('### ')) blocks.push(<h4 key={n}>{inline(line.slice(4), n)}</h4>)
     else if (line.startsWith('## ')) blocks.push(<h3 key={n}>{inline(line.slice(3), n)}</h3>)
     else if (line.startsWith('# ')) blocks.push(<h2 key={n}>{inline(line.slice(2), n)}</h2>)
     else if (line.startsWith('- ')) blocks.push(<li key={n}>{inline(line.slice(2), n)}</li>)
+    else if (line.startsWith('---')) blocks.push(<hr key={n} />)
     else if (line.trim()) blocks.push(<p key={n}>{inline(line, n)}</p>)
-  })
+    n++
+  }
   return <div className="md">{blocks}</div>
 }

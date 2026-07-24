@@ -7,6 +7,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.11.1] — 2026-07-24
+
+**Reports family, part 2: the guided React flow.**
+
+### Added
+
+- **Crystal reports UI flow** with its own stepper — Upload → Inspect →
+  Formulas → Download — reusing the existing visual language (tiles, badges,
+  filters, workbench bar). Inspect shows bands, groups, parameters, summaries,
+  and the data-source SQL with a provenance badge (from Crystal command vs
+  generated — verify joins) plus the record-selection formula warning.
+  Formulas is a filterable auto/review/manual table with translated OpenFormula
+  and the original Crystal text preserved for manual ones. Download builds the
+  .prpt client-side from the base64 response, offers the conversion report,
+  and re-converts in place when the JNDI datasource name is changed.
+- **Format auto-routing in the UI**: dropping a Crystal RptToXml dump on the
+  ordinary upload zone detects the 422 "Reports pipeline" hint from
+  `detect_parser` and reroutes the file to `/reports/convert` automatically;
+  a "Try the Crystal sample" button sits beside the ETL sample.
+- Crystal source badge (SAP gold lettermark), reports workbench bar with
+  formula-status chip, masthead updated to "Informatica · Talend → PDI ·
+  Crystal → PRD".
+- Shared `Markdown` component now renders fenced code blocks, pipe tables,
+  and horizontal rules (used by the inline conversion report).
+
+### Changed
+
+- `Stepper` accepts a custom step list (`REPORT_STEPS`) instead of hardcoding
+  the ETL five; ETL behavior unchanged.
+
 ## [1.11.0] — 2026-07-24
 
 **Reports family: SAP Crystal Reports → Pentaho Report Designer (backend).**

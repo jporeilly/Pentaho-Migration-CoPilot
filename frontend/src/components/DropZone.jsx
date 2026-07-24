@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function DropZone({ onFile, onSample }) {
+export default function DropZone({ onFile, onSample, onCrystalSample }) {
   const [over, setOver] = useState(false)
 
   return (
@@ -20,9 +20,15 @@ export default function DropZone({ onFile, onSample }) {
           accept=".xml,.item"
           onChange={(e) => e.target.files.length && onFile(e.target.files[0])}
         />
-        Drop a PowerCenter .xml or Talend .item export here, or <strong>browse</strong>
+        Drop a PowerCenter .xml, Talend .item, or Crystal Reports RptToXml dump here, or{' '}
+        <strong>browse</strong> — the format is auto-detected
       </label>
-      <button className="ghost" onClick={onSample}>Try the sample</button>
+      <span className="sample-buttons">
+        <button className="ghost" onClick={onSample}>Try the ETL sample</button>
+        {onCrystalSample && (
+          <button className="ghost" onClick={onCrystalSample}>Try the Crystal sample</button>
+        )}
+      </span>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Stepper from './components/Stepper.jsx'
+import Stepper, { REPORT_STEPS } from './components/Stepper.jsx'
 import PageNav from './components/PageNav.jsx'
 import DocModal from './components/DocModal.jsx'
 import SourceBadge from './components/SourceBadge.jsx'
@@ -10,6 +10,9 @@ import ParsePage from './pages/ParsePage.jsx'
 import MapPage from './pages/MapPage.jsx'
 import GeneratePage from './pages/GeneratePage.jsx'
 import ValidatePage from './pages/ValidatePage.jsx'
+import ReportsInspectPage from './pages/ReportsInspectPage.jsx'
+import ReportsFormulasPage from './pages/ReportsFormulasPage.jsx'
+import ReportsDownloadPage from './pages/ReportsDownloadPage.jsx'
 
 export default function App() {
   const [results, setResults] = useState([])
@@ -23,6 +26,8 @@ export default function App() {
   const [showChangelog, setShowChangelog] = useState(false)
   const [showPractices, setShowPractices] = useState(false)
   const [view, setView] = useState('workflow')  // workflow | project | settings
+  const [report, setReport] = useState(null)    // reports family: /reports/convert response
+  const [reportFile, setReportFile] = useState(null)
 
   useEffect(() => {
     fetch('/health')
@@ -31,7 +36,7 @@ export default function App() {
       .catch(() => {})
   }, [])
 
-  const maxStep = results.length ? 4 : 0
+  const maxStep = report ? 3 : results.length ? 4 : 0
   const result = results[selected]
 
   async function convert(file) {
@@ -43,9 +48,16 @@ export default function App() {
       const res = await fetch('/convert', { method: 'POST', body: form })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(body.detail || res.statusText)
+        const detail = body.detail || res.statusText
+        if (detail.includes('Reports pipeline')) {
+          // detect_parser recognized a Crystal RptToXml dump — route it there
+          setLoading(false)
+          return convertReport(file)
+        }
+        throw new Error(detail)
       }
       const data = await res.json()
+      setReport(null)
       setSource(data.source)
       setResults(data.results)
       setFileName(file.name)
@@ -60,10 +72,43 @@ export default function App() {
     }
   }
 
+  async function convertReport(file, jndi = '') {
+    setError(null)
+    setLoading(true)
+    try {
+      const form = new FormData()
+      form.append('dump', file)
+      const res = await fetch(`/reports/convert?jndi=${encodeURIComponent(jndi)}`, {
+        method: 'POST',
+        body: form,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.detail || res.statusText)
+      setResults([])
+      setSource(null)
+      setReport(data)
+      setReportFile(file)
+      setFileName(file.name)
+      setStep((s) => (s > 0 && s <= 3 ? s : 1))
+    } catch (err) {
+      setReport(null)
+      setError(err.message)
+      setStep(0)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function loadSample() {
     const res = await fetch('/sample')
     const blob = await res.blob()
     convert(new File([blob], 'm_load_sales.xml', { type: 'text/xml' }))
+  }
+
+  async function loadCrystalSample() {
+    const res = await fetch('/reports/sample')
+    const blob = await res.blob()
+    convertReport(new File([blob], 'branch_transactions.xml', { type: 'text/xml' }), 'CSCU_Bank')
   }
 
   async function openFromProject(row) {
@@ -94,6 +139,8 @@ export default function App() {
   function reset() {
     setResults([])
     setSource(null)
+    setReport(null)
+    setReportFile(null)
     setFileName('')
     setStep(0)
     setError(null)
@@ -111,7 +158,7 @@ export default function App() {
           )}
         </h1>
         <span className="links">
-          Informatica · Talend → Pentaho Data Integration ·{' '}
+          Informatica · Talend → PDI · Crystal → PRD ·{' '}
           <a href="/docs" target="_blank" rel="noreferrer">API docs</a> ·{' '}
           <button
             className={`nav${view === 'project' ? ' active' : ''}`}
@@ -141,7 +188,19 @@ export default function App() {
         <ProjectPage onBack={() => setView('workflow')} onOpen={openFromProject} />
       ) : (
         <>
-          <Stepper step={step} maxStep={maxStep} onStep={setStep} />
+          <Stepper step={step} maxStep={maxStep} onStep={setStep} steps={report ? REPORT_STEPS : undefined} />
+
+          {report && (
+            <div className="workbench-bar">
+              <SourceBadge tool="crystal" />
+              <span className="file-chip" title={fileName}>📄 {fileName}</span>
+              <span className="score-chip" title="Formula translation: auto / review / manual">
+                formulas {report.summary.counts.auto}✓ · {report.summary.counts.review}⚠ · {report.summary.counts.manual}✋
+              </span>
+              <span className="spacer" />
+              <button className="ghost" onClick={reset}>New upload</button>
+            </div>
+          )}
 
           {results.length > 0 && (
             <div className="workbench-bar">
@@ -190,12 +249,28 @@ export default function App() {
             <UploadPage
               onFile={convert}
               onSample={loadSample}
+              onCrystalSample={loadCrystalSample}
               error={error}
               loading={loading}
               source={results.length === 0 ? source : null}
               onShowPractices={() => setShowPractices(true)}
             />
           )}
+          {report ? (
+            <>
+              {step === 1 && <ReportsInspectPage summary={report.summary} />}
+              {step === 2 && <ReportsFormulasPage summary={report.summary} />}
+              {step === 3 && (
+                <ReportsDownloadPage
+                  report={report}
+                  loading={loading}
+                  onReconvert={(jndi) => convertReport(reportFile, jndi)}
+                />
+              )}
+              {step > 0 && <PageNav step={step} maxStep={maxStep} onStep={setStep} />}
+            </>
+          ) : (
+            <>
           {step === 1 && result && <ParsePage result={result} source={source} />}
           {step === 2 && result && (
             <MapPage
@@ -212,6 +287,8 @@ export default function App() {
 
           {results.length > 0 && step > 0 && (
             <PageNav step={step} maxStep={maxStep} onStep={setStep} />
+          )}
+            </>
           )}
         </>
       )}
