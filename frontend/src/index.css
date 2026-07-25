@@ -494,6 +494,72 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
   font: .8rem/1.5 Consolas, "Cascadia Mono", monospace; color: var(--text-secondary);
   overflow-x: auto; white-space: pre;
 }
+/* connection picker on the Inspect page */
+.connection-panel {
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  margin: .4rem 0 .6rem; font-size: .88rem;
+}
+.connection-panel select, .connection-panel input {
+  background: var(--surface-2); border: none; border-radius: 8px;
+  color: var(--text-primary); padding: .45rem .7rem; font-size: .88rem; outline: none;
+}
+.connection-panel input { width: 14rem; }
+.connection-panel button {
+  border: none; border-radius: 8px; padding: .45rem .9rem; cursor: pointer;
+  background: var(--text-primary); color: var(--page); font-size: .85rem; font-weight: 600;
+}
+.connection-panel button:disabled { opacity: .5; cursor: default; }
+
+.connection-panel .secondary {
+  background: var(--surface-2); color: var(--text-secondary);
+}
+.connection-manager {
+  background: var(--surface-2); border-radius: 10px; padding: .7rem .9rem; margin: .3rem 0 .7rem;
+}
+.connection-manager td { background: none; padding: .3rem .5rem; font-size: .85rem; }
+.connection-manager tbody tr { border-bottom: none; }
+.connection-manager .linkish {
+  border: none; background: none; cursor: pointer; padding: 0;
+  color: var(--text-secondary); font-size: .8rem; text-decoration: underline;
+}
+.connection-manager .linkish.danger { color: var(--status-serious); }
+.connection-form { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+.connection-form input {
+  background: var(--page); border: none; border-radius: 8px;
+  color: var(--text-primary); padding: .45rem .7rem; font-size: .85rem; outline: none;
+}
+.connection-form button {
+  border: none; border-radius: 8px; padding: .45rem .9rem; cursor: pointer;
+  background: var(--text-primary); color: var(--page); font-size: .85rem; font-weight: 600;
+}
+.connection-form button:disabled { opacity: .5; cursor: default; }
+
+/* schema browser inside the assistant card */
+.schema-toggle {
+  border: none; background: none; cursor: pointer; padding: 0;
+  color: var(--text-secondary); font-size: .85rem; font-weight: 600;
+}
+.schema-browser {
+  margin-top: .5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: .5rem 1.2rem; align-items: start;
+}
+.schema-browser details {
+  background: var(--surface-2); border-radius: 8px; padding: .45rem .7rem;
+}
+.schema-browser summary { cursor: pointer; font-size: .85rem; }
+.schema-browser table { margin-top: .4rem; font-size: .8rem; }
+.schema-browser td { padding: .15rem .5rem; background: none; }
+.schema-browser tbody tr { border-bottom: none; }
+.key-badge {
+  display: inline-block; margin-left: .45rem; padding: .05rem .45rem;
+  border-radius: 99px; font-size: .68rem; font-weight: 700;
+}
+.key-badge.pk { color: var(--status-good); background: rgba(12, 163, 12, 0.12); }
+.key-badge.fk { color: var(--status-warning); background: rgba(250, 178, 25, 0.12); }
+.data-preview { margin-top: .5rem; max-height: 22rem; overflow: auto; }
+.data-preview th { position: sticky; top: 0; background: var(--surface-1); font-size: .78rem; }
+.data-preview td { font-size: .8rem; white-space: nowrap; }
+
 /* schema-aware SQL assistant (full-width card on the Inspect page) */
 .sql-assistant { margin-top: .8rem; display: flex; flex-direction: column; gap: .9rem; }
 .sql-verdict {

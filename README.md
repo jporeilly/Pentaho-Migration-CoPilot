@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.22.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.23.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -43,8 +43,12 @@ parameter mappings, so a linked subreport filters per parent row — live. Simpl
 live data. The Inspect page carries the **schema-aware SQL agent**: the report
 SQL is `EXPLAIN`-validated against the live JNDI target automatically, and a
 schema-grounded chat answers join/column questions and proposes corrected SQL
-as a reviewable diff — applied only on click, recorded as a review item. The
-ETL flow in detail:
+as a reviewable diff — applied only on click, recorded as a review item.
+A **connection panel** picks (or saves/edits/deletes) the JNDI connection —
+persisted to the engine's own simple-jndi config — with a **schema browser**
+(PK/FK badges), a **live dataset preview** (first 50 rows), and dialect
+adapters for PostgreSQL, MySQL, SQL Server, and Oracle. The ETL flow in
+detail:
 
 1. **Upload** — drag-and-drop a PowerCenter `.xml` or Talend `.item` export (format
    auto-detected by content, never by extension) — or one click on the bundled sample.

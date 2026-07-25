@@ -1,9 +1,11 @@
 // Reports flow, step 1: structure + data source of the parsed Crystal report.
 // Deterministic view — everything here came straight out of the RptToXml dump.
 
+import ConnectionPanel from '../components/ConnectionPanel.jsx'
 import Explain from '../components/Explain.jsx'
 import LayoutPreview from '../components/LayoutPreview.jsx'
 import SqlAssistant from '../components/SqlAssistant.jsx'
+import formatSql from '../lib/formatSql.js'
 
 const BAND_TIPS = {
   ReportHeader: 'Printed once at the start of the report.',
@@ -108,11 +110,13 @@ export default function ReportsInspectPage({ summary, file, onUpdate }) {
             selection formula, when present, is Crystal&apos;s WHERE-equivalent —
             fold it into the SQL by hand.
           </Explain>
+          <ConnectionPanel summary={summary} file={file} onUpdate={onUpdate} />
           <p className="muted">
-            Wired to JNDI connection <code>{summary.jndi}</code> — create or verify it on the
-            Pentaho Server, or swap to a native JDBC datasource in PRD.
+            The .prpt is wired to this JNDI name — the schema assistant below
+            validates against it live, and the same name must exist on the
+            Pentaho Server (or swap to a native JDBC datasource in PRD).
           </p>
-          <pre className="sql-pre">{summary.sql}</pre>
+          <pre className="sql-pre">{formatSql(summary.sql)}</pre>
           {summary.record_selection && (
             <div className="source-warnings">
               <b>Record selection formula</b> — fold into the SQL WHERE clause or a PRD filter:

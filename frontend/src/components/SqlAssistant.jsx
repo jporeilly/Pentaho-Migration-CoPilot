@@ -8,6 +8,10 @@ import { useEffect, useRef, useState } from 'react'
 export default function SqlAssistant({ summary, file, onUpdate }) {
   const [check, setCheck] = useState(null)        // {ok, error} | {unavailable}
   const [checking, setChecking] = useState(false)
+  const [schema, setSchema] = useState(null)      // null | {tables} | {error}
+  const [showSchema, setShowSchema] = useState(false)
+  const [preview, setPreview] = useState(null)    // null | {columns, rows} | {error}
+  const [previewing, setPreviewing] = useState(false)
   const [messages, setMessages] = useState([])    // {role, content, sql?}
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
@@ -34,7 +38,40 @@ export default function SqlAssistant({ summary, file, onUpdate }) {
     }
   }
 
-  useEffect(() => { runCheck() }, [summary.sql, summary.jndi]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { runCheck(); setSchema(null); setPreview(null) }, [summary.sql, summary.jndi]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function runPreview() {
+    if (preview && !preview.error) { setPreview(null); return }  // toggle off
+    setPreviewing(true)
+    setPreview(null)
+    try {
+      const res = await fetch('/reports/sql/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jndi: summary.jndi, sql: summary.sql, parameters: params }),
+      })
+      const data = await res.json()
+      setPreview(res.ok ? data : { error: data.detail || res.statusText })
+    } catch (err) {
+      setPreview({ error: err.message })
+    } finally {
+      setPreviewing(false)
+    }
+  }
+
+  async function toggleSchema() {
+    const next = !showSchema
+    setShowSchema(next)
+    if (next && schema === null) {
+      try {
+        const res = await fetch(`/reports/schema?jndi=${encodeURIComponent(summary.jndi)}`)
+        const data = await res.json()
+        setSchema(res.ok ? data : { error: data.detail || res.statusText })
+      } catch (err) {
+        setSchema({ error: err.message })
+      }
+    }
+  }
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   async function ask(e) {
@@ -104,6 +141,72 @@ export default function SqlAssistant({ summary, file, onUpdate }) {
   return (
     <div className="sql-assistant">
       {banner && <div className={`sql-verdict badge ${banner.cls}`}>{banner.text}</div>}
+
+      {check?.ok !== false || check?.checked_sql !== '' ? (
+        <div>
+          <button className="schema-toggle" onClick={toggleSchema}>
+            {showSchema ? '▾' : '▸'} 📚 Browse the {summary.jndi} schema
+          </button>
+          {'  '}
+          <button className="schema-toggle" onClick={runPreview} disabled={previewing}>
+            {previewing ? '… running' : preview && !preview.error ? '▾ ▶ Run query (first 50 rows)' : '▸ ▶ Run query (first 50 rows)'}
+          </button>
+          {preview?.error && <p className="muted">preview unavailable — {preview.error}</p>}
+          {preview?.columns && (
+            <div className="table-scroll data-preview">
+              <table>
+                <thead>
+                  <tr>{preview.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {preview.rows.map((row, i) => (
+                    <tr key={i}>{row.map((v, j) => <td key={j}>{v}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="muted">
+                {preview.rows.length} row{preview.rows.length === 1 ? '' : 's'}
+                {preview.truncated ? ' (more available — showing the first 50)' : ''} —
+                parameters substituted with their defaults
+              </p>
+            </div>
+          )}
+          {showSchema && schema === null && <p className="muted">loading…</p>}
+          {showSchema && schema?.error && (
+            <p className="muted">schema unavailable — {schema.error}</p>
+          )}
+          {showSchema && schema?.tables && (
+            <div className="schema-browser">
+              {schema.tables.map((t) => (
+                <details key={`${t.schema}.${t.name}`}>
+                  <summary>
+                    <code>{t.schema}.{t.name}</code>
+                    <span className="muted"> · {t.columns.length} columns</span>
+                  </summary>
+                  <table>
+                    <tbody>
+                      {t.columns.map((c) => (
+                        <tr key={c.name}>
+                          <td>
+                            <code>{c.name}</code>
+                            {c.key?.includes('PK') && <span className="key-badge pk" title="primary key">🔑 PK</span>}
+                            {c.key?.includes('FK') && (
+                              <span className="key-badge fk" title={`foreign key → ${c.references || ''}`}>
+                                → {c.references || 'FK'}
+                              </span>
+                            )}
+                          </td>
+                          <td className="muted">{c.type}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </details>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {messages.length > 0 && (
         <div className="sql-chat-log">

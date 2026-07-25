@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.23.0] — 2026-07-25
+
+### Added
+
+- **Connection panel on the Inspect page**: a dropdown of the JNDI
+  connections discovered from the same simple-jndi config the reporting
+  engine reads; picking one re-converts the report, so the schema
+  assistant, previews, and the .prpt all follow. **⚙ Manage** adds full
+  save / edit / delete, persisted to
+  `~/.pentaho/simple-jndi/default.properties` (driver class inferred from
+  the JDBC URL; passwords never returned by the listing API; connections
+  owned by the PRD install's config are usable but not deletable here).
+  Fixes "drag-dropped reports default to SampleData with no way to switch".
+- **Multi-database dialect adapters** (`reports/db_dialects.py`): schema
+  introspection, SQL validation, and key discovery now speak
+  **PostgreSQL** (live-verified against CSCU), **MySQL** (`pymysql`,
+  EXPLAIN), **SQL Server** (`python-tds`,
+  `sp_describe_first_result_set`), and **Oracle** (`oracledb`,
+  `EXPLAIN PLAN FOR`) — each with its own JDBC URL parser; a missing
+  driver reports the exact `pip install`, and unsupported URLs (hsqldb...)
+  stay an honest "not supported".
+- **Schema browser**: 📚 Browse the schema inside the assistant card —
+  every table with its columns and types, plus **🔑 PK and → FK badges**
+  showing the join relationships (also fed to the LLM context as
+  `[PK]` / `[FK -> table.column]` markers, so chat join advice follows the
+  real constraints). The CSCU demo database currently defines no
+  constraints — `samples/cscu/add_constraints.sql` is ready to run as the
+  table owner.
+- **Live dataset preview**: ▶ Run query executes the report's SELECT
+  (SELECT-only guard, parameters substituted with their defaults) and
+  shows the first 50 rows in a sticky-header grid — verified live against
+  CSCU showing the flagship's exact filtered dataset.
+- **Line-by-line SQL display**: the Inspect page pretty-prints the query —
+  one select-list column per line, FROM/JOIN/WHERE/AND/ORDER BY on their
+  own lines (display only; the bundle's SQL is untouched).
+
 ## [1.22.0] — 2026-07-25
 
 ### Added

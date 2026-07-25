@@ -13,8 +13,9 @@ Three layers, deterministic first per the product's design principle:
    SQL, and the validation verdict, and proposes corrected SQL. Proposals are
    advisory - the UI shows them as a reviewable diff, never auto-applied.
 
-PostgreSQL only for now (the JDBC url is parsed; other drivers get an honest
-"introspection not available" instead of a guess).
+Dialects: PostgreSQL (live-verified), MySQL, SQL Server, and Oracle via
+db_dialects.py adapters; anything else gets an honest "introspection not
+available" instead of a guess.
 """
 
 import json
@@ -43,6 +44,100 @@ def _jndi_files() -> list[Path]:
     return files
 
 
+def list_jndi_connections() -> list[dict]:
+    """Every JNDI connection defined in the simple-jndi properties files the
+    reporting engine reads: [{'name', 'url', 'driver', 'introspectable'}].
+    First definition of a name wins (same precedence as resolve_jndi)."""
+    connections: dict[str, dict] = {}
+    for path in _jndi_files():
+        if not path.is_file():
+            continue
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            line = line.strip()
+            if line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            prefix, _, prop = key.strip().partition("/")
+            if not prefix or not prop:
+                continue
+            entry = connections.setdefault(prefix, {"name": prefix})
+            if prop in ("url", "driver") and prop not in entry:
+                entry[prop] = value.strip()
+    from pentaho_migration.reports.db_dialects import dialect_for
+
+    out = []
+    for entry in connections.values():
+        url = entry.get("url", "")
+        if not url:
+            continue
+        dialect = dialect_for(url)
+        entry["introspectable"] = dialect is not None
+        entry["dialect"] = dialect.name if dialect else ""
+        out.append(entry)
+    return sorted(out, key=lambda e: e["name"].lower())
+
+
+def _user_jndi_file() -> Path:
+    """The user's own simple-jndi properties file - the one connection
+    save/edit/delete manages (the PRD install's copy stays untouched)."""
+    extra = os.environ.get("SIMPLE_JNDI_PROPERTIES")
+    if extra:
+        return Path(extra)
+    return Path.home() / ".pentaho" / "simple-jndi" / "default.properties"
+
+
+_DRIVER_BY_URL = [
+    ("jdbc:postgresql:", "org.postgresql.Driver"),
+    ("jdbc:mysql:", "com.mysql.cj.jdbc.Driver"),
+    ("jdbc:sqlserver:", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+    ("jdbc:oracle:", "oracle.jdbc.OracleDriver"),
+    ("jdbc:hsqldb:", "org.hsqldb.jdbcDriver"),
+]
+
+
+def save_jndi_connection(name: str, url: str, driver: str = "",
+                         user: str = "", password: str = "") -> Path:
+    """Create or update a JNDI connection in the user's simple-jndi file.
+    The block format matches what the reporting engine reads. Returns the
+    file written."""
+    if not re.fullmatch(r"\w+", name or ""):
+        raise ValueError("connection name must be a plain identifier (letters/digits/_)")
+    if not url.startswith("jdbc:"):
+        raise ValueError("url must be a jdbc: URL")
+    if not driver:
+        driver = next((d for prefix, d in _DRIVER_BY_URL if url.startswith(prefix)), "")
+    if not driver:
+        raise ValueError("driver class is required for this jdbc URL type")
+
+    path = _user_jndi_file()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = (path.read_text(encoding="utf-8", errors="replace").splitlines()
+             if path.is_file() else [])
+    lines = [ln for ln in lines if not ln.strip().startswith(f"{name}/")]
+    while lines and not lines[-1].strip():
+        lines.pop()
+    lines += ["", f"{name}/type=javax.sql.DataSource", f"{name}/driver={driver}",
+              f"{name}/user={user}", f"{name}/password={password}",
+              f"{name}/url={url}"]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def delete_jndi_connection(name: str) -> bool:
+    """Remove a connection from the user's simple-jndi file. Returns True
+    when something was removed. A connection defined only in the PRD
+    install's copy is not touched (and will still resolve)."""
+    path = _user_jndi_file()
+    if not path.is_file():
+        return False
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    kept = [ln for ln in lines if not ln.strip().startswith(f"{name}/")]
+    if len(kept) == len(lines):
+        return False
+    path.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return True
+
+
 def resolve_jndi(name: str) -> dict | None:
     """{'url', 'driver', 'user', 'password', 'source'} for a JNDI name, read
     from the same simple-jndi properties files the engine uses."""
@@ -64,28 +159,30 @@ def resolve_jndi(name: str) -> dict | None:
     return None
 
 
-def _connect(jndi_entry: dict):
-    """psycopg2 connection for a resolved JNDI entry (PostgreSQL only)."""
-    m = _JDBC_PG_RE.match(jndi_entry.get("url", ""))
-    if not m:
+def _dialect_and_connection(jndi_entry: dict):
+    """(dialect, open connection) for a resolved JNDI entry, via the adapter
+    matching its JDBC URL family (PostgreSQL, MySQL, SQL Server, Oracle)."""
+    from pentaho_migration.reports.db_dialects import dialect_for
+
+    url = jndi_entry.get("url", "")
+    dialect = dialect_for(url)
+    if dialect is None:
         raise RuntimeError(
-            "schema introspection currently supports PostgreSQL JNDI "
-            f"connections only (url: {jndi_entry.get('url', '<none>')})")
+            "schema introspection supports PostgreSQL, MySQL, SQL Server and "
+            f"Oracle JNDI connections - this url is none of those: {url or '<none>'}")
     try:
-        import psycopg2
-    except ImportError:
-        raise RuntimeError(
-            "psycopg2 is not installed - `pip install psycopg2-binary` "
-            "to enable schema introspection")
-    try:
-        return psycopg2.connect(
-            host=m.group("host"), port=int(m.group("port") or 5432),
-            dbname=m.group("db"),
-            user=jndi_entry.get("user", ""), password=jndi_entry.get("password", ""),
-            connect_timeout=5)
+        conn = dialect.connect(url, jndi_entry.get("user", ""),
+                               jndi_entry.get("password", ""))
+    except RuntimeError:
+        raise
     except Exception as exc:
-        raise RuntimeError(
-            f"cannot connect to {jndi_entry['url']}: {str(exc).strip()}")
+        raise RuntimeError(f"cannot connect to {url}: {str(exc).strip()}")
+    return dialect, conn
+
+
+def _connect(jndi_entry: dict):
+    """Back-compat shim: connection only (PostgreSQL tests monkeypatch this)."""
+    return _dialect_and_connection(jndi_entry)[1]
 
 
 def probe_schema(jndi: str) -> dict:
@@ -96,23 +193,36 @@ def probe_schema(jndi: str) -> dict:
         raise RuntimeError(
             f"JNDI connection {jndi!r} not found in simple-jndi "
             "(~/.pentaho/simple-jndi or the PRD install)")
-    conn = _connect(entry)
+    dialect, conn = _dialect_and_connection(entry)
     try:
         cur = conn.cursor()
-        cur.execute(
-            "SELECT table_schema, table_name, column_name, data_type "
-            "FROM information_schema.columns "
-            "WHERE table_schema NOT IN ('pg_catalog', 'information_schema') "
-            "ORDER BY table_schema, table_name, ordinal_position")
+        cur.execute(dialect.columns_sql)
         tables: dict[tuple, list] = {}
         for schema, table, column, dtype in cur.fetchall():
             tables.setdefault((schema, table), []).append(
                 {"name": column, "type": dtype})
+        # PK/FK decoration - an enhancement, never fatal to introspection
+        try:
+            cur.execute(dialect.keys_sql)
+            key_rows = cur.fetchall()
+        except Exception:
+            key_rows = []
+        for schema, table, column, ctype, rs, rt, rcol in key_rows:
+            for col in tables.get((schema, table), []):
+                if col["name"] != column:
+                    continue
+                kind = "PK" if str(ctype).startswith("PRIMARY") else "FK"
+                keys = set((col.get("key") or "").split(",")) - {""}
+                keys.add(kind)
+                col["key"] = ",".join(sorted(keys))
+                if kind == "FK" and rt and rcol:
+                    col["references"] = f"{rs}.{rt}.{rcol}" if rs else f"{rt}.{rcol}"
     finally:
         conn.close()
     return {
         "jndi": jndi,
         "url": entry["url"],
+        "dialect": dialect.name,
         "tables": [{"schema": s, "name": t, "columns": cols}
                    for (s, t), cols in tables.items()],
     }
@@ -143,28 +253,75 @@ def validate_sql(jndi: str, sql: str, parameters: list[dict] | None = None) -> d
         if entry is None:
             raise RuntimeError(
                 f"JNDI connection {jndi!r} not found in simple-jndi")
+        from pentaho_migration.reports.db_dialects import dialect_for
+        dialect = dialect_for(entry.get("url", ""))
         conn = _connect(entry)
     except RuntimeError as exc:
         return {"ok": False, "error": str(exc), "checked_sql": ""}
     try:
         cur = conn.cursor()
         try:
-            cur.execute("EXPLAIN " + checked)
+            if dialect is not None:
+                dialect.validate(cur, checked)
+            else:  # only reachable when tests monkeypatch _connect
+                cur.execute("EXPLAIN " + checked)
             return {"ok": True, "error": "", "checked_sql": checked}
         except Exception as exc:
             return {"ok": False,
                     "error": str(exc).strip().splitlines()[0],
                     "checked_sql": checked}
     finally:
-        conn.rollback()
+        try:
+            conn.rollback()
+        except Exception:
+            pass
         conn.close()
 
 
+def preview_query(jndi: str, sql: str, parameters: list[dict] | None = None,
+                  limit: int = 50) -> dict:
+    """Execute the (parameter-substituted) SELECT and return the first rows -
+    the Inspect page's dataset preview. Read-only by construction: anything
+    that is not a SELECT/WITH is refused, and only `limit` rows are fetched."""
+    checked = substitute_params(sql, parameters or [])
+    if not re.match(r"(?is)^\s*(SELECT|WITH)\b", checked):
+        raise RuntimeError("only SELECT queries can be previewed")
+    entry = resolve_jndi(jndi)
+    if entry is None:
+        raise RuntimeError(f"JNDI connection {jndi!r} not found in simple-jndi")
+    dialect, conn = _dialect_and_connection(entry)
+    try:
+        cur = conn.cursor()
+        cur.execute(checked)
+        columns = [d[0] for d in (cur.description or [])]
+        raw = cur.fetchmany(limit + 1)
+        truncated = len(raw) > limit
+        rows = [["" if v is None else str(v) for v in row] for row in raw[:limit]]
+    finally:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        conn.close()
+    return {"dialect": dialect.name, "columns": columns, "rows": rows,
+            "truncated": truncated}
+
+
 def schema_context(schema: dict, max_chars: int = 6000) -> str:
-    """Compact schema text for the LLM prompt: one line per table."""
+    """Compact schema text for the LLM prompt: one line per table, with
+    PK/FK markers so join advice follows the real relationships."""
+    def _col(c):
+        out = f"{c['name']} {c['type']}"
+        if c.get("key"):
+            out += f" [{c['key']}"
+            if c.get("references"):
+                out += f" -> {c['references']}"
+            out += "]"
+        return out
+
     lines = []
     for t in schema.get("tables", []):
-        cols = ", ".join(f"{c['name']} {c['type']}" for c in t["columns"])
+        cols = ", ".join(_col(c) for c in t["columns"])
         lines.append(f"{t['schema']}.{t['name']}({cols})")
     text = "\n".join(lines)
     if len(text) > max_chars:

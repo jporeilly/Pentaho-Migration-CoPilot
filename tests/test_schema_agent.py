@@ -50,6 +50,72 @@ def test_non_postgres_url_is_an_honest_error(tmp_path, monkeypatch):
     assert "PostgreSQL" in result["error"]
 
 
+def test_list_jndi_connections(tmp_path, monkeypatch):
+    props = tmp_path / "default.properties"
+    props.write_text(
+        "CSCU/driver=org.postgresql.Driver\n"
+        "CSCU/url=jdbc:postgresql://db:5433/cscu_core\n"
+        "SampleData/driver=org.hsqldb.jdbcDriver\n"
+        "SampleData/url=jdbc:hsqldb:file:/x/sampledata\n",
+        encoding="utf-8")
+    monkeypatch.setenv("SIMPLE_JNDI_PROPERTIES", str(props))
+    from pentaho_migration.reports.schema_agent import list_jndi_connections
+    conns = {c["name"]: c for c in list_jndi_connections()}
+    assert conns["CSCU"]["introspectable"] is True
+    assert conns["SampleData"]["introspectable"] is False
+
+
+def test_api_connections_endpoint():
+    res = client.get("/reports/connections")
+    assert res.status_code == 200
+    assert isinstance(res.json(), list)
+
+
+def test_connection_crud(tmp_path, monkeypatch):
+    props = tmp_path / "default.properties"
+    monkeypatch.setenv("SIMPLE_JNDI_PROPERTIES", str(props))
+    from pentaho_migration.reports.schema_agent import (
+        delete_jndi_connection, list_jndi_connections, save_jndi_connection)
+
+    save_jndi_connection("TESTDB", "jdbc:postgresql://h:5432/d", user="u", password="p")
+    text = props.read_text(encoding="utf-8")
+    assert "TESTDB/driver=org.postgresql.Driver" in text   # inferred from url
+    assert "TESTDB/url=jdbc:postgresql://h:5432/d" in text
+    assert any(c["name"] == "TESTDB" for c in list_jndi_connections())
+
+    # update replaces the block, never duplicates it
+    save_jndi_connection("TESTDB", "jdbc:postgresql://h2:5432/d2")
+    text = props.read_text(encoding="utf-8")
+    assert text.count("TESTDB/url=") == 1
+    assert "h2:5432/d2" in text
+
+    assert delete_jndi_connection("TESTDB") is True
+    assert "TESTDB/" not in props.read_text(encoding="utf-8")
+    assert delete_jndi_connection("TESTDB") is False
+
+    with pytest.raises(ValueError):
+        save_jndi_connection("bad name", "jdbc:postgresql://h/d")
+    with pytest.raises(ValueError):
+        save_jndi_connection("X", "not-a-jdbc-url")
+
+
+def test_api_connection_save_and_delete(tmp_path, monkeypatch):
+    props = tmp_path / "default.properties"
+    monkeypatch.setenv("SIMPLE_JNDI_PROPERTIES", str(props))
+    res = client.post("/reports/connections", json={
+        "name": "APITEST", "url": "jdbc:postgresql://h:5432/d",
+        "user": "u", "password": "p"})
+    assert res.status_code == 200
+    assert any(c["name"] == "APITEST" for c in res.json()["connections"])
+    # passwords never come back in the listing
+    assert all("password" not in c for c in res.json()["connections"])
+
+    res = client.delete("/reports/connections/APITEST")
+    assert res.status_code == 200
+    res = client.delete("/reports/connections/APITEST")
+    assert res.status_code == 404
+
+
 # ------------------------------------------------------ parameter substitution
 
 def test_substitute_params_defaults_and_null():
@@ -225,3 +291,65 @@ def test_live_flagship_sql_validates():
     assert validate_sql("CSCU", model.sql, params)["ok"]
     bad = validate_sql("CSCU", "SELECT nope FROM cscu_core.transactions", [])
     assert not bad["ok"] and "nope" in bad["error"]
+
+
+# ------------------------------------------------------------- db dialects
+
+def test_dialect_url_parsing():
+    from pentaho_migration.reports.db_dialects import dialect_for
+
+    cases = {
+        "jdbc:postgresql://h:5433/db": ("PostgreSQL", "h", "5433", "db"),
+        "jdbc:mysql://h/db": ("MySQL", "h", None, "db"),
+        "jdbc:sqlserver://h:1433;databaseName=db;encrypt=false": ("SQL Server", "h", "1433", "db"),
+        "jdbc:oracle:thin:@//h:1521/svc": ("Oracle", "h", "1521", "svc"),
+        "jdbc:oracle:thin:@h:1521:sid": ("Oracle", "h", "1521", "sid"),
+    }
+    for url, (name, host, port, db) in cases.items():
+        d = dialect_for(url)
+        assert d is not None and d.name == name, url
+        m = d.match(url)
+        assert m.group("host") == host
+        assert m.group("port") == port
+        assert m.group("db") == db
+
+    assert dialect_for("jdbc:hsqldb:file:/x/sample") is None
+    assert dialect_for("") is None
+
+
+def test_dialect_missing_driver_message(monkeypatch, tmp_path):
+    props = tmp_path / "default.properties"
+    props.write_text("MY/url=jdbc:mysql://h/db\nMY/user=u\nMY/password=p\n",
+                     encoding="utf-8")
+    monkeypatch.setenv("SIMPLE_JNDI_PROPERTIES", str(props))
+    import builtins
+    real_import = builtins.__import__
+
+    def no_pymysql(name, *a, **k):
+        if name == "pymysql":
+            raise ImportError(name)
+        return real_import(name, *a, **k)
+    monkeypatch.setattr(builtins, "__import__", no_pymysql)
+    result = validate_sql("MY", "SELECT 1", [])
+    assert not result["ok"]
+    assert "pip install pymysql" in result["error"]
+
+
+def test_preview_rejects_non_select(tmp_path, monkeypatch):
+    props = tmp_path / "default.properties"
+    props.write_text("PG/url=jdbc:postgresql://h/d\n", encoding="utf-8")
+    monkeypatch.setenv("SIMPLE_JNDI_PROPERTIES", str(props))
+    from pentaho_migration.reports.schema_agent import preview_query
+    with pytest.raises(RuntimeError, match="only SELECT"):
+        preview_query("PG", "DELETE FROM members")
+
+
+@pytest.mark.skipif(os.environ.get("CSCU_LIVE") != "1",
+                    reason="set CSCU_LIVE=1 for the live dataset preview")
+def test_live_preview_returns_rows():
+    from pentaho_migration.reports.schema_agent import preview_query
+    result = preview_query(
+        "CSCU", "SELECT br_name FROM cscu_core.branches ORDER BY br_name")
+    assert result["columns"] == ["br_name"]
+    assert len(result["rows"]) >= 4
+    assert not result["truncated"]

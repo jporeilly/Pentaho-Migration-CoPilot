@@ -299,6 +299,53 @@ class SqlChatRequest(BaseModel):
     history: list[SqlChatTurn] = []
 
 
+@router.get("/connections", dependencies=[Depends(require_api_key)])
+def connections() -> list[dict]:
+    """The JNDI connections defined in the simple-jndi config the reporting
+    engine reads - what the Inspect page's connection picker offers."""
+    from pentaho_migration.reports.schema_agent import list_jndi_connections
+
+    return list_jndi_connections()
+
+
+class ConnectionRequest(BaseModel):
+    name: str
+    url: str
+    driver: str = ""
+    user: str = ""
+    password: str = ""
+
+
+@router.post("/connections", dependencies=[Depends(require_api_key)])
+def save_connection(req: ConnectionRequest) -> dict:
+    """Create or update a JNDI connection in the user's simple-jndi file
+    (~/.pentaho/simple-jndi) - the same file the reporting engine reads."""
+    from pentaho_migration.reports.schema_agent import (
+        list_jndi_connections, save_jndi_connection)
+
+    try:
+        save_jndi_connection(req.name, req.url, req.driver, req.user, req.password)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {"saved": req.name, "connections": list_jndi_connections()}
+
+
+@router.delete("/connections/{name}", dependencies=[Depends(require_api_key)])
+def delete_connection(name: str) -> dict:
+    """Delete a JNDI connection from the user's simple-jndi file. A name
+    defined in the PRD install's own config is not touched."""
+    from pentaho_migration.reports.schema_agent import (
+        delete_jndi_connection, list_jndi_connections, resolve_jndi)
+
+    removed = delete_jndi_connection(name)
+    if not removed:
+        detail = ("connection not found in the user's simple-jndi file"
+                  + (" (it is defined in the PRD install's config - edit that "
+                     "file directly)" if resolve_jndi(name) else ""))
+        raise HTTPException(status_code=404, detail=detail)
+    return {"deleted": name, "connections": list_jndi_connections()}
+
+
 @router.get("/schema", dependencies=[Depends(require_api_key)])
 def schema(jndi: str) -> dict:
     """Introspect the JNDI target database (tables + columns). Deterministic:
@@ -315,6 +362,21 @@ def sql_check(req: SqlCheckRequest) -> dict:
     substituted with their defaults) against the live JNDI target."""
     return validate_sql(req.jndi, req.sql,
                         [p.model_dump() for p in req.parameters])
+
+
+@router.post("/sql/preview", dependencies=[Depends(require_api_key)])
+def sql_preview(req: SqlCheckRequest) -> dict:
+    """Execute the report's SELECT against the live JNDI target and return
+    the first 50 rows - the Inspect page's dataset preview. SELECT-only."""
+    from pentaho_migration.reports.schema_agent import preview_query
+
+    try:
+        return preview_query(req.jndi, req.sql,
+                             [p.model_dump() for p in req.parameters])
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc).splitlines()[0])
 
 
 @router.post("/sql/chat", dependencies=[Depends(require_api_key)])
