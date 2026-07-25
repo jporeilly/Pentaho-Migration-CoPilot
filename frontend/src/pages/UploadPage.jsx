@@ -43,11 +43,20 @@ export default function UploadPage({ onFile, onSample, onTalendSample, onCrystal
         judgment is genuinely required.{' '}
         <a href="/brief" target="_blank" rel="noreferrer">Read the technical brief →</a>
       </p>
-      <p className="practices-cta">
+      <div className="practices-cta">
         <button className="ghost" onClick={onShowPractices}>📘 Migration best practices</button>
-      </p>
+        <span className="sample-row">
+          <button className="ghost" onClick={onSample}>Try Informatica</button>
+          {onTalendSample && (
+            <button className="ghost" onClick={onTalendSample}>Try Talend</button>
+          )}
+          {onCrystalSample && (
+            <button className="ghost" onClick={onCrystalSample}>Try Crystal Reports</button>
+          )}
+        </span>
+      </div>
 
-      <DropZone onFile={onFile} onSample={onSample} onTalendSample={onTalendSample} onCrystalSample={onCrystalSample} />
+      <DropZone onFile={onFile} />
       {error && <div className="error">Conversion failed: {error}</div>}
       {loading && <p className="loading">Converting…</p>}
       {source && <SourceCard source={source} />}
