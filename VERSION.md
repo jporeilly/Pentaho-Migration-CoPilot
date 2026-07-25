@@ -1,12 +1,11 @@
 # Version
 
-**1.23.0** — 2026-07-25
+**1.24.0** — 2026-07-25
 
 **Phase 1** — Informatica PowerCenter & SAP Crystal Reports complete;
-Talend in progress. The connection round: a **connection panel** on the
-Inspect page (pick, save, edit, delete JNDI connections — persisted to the
-engine's own simple-jndi file), **multi-database dialect adapters**
-(PostgreSQL live-verified; MySQL, SQL Server, Oracle), a **schema browser**
-with PK/FK badges, a **live dataset preview** (first 50 rows with parameter
-defaults substituted), and line-by-line SQL display.
+Talend in progress. The layout/schema round: the **layout preview is tabbed
+for subreports** (Main report + a tab per converted subreport, showing its
+own bands), PK/FK discovery reads `pg_catalog` (a read-only report user is
+privilege-filtered out of `information_schema` and saw *no* keys), clearer
+🔗 FK badges, and a taller, un-squashed layout preview.
 See [CHANGELOG.md](CHANGELOG.md) for history.

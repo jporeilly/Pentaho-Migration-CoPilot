@@ -353,3 +353,29 @@ def test_live_preview_returns_rows():
     assert result["columns"] == ["br_name"]
     assert len(result["rows"]) >= 4
     assert not result["truncated"]
+
+
+def test_postgres_keys_use_pg_catalog_not_information_schema():
+    """information_schema.table_constraints is privilege-filtered - a read-only
+    report user sees NONE of the constraints. The keys query must use
+    pg_catalog so the app (connecting as that user) can read PK/FK."""
+    from pentaho_migration.reports.db_dialects import dialect_for
+    pg = dialect_for("jdbc:postgresql://h/d")
+    assert "pg_constraint" in pg.keys_sql
+    # must not READ FROM information_schema (excluding it in a WHERE is fine)
+    assert "information_schema.table_constraints" not in pg.keys_sql
+    assert "FROM information_schema" not in pg.keys_sql
+
+
+@pytest.mark.skipif(os.environ.get("CSCU_LIVE") != "1",
+                    reason="set CSCU_LIVE=1 for live PK/FK badge introspection")
+def test_live_pk_fk_visible_to_report_user():
+    """The whole point: probe_schema connects as the app's (read-only) user
+    and must still surface PK/FK from pg_catalog."""
+    from pentaho_migration.reports.schema_agent import probe_schema
+    s = probe_schema("CSCU")
+    accounts = next(t for t in s["tables"] if t["name"] == "accounts")
+    by_name = {c["name"]: c for c in accounts["columns"]}
+    assert by_name["acct_id"]["key"] == "PK"
+    assert "FK" in by_name["mbr_id"]["key"]
+    assert by_name["mbr_id"]["references"].endswith("members.mbr_id")

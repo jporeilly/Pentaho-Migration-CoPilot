@@ -54,19 +54,26 @@ class _Postgres(Dialect):
         "ORDER BY table_schema, table_name, ordinal_position")
 
     # rows: schema, table, column, PRIMARY KEY|FOREIGN KEY, ref_schema, ref_table, ref_column
+    # Uses pg_catalog, not information_schema: information_schema.table_constraints
+    # is privilege-filtered (a read-only report user sees NONE of its own
+    # constraints), while pg_catalog is visible to every role. Column position
+    # is paired via WITH ORDINALITY so composite foreign keys line up.
     keys_sql = (
-        "SELECT tc.table_schema, tc.table_name, kcu.column_name, tc.constraint_type, "
-        "       ccu.table_schema, ccu.table_name, ccu.column_name "
-        "FROM information_schema.table_constraints tc "
-        "JOIN information_schema.key_column_usage kcu "
-        "  ON kcu.constraint_name = tc.constraint_name "
-        " AND kcu.constraint_schema = tc.constraint_schema "
-        "LEFT JOIN information_schema.constraint_column_usage ccu "
-        "  ON ccu.constraint_name = tc.constraint_name "
-        " AND ccu.constraint_schema = tc.constraint_schema "
-        " AND tc.constraint_type = 'FOREIGN KEY' "
-        "WHERE tc.constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY') "
-        "  AND tc.table_schema NOT IN ('pg_catalog', 'information_schema')")
+        "SELECT n.nspname, cl.relname, att.attname, "
+        "       CASE con.contype WHEN 'p' THEN 'PRIMARY KEY' ELSE 'FOREIGN KEY' END, "
+        "       fn.nspname, fcl.relname, fatt.attname "
+        "FROM pg_constraint con "
+        "JOIN pg_class cl ON cl.oid = con.conrelid "
+        "JOIN pg_namespace n ON n.oid = cl.relnamespace "
+        "JOIN LATERAL unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord) ON true "
+        "JOIN pg_attribute att ON att.attrelid = con.conrelid AND att.attnum = k.attnum "
+        "LEFT JOIN pg_class fcl ON fcl.oid = con.confrelid "
+        "LEFT JOIN pg_namespace fn ON fn.oid = fcl.relnamespace "
+        "LEFT JOIN LATERAL unnest(con.confkey) WITH ORDINALITY AS fk(attnum, ord) "
+        "  ON con.contype = 'f' AND fk.ord = k.ord "
+        "LEFT JOIN pg_attribute fatt ON fatt.attrelid = con.confrelid AND fatt.attnum = fk.attnum "
+        "WHERE con.contype IN ('p', 'f') "
+        "  AND n.nspname NOT IN ('pg_catalog', 'information_schema')")
 
     def validate(self, cursor, sql):
         cursor.execute("EXPLAIN " + sql)

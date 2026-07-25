@@ -192,7 +192,7 @@ export default function SqlAssistant({ summary, file, onUpdate }) {
                             {c.key?.includes('PK') && <span className="key-badge pk" title="primary key">🔑 PK</span>}
                             {c.key?.includes('FK') && (
                               <span className="key-badge fk" title={`foreign key → ${c.references || ''}`}>
-                                → {c.references || 'FK'}
+                                🔗 FK{c.references ? ` → ${c.references.split('.').slice(-2).join('.')}` : ''}
                               </span>
                             )}
                           </td>

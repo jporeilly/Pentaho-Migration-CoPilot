@@ -7,6 +7,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.24.0] — 2026-07-25
+
+### Added
+
+- **Tabbed layout preview for subreports**: a report with converted
+  subreports now shows a *Main report* tab plus one tab per subreport
+  (`▸ name 🔗` for linked ones), each rendering the subreport's own bands
+  in the same wireframe — so you can see the nested report's layout, not
+  just a box where it sits. The API summary carries each child's sections
+  (`subreports[]`).
+
+### Fixed
+
+- **PK/FK badges were invisible to the app's own database user.** The
+  PostgreSQL key-discovery query read `information_schema.table_constraints`,
+  which PostgreSQL privilege-filters — a read-only report user (the JNDI
+  account a report runs as) sees *none* of the constraints, even its own
+  tables'. Rewrote it against `pg_catalog.pg_constraint` (visible to every
+  role), pairing composite keys via `WITH ORDINALITY`. Verified live against
+  CSCU as `pdc_user`: `accounts.mbr_id → members.mbr_id`,
+  `accounts.br_id → branches.br_id`, etc. now surface. A regression test
+  pins the query away from `information_schema`. (MySQL/SQL Server/Oracle use
+  each vendor's catalog, which respects the user's `SELECT` grants — only
+  PostgreSQL's `information_schema` needed this.)
+- **FK badges are now unmistakable**: `🔗 FK → table.column` (was a faint
+  amber arrow that read as decoration).
+- **Layout preview is no longer squashed**: report bands are wide and short,
+  so scaling the SVG to the card width collapsed the height — the vertical
+  axis now has a 2.2× schematic stretch (column x-positions stay 1:1, so
+  header/data alignment still reads true) and larger band/element labels.
+
 ## [1.23.0] — 2026-07-25
 
 ### Added

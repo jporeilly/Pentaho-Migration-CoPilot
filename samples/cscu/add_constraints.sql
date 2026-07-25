@@ -7,6 +7,7 @@ ALTER TABLE cscu_core.members             ADD PRIMARY KEY (mbr_id);
 ALTER TABLE cscu_core.accounts            ADD PRIMARY KEY (acct_id);
 ALTER TABLE cscu_core.branches            ADD PRIMARY KEY (br_id);
 ALTER TABLE cscu_core.transactions        ADD PRIMARY KEY (txn_id);
+ALTER TABLE cscu_core.loans               ADD PRIMARY KEY (ln_id);
 ALTER TABLE cscu_core.cards               ADD PRIMARY KEY (card_id);
 ALTER TABLE cscu_core.suspicious_activity ADD PRIMARY KEY (sar_id);
 ALTER TABLE cscu_core.employees           ADD PRIMARY KEY (emp_id);

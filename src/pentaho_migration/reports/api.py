@@ -82,6 +82,14 @@ class ReportSection(BaseModel):
     items: list[ReportElementInfo] = []
 
 
+class ReportSubLayout(BaseModel):
+    """A converted subreport's own bands, for the tabbed layout preview."""
+
+    name: str
+    linked: bool = False           # has parent->child parameter links
+    sections: list[ReportSection] = []
+
+
 class ReportCounts(BaseModel):
     sections: int
     elements: int
@@ -107,6 +115,7 @@ class ReportSummary(BaseModel):
     parameters: list[ReportParameter]
     summaries: list[ReportSummaryField]
     sections: list[ReportSection]
+    subreports: list[ReportSubLayout] = []
     formulas: list[ReportFormula]
     todos: list[str]
     counts: ReportCounts
@@ -122,6 +131,29 @@ class ReportConversionResponse(BaseModel):
 
 def _summarize(model, source_name: str) -> ReportSummary:
     from pentaho_migration.reports.model import is_todo_element
+
+    def _sections(sections):
+        return [ReportSection(
+            area=s.area_kind,
+            group=s.group_index if s.group_index >= 0 else None,
+            height=round(s.height, 1), elements=len(s.elements),
+            suppressed=s.suppressed,
+            items=[ReportElementInfo(
+                kind=el.kind, x=round(el.x, 1), y=round(el.y, 1),
+                width=round(el.width, 1), height=round(el.height, 1),
+                label=(el.text or el.column or el.field_ref or "")[:60])
+                for el in s.elements])
+            for s in sections]
+
+    # converted subreports, in the order they appear, for the tabbed preview
+    sublayouts: list[ReportSubLayout] = []
+    for s in model.sections:
+        for el in s.elements:
+            if el.kind == "subreport" and el.subreport is not None:
+                sublayouts.append(ReportSubLayout(
+                    name=el.subreport.name,
+                    linked=bool(el.subreport_links),
+                    sections=_sections(el.subreport.sections)))
 
     todos: list[str] = []
     for s in model.sections:
@@ -146,17 +178,8 @@ def _summarize(model, source_name: str) -> ReportSummary:
                                       field=s.field_ref, group=s.group_field,
                                       expression=s.expression_name)
                    for s in model.summaries],
-        sections=[ReportSection(
-            area=s.area_kind,
-            group=s.group_index if s.group_index >= 0 else None,
-            height=round(s.height, 1), elements=len(s.elements),
-            suppressed=s.suppressed,
-            items=[ReportElementInfo(
-                kind=el.kind, x=round(el.x, 1), y=round(el.y, 1),
-                width=round(el.width, 1), height=round(el.height, 1),
-                label=(el.text or el.column or el.field_ref or "")[:60])
-                for el in s.elements])
-            for s in model.sections],
+        sections=_sections(model.sections),
+        subreports=sublayouts,
         formulas=[ReportFormula(name=f.name, status=f.status, translation=f.translation,
                                 prd=f.prd_target(), source=f.source,
                                 llm_confidence=f.llm_confidence,

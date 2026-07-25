@@ -3,7 +3,7 @@
 
 import ConnectionPanel from '../components/ConnectionPanel.jsx'
 import Explain from '../components/Explain.jsx'
-import LayoutPreview from '../components/LayoutPreview.jsx'
+import { TabbedLayoutPreview } from '../components/LayoutPreview.jsx'
 import SqlAssistant from '../components/SqlAssistant.jsx'
 import formatSql from '../lib/formatSql.js'
 
@@ -50,7 +50,7 @@ export default function ReportsInspectPage({ summary, file, onUpdate }) {
           no data is rendered; use <b>👁 PDF preview</b> on the Download step to
           see the engine-rendered page. Hover any element for its name.
         </Explain>
-        <LayoutPreview sections={summary.sections} />
+        <TabbedLayoutPreview sections={summary.sections} subreports={summary.subreports || []} />
       </div>
 
       <div className="report-grid">

@@ -4,6 +4,8 @@
 // wireframe previews both source and target layout. A design-time view —
 // use the PDF preview for the engine-rendered version.
 
+import { useState } from 'react'
+
 const BAND_ORDER = ['ReportHeader', 'PageHeader', 'GroupHeader', 'Detail',
   'GroupFooter', 'ReportFooter', 'PageFooter']
 
@@ -18,6 +20,41 @@ const KIND_COLORS = {
   image: 'var(--status-warning)',
 }
 
+// Report bands are wide and short (a 17pt detail row on an 806pt page), so
+// when the SVG scales to fit the card width the height collapses. Give the
+// vertical axis a schematic stretch — column x-positions stay 1:1 so header
+// and data alignment (what a report reviewer checks) reads true.
+const SCALE_Y = 2.2
+const BAND_GAP = 4
+
+// When a report has converted subreports, tab between the main report and
+// each subreport's own bands (a subreport is a nested banded report).
+export function TabbedLayoutPreview({ sections, subreports = [] }) {
+  const [tab, setTab] = useState(0)
+  if (!subreports.length) return <LayoutPreview sections={sections} />
+  const tabs = [{ name: 'Main report', sections },
+    ...subreports.map((s) => ({ name: `▸ ${s.name}${s.linked ? ' 🔗' : ''}`, sections: s.sections }))]
+  const active = tabs[Math.min(tab, tabs.length - 1)]
+  return (
+    <div>
+      <div className="wf-tabs">
+        {tabs.map((t, i) => (
+          <button key={i} className={i === tab ? 'active' : ''} onClick={() => setTab(i)}>
+            {t.name}
+          </button>
+        ))}
+      </div>
+      <LayoutPreview sections={active.sections} />
+      {tab > 0 && (
+        <p className="muted wf-sub-note">
+          Subreport — converts to a nested PRD sub-report bundle
+          {active.name.includes('🔗') ? ', linked to the parent row by parameter' : ' (unlinked)'}.
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default function LayoutPreview({ sections }) {
   const ordered = [...sections].sort(
     (a, b) => BAND_ORDER.indexOf(a.area) - BAND_ORDER.indexOf(b.area) || (a.group ?? 0) - (b.group ?? 0))
@@ -27,41 +64,44 @@ export default function LayoutPreview({ sections }) {
   const LABEL_W = 92
   let y = 0
   const bands = visible.map((s) => {
-    const h = Math.max(s.height, 16)
+    const h = Math.max(s.height, 14) * SCALE_Y
     const band = { ...s, y, h }
-    y += h + 2
+    y += h + BAND_GAP
     return band
   })
 
   return (
     <div className="wireframe">
-      <svg viewBox={`0 0 ${width + LABEL_W} ${y + 4}`} width={width + LABEL_W}>
+      <svg viewBox={`0 0 ${width + LABEL_W} ${y + 4}`} width={width + LABEL_W}
+        style={{ minHeight: Math.min(y + 4, 640) }}>
         {bands.map((band, i) => (
           <g key={i} transform={`translate(0 ${band.y})`}>
             <rect x={LABEL_W} y="0" width={width} height={band.h}
               fill="var(--surface-2)" stroke="var(--gridline)" strokeWidth="1" />
-            <text x={LABEL_W - 8} y={Math.min(band.h / 2 + 3, 12)} textAnchor="end"
-              fill="var(--text-muted)" fontSize="8" fontFamily="system-ui">
+            <text x={LABEL_W - 8} y={band.h / 2 + 4} textAnchor="end"
+              fill="var(--text-muted)" fontSize="11" fontFamily="system-ui">
               {band.area}{band.group !== null && band.group !== undefined ? ` G${band.group + 1}` : ''}
             </text>
             {band.items.map((el, j) => {
               const color = KIND_COLORS[el.kind] || 'var(--text-muted)'
+              const ey = el.y * SCALE_Y
+              const eh = Math.max(el.height * SCALE_Y, 8)
               if (el.kind === 'line') {
-                return <line key={j} x1={LABEL_W + el.x} y1={el.y + 1} x2={LABEL_W + el.x + el.width} y2={el.y + 1}
+                return <line key={j} x1={LABEL_W + el.x} y1={ey + 1} x2={LABEL_W + el.x + el.width} y2={ey + 1}
                   stroke={color} strokeWidth="1" />
               }
               return (
                 <g key={j}>
-                  <rect x={LABEL_W + el.x} y={el.y} width={Math.max(el.width, 2)} height={Math.max(el.height, 4)}
+                  <rect x={LABEL_W + el.x} y={ey} width={Math.max(el.width, 2)} height={eh}
                     fill={el.kind === 'field' || el.kind === 'special' ? 'rgba(57,135,229,0.12)' : 'none'}
                     stroke={color} strokeWidth="0.8" rx="1.5">
                     <title>{el.kind}: {el.label}</title>
                   </rect>
-                  {el.height >= 8 && el.width >= 28 && (
-                    <text x={LABEL_W + el.x + 2.5} y={el.y + Math.min(el.height - 2, 9)}
+                  {eh >= 10 && el.width >= 24 && (
+                    <text x={LABEL_W + el.x + 3} y={ey + Math.min(eh - 4, 12)}
                       fill={el.kind === 'unknown' ? 'var(--status-serious)' : 'var(--text-secondary)'}
-                      fontSize="6.5" fontFamily="system-ui">
-                      {el.label.slice(0, Math.floor(el.width / 4))}
+                      fontSize="8.5" fontFamily="system-ui">
+                      {el.label.slice(0, Math.floor(el.width / 4.5))}
                     </text>
                   )}
                 </g>
