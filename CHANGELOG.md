@@ -7,6 +7,46 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.21.0] — 2026-07-25
+
+### Added
+
+- **Conditional formatting → PRD style expressions**: Crystal conditional
+  font colors and backgrounds now convert into `paint` /
+  `background-color` style expressions on the element, with the condition
+  run through the deterministic translator (Crystal color constants map to
+  hex; `crNoColor`/`DefaultAttribute` honestly stay notes). *Live-proven
+  against CSCU: the Delinquent30 loan balance renders red.*
+- **Conditional suppression → visibility expressions**: object- and
+  section-level Suppress formulas become `visible` style expressions
+  (`=NOT(condition)`) on elements and bands (sections merging into one PRD
+  band keep the honest note). *Live-proven: the PaidOff loan row is absent
+  from the rendered report.*
+- **Output-parity harness** (`reports/parity.py`, `pentaho-migrate
+  report-parity <prpt|dump> <export.pdf|csv>`, `POST /reports/parity`):
+  renders the converted report against the live JNDI database and diffs
+  its **numbers** (normalized: currency stripped, accounting negatives
+  folded, multiset compare) against the customer's Crystal export —
+  PASS / NEAR / FAIL with the missing values listed. Live-verified:
+  self-parity passes; a simulated customer CSV export of CSCU-100501's
+  transactions matches the converted Member Statement.
+- **Translator sharpeners**: `x in a to b` → `AND(x >= a; x <= b)`;
+  Select Case range values (`1 To 5`) and `Is <op>` tests convert;
+  single-assignment local variables (readability aliases) are inlined
+  deterministically (multi-variable state stays honestly manual).
+- **Group & record sort directions**: consumed from the dump's SortField
+  list; the generated SQL now carries `ORDER BY` for groups (honoring
+  descending) and record sorts — previously generated SQL had no ORDER BY
+  at all, which PRD's relational groups silently depend on. Group Sort
+  Expert / Top N is flagged as a review note.
+- **Demo rung 7 — "Card Program Review - Select Case, Ranges & Sorts"**:
+  every new translator feature in one live-rendering report (DEBIT group
+  before CREDIT, newest cards first, multi-value Select Case, expiry-window
+  range, inlined holder alias).
+- **docs/CRYSTAL-COVERAGE.md**: the full Crystal→PRD feature map — what
+  converts, into what, and whether it is deterministic, ✨ LLM-assisted
+  (with confidence), or honestly manual.
+
 ## [1.20.1] — 2026-07-25
 
 ### Added

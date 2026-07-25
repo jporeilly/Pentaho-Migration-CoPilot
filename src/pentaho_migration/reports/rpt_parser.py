@@ -77,13 +77,14 @@ def parse_field_ref(ref):
     return "unknown", ref
 
 
-def _conditional_formula_notes(node, context=""):
+def _condition_formula_pairs(node):
     """Conditional-formatting formulas (RptToXml dumps them in
-    *ConditionFormulas elements, sometimes nested under Border/SectionFormat).
-    Not convertible mechanically — but dropping them silently hides real
-    behavior, so surface each as a note. Safe to scan the whole subtree of an
-    object or a SectionFormat: neither contains other report objects."""
-    notes = []
+    *ConditionFormulas elements, sometimes nested under Border/SectionFormat)
+    as raw (attribute, crystal_text) pairs. Conversion to PRD style
+    expressions happens later, in _resolve_references, where the model's
+    field types are known. Safe to scan the whole subtree of an object or a
+    SectionFormat: neither contains other report objects."""
+    pairs = []
     for child in node.iter():
         if not child.tag.endswith("ConditionFormulas"):
             continue
@@ -92,9 +93,29 @@ def _conditional_formula_notes(node, context=""):
                 line for line in raw.splitlines()
                 if line.strip() and not line.strip().startswith("//"))
             if body.strip():
-                snippet = " ".join(body.split())[:100]
-                notes.append(
-                    f"conditional {attr} formula not carried{context}: {snippet}")
+                pairs.append((attr, body.strip()))
+    return pairs
+
+
+def _convert_condition_formulas(target, field_types, context=""):
+    """Turn a Section's/Element's raw condition formulas into PRD style
+    expressions where the translator can prove them; everything else becomes
+    the honest 'not carried' note. Returns the fallback notes."""
+    from .formula_translator import TranslationError, translate_style_condition
+
+    notes = []
+    for attr, body in target.condition_formulas:
+        snippet = " ".join(body.split())[:100]
+        try:
+            key, formula = translate_style_condition(attr, body, field_types)
+        except TranslationError as e:
+            notes.append(
+                f"conditional {attr} formula not carried{context} ({e}): {snippet}")
+            continue
+        target.style_expressions.append((key, formula))
+        notes.append(
+            f"conditional {attr} converted to a '{key}' style expression{context} "
+            f"- verify against Crystal: {snippet}")
     return notes
 
 
@@ -191,7 +212,7 @@ def _parse_object(obj):
     else:
         el.kind = "unknown"
         el.text = tag
-    el.notes.extend(_conditional_formula_notes(obj))
+    el.condition_formulas = _condition_formula_pairs(obj)
     return el
 
 
@@ -241,6 +262,30 @@ def _parse_data_definition(root, model):
         kind, column = parse_field_ref(cond)
         model.groups.append(Group(condition_field=cond, column=column,
                                   name=_attr(g, "Name", default="")))
+
+    # sort fields: group direction + detail (record) ordering
+    for sf in dd.iter("SortField"):
+        raw = _attr(sf, "Field", default="")
+        direction = _attr(sf, "SortDirection", default="AscendingOrder")
+        descending = direction.startswith("Descending")
+        stype = _attr(sf, "SortType", default="RecordSortField")
+        if stype == "GroupSortField":
+            matched = next((g for g in model.groups if g.condition_field == raw), None)
+            if matched is not None and not direction.startswith(("TopN", "BottomN")):
+                matched.descending = descending
+            else:
+                # Group Sort Expert: groups ordered by a summary value / Top N
+                model.issues.append(
+                    f"group sort '{raw}' ({direction}) not carried - order the "
+                    "groups in the query or rebuild with PRD group sorting")
+        else:
+            skind, column = parse_field_ref(raw)
+            if skind == "db":
+                model.record_sorts.append((column, descending))
+            else:
+                model.issues.append(
+                    f"record sort on {raw} ({direction}) not carried - the "
+                    "sort key is not a plain database column")
 
     for f in dd.iter("FormulaFieldDefinition"):
         name = _attr(f, "Name", "FormulaName", default="").strip("{}@")
@@ -353,8 +398,7 @@ def _parse_areas(root, model):
                 bg_color=band_bg if band_bg not in ("#ffffff",) else "",
             )
             if fmt is not None:
-                model.issues.extend(_conditional_formula_notes(
-                    fmt, context=f" (section {section.name or kind})"))
+                section.condition_formulas = _condition_formula_pairs(fmt)
             objects = sec.find("ReportObjects")
             if objects is not None:
                 for obj in objects:
@@ -446,6 +490,31 @@ def _resolve_references(model):
                     el.notes.append(f"Unresolved field reference: {el.field_ref!r}")
             _resolve_format(el)
 
+    # conditional formatting -> PRD style expressions (needs field types,
+    # so it runs here rather than at parse time)
+    band_counts: dict = {}
+    for section in model.sections:
+        band_counts[(section.area_kind, section.group_index)] = \
+            band_counts.get((section.area_kind, section.group_index), 0) + 1
+    for section in model.sections:
+        for el in section.elements:
+            if el.condition_formulas:
+                el.notes.extend(_convert_condition_formulas(el, model.field_types))
+        if not section.condition_formulas:
+            continue
+        context = f" (section {section.name or section.area_kind})"
+        if band_counts[(section.area_kind, section.group_index)] == 1:
+            model.issues.extend(_convert_condition_formulas(
+                section, model.field_types, context))
+        else:
+            # several Crystal sections merge into one PRD band - a per-section
+            # condition cannot be applied to the merged band
+            for attr, body in section.condition_formulas:
+                snippet = " ".join(body.split())[:100]
+                model.issues.append(
+                    f"conditional {attr} formula not carried{context} "
+                    f"(sections merge into one PRD band): {snippet}")
+
 
 def generate_sql(model):
     """Build a SELECT statement from the columns the layout actually uses."""
@@ -470,4 +539,21 @@ def generate_sql(model):
     if not used:
         used = ["*"]
     tables = ", ".join(model.tables) if model.tables else "TABLE"
-    return "SELECT\n  " + ",\n  ".join(used) + f"\nFROM {tables}"
+    sql = "SELECT\n  " + ",\n  ".join(used) + f"\nFROM {tables}"
+
+    # PRD relational groups need pre-sorted data: order by the group columns
+    # (honoring group direction), then the report's record sorts
+    def _qualify(column):
+        for tname, fields in model.tables.items():
+            if column in fields:
+                return f"{tname}.{column}"
+        return column
+
+    order = [f"{_qualify(g.column)}{' DESC' if g.descending else ''}"
+             for g in model.groups if g.column]
+    order += [f"{_qualify(col)}{' DESC' if desc else ''}"
+              for col, desc in model.record_sorts
+              if _qualify(col) not in [o.split(" ")[0] for o in order]]
+    if order:
+        sql += "\nORDER BY " + ", ".join(order)
+    return sql

@@ -92,6 +92,18 @@ NOARG_MAP = {
     "printdate": "TODAY()",
 }
 
+# Crystal color constants -> hex strings PRD's color converter accepts.
+# crNoColor and DefaultAttribute cannot be expressed (transparent / "keep the
+# static value") - they raise, so the condition stays an honest note.
+CR_COLORS = {
+    "crblack": '"#000000"', "crwhite": '"#ffffff"', "crred": '"#ff0000"',
+    "crgreen": '"#008000"', "crblue": '"#0000ff"', "cryellow": '"#ffff00"',
+    "crcyan": '"#00ffff"', "craqua": '"#00ffff"', "crmagenta": '"#ff00ff"',
+    "crfuchsia": '"#ff00ff"', "crgray": '"#808080"', "crsilver": '"#c0c0c0"',
+    "crmaroon": '"#800000"', "crnavy": '"#000080"', "crteal": '"#008080"',
+    "crolive": '"#808000"', "crpurple": '"#800080"', "crlime": '"#00ff00"',
+}
+
 KEYWORDS = {"if", "then", "else", "and", "or", "not", "mod", "in", "to"}
 
 TOKEN_RE = re.compile(r"""
@@ -205,7 +217,16 @@ class _Parser:
             right = self.add_expr()
             return f"{left} {val} {right}"
         if self._is_kw(self.peek(), "in"):
-            raise TranslationError("'in' range/set test has no direct OpenFormula equivalent")
+            # Crystal range test: x in a to b (inclusive both ends)
+            self.next()
+            low = self.add_expr()
+            if not self._is_kw(self.peek(), "to"):
+                raise TranslationError(
+                    "'in' set test (arrays) has no OpenFormula equivalent - "
+                    "only 'in a to b' ranges map")
+            self.next()
+            high = self.add_expr()
+            return f"AND({left} >= {low};{left} <= {high})"
         return left
 
     def add_expr(self):
@@ -270,6 +291,11 @@ class _Parser:
                 return self.func_call(low, val)
             if low in NOARG_MAP:
                 return NOARG_MAP[low]
+            if low in CR_COLORS:
+                return CR_COLORS[low]
+            if low in ("crnocolor", "defaultattribute"):
+                raise TranslationError(
+                    f"{val} means 'keep the static value' - no style-expression equivalent")
             if low in KEYWORDS:
                 raise TranslationError(f"unexpected keyword {val!r}")
             raise TranslationError(f"unknown identifier {val!r} (undeclared variable?)")
@@ -377,6 +403,47 @@ def _split_on_op(tokens, symbol):
     return parts
 
 
+def _split_on_ident(tokens, word):
+    """Split a token list on a top-level keyword identifier (paren-depth 0)."""
+    parts, current, depth = [], [], 0
+    for tok in tokens:
+        kind, val = tok
+        if kind == "op" and val == "(":
+            depth += 1
+        elif kind == "op" and val == ")":
+            depth -= 1
+        if kind == "ident" and val.lower() == word and depth == 0:
+            parts.append(current)
+            current = []
+        else:
+            current.append(tok)
+    parts.append(current)
+    return parts
+
+
+def _case_condition(selector, value_tokens, field_types, notes):
+    """One Case value -> an OpenFormula condition against the selector.
+    Handles equality (v), ranges (a To b, inclusive), and Is-comparisons
+    (Is < x)."""
+    if (value_tokens and value_tokens[0][0] == "ident"
+            and value_tokens[0][1].lower() == "is"):
+        if len(value_tokens) < 3 or value_tokens[1][0] != "op":
+            raise TranslationError("Is-comparison Case without an operator")
+        op = value_tokens[1][1]
+        if op not in ("=", "<>", "<", ">", "<=", ">="):
+            raise TranslationError(f"Is-comparison with unsupported operator {op!r}")
+        rhs = _parse_slice(value_tokens[2:], field_types, notes)
+        return f"{selector} {op} {rhs}"
+    range_parts = _split_on_ident(value_tokens, "to")
+    if len(range_parts) == 2:
+        low = _parse_slice(range_parts[0], field_types, notes)
+        high = _parse_slice(range_parts[1], field_types, notes)
+        return f"AND({selector} >= {low};{selector} <= {high})"
+    if len(range_parts) > 2:
+        raise TranslationError("Case range with more than one 'To'")
+    return f"{selector} = {_parse_slice(value_tokens, field_types, notes)}"
+
+
 def translate_select_case(text, field_types=None):
     """Crystal `Select {x} Case v1: r1 Case v2, v3: r2 Default: rd` ->
     nested IF(...). Returns (openformula, notes); raises TranslationError on
@@ -417,15 +484,11 @@ def translate_select_case(text, field_types=None):
         if len(halves) != 2:
             raise TranslationError("Case branch is not 'values : result'")
         value_tokens, result_tokens = halves
-        for kind, val in value_tokens:
-            if kind == "ident" and val.lower() in ("to", "is"):
-                raise TranslationError(
-                    f"Case range ({val} ...) has no direct IF() equivalent")
         conditions = []
         for value in _split_on_op(value_tokens, ","):
             if not value:
                 raise TranslationError("empty Case value")
-            conditions.append(f"{selector} = {_parse_slice(value, field_types, notes)}")
+            conditions.append(_case_condition(selector, value, field_types, notes))
         cond = conditions[0] if len(conditions) == 1 else "OR(" + ";".join(conditions) + ")"
         branches.append((cond, _parse_slice(result_tokens, field_types, notes)))
 
@@ -451,6 +514,14 @@ _RUNNING_TOTAL_RE = re.compile(
     r"(?P=var)\s*:=\s*(?P=var)\s*\+\s*(?P<term>\{[^}]+\}|1)\s*;\s*"
     r"(?P=var)\s*;?\s*$",
     re.IGNORECASE)
+
+
+# a single local variable used as a readability alias:
+#   [Local] <Type>Var x; x := <expr>; x     (expr does not reference x)
+_LOCAL_ALIAS_RE = re.compile(
+    r"^(?:local\s+)?(?:string|number|date|time|datetime|currency|boolean)var\s+"
+    r"(?P<var>\w+)\s*;\s*(?P=var)\s*:=\s*(?P<expr>.+?)\s*;\s*(?P=var)\s*;?\s*$",
+    re.IGNORECASE | re.DOTALL)
 
 
 # a formula whose entire body is one aggregate call: Sum({T.F}) or
@@ -523,6 +594,20 @@ def translate_formula(name, text, field_types=None):
         f.notes.append(note)
         return f
     stripped = re.sub(r"//[^\n]*", "", text)
+    alias = _LOCAL_ALIAS_RE.match(stripped.strip())
+    if alias and not re.search(rf"\b{re.escape(alias.group('var'))}\b",
+                               alias.group("expr"), re.IGNORECASE):
+        # a readability alias, not real state - inline the expression
+        try:
+            parser = _Parser(_tokenize(alias.group("expr")), field_types=field_types)
+            f.translation = "=" + parser.parse()
+            f.notes = parser.notes + [
+                f"local variable '{alias.group('var')}' inlined - the variable "
+                "was a single-assignment alias, not state"]
+            f.status = "review"
+            return f
+        except TranslationError:
+            pass  # expression itself is hard - fall through to the blockers
     if re.match(r"(?i)\s*select\b", stripped):
         # Select Case maps mechanically onto nested IF() - generate the PRD
         # formula for review instead of flagging it manual
@@ -552,6 +637,37 @@ def translate_formula(name, text, field_types=None):
         f.status = "manual"
         f.notes.append(f"Not mechanically translatable: {e}")
     return f
+
+
+# Crystal conditional-format attribute -> PRD style key. Suppress inverts
+# (Crystal: true = hide; PRD visible: true = show).
+_STYLE_KEY_MAP = {
+    "color": ("paint", False),
+    "fontcolor": ("paint", False),
+    "backgroundcolor": ("background-color", False),
+    "enablesuppress": ("visible", True),
+    "suppress": ("visible", True),
+}
+
+
+def translate_style_condition(attr, text, field_types=None):
+    """One Crystal conditional-format formula -> (prd_style_key, openformula).
+    Raises TranslationError for attributes with no PRD style mapping or
+    formulas the deterministic translator cannot prove (crNoColor,
+    DefaultAttribute, variables, ...)."""
+    mapping = _STYLE_KEY_MAP.get(attr.lower())
+    if mapping is None:
+        raise TranslationError(f"no PRD style mapping for conditional {attr}")
+    style_key, invert = mapping
+    stripped = re.sub(r"//[^\n]*", "", text)
+    for pattern, why in BLOCKER_PATTERNS:
+        if re.search(pattern, stripped):
+            raise TranslationError(why)
+    parser = _Parser(_tokenize(text), field_types=field_types)
+    expr = parser.parse()
+    if invert:
+        expr = f"NOT({expr})"
+    return style_key, "=" + expr
 
 
 def translate_all(model):

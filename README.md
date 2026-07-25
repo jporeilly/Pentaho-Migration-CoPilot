@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.20.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.21.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -158,6 +158,7 @@ pentaho-migrate report ... --validate       # load the .prpt through the real Pe
 pentaho-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
 pentaho-migrate report-sql <dump> --jndi <ds> # validate the report SQL against the live JNDI target (EXPLAIN)
 pentaho-migrate report-qa <dump> [--render] # layout QA agent: geometry lint + optional engine render verification
+pentaho-migrate report-parity <prpt|dump> <crystal-export.pdf|csv> # measured output parity vs the live database
 pentaho-migrate report-triage <dir> --jndi <ds> # batch triage agent: READY/REVIEW/BLOCKED verdict per report
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
@@ -195,10 +196,14 @@ avg confidence 62/100.
 harvested from public GitHub repositories, with fork-extracted, credential-scrubbed
 dumps in `samples/crystal/real/`. All 150 parse with zero errors; of their 726
 formulas, **80% translate deterministically** (auto + review, including idiom
-rewrites) before any LLM assist. `samples/cr_demo/` is the demo set: six authored
+rewrites) before any LLM assist. `samples/cr_demo/` is the demo set: seven authored
 CSCU credit-union reports of increasing complexity that convert *and render live*
-against the CSCU Postgres database — including working parameter prompts, a bar
-chart, and a running balance rebuilt as a PRD report function.
+against the CSCU Postgres database — working parameter prompts, a bar chart, a
+running balance rebuilt as a PRD report function, live conditional formatting
+(delinquent balances render red; paid-off rows are suppressed by a visibility
+expression), and descending group/record sorts. The full Crystal→PRD feature
+map — what converts, into what, deterministic vs ✨ LLM — is in
+[docs/CRYSTAL-COVERAGE.md](docs/CRYSTAL-COVERAGE.md).
 
 ## Tests & CI
 

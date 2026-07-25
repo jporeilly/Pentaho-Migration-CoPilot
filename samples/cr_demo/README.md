@@ -1,6 +1,6 @@
 # CSCU Crystal Reports demo set (cr_demo)
 
-Six authored RptToXml dumps of **increasing complexity**, all backed by the
+Seven authored RptToXml dumps of **increasing complexity**, all backed by the
 live `cscu_core` credit-union schema so each one **converts and renders
 end-to-end** against the real database. This is the pipeline's golden-path
 regression and demo set; the 150-file GitHub corpus (`samples/crystal/real/`)
@@ -15,18 +15,20 @@ Regenerate with `python samples/cr_demo/build_ladder.py`.
 | 1 | Member Roster **- Basic Layout** | single table, page bands, footer | all auto |
 | 2 | Accounts by Branch **- Groups & Chart** | join, group, Sum totals, **migrated bar chart** | all auto |
 | 3 | Transaction Register **- Formulas** | multi-join via `accounts`, translated formulas | formulas auto |
-| 4 | Member Statement **- Nested Groups & Running Total** | parameter, nested groups | running total → manual (report-function advice) |
-| 5 | Loan Portfolio **- Conditional Formatting** | conditional font color, StdDev aggregate | both flagged honestly |
-| 6 | Suspicious Activity **- Subreport & Cross-tab** | subreport, image, cross-tab | three TODO placeholders |
+| 4 | Member Statement **- Nested Groups & Running Total** | parameter, nested groups | running total → **generated ItemSumFunction** (review) |
+| 5 | Loan Portfolio **- Conditional Formatting** | conditional font color → **paint style expression** (delinquent = red, live), conditional suppression → **visible expression** (paid-off rows hidden, live), StdDev aggregate | StdDev flagged honestly |
+| 6 | Suspicious Activity **- Subreport & Cross-tab** | subreport, cross-tab | two TODO placeholders |
+| 7 | Card Program Review **- Select Case, Ranges & Sorts** | multi-value Select Case → IF/OR, `in a to b` range, local-alias inlining, **descending group + record sorts** | all deterministic (auto/review) |
 
 The flagship UI sample **Branch Transaction Summary - Prompt**
 (`../crystal/branch_transactions.xml`) demonstrates the working parameter
 prompt: the record selection folds into the SQL WHERE, so changing the Branch
 prompt in Report Designer re-filters the report live.
 
-Rungs 1–4 convert cleanly on the auto/review path; 5–6 deliberately exercise
-the honest-flagging path (manual formulas and TODO placeholders) — the tool
-never silently drops what PRD can't do mechanically.
+Rungs 1–4 and 7 convert cleanly on the auto/review path; 5–6 deliberately
+exercise the honest-flagging path (unsupported aggregates and TODO
+placeholders) — the tool never silently drops what PRD can't do mechanically.
+The full feature map is in [docs/CRYSTAL-COVERAGE.md](../../docs/CRYSTAL-COVERAGE.md).
 
 ## Rendering against live CSCU
 

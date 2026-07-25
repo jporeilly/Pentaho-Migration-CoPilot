@@ -111,10 +111,10 @@ def test_triage_db_unreachable_is_not_blocking(monkeypatch):
 
 def test_triage_report_markdown():
     results = triage_corpus(LADDER, check_sql=False)
-    assert len(results) == 6
+    assert len(results) == 7
     md = build_triage_report(results, jndi="")
     assert md.startswith("# Migration Triage Report")
-    assert "READY 3 | REVIEW 3 | BLOCKED 0" in md
+    assert "READY 4 | REVIEW 3 | BLOCKED 0" in md
     assert "Member Statement" in md
     assert "## Needs review" in md
 

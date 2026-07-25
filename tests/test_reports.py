@@ -97,10 +97,34 @@ def test_select_case_becomes_nested_if_for_review():
                              'IF(OR([TXN_TYPE] = "ATM";[TXN_TYPE] = "POS");"Low";"Std"))')
 
 
-def test_select_case_range_stays_manual():
-    f = translate_formula("Band", 'Select {O.N} Case 1 To 5: "low" Default: "high"')
+def test_select_case_ranges_and_is_comparisons_convert():
+    f = translate_formula(
+        "Band", 'Select {O.N} Case 1 To 5: "low" Case Is > 100: "high" Default: "mid"')
+    assert f.status == "review"
+    assert f.translation == ('=IF(AND([N] >= 1;[N] <= 5);"low";'
+                             'IF([N] > 100;"high";"mid"))')
+
+
+def test_select_case_array_values_stay_manual():
+    f = translate_formula("Band", 'Select {O.N} Case ["a", "b"]: 1 Default: 2')
     assert f.status == "manual"
     assert f.translation == ""
+
+
+def test_in_range_and_local_alias_convert():
+    f = translate_formula("Mid", 'If {O.AMT} in 1000 to 5000 Then "mid" Else "hi"')
+    assert f.status == "auto"
+    assert f.translation == '=IF(AND([AMT] >= 1000;[AMT] <= 5000);"mid";"hi")'
+
+    f = translate_formula("Alias", 'Local StringVar s;\ns := {O.TYPE} + " x";\ns')
+    assert f.status == "review"
+    assert f.translation == '=[TYPE] & " x"'
+    assert any("inlined" in n for n in f.notes)
+
+    # two variables = real state, honestly manual
+    f = translate_formula(
+        "TwoVars", 'Local StringVar a;\nLocal StringVar b;\nb := " / ";\na := {O.X} + b;\na')
+    assert f.status == "manual"
 
 
 # ---------------------------------------------------------------- parser

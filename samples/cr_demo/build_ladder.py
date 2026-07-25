@@ -89,9 +89,11 @@ def chart(name, x, y, w, h, style, title, category, value):
             f'</ChartDefinition></ChartObject>')
 
 
-def section(kind, name, height, objects, bg=None):
+def section(kind, name, height, objects, bg=None, suppress_condition=None):
     fill = _color_el("BackgroundColor", bg) if bg else ""
-    fmt = f'<SectionFormat EnableSuppress="false">{fill}</SectionFormat>'
+    cond = (f'<SectionAreaFormatConditionFormulas EnableSuppress={quoteattr(suppress_condition)}/>'
+            if suppress_condition else "")
+    fmt = f'<SectionFormat EnableSuppress="false">{cond}{fill}</SectionFormat>'
     return (f'<Area Kind="{kind}" Name="{name}Area"><Sections>'
             f'<Section Name="{name}" Height="{int(height*TW)}">{fmt}'
             f'<ReportObjects>{"".join(objects)}</ReportObjects></Section>'
@@ -104,7 +106,7 @@ _NAME_TO_FILE = {}
 
 
 def build(name, filename, sql, fields, *, groups=None, formulas=None, params=None,
-          summaries=None, record_selection=None, areas):
+          summaries=None, record_selection=None, sorts=None, areas):
     _NAME_TO_FILE[name] = filename
     p = [f'<?xml version="1.0" encoding="utf-8"?>',
          f'<Report Name={quoteattr(name)} FileName={quoteattr(name + ".rpt")} HasSavedData="False">']
@@ -117,6 +119,9 @@ def build(name, filename, sql, fields, *, groups=None, formulas=None, params=Non
     if record_selection:
         dd.append(f'<RecordSelectionFormula>{escape(record_selection)}</RecordSelectionFormula>')
     dd.append('<Groups>' + "".join(f'<Group ConditionField="{{Command.{g}}}"/>' for g in (groups or [])) + '</Groups>')
+    dd.append('<SortFields>' + "".join(
+        f'<SortField Field={quoteattr(fld)} SortDirection="{d}" SortType="{st}"/>'
+        for fld, d, st in (sorts or [])) + '</SortFields>')
     dd.append('<FormulaFieldDefinitions>' + "".join(
         f'<FormulaFieldDefinition Name="{fn}" FormulaName="{{@{fn}}}" ValueType="{vt}">{escape(b)}</FormulaFieldDefinition>'
         for fn, vt, b in (formulas or [])) + '</FormulaFieldDefinitions>')
@@ -329,7 +334,7 @@ def r5():
             det.append('<FieldObject Name="d_Balance" DataSource="{Command.PRIN_BAL_AMT}" '
                        f'Left="{x*TW}" Top="0" Width="{w*TW}" Height="{15*TW}" HorizontalAlignment="RightAlign">'
                        '<Font FontName="Arial" Size="9"/>'
-                       '<FontColorConditionFormulas Color="If {Command.LN_STATUS} = \'Delinquent\' Then crRed Else crBlack"/>'
+                       '<FontColorConditionFormulas Color="If {Command.LN_STATUS} = \'Delinquent30\' Then crRed Else crBlack"/>'
                        '</FieldObject>')
         else:
             det.append(field(f"d_{lbl}", ref, x, 0, w, 15, size=9, align=al, color=INK))
@@ -357,7 +362,10 @@ def r5():
                      ("StdDev of APR_RT","StdDeviation","APR_RT","BR_NAME")],
           areas=[masthead("Loan Portfolio", "Demo: conditional formatting and unsupported-aggregate flags"),
                  column_header(cols), group_header("{Command.BR_NAME}"),
-                 section("Detail", "D", 17, det), gf, page_footer()])
+                 # suppress paid-off loans - becomes a band visible-expression
+                 section("Detail", "D", 17, det,
+                         suppress_condition="{Command.PRIN_BAL_AMT} = 0"),
+                 gf, page_footer()])
 
 
 def r6():
@@ -385,6 +393,47 @@ def r6():
           formulas=[("FullName","StringField","{Command.FIRST_NM} + ' ' + {Command.LAST_NM}")],
           areas=[masthead("Suspicious Activity Report (SAR)", "Demo: subreport, image and cross-tab TODO placeholders"),
                  column_header(cols), detail(cols, extra), rf, page_footer()])
+
+
+def r7():
+    """Rung 7 - every v1.19-1.21 translator upgrade in one report: Select Case
+    (multi-value), an in-range test, an inlined local-variable alias, and
+    sort directions consumed from the Crystal SortField list."""
+    cols = [("Card #", "{Command.CARD_NO}", 150, None, "StringField"),
+            ("Holder", "{@Holder}", 170, None, "StringField"),
+            ("Issued", "{Command.ISSUED_DT}", 100, None, "DateField"),
+            ("Expires", "{Command.EXP_DT}", 100, None, "DateField"),
+            ("Window", "{@ExpiryWindow}", 106, None, "StringField"),
+            ("Status", "{Command.CARD_STATUS}", 90, None, "StringField"),
+            ("Action", "{@CardAction}", 90, None, "StringField")]
+    build("Card Program Review - Select Case, Ranges & Sorts", "07_card_program.xml",
+          'SELECT c.card_no AS "CARD_NO", m.first_nm AS "FIRST_NM", m.last_nm AS "LAST_NM",\n'
+          '       c.card_type_cd AS "CARD_TYPE_CD", c.card_status AS "CARD_STATUS",\n'
+          '       c.issued_dt AS "ISSUED_DT", c.exp_dt AS "EXP_DT"\n'
+          'FROM cscu_core.cards c\n'
+          'JOIN cscu_core.accounts a ON a.acct_id = c.acct_id\n'
+          'JOIN cscu_core.members  m ON m.mbr_id = a.mbr_id\n'
+          'ORDER BY c.card_type_cd DESC, c.issued_dt DESC',
+          [("CARD_NO","StringField"),("FIRST_NM","StringField"),("LAST_NM","StringField"),
+           ("CARD_TYPE_CD","StringField"),("CARD_STATUS","StringField"),
+           ("ISSUED_DT","DateField"),("EXP_DT","DateField")],
+          groups=["CARD_TYPE_CD"],
+          sorts=[("{Command.CARD_TYPE_CD}", "DescendingOrder", "GroupSortField"),
+                 ("{Command.ISSUED_DT}", "DescendingOrder", "RecordSortField")],
+          formulas=[
+              # Select Case with a multi-value branch -> nested IF + OR
+              ("CardAction","StringField",
+               'Select {Command.CARD_STATUS}\nCase "Blocked", "Expired": "Action required"\n'
+               'Case "Active": "OK"\nDefault: "Review"'),
+              # in-range test -> AND(>= ; <=)
+              ("ExpiryWindow","StringField",
+               'If Year({Command.EXP_DT}) in 2026 to 2027 Then "Expiring soon" Else "Current"'),
+              # single-assignment local variable -> inlined deterministically
+              ("Holder","StringField",
+               'Local StringVar h;\nh := {Command.FIRST_NM} + \' \' + {Command.LAST_NM};\nh')],
+          areas=[masthead("Card Program Review", "Demo: Select Case, ranges, alias inlining and sort directions"),
+                 column_header(cols), group_header("{Command.CARD_TYPE_CD}"),
+                 detail(cols), page_footer()])
 
 
 def flagship():
@@ -427,10 +476,11 @@ def flagship():
                          "WhilePrintingRecords;\nShared NumberVar balance;\nbalance := balance + {Command.AMOUNT};\nbalance"),
                         ("TxnRiskBand","StringField",
                          'Select {Command.TXN_TYPE}\nCase "WIRE": "High risk"\nCase "ATM": "Low risk"\nDefault: "Standard"'),
-                        # genuinely manual (local variable + assignment):
-                        # keeps the ✨ AI-assist demo honest
+                        # genuinely manual (TWO local variables - real state,
+                        # not an inlinable alias): keeps the ✨ AI-assist demo honest
                         ("AuditNote","StringField",
-                         'Local StringVar note;\nnote := {Command.TXN_TYPE} + " flagged for " + {Command.FIRST_NAME};\nnote')],
+                         'Local StringVar note;\nLocal StringVar sep;\nsep := " / ";\n'
+                         'note := {Command.TXN_TYPE} + sep + {Command.FIRST_NAME};\nnote')],
               summaries=[("Sum of Command.AMOUNT","Sum","AMOUNT","BRANCH_NAME"),
                          ("Grand Total AMOUNT","Sum","AMOUNT",None)],
               areas=[masthead("Branch Transaction Summary", "Demo: working prompt - change the Branch parameter"),
@@ -443,7 +493,7 @@ def flagship():
 
 
 if __name__ == "__main__":
-    for fn in (r1, r2, r3, r4, r5, r6):
+    for fn in (r1, r2, r3, r4, r5, r6, r7):
         fn()
     flagship()
     for f in sorted(OUT.glob("0*.xml")):

@@ -20,7 +20,7 @@ RUNGS = sorted(LADDER.glob("0*.xml"))
 
 
 def test_ladder_present():
-    assert len(RUNGS) == 6, "expected 6 ladder rungs"
+    assert len(RUNGS) == 7, "expected 7 ladder rungs"
 
 
 @pytest.mark.parametrize("dump", RUNGS, ids=lambda p: p.stem)
@@ -67,11 +67,25 @@ def test_ladder_exercises_increasing_complexity():
 
     loans = models["05_loan_portfolio"]
     assert any("StdDeviation" in i for i in loans.issues)   # unsupported aggregate flagged
-    element_notes = [n for s in loans.sections for el in s.elements for n in el.notes]
-    assert any("conditional" in n.lower() for n in element_notes)  # conditional format flagged
+    # conditional font color -> paint style expression on the balance field
+    balance = next(el for s in loans.sections for el in s.elements
+                   if el.name == "d_Balance")
+    assert ("paint", '=IF([LN_STATUS] = "Delinquent30";"#ff0000";"#000000")') \
+        in balance.style_expressions
+    # conditional section suppression -> band visible expression
+    detail_band = loans.sections_of("Detail")[0]
+    assert ("visible", "=NOT([PRIN_BAL_AMT] = 0)") in detail_band.style_expressions
 
     sar = models["06_suspicious_activity"]
     assert count_todos(sar) >= 2   # subreport + crosstab (embedded logo is migrated, not a TODO)
+
+    cards = models["07_card_program"]
+    assert cards.groups[0].descending                       # group sort direction consumed
+    assert ("ISSUED_DT", True) in cards.record_sorts        # record sort consumed
+    statuses = {f.name: f.status for f in cards.formulas.values()}
+    assert statuses == {"CardAction": "review",   # Select Case multi-value -> IF/OR
+                        "ExpiryWindow": "auto",   # in-range -> AND(>=;<=)
+                        "Holder": "review"}       # local alias inlined
 
 
 @pytest.mark.skipif(os.environ.get("CSCU_LIVE") != "1",

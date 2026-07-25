@@ -60,6 +60,34 @@ def validate_prpts(paths: list[Path | str], timeout: float = 300.0) -> list[Prpt
 
 
 RENDERER_SOURCE = REPO_ROOT / "tools" / "PrptRenderer.java"
+DATA_RENDERER_SOURCE = REPO_ROOT / "tools" / "PrptDataRender.java"
+
+
+def render_prpt_pdf_live(prpt_path: Path | str, timeout: float = 300.0) -> bytes:
+    """Render a .prpt WITH its own JNDI datasource (real rows from the live
+    database) - the parity harness's side of the comparison. Needs PRD, Java,
+    the JDBC driver, and a reachable database."""
+    import tempfile
+
+    prd = find_prd_home()
+    java = find_java(prd)
+    if prd is None or java is None:
+        raise RuntimeError(
+            "live rendering needs Pentaho Report Designer and Java - "
+            "run `pentaho-migrate report-env` for setup hints")
+    cp = ";".join([str(prd / "lib" / "*"), str(prd / "lib" / "jdbc" / "*"),
+                   str(prd / "resources")])
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "live.pdf"
+        completed = subprocess.run(
+            [str(java), "-cp", cp, str(DATA_RENDERER_SOURCE),
+             str(Path(prpt_path).resolve()), str(out)],
+            capture_output=True, text=True, timeout=timeout,
+        )
+        if not out.exists() or out.stat().st_size == 0:
+            raise RuntimeError(
+                "live render failed - stderr: " + completed.stderr[-800:])
+        return out.read_bytes()
 
 
 def render_prpt_pdf(prpt_path: Path | str, timeout: float = 300.0) -> bytes:

@@ -523,6 +523,45 @@ def report_triage(
         raise typer.Exit(code=1)
 
 
+@app.command("report-parity")
+def report_parity(
+    prpt: Path = typer.Argument(..., help=".prpt bundle, or an RptToXml dump to convert first"),
+    reference: Path = typer.Argument(..., help="The Crystal report exported as PDF, or its data as CSV"),
+    jndi: str = typer.Option("", "--jndi", help="JNDI connection (when converting a dump)"),
+) -> None:
+    """Measured output parity: render the converted report against the live
+    database and diff its NUMBERS against the customer's Crystal export."""
+    import tempfile
+
+    from pentaho_migration.reports.parity import run_report_parity
+
+    target = prpt
+    if prpt.suffix.lower() == ".xml":
+        from pentaho_migration.reports import load_report_model, write_prpt
+
+        model = load_report_model(prpt, jndi or None)
+        td = tempfile.mkdtemp()
+        target = Path(td) / "parity.prpt"
+        write_prpt(model, target)
+        typer.echo(f"converted {prpt.name} -> {model.name}")
+
+    try:
+        result = run_report_parity(target, reference)
+    except RuntimeError as exc:
+        typer.echo(f"parity unavailable: {exc}", err=True)
+        raise typer.Exit(code=2)
+
+    typer.echo(f"{result.verdict}: {result.note}")
+    typer.echo(f"  reference numbers: {result.reference_total}  "
+               f"rendered numbers: {result.rendered_total}  matched: {result.matched}")
+    if result.missing:
+        typer.echo(f"  missing from the converted report: {', '.join(result.missing)}")
+    if result.extra:
+        typer.echo(f"  extra in the converted report: {', '.join(result.extra)}")
+    if result.verdict == "FAIL":
+        raise typer.Exit(code=1)
+
+
 @app.command("report-gaps")
 def report_gaps(
     directory: Path = typer.Argument(Path("samples/crystal/real")),

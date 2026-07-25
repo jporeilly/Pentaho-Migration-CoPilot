@@ -76,6 +76,16 @@ def _shifted(el, dy):
     return el2
 
 
+def _band_style_expressions(sections):
+    """Section-level conditional formatting (suppress condition, background)
+    as band style-expressions. The parser only converts these when the
+    section is alone in its band, so emitting them all here is safe."""
+    return "".join(
+        f"<style-expression style-key={quoteattr(key)} formula={quoteattr(formula)}/>"
+        for section in sections
+        for key, formula in section.style_expressions)
+
+
 def _root_band(sections, element_type):
     content, height, bg = _band_content(sections, element_type)
     style = ""
@@ -86,7 +96,7 @@ def _root_band(sections, element_type):
     return (f'<root-level-content core:element-type="{element_type}" '
             f'xmlns:report-designer="http://reporting.pentaho.org/namespaces/report-designer/2.0" '
             f'report-designer:visual-height="{_num(height)}">'
-            f"{style}{content}</root-level-content>")
+            f"{style}{_band_style_expressions(sections)}{content}</root-level-content>")
 
 
 # ---------------------------------------------------------------- layout.xml

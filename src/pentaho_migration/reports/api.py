@@ -345,6 +345,38 @@ def sql_chat(req: SqlChatRequest) -> dict:
     return result
 
 
+@router.post("/parity", dependencies=[Depends(require_api_key)])
+async def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dict:
+    """Measured output parity: convert the dump, render it against the live
+    JNDI database, and diff its numbers against the customer's Crystal export
+    (PDF or CSV). 503 when the environment cannot render."""
+    from pentaho_migration.reports.parity import (
+        compare_numbers, numbers_from_csv, numbers_from_pdf)
+    from pentaho_migration.reports.prpt_validator import (
+        render_prpt_pdf_live, validator_available)
+
+    if not validator_available():
+        raise HTTPException(status_code=503,
+                            detail="parity needs a local PRD install + Java")
+    model = _load_upload(await dump.read(), dump.filename or "upload.xml", jndi)
+    ref_data = await reference.read()
+    ref_name = (reference.filename or "").lower()
+    try:
+        ref_numbers = (numbers_from_csv(ref_data) if ref_name.endswith(".csv")
+                       else numbers_from_pdf(ref_data))
+        with tempfile.TemporaryDirectory() as td:
+            prpt = Path(td) / "parity.prpt"
+            write_prpt(model, prpt)
+            rendered = numbers_from_pdf(render_prpt_pdf_live(prpt))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    result = compare_numbers(ref_numbers, rendered)
+    return {"verdict": result.verdict, "note": result.note,
+            "matched": result.matched, "reference_total": result.reference_total,
+            "rendered_total": result.rendered_total,
+            "missing": result.missing, "extra": result.extra}
+
+
 _assist_jobs: dict[str, dict] = {}
 _MAX_JOBS = 50
 

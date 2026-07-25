@@ -82,10 +82,19 @@ def _number_format(value_type):
     return "#,##0.00"
 
 
+def _style_expr_block(el):
+    """Converted conditional formatting: PRD style expressions on the element
+    (paint / background-color / visible), evaluated per row by the engine."""
+    return "".join(
+        f"<style-expression style-key={quoteattr(key)} formula={quoteattr(formula)}/>"
+        for key, formula in el.style_expressions)
+
+
 def render_element(el, tp="", sp="style:"):
     """Render one Element. tp/sp are tag prefixes for layout.xml vs styles.xml."""
     if el.kind == "label":
         return (f'<{tp}label core:element-type="label">{_style_block(el, sp)}'
+                f"{_style_expr_block(el)}"
                 f"<core:value>{escape(el.text)}</core:value></{tp}label>")
     if el.kind == "line":
         return f'<{tp}horizontal-line core:element-type="horizontal-line">{_line_style(el, sp)}</{tp}horizontal-line>'
@@ -116,14 +125,14 @@ def render_element(el, tp="", sp="style:"):
             fmt = el.format_string or _number_format(el.value_type)
             return (f'<{tp}number-field core:element-type="number-field" '
                     f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}>"
-                    f"{_style_block(el, sp)}</{tp}number-field>")
+                    f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}number-field>")
         if el.value_type in DATE_TYPES:
             fmt = el.format_string or _date_format(el.value_type)
             return (f'<{tp}date-field core:element-type="date-field" '
                     f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}>"
-                    f"{_style_block(el, sp)}</{tp}date-field>")
+                    f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}date-field>")
         return (f'<{tp}text-field core:element-type="text-field" core:field={quoteattr(el.column)}>'
-                f"{_style_block(el, sp)}</{tp}text-field>")
+                f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}text-field>")
     if el.kind == "chart":
         return _render_chart(el, tp, sp)
     if el.kind == "subreport":

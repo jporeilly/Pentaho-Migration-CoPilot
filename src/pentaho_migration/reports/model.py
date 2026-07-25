@@ -66,6 +66,8 @@ class Element:
     chart_category: str = ""   # resolved category column
     chart_series: str = ""     # resolved series column (optional)
     chart_value: str = ""      # resolved value column
+    condition_formulas: list = field(default_factory=list)  # raw (attr, crystal_text)
+    style_expressions: list = field(default_factory=list)   # converted (style_key, openformula)
     notes: list = field(default_factory=list)
 
 
@@ -88,6 +90,8 @@ class Section:
     elements: list = field(default_factory=list)
     suppressed: bool = False
     bg_color: str = ""        # #rrggbb band background
+    condition_formulas: list = field(default_factory=list)  # raw (attr, crystal_text)
+    style_expressions: list = field(default_factory=list)   # converted (style_key, openformula)
 
 
 @dataclass
@@ -145,6 +149,7 @@ class Group:
     condition_field: str      # raw {Table.Field}
     column: str = ""          # resolved column name
     name: str = ""
+    descending: bool = False  # group direction from the SortField list
 
 
 @dataclass
@@ -172,6 +177,7 @@ class ReportModel:
     parameters: list = field(default_factory=list)
     summaries: list = field(default_factory=list)
     groups: list = field(default_factory=list)
+    record_sorts: list = field(default_factory=list)  # (bare column, descending) detail ordering
     page: PageSetup = field(default_factory=PageSetup)
     issues: list = field(default_factory=list)       # global conversion warnings
 
