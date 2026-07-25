@@ -39,9 +39,10 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
             ))
     if source.mapplets:
         warn(SourceWarning(
-            level=WarningLevel.WARNING,
-            text=f"Contains {source.mapplets} mapplet(s). Mapplets are not expanded inline; "
-                 "convert each mapplet separately and re-link the results.",
+            level=WarningLevel.INFO,
+            text=f"Contains {source.mapplets} mapplet(s). Mapplet instances are "
+                 "expanded inline into the parent pipeline (their transformations "
+                 "become prefixed steps) — verify the port mapping at each boundary.",
         ))
 
     # -- version-specific ----------------------------------------------------

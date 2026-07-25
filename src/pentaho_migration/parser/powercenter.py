@@ -46,7 +46,57 @@ class PowerCenterParseError(ParseError):
 
 class PowerCenterParser:
     def parse_file(self, path: str | Path) -> list[Pipeline]:
-        return [self._parse_mapping(m) for m in self._root(path).iter("MAPPING")]
+        root = self._root(path)
+        targets = self._parse_target_defs(root)
+        mapplets = self._parse_mapplet_defs(root)
+        return [self._parse_mapping(m, targets, mapplets) for m in root.iter("MAPPING")]
+
+    def _parse_mapplet_defs(self, root: ElementTree.Element) -> dict[str, dict]:
+        """Folder-level <MAPPLET> definitions -> {name: {steps, hops, inputs,
+        outputs}}. A mapplet is a reusable sub-mapping; expanding it inline
+        preserves its Expression/Filter/etc. transformations (and their
+        translatable expressions) instead of dropping the instance."""
+        defs: dict[str, dict] = {}
+        for mapplet in root.iter("MAPPLET"):
+            name = mapplet.get("NAME", "")
+            if not name:
+                continue
+            steps = [self._parse_transformation(x) for x in mapplet.iter("TRANSFORMATION")]
+            hops = []
+            seen: set[tuple[str, str]] = set()
+            for conn in mapplet.iter("CONNECTOR"):
+                edge = (conn.get("FROMINSTANCE", ""), conn.get("TOINSTANCE", ""))
+                if all(edge) and edge not in seen and edge[0] != edge[1]:
+                    seen.add(edge)
+                    hops.append(edge)
+            inputs = [s.name for s in steps if s.source_type == "Input Transformation"]
+            outputs = [s.name for s in steps if s.source_type == "Output Transformation"]
+            defs[name] = {"steps": steps, "hops": hops,
+                          "inputs": inputs, "outputs": outputs}
+        return defs
+
+    def _parse_target_defs(self, root: ElementTree.Element) -> dict[str, list[FieldDef]]:
+        """Folder-level <TARGET> definitions, keyed by name. Their <TARGETFIELD>
+        elements carry KEYTYPE (PRIMARY KEY / FOREIGN KEY / NOT A KEY) - the
+        source of truth for Insert/Update match keys, which the mapping's
+        transformations never name."""
+        targets: dict[str, list[FieldDef]] = {}
+        for target in root.iter("TARGET"):
+            name = target.get("NAME", "")
+            if not name:
+                continue
+            fields = []
+            for tf in target.iter("TARGETFIELD"):
+                keytype = tf.get("KEYTYPE", "NOT A KEY")
+                fields.append(FieldDef(
+                    name=tf.get("NAME", ""),
+                    datatype=tf.get("DATATYPE", "string"),
+                    precision=_to_int(tf.get("PRECISION")),
+                    scale=_to_int(tf.get("SCALE")),
+                    nullable=tf.get("NULLABLE", "NULL") != "NOTNULL",
+                    attrs={"KEYTYPE": keytype} if keytype != "NOT A KEY" else {}))
+            targets[name] = fields
+        return targets
 
     def parse_workflows(self, path: str | Path) -> list[Job]:
         """WORKFLOW elements -> Job IR (orchestration layer, ≈ PDI .kjb)."""
@@ -56,6 +106,7 @@ class PowerCenterParser:
             s.get("NAME", ""): s.get("MAPPINGNAME")
             for s in root.iter("SESSION")
         }
+        task_details = self._parse_task_details(root)
         jobs = []
         for workflow in root.iter("WORKFLOW"):
             job = Job(name=workflow.get("NAME", "unnamed_workflow"))
@@ -65,6 +116,12 @@ class PowerCenterParser:
                 entry = JobEntry(name=name, task_type=task_type)
                 if task_type == "Session":
                     entry.mapping = session_mappings.get(task.get("TASKNAME", name))
+                else:
+                    # Command tasks carry a shell command list, Email tasks the
+                    # recipient/subject/body - both keyed by the TASK name
+                    detail = task_details.get(task.get("TASKNAME", name), {})
+                    entry.commands = detail.get("commands", [])
+                    entry.properties = detail.get("properties", {})
                 job.entries.append(entry)
             for link in workflow.iter("WORKFLOWLINK"):
                 job.hops.append(JobHop(
@@ -74,6 +131,24 @@ class PowerCenterParser:
                 ))
             jobs.append(job)
         return jobs
+
+    def _parse_task_details(self, root: ElementTree.Element) -> dict[str, dict]:
+        """Command/Email <TASK> definitions -> {task_name: {commands, properties}}.
+        Command tasks store an ordered shell command list in <VALUEPAIR>; Email
+        tasks store recipient/subject/body in <ATTRIBUTE>."""
+        details: dict[str, dict] = {}
+        for task in root.iter("TASK"):
+            name, ttype = task.get("NAME", ""), task.get("TYPE", "")
+            if ttype == "Command":
+                pairs = sorted(
+                    (vp for vp in task.iter("VALUEPAIR") if vp.get("VALUE")),
+                    key=lambda vp: _to_int(vp.get("EXECORDER")) or 0)
+                details[name] = {"commands": [vp.get("VALUE", "") for vp in pairs]}
+            elif ttype == "Email":
+                props = {a.get("NAME", ""): a.get("VALUE", "")
+                         for a in task.iter("ATTRIBUTE") if a.get("VALUE")}
+                details[name] = {"properties": props}
+        return details
 
     def analyze_export(self, path: str | Path) -> SourceInfo:
         """Export-level facts: tool version, repository, object counts."""
@@ -102,7 +177,11 @@ class PowerCenterParser:
             )
         return root
 
-    def _parse_mapping(self, mapping: ElementTree.Element) -> Pipeline:
+    def _parse_mapping(self, mapping: ElementTree.Element,
+                       targets: dict[str, list[FieldDef]] | None = None,
+                       mapplets: dict[str, dict] | None = None) -> Pipeline:
+        targets = targets or {}
+        mapplets = mapplets or {}
         pipeline = Pipeline(
             name=mapping.get("NAME", "unnamed_mapping"),
             source_tool=SourceTool.POWERCENTER,
@@ -112,26 +191,66 @@ class PowerCenterParser:
         for xform in mapping.iter("TRANSFORMATION"):
             pipeline.steps.append(self._parse_transformation(xform))
 
-        # Source/target instances appear as INSTANCE elements, not TRANSFORMATION.
+        # mapplet instance name -> (input_boundary_step, output_boundary_step)
+        # used to rewire the mapping's connectors through the expanded steps
+        mapplet_boundaries: dict[str, tuple[str | None, str | None]] = {}
         for instance in mapping.iter("INSTANCE"):
-            if instance.get("TYPE") in ("SOURCE", "TARGET") and not pipeline.step(
-                instance.get("NAME", "")
-            ):
+            itype = instance.get("TYPE", "")
+            if itype in ("SOURCE", "TARGET") and not pipeline.step(instance.get("NAME", "")):
+                # a target instance carries its definition's key fields, so the
+                # generator can infer Insert/Update match keys
+                fields = (targets.get(instance.get("TRANSFORMATION_NAME", ""), [])
+                          if itype == "TARGET" else [])
                 pipeline.steps.append(
-                    Step(
-                        name=instance.get("NAME", "unnamed"),
-                        source_type=instance.get("TYPE", "").title(),
-                    )
-                )
+                    Step(name=instance.get("NAME", "unnamed"),
+                         source_type=itype.title(), fields=list(fields)))
+            elif itype == "MAPPLET" or instance.get("TRANSFORMATION_TYPE") == "Mapplet":
+                definition = mapplets.get(instance.get("TRANSFORMATION_NAME", ""))
+                if definition is not None:
+                    mapplet_boundaries[instance.get("NAME", "")] = \
+                        self._expand_mapplet(pipeline, instance.get("NAME", ""), definition)
+
+        def _reroute(instance_name: str, *, as_source: bool) -> str:
+            b = mapplet_boundaries.get(instance_name)
+            if b is None:
+                return instance_name
+            return (b[1] if as_source else b[0]) or instance_name
 
         seen: set[tuple[str, str]] = set()
         for conn in mapping.iter("CONNECTOR"):
-            edge = (conn.get("FROMINSTANCE", ""), conn.get("TOINSTANCE", ""))
-            if all(edge) and edge not in seen:
+            src = _reroute(conn.get("FROMINSTANCE", ""), as_source=True)
+            dst = _reroute(conn.get("TOINSTANCE", ""), as_source=False)
+            edge = (src, dst)
+            if all(edge) and edge[0] != edge[1] and edge not in seen:
                 seen.add(edge)
                 pipeline.hops.append(Hop(from_step=edge[0], to_step=edge[1]))
 
         return pipeline
+
+    def _expand_mapplet(self, pipeline: Pipeline, instance_name: str,
+                        definition: dict) -> tuple[str | None, str | None]:
+        """Inline a mapplet's internal transformations into the parent pipeline,
+        prefixed by the instance name. Returns (input_step, output_step) so the
+        parent's connectors can rewire through the expanded chain. The Input/
+        Output Transformation shells are kept as pass-through steps so the graph
+        stays connected; the Expression/Filter/etc. inside are the real payload."""
+        def qualified(name: str) -> str:
+            return f"{instance_name}.{name}"
+
+        for step in definition["steps"]:
+            expanded = step.model_copy(deep=True)
+            expanded.name = qualified(step.name)
+            expanded.notes = [*expanded.notes,
+                              f"expanded inline from mapplet instance {instance_name!r} "
+                              "- verify port mapping"]
+            pipeline.steps.append(expanded)
+        for frm, to in definition["hops"]:
+            pipeline.hops.append(Hop(from_step=qualified(frm), to_step=qualified(to)))
+
+        inputs = definition["inputs"]
+        outputs = definition["outputs"]
+        return (qualified(inputs[0]) if inputs else None,
+                qualified(outputs[0]) if outputs else None)
 
     def _parse_transformation(self, xform: ElementTree.Element) -> Step:
         step = Step(

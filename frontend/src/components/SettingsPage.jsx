@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import ThemeSelect from './ThemeSelect.jsx'
 
+// Mirrors CLOUD_PROVIDERS in llm/translate.py (labels + env var + model hint).
+const CLOUD_PROVIDERS = {
+  anthropic: { label: 'Anthropic (Claude)', env: 'ANTHROPIC_API_KEY', modelHint: 'claude-opus-5 (default)' },
+  openai: { label: 'OpenAI (GPT)', env: 'OPENAI_API_KEY', modelHint: 'gpt-4o (default)' },
+  google: { label: 'Google (Gemini)', env: 'GEMINI_API_KEY', modelHint: 'gemini-1.5-pro (default)' },
+  azure: { label: 'Microsoft (Azure OpenAI)', env: 'AZURE_OPENAI_API_KEY', modelHint: 'your deployment name' },
+}
+
 export default function SettingsPage({ onBack }) {
   const [data, setData] = useState(null)       // { settings, detection }
   const [form, setForm] = useState(null)       // editable copy of settings
@@ -88,8 +96,12 @@ export default function SettingsPage({ onBack }) {
                 ? <span className="ok">✓ running v{ollama.version} at {ollama.base_url}</span>
                 : <span className="warn">⚠ not reachable at {ollama.base_url} — install from ollama.com and start it</span>}
             </dd>
-            <dt>ANTHROPIC_API_KEY</dt>
-            <dd>{detection.anthropic_key_present ? '✓ present' : 'not set'}</dd>
+            {Object.entries(CLOUD_PROVIDERS).map(([key, spec]) => (
+              <div key={key} className="pair">
+                <dt>{spec.env}</dt>
+                <dd>{detection.cloud_keys?.[key] ? '✓ present' : 'not set'}</dd>
+              </div>
+            ))}
           </dl>
           {Object.keys(detection.env).length > 0 && (
             <>
@@ -137,15 +149,31 @@ export default function SettingsPage({ onBack }) {
 
       <section className="card">
         <h2>LLM settings</h2>
+        <p className="hint">
+          One provider powers every AI feature: Informatica / Talend expression
+          translation, Crystal Reports formula translation, and the schema-SQL
+          assistant.
+        </p>
         <div className="form-grid">
           <label>
             Provider
             <select
               value={form.provider}
-              onChange={(e) => setForm({ ...form, provider: e.target.value })}
+              onChange={(e) => {
+                const provider = e.target.value
+                // base_url is provider-specific: reset it when switching so an
+                // Ollama URL never leaks into a cloud provider (and back).
+                const base_url = provider === 'ollama'
+                  ? (ollama.base_url || 'http://127.0.0.1:11434')
+                  : ''
+                setForm({ ...form, provider, base_url, model: null })
+              }}
             >
               <option value="ollama">Ollama (local)</option>
-              <option value="anthropic">Anthropic API</option>
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI (GPT)</option>
+              <option value="google">Google (Gemini)</option>
+              <option value="azure">Microsoft (Azure OpenAI)</option>
               <option value="none">Disabled</option>
             </select>
           </label>
@@ -175,12 +203,46 @@ export default function SettingsPage({ onBack }) {
               </label>
             </>
           )}
-          {form.provider === 'anthropic' && (
-            <p className="hint">
-              Uses the ANTHROPIC_API_KEY environment variable
-              ({detection.anthropic_key_present ? '✓ detected' : '⚠ not set'}).
-              The key itself is never stored or displayed.
-            </p>
+          {CLOUD_PROVIDERS[form.provider] && (
+            <>
+              <label>
+                API key
+                <input
+                  type="password"
+                  placeholder={detection.cloud_keys?.[form.provider]
+                    ? `using ${CLOUD_PROVIDERS[form.provider].env} from environment`
+                    : `paste key, or set ${CLOUD_PROVIDERS[form.provider].env}`}
+                  value={form.api_key ?? ''}
+                  onChange={(e) => setForm({ ...form, api_key: e.target.value })}
+                  autoComplete="off"
+                />
+              </label>
+              <label>
+                {form.provider === 'azure' ? 'Deployment name' : 'Model'}
+                <input
+                  placeholder={CLOUD_PROVIDERS[form.provider].modelHint}
+                  value={form.model ?? ''}
+                  onChange={(e) => setForm({ ...form, model: e.target.value || null })}
+                />
+              </label>
+              {form.provider === 'azure' && (
+                <label>
+                  Resource endpoint
+                  <input
+                    placeholder="https://<resource>.openai.azure.com"
+                    value={form.base_url}
+                    onChange={(e) => setForm({ ...form, base_url: e.target.value })}
+                  />
+                </label>
+              )}
+              <p className="hint">
+                {CLOUD_PROVIDERS[form.provider].env}:{' '}
+                {detection.cloud_keys?.[form.provider] ? '✓ detected in environment' : 'not set in environment'}.
+                A key saved here is stored locally in config/settings.json and
+                takes precedence over the environment variable. Keys are only
+                ever sent to the provider's own API.
+              </p>
+            </>
           )}
         </div>
         <div className="actions">

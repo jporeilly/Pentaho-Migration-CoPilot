@@ -69,6 +69,8 @@ class JobEntry(BaseModel):
     name: str
     task_type: str                    # Session, Start, Email, Command, ...
     mapping: str | None = None        # for Session tasks: the mapping it runs
+    commands: list[str] = Field(default_factory=list)   # Command task: shell command list
+    properties: dict[str, str] = Field(default_factory=dict)  # Email task: recipients/subject/body
     notes: list[str] = Field(default_factory=list)
 
 

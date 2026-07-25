@@ -14,11 +14,13 @@ import subprocess
 import httpx
 from pydantic import BaseModel
 
+from pentaho_migration.llm.translate import CLOUD_PROVIDERS
+
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 PROBE_TIMEOUT = 2.0
 
-# Env vars worth surfacing in the settings UI. ANTHROPIC_API_KEY is reported
-# presence-only — its value must never leave the machine.
+# Env vars worth surfacing in the settings UI. Cloud API keys are reported
+# presence-only — their values must never leave the machine.
 OLLAMA_ENV_VARS = (
     "OLLAMA_HOST",
     "OLLAMA_MODELS",
@@ -52,6 +54,8 @@ class DetectionReport(BaseModel):
     gpu_count: int = 0
     env: dict[str, str]
     anthropic_key_present: bool
+    # presence-only per provider: {"anthropic": bool, "openai": ..., "google", "azure"}
+    cloud_keys: dict[str, bool] = {}
     ollama: OllamaStatus
     recommendation: Recommendation
 
@@ -221,6 +225,10 @@ def detection_report() -> DetectionReport:
         gpu_count=gpu_count,
         env={k: v for k in OLLAMA_ENV_VARS if (v := os.environ.get(k))},
         anthropic_key_present=bool(os.environ.get("ANTHROPIC_API_KEY")),
+        cloud_keys={
+            provider: bool(os.environ.get(spec["env"]))
+            for provider, spec in CLOUD_PROVIDERS.items()
+        },
         ollama=ollama_status(),
         recommendation=recommend(ram, vram, gpu_count),
     )

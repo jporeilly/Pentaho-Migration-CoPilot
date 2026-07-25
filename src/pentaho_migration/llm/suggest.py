@@ -6,11 +6,9 @@ LLM proposes a concrete PDI implementation plan. Output is advisory markdown
 for a human engineer; nothing is applied to the generated artifacts.
 """
 
-import httpx
-
 from pentaho_migration.ir import Pipeline, Step
 from pentaho_migration.llm.settings import LLMSettings, load_settings
-from pentaho_migration.llm.translate import TranslationError
+from pentaho_migration.llm.translate import chat_text, check_provider
 
 SYSTEM_PROMPT = """\
 You are a senior Pentaho Data Integration (PDI/Kettle) migration engineer. Given one
@@ -83,26 +81,11 @@ class SolutionSuggester:
         return "\n".join(lines)
 
     def _check_provider(self) -> None:
-        if self.settings.provider == "none":
-            raise TranslationError("LLM suggestions are disabled — choose a provider in Settings.")
-        if self.settings.provider == "anthropic":
-            raise TranslationError("The Anthropic provider is not implemented yet — use Ollama.")
-        if not self.settings.model:
-            raise TranslationError("No Ollama model configured — open Settings and apply the recommendation.")
+        check_provider(self.settings)
 
     def _chat(self, context: str) -> str:
-        response = httpx.post(
-            f"{self.settings.base_url}/api/chat",
-            json={
-                "model": self.settings.model,
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": f"Propose the PDI solution for this step:\n\n{context}"},
-                ],
-                "stream": False,
-                "options": {"temperature": 0.2},
-            },
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        return response.json()["message"]["content"]
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Propose the PDI solution for this step:\n\n{context}"},
+        ]
+        return chat_text(self.settings, messages, self.timeout, temperature=0.2)

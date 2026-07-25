@@ -164,6 +164,206 @@ RESPONSE_SCHEMA = {
 }
 
 
+# --------------------------------------------------------------------------- #
+# Provider dispatch — shared by every LLM call site in the app (expression /
+# formula translation AND the schema-SQL assistant), so switching provider in
+# Settings takes effect everywhere. openai/google/azure all speak the OpenAI
+# chat API (Gemini via its OpenAI-compatible endpoint, Azure via AzureOpenAI),
+# so one code path covers three vendors; Anthropic and Ollama each have their
+# own SDK/endpoint.
+# --------------------------------------------------------------------------- #
+
+CLOUD_PROVIDERS = {
+    "anthropic": {"pkg": "anthropic", "env": "ANTHROPIC_API_KEY",
+                  "label": "Anthropic", "default_model": "claude-opus-5"},
+    "openai": {"pkg": "openai", "env": "OPENAI_API_KEY",
+               "label": "OpenAI", "default_model": "gpt-4o", "base_url": None},
+    "google": {"pkg": "openai", "env": "GEMINI_API_KEY",
+               "label": "Google (Gemini)", "default_model": "gemini-1.5-pro",
+               "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/"},
+    "azure": {"pkg": "openai", "env": "AZURE_OPENAI_API_KEY",
+              "label": "Microsoft (Azure OpenAI)", "default_model": "", "azure": True},
+}
+
+
+def cloud_api_key(settings: LLMSettings, env_var: str) -> str:
+    """The saved key, else the provider's environment variable."""
+    import os
+    return settings.api_key or os.environ.get(env_var, "")
+
+
+def check_provider(settings: LLMSettings) -> None:
+    """Raise TranslationError if the configured provider can't run — missing
+    SDK, missing API key, missing Azure endpoint, or (Ollama) missing model."""
+    if settings.provider == "none":
+        raise TranslationError(
+            "LLM translation is disabled — choose a provider in Settings."
+        )
+    spec = CLOUD_PROVIDERS.get(settings.provider)
+    if spec is not None:
+        try:
+            __import__(spec["pkg"])
+        except ImportError:
+            raise TranslationError(
+                f"The {spec['pkg']} SDK is not installed — "
+                f"`pip install {spec['pkg']}` (or `pip install .[llm]`)."
+            )
+        if not cloud_api_key(settings, spec["env"]):
+            raise TranslationError(
+                f"No API key for {spec['label']} — set it in Settings or the "
+                f"{spec['env']} environment variable."
+            )
+        if spec.get("azure") and not settings.base_url:
+            raise TranslationError(
+                "Azure OpenAI needs the resource endpoint in the base URL "
+                "(e.g. https://<resource>.openai.azure.com) and the deployment "
+                "name as the model."
+            )
+        return
+    if not settings.model:
+        raise TranslationError(
+            "No Ollama model configured — open Settings and apply the recommendation."
+        )
+
+
+def _strip_json(text: str) -> dict:
+    """Parse a JSON object, tolerating ```/```json code fences around it."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+        if text.startswith("json"):
+            text = text[4:].strip()
+    return json.loads(text)
+
+
+def chat_json(settings: LLMSettings, messages: list[dict], schema: dict,
+              timeout: float = 120.0) -> dict:
+    """One chat exchange -> parsed JSON object, via the configured provider.
+
+    `messages` is an OpenAI-style list (a leading system message is honored by
+    every provider); `schema` constrains the JSON for providers that support
+    it (Ollama `format`, OpenAI `response_format`). Anthropic relies on the
+    system prompt already demanding JSON-only output."""
+    provider = settings.provider
+    if provider == "anthropic":
+        return _chat_anthropic(settings, messages, timeout)
+    if provider in ("openai", "google", "azure"):
+        return _chat_openai(settings, messages, timeout)
+    return _chat_ollama(settings, messages, schema, timeout)
+
+
+def chat_text(settings: LLMSettings, messages: list[dict],
+              timeout: float = 120.0, temperature: float = 0.0) -> str:
+    """One chat exchange -> plain text (markdown), via the configured provider.
+    For call sites whose output is prose rather than JSON (e.g. per-step
+    solution suggestions)."""
+    provider = settings.provider
+    if provider == "anthropic":
+        import anthropic
+
+        system = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
+        convo = [{"role": m["role"], "content": m["content"]}
+                 for m in messages if m["role"] in ("user", "assistant")]
+        client = anthropic.Anthropic(
+            api_key=cloud_api_key(settings, "ANTHROPIC_API_KEY"), timeout=timeout)
+        try:
+            message = client.messages.create(
+                model=settings.model or CLOUD_PROVIDERS["anthropic"]["default_model"],
+                max_tokens=2048, system=system, messages=convo,
+            )
+        except anthropic.APIError as exc:
+            raise TranslationError(f"Anthropic API error: {exc}") from exc
+        return "".join(b.text for b in message.content if b.type == "text")
+    if provider in ("openai", "google", "azure"):
+        import openai
+
+        spec = CLOUD_PROVIDERS[provider]
+        key = cloud_api_key(settings, spec["env"])
+        if spec.get("azure"):
+            client = openai.AzureOpenAI(
+                api_key=key, azure_endpoint=settings.base_url,
+                api_version="2024-06-01", timeout=timeout)
+        else:
+            base_url = settings.base_url or spec.get("base_url")
+            client = openai.OpenAI(api_key=key, base_url=base_url or None,
+                                   timeout=timeout)
+        try:
+            completion = client.chat.completions.create(
+                model=settings.model or spec["default_model"],
+                messages=messages, temperature=temperature,
+            )
+        except openai.OpenAIError as exc:
+            raise TranslationError(f"{spec['label']} API error: {exc}") from exc
+        return completion.choices[0].message.content or ""
+    response = httpx.post(
+        f"{settings.base_url}/api/chat",
+        json={"model": settings.model, "messages": messages, "stream": False,
+              "options": {"temperature": temperature}},
+        timeout=timeout,
+    )
+    response.raise_for_status()
+    return response.json()["message"]["content"]
+
+
+def _chat_ollama(settings: LLMSettings, messages: list[dict], schema: dict,
+                 timeout: float) -> dict:
+    response = httpx.post(
+        f"{settings.base_url}/api/chat",
+        json={"model": settings.model, "messages": messages, "stream": False,
+              "format": schema, "options": {"temperature": 0}},
+        timeout=timeout,
+    )
+    response.raise_for_status()
+    return json.loads(response.json()["message"]["content"])
+
+
+def _chat_openai(settings: LLMSettings, messages: list[dict], timeout: float) -> dict:
+    """OpenAI-compatible chat completion — covers OpenAI, Google Gemini (its
+    OpenAI-compatible endpoint) and Azure OpenAI (deployment = model,
+    resource endpoint = base_url)."""
+    import openai
+
+    spec = CLOUD_PROVIDERS[settings.provider]
+    key = cloud_api_key(settings, spec["env"])
+    if spec.get("azure"):
+        client = openai.AzureOpenAI(
+            api_key=key, azure_endpoint=settings.base_url,
+            api_version="2024-06-01", timeout=timeout)
+    else:
+        base_url = settings.base_url or spec.get("base_url")
+        client = openai.OpenAI(api_key=key, base_url=base_url or None, timeout=timeout)
+    try:
+        completion = client.chat.completions.create(
+            model=settings.model or spec["default_model"],
+            messages=messages, temperature=0,
+            response_format={"type": "json_object"},
+        )
+    except openai.OpenAIError as exc:
+        raise TranslationError(f"{spec['label']} API error: {exc}") from exc
+    return _strip_json(completion.choices[0].message.content or "")
+
+
+def _chat_anthropic(settings: LLMSettings, messages: list[dict], timeout: float) -> dict:
+    """Claude Messages call. System turns are hoisted into the `system`
+    parameter; the prompts already require JSON-only output."""
+    import anthropic
+
+    system = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
+    convo = [{"role": m["role"], "content": m["content"]}
+             for m in messages if m["role"] in ("user", "assistant")]
+    client = anthropic.Anthropic(api_key=cloud_api_key(settings, "ANTHROPIC_API_KEY"),
+                                 timeout=timeout)
+    try:
+        message = client.messages.create(
+            model=settings.model or CLOUD_PROVIDERS["anthropic"]["default_model"],
+            max_tokens=1024, system=system, messages=convo,
+        )
+    except anthropic.APIError as exc:
+        raise TranslationError(f"Anthropic API error: {exc}") from exc
+    text = "".join(b.text for b in message.content if b.type == "text")
+    return _strip_json(text)
+
+
 class ExpressionTranslator:
     def __init__(self, settings: LLMSettings | None = None, timeout: float = 120.0):
         self.settings = settings or load_settings()
@@ -224,39 +424,16 @@ class ExpressionTranslator:
         return expr
 
     def _check_provider(self) -> None:
-        if self.settings.provider == "none":
-            raise TranslationError(
-                "LLM translation is disabled — choose a provider in Settings."
-            )
-        if self.settings.provider == "anthropic":
-            raise TranslationError(
-                "The Anthropic provider is not implemented yet — use Ollama."
-            )
-        if not self.settings.model:
-            raise TranslationError(
-                "No Ollama model configured — open Settings and apply the recommendation."
-            )
+        check_provider(self.settings)
+
+    def _messages(self, expr: Expression) -> tuple[str, str]:
+        """(system_prompt, user_prompt) for one expression - shared by providers."""
+        system = PROMPTS.get(expr.language, SYSTEM_PROMPT)
+        label = LANG_LABELS.get(expr.language, LANG_LABELS["informatica"]).format(field=expr.field)
+        return system, f"Translate this {label}:\n{expr.raw}"
 
     def _chat(self, expr: Expression) -> dict:
-        """One expression -> one structured Ollama chat call."""
-        response = httpx.post(
-            f"{self.settings.base_url}/api/chat",
-            json={
-                "model": self.settings.model,
-                "messages": [
-                    {"role": "system", "content": PROMPTS.get(expr.language, SYSTEM_PROMPT)},
-                    {
-                        "role": "user",
-                        "content": "Translate this "
-                                   + LANG_LABELS.get(expr.language, LANG_LABELS["informatica"]).format(field=expr.field)
-                                   + f":\n{expr.raw}",
-                    },
-                ],
-                "stream": False,
-                "format": RESPONSE_SCHEMA,
-                "options": {"temperature": 0},
-            },
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        return json.loads(response.json()["message"]["content"])
+        system, user = self._messages(expr)
+        messages = [{"role": "system", "content": system},
+                    {"role": "user", "content": user}]
+        return chat_json(self.settings, messages, RESPONSE_SCHEMA, self.timeout)

@@ -16,6 +16,7 @@ class LLMSettings(BaseModel):
     provider: str = "ollama"          # ollama | anthropic | none
     base_url: str = "http://127.0.0.1:11434"
     model: str | None = None
+    api_key: str = ""                 # Anthropic API key (or via ANTHROPIC_API_KEY)
     env: dict[str, str] = {}          # applied Ollama tuning, e.g. OLLAMA_FLASH_ATTENTION
 
 

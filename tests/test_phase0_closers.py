@@ -96,7 +96,34 @@ class TestInsertUpdateAndDbProc:
         )
         el = _step_xml(KtrGenerator().generate(pipeline), "UPD")
         assert el.findtext("lookup/table") == "T_MEMBERS"
+        # target has no key fields -> update values fall back to the step's own
         assert [v.findtext("name") for v in el.findall("lookup/value")] == ["ID", "STATUS"]
+
+    def test_insert_update_infers_keys_from_target_primary_key(self):
+        """The match keys come from the target's PRIMARY KEY fields, not from
+        the update-strategy transform (which never names them)."""
+        upd = Step(name="UPD", source_type="Update Strategy", pdi_type="InsertUpdate",
+                   fields=[FieldDef(name="CUST_ID"), FieldDef(name="AMT")])
+        target = Step(name="T_CUST", source_type="Target", fields=[
+            FieldDef(name="CUST_ID", attrs={"KEYTYPE": "PRIMARY KEY"}),
+            FieldDef(name="AMT"), FieldDef(name="NAME")])
+        pipeline = _pipeline(upd, target, hops=[("UPD", "T_CUST")])
+        el = _step_xml(KtrGenerator().generate(pipeline), "UPD")
+        assert el.findtext("lookup/table") == "T_CUST"
+        assert [k.findtext("name") for k in el.findall("lookup/key")] == ["CUST_ID"]
+        assert el.find("lookup/key").findtext("condition") == "="
+        # update columns are the target's NON-key fields
+        assert [v.findtext("name") for v in el.findall("lookup/value")] == ["AMT", "NAME"]
+
+    def test_target_primary_key_parsed_from_real_export(self):
+        """A target INSTANCE carries its definition's PRIMARY KEY fields, so the
+        generator can infer Insert/Update keys from the real corpus."""
+        afps = HHS.parent / "hhs_cpm_afps.xml"
+        pipelines = PowerCenterParser().parse_file(afps)
+        keyed = [f.name for pipe in pipelines for s in pipe.steps
+                 if s.source_type == "Target"
+                 for f in s.fields if "PRIMARY" in f.attrs.get("KEYTYPE", "")]
+        assert "PROCESS_NAME" in keyed
 
     def test_stored_procedure_now_maps(self):
         step = Step(
@@ -133,10 +160,33 @@ class TestWorkflowToJob:
         types = [e.findtext("type") for e in entries]
         assert types.count("TRANS") == 3
         assert "SPECIAL" in types              # Start entry
-        assert "DUMMY" in types                # Email placeholder
+        assert "MAIL" in types                 # Email task now converts
         trans = next(e for e in entries if e.findtext("type") == "TRANS")
         assert trans.findtext("filename").endswith(".ktr")
         assert len(root.findall("hops/hop")) == 4
+
+    def test_email_task_converts_to_mail_entry(self):
+        (job,) = PowerCenterParser().parse_workflows(HHS)
+        kjb = KjbGenerator().generate(job)
+        root = ElementTree.fromstring(kjb)
+        mail = next(e for e in root.findall("entries/entry")
+                    if e.findtext("type") == "MAIL")
+        # recipient/subject/body carried from the Email task attributes
+        assert mail.findtext("destination") == "$$WF_COMPTIME_EMAIL_LIST"
+        assert mail.findtext("subject") == "$$WF_SUBJECT"
+        assert mail.findtext("comment") == "$$WF_MESSAGE"
+
+    def test_command_task_converts_to_shell_entry(self):
+        from pentaho_migration.ir import Job, JobEntry
+        job = Job(name="wf_x", entries=[
+            JobEntry(name="Start", task_type="Start"),
+            JobEntry(name="archive", task_type="Command",
+                     commands=["mv a b", "rm c"])])
+        root = ElementTree.fromstring(KjbGenerator().generate(job))
+        shell = next(e for e in root.findall("entries/entry")
+                     if e.findtext("type") == "SHELL")
+        assert shell.findtext("insertScript") == "Y"
+        assert shell.findtext("script") == "mv a b\nrm c"
 
 
 class TestPdiRunner:
@@ -160,3 +210,23 @@ class TestPdiRunner:
         assert result.ok is False
         assert result.meaning == EXIT_CODES[7]
         assert "Could not load" in result.log_tail
+
+class TestMappletExpansion:
+    def test_mapplet_expanded_inline_from_real_export(self):
+        """A mapplet instance's internal transformations are inlined into the
+        parent pipeline (instead of vanishing), prefixed by the instance name,
+        with the graph reconnected through the expansion."""
+        cpm = HHS.parent / "hhs_cpm.xml"
+        pipelines = PowerCenterParser().parse_file(cpm)
+        expanded = [(p.name, s) for p in pipelines for s in p.steps
+                    if any("expanded inline from mapplet" in n for n in s.notes)]
+        assert expanded, "expected inlined mapplet steps"
+        # the mapplet's Expression transforms survive expansion (their
+        # expressions are then translatable)
+        kinds = {s.source_type for _, s in expanded}
+        assert "Expression" in kinds
+        # no hop points at a step that doesn't exist (graph stays connected)
+        for p in pipelines:
+            names = {s.name for s in p.steps}
+            for h in p.hops:
+                assert h.from_step in names and h.to_step in names

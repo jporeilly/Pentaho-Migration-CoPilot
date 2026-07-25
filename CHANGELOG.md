@@ -7,6 +7,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.25.0] — 2026-07-25
+
+### Added
+
+- **Cloud LLM providers — Anthropic, OpenAI, Google, Azure.** Settings now
+  offers Anthropic (Claude, default `claude-opus-5`), OpenAI (GPT, default
+  `gpt-4o`), Google (Gemini via its OpenAI-compatible endpoint, default
+  `gemini-1.5-pro`) and Microsoft (Azure OpenAI, deployment + resource
+  endpoint) alongside local Ollama. One shared dispatch
+  (`llm/translate.py: chat_json/chat_text/check_provider`) powers **every**
+  AI feature: Informatica/Talend expression translation, Crystal Reports
+  formula translation, the schema-SQL assistant, triage briefs, and per-step
+  AI suggestions — the old "Anthropic not implemented yet" gates in the SQL
+  assistant and solution suggester are gone. API keys come from Settings
+  (stored locally, gitignored) or the provider's environment variable
+  (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`,
+  `AZURE_OPENAI_API_KEY`); the Environment card reports presence-only for
+  all four. `pip install .[llm]` now installs both the `anthropic` and
+  `openai` SDKs.
+- **Insert/Update key inference.** The match keys for an Update Strategy →
+  Insert/Update conversion are traced through the graph to the downstream
+  target's PRIMARY KEY fields (parsed from the export's `<TARGET>`
+  definitions) — keys and non-key update columns are emitted instead of a
+  TODO. Verified against the real corpus (`hhs_cpm_afps.xml`).
+- **Workflow Email/Command tasks → real PDI job entries.** Email tasks
+  become Mail entries (recipient/subject/body carried over; SMTP server
+  left to configure), Command tasks become Shell entries with the actual
+  ordered command script — no more labeled placeholders.
+- **Informatica mapplet expansion.** Mapplet instances are expanded inline
+  into the parent pipeline: internal transformations become
+  `instance.step`-prefixed steps, connectors are rerouted through the
+  Input/Output boundaries, and the assessment warning drops from WARNING to
+  INFO. Verified 0 dangling hops across the corpus.
+
 ## [1.24.0] — 2026-07-25
 
 ### Added

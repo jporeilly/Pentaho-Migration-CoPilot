@@ -24,7 +24,6 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import httpx
 
 from pentaho_migration.llm.settings import LLMSettings, load_settings
 from pentaho_migration.reports import load_report_model
@@ -158,16 +157,11 @@ def llm_brief(result: TriageResult, settings: LLMSettings | None = None,
                           (f" ({result.sql_error})" if result.sql_error else ""),
         "estimated_hours_with_copilot": result.copilot_hours,
     }
-    response = httpx.post(
-        f"{settings.base_url}/api/chat",
-        json={"model": settings.model,
-              "messages": [{"role": "system", "content": TRIAGE_PROMPT},
-                           {"role": "user", "content": json.dumps(facts, indent=1)}],
-              "stream": False, "format": TRIAGE_SCHEMA,
-              "options": {"temperature": 0}},
-        timeout=timeout)
-    response.raise_for_status()
-    return json.loads(response.json()["message"]["content"]).get("brief", "")
+    from pentaho_migration.llm.translate import chat_json
+
+    messages = [{"role": "system", "content": TRIAGE_PROMPT},
+                {"role": "user", "content": json.dumps(facts, indent=1)}]
+    return chat_json(settings, messages, TRIAGE_SCHEMA, timeout).get("brief", "")
 
 
 # ------------------------------------------------------- markdown report

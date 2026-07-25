@@ -212,6 +212,22 @@ def test_assistant_provider_gating():
         SqlAssistant(LLMSettings(provider="none")).check_provider()
 
 
+def test_assistant_shares_cloud_providers_with_translation(monkeypatch):
+    """The SQL assistant uses the same provider dispatch as expression/formula
+    translation, so a cloud provider (with a key) is accepted here too."""
+    import sys
+
+    fake = type(sys)("anthropic")
+    fake.APIError = Exception
+    monkeypatch.setitem(sys.modules, "anthropic", fake)
+    # anthropic without a key is rejected, with a key is accepted - no longer
+    # the old hard-coded "not implemented yet"
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    with pytest.raises(TranslationError):
+        SqlAssistant(LLMSettings(provider="anthropic", api_key="")).check_provider()
+    SqlAssistant(LLMSettings(provider="anthropic", api_key="sk-x")).check_provider()
+
+
 # ------------------------------------------------------------------------ API
 
 def test_api_schema_unavailable_is_503(monkeypatch):

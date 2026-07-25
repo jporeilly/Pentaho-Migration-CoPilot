@@ -1,7 +1,6 @@
 """Layout QA agent (geometry lint) and batch triage agent (verdicts +
 markdown report). Deterministic throughout; the LLM brief is mocked."""
 
-import json
 from pathlib import Path
 
 from pentaho_migration.llm.settings import LLMSettings
@@ -120,23 +119,16 @@ def test_triage_report_markdown():
 
 
 def test_llm_brief_mocked(monkeypatch):
+    """The brief goes through the shared provider dispatch (chat_json)."""
     captured = {}
 
-    class _Resp:
-        def raise_for_status(self):
-            pass
+    def fake_chat_json(settings, messages, schema, timeout=120.0):
+        captured["messages"] = messages
+        return {"brief": "Check the running-total rewrite first."}
 
-        def json(self):
-            return {"message": {"content": json.dumps(
-                {"brief": "Check the running-total rewrite first."})}}
-
-    def fake_post(url, json=None, timeout=None):
-        captured["payload"] = json
-        return _Resp()
-
-    monkeypatch.setattr(triage_mod.httpx, "post", fake_post)
+    monkeypatch.setattr("pentaho_migration.llm.translate.chat_json", fake_chat_json)
     r = triage_one(LADDER / "04_member_statement.xml", check_sql=False)
     brief = llm_brief(r, LLMSettings(provider="ollama", model="test"))
     assert brief == "Check the running-total rewrite first."
-    sent = captured["payload"]["messages"][1]["content"]
+    sent = captured["messages"][1]["content"]
     assert "idiom_rewrites" in sent and "Member Statement" in sent

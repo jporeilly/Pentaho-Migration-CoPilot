@@ -54,6 +54,10 @@ class KjbGenerator:
                     f"Runs mapping {entry.mapping} (session {entry.name}). "
                     "TODO: session overrides not converted."
                 )
+            elif entry.task_type == "Command" and entry.commands:
+                self._shell_entry(el, entry)
+            elif entry.task_type == "Email":
+                self._mail_entry(el, entry)
             else:
                 SubElement(el, "type").text = "DUMMY"
                 SubElement(el, "description").text = (
@@ -80,6 +84,42 @@ class KjbGenerator:
 
         ElementTree.indent(root)
         return ElementTree.tostring(root, encoding="unicode", xml_declaration=True)
+
+    def _shell_entry(self, el: Element, entry) -> None:
+        """Informatica Command task -> PDI Shell job entry, running the command
+        list as an inline script. Informatica $Param/$$Var tokens are left as-is
+        (map them to PDI ${variables} - noted in the description)."""
+        SubElement(el, "type").text = "SHELL"
+        SubElement(el, "description").text = (
+            f"Converted from Command task '{entry.name}'. Review the script and "
+            "map Informatica $Param/$$Var tokens to PDI ${variables}.")
+        SubElement(el, "filename")
+        SubElement(el, "work_directory")
+        SubElement(el, "arg_from_previous").text = "N"
+        SubElement(el, "exec_per_row").text = "N"
+        SubElement(el, "set_logfile").text = "N"
+        SubElement(el, "set_append_logfile").text = "N"
+        SubElement(el, "insertScript").text = "Y"
+        SubElement(el, "script").text = "\n".join(entry.commands)
+        SubElement(el, "loglevel").text = "Basic"
+
+    def _mail_entry(self, el: Element, entry) -> None:
+        """Informatica Email task -> PDI Mail job entry. The SMTP server is not
+        in the Informatica export, so it is left blank for the reviewer."""
+        p = entry.properties
+        SubElement(el, "type").text = "MAIL"
+        SubElement(el, "description").text = (
+            f"Converted from Email task '{entry.name}'. Set the SMTP server/port "
+            "and map Informatica $$Vars to PDI ${variables}.")
+        SubElement(el, "server")
+        SubElement(el, "port").text = "25"
+        SubElement(el, "destination").text = p.get("Email User Name", "")
+        SubElement(el, "subject").text = p.get("Email Subject", "")
+        SubElement(el, "comment").text = p.get("Email Text", "")
+        SubElement(el, "include_date").text = "N"
+        SubElement(el, "include_files").text = "N"
+        SubElement(el, "use_auth").text = "N"
+        SubElement(el, "usessl").text = "N"
 
     def _start_entry(self, name: str, position: int = 0) -> Element:
         el = Element("entry")

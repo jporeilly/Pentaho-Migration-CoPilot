@@ -18,15 +18,12 @@ db_dialects.py adapters; anything else gets an honest "introspection not
 available" instead of a guess.
 """
 
-import json
 import os
 import re
 from pathlib import Path
 
-import httpx
-
-from pentaho_migration.llm import TranslationError
 from pentaho_migration.llm.settings import LLMSettings, load_settings
+from pentaho_migration.llm.translate import chat_json, check_provider
 from pentaho_migration.reports.environment import find_prd_home
 
 _JDBC_PG_RE = re.compile(
@@ -359,22 +356,16 @@ SQL_ASSIST_SCHEMA = {
 
 
 class SqlAssistant:
-    """Schema-grounded SQL chat via the configured LLM provider (Ollama)."""
+    """Schema-grounded SQL chat via the configured LLM provider (Ollama,
+    Anthropic, OpenAI, Google Gemini, or Azure OpenAI — same provider dispatch
+    as expression/formula translation)."""
 
     def __init__(self, settings: LLMSettings | None = None, timeout: float = 120.0):
         self.settings = settings or load_settings()
         self.timeout = timeout
 
     def check_provider(self) -> None:
-        if self.settings.provider == "none":
-            raise TranslationError(
-                "The SQL assistant needs an LLM - choose a provider in Settings.")
-        if self.settings.provider == "anthropic":
-            raise TranslationError(
-                "The Anthropic provider is not implemented yet - use Ollama.")
-        if not self.settings.model:
-            raise TranslationError(
-                "No Ollama model configured - open Settings and apply the recommendation.")
+        check_provider(self.settings)
 
     def ask(self, question: str, sql: str, schema_text: str,
             validation: dict | None = None,
@@ -397,11 +388,4 @@ class SqlAssistant:
         return {"reply": result.get("reply", ""), "sql": result.get("sql", "")}
 
     def _chat(self, messages: list[dict]) -> dict:
-        response = httpx.post(
-            f"{self.settings.base_url}/api/chat",
-            json={"model": self.settings.model, "messages": messages,
-                  "stream": False, "format": SQL_ASSIST_SCHEMA,
-                  "options": {"temperature": 0}},
-            timeout=self.timeout)
-        response.raise_for_status()
-        return json.loads(response.json()["message"]["content"])
+        return chat_json(self.settings, messages, SQL_ASSIST_SCHEMA, self.timeout)

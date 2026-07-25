@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.24.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.25.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -91,7 +91,7 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | --- | --- | --- |
 | Parsers (Parse) | `src/pentaho_migration/parser/` | PowerCenter XML and Talend .item → one normalized Pydantic IR; content-sniffing auto-detection; source analysis with version detection. Zero failures across both real corpora (90 files) |
 | Rules mappers (Map) | `src/pentaho_migration/mapper/` + `rules/*.yaml` | Per-source rules libraries with governance metadata (PowerCenter v3: 18 types; Talend v2: 60+ components); unknown types → explicit manual handoff |
-| LLM (Map) | `src/pentaho_migration/llm/` | Expression translation (Informatica + Java prompts, schema-forced JSON, always flagged `review`), per-step solution suggestions, hardware detection with multi-GPU model recommendation |
+| LLM (Map) | `src/pentaho_migration/llm/` | Expression translation (Informatica + Java prompts, schema-forced JSON, always flagged `review`), per-step solution suggestions, hardware detection with multi-GPU model recommendation; provider dispatch shared app-wide — Ollama (local), Anthropic, OpenAI, Google Gemini, Azure OpenAI |
 | Generators (Generate) | `src/pentaho_migration/generator/` | .ktr with real config for 9 step types (incl. Merge Join keys, Stream Lookup with injected lookup source); .kjb jobs from PowerCenter workflows |
 | Validator (Validate) | `src/pentaho_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact knowledge base (both sources), confidence score, effort & cost estimate (Copilot vs manual rebuild), CSV diff harness (measured parity) |
 | Sandbox kits | `src/pentaho_migration/sandbox.py` | Per-mapping setup guide, inferred DDL, seeded synthetic test data |
@@ -172,6 +172,45 @@ make run
 Full details in [docs/INSTALL.md](docs/INSTALL.md). Helper commands (identical across
 `make`, `dev.ps1`, `dev.sh`): `setup · install · test · run · run-dev · convert ·
 parse · gaps · ui-install · ui-build · ui-dev · status · clean · distclean`.
+
+## LLM providers & API keys
+
+One provider (chosen in **⚙ Settings**) powers every AI feature — Informatica/Talend
+expression translation, Crystal Reports formula translation, the schema-SQL
+assistant, triage briefs, and per-step AI suggestions. Local **Ollama** is the
+default and needs no key. The cloud providers need their SDK
+(`pip install .[llm]` installs both) and an API key:
+
+| Provider | Env variable | Default model | Get a key |
+| --- | --- | --- | --- |
+| Anthropic (Claude) | `ANTHROPIC_API_KEY` | `claude-opus-5` | console.anthropic.com |
+| OpenAI (GPT) | `OPENAI_API_KEY` | `gpt-4o` | platform.openai.com |
+| Google (Gemini) | `GEMINI_API_KEY` | `gemini-1.5-pro` | aistudio.google.com |
+| Microsoft (Azure OpenAI) | `AZURE_OPENAI_API_KEY` | your deployment | portal.azure.com |
+
+Set the key either **in Settings** (stored locally in `config/settings.json`,
+which is gitignored) or as an environment variable before starting the app:
+
+```powershell
+# Windows - current session only
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+.\run.ps1
+
+# Windows - persistent (new terminals pick it up)
+setx ANTHROPIC_API_KEY "sk-ant-..."
+```
+
+```bash
+# Linux / macOS (add to ~/.bashrc to persist)
+export ANTHROPIC_API_KEY="sk-ant-..."
+./run.sh
+```
+
+A key saved in Settings takes precedence over the environment variable. Keys
+never leave your machine except to the provider's own API; the Settings page
+only ever reports key *presence*, never the value. Azure additionally needs
+the resource endpoint (`https://<resource>.openai.azure.com`) as the base URL
+and the deployment name as the model.
 
 ## CLI
 
@@ -293,16 +332,22 @@ Completed sources — Informatica PowerCenter and SAP Crystal Reports:
   (geometry lint + render verification), batch triage agent
   (per-report READY/REVIEW/BLOCKED verdicts over a whole corpus)
 
-Outstanding — Talend completion and known Informatica gaps:
+- [x] Informatica mapplets — instances expand inline into the parent pipeline
+  (prefixed steps, graph rewired through the input/output boundaries)
+- [x] Informatica workflow tasks beyond sessions — Email → Mail entry,
+  Command → Shell entry with the real script, in the generated .kjb
+- [x] Insert/Update key inference — match keys traced to the downstream
+  target's PRIMARY KEY definition
+- [x] Cloud LLM providers — Anthropic (Claude), OpenAI (GPT), Google (Gemini),
+  Microsoft (Azure OpenAI) selectable in Settings alongside local Ollama;
+  one provider powers expression translation, Crystal formula assist, the
+  schema-SQL chat, triage briefs, and per-step AI suggestions
+
+Outstanding — Talend completion:
 
 - [ ] Talend: core shipped in v1.10.0 (.item parser, 60+ component rules
   validated against a 40-job real corpus, Java→JavaScript translation,
   🤖 per-step AI suggestions) — production-completion pass outstanding
-- [ ] Informatica mapplets (currently a pre-migration warning, not converted)
-- [ ] Informatica workflow tasks beyond sessions — Email/Command tasks emit
-  labeled placeholders in the .kjb
-- [ ] Insert/Update key inference (keys are an explicit TODO in the step config)
-- [ ] Anthropic API provider (Ollama is the working provider today)
 
 **Phase 2 — multi-source, next:**
 

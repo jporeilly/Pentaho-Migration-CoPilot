@@ -284,20 +284,56 @@ def _emit_stream_lookup(step: Step, el: Element, pipeline: Pipeline) -> None:
         SubElement(value, "type").text = PDI_DATATYPES.get(field.datatype.lower(), "String")
 
 
+def _infer_update_keys(step: Step, pipeline: Pipeline):
+    """(target_step, key_field_names) for an Insert/Update step: follow the
+    flow to the target it writes into and take that target's PRIMARY KEY
+    fields (Informatica's update-strategy flags never name the keys, but the
+    target definition does)."""
+    seen, queue = set(), [h.to_step for h in pipeline.hops if h.from_step == step.name]
+    while queue:
+        name = queue.pop(0)
+        if name in seen:
+            continue
+        seen.add(name)
+        nxt = pipeline.step(name)
+        if nxt is not None and nxt.source_type == "Target":
+            keys = [f.name for f in nxt.fields
+                    if "PRIMARY" in f.attrs.get("KEYTYPE", "")]
+            return nxt, keys
+        queue += [h.to_step for h in pipeline.hops if h.from_step == name]
+    return None, []
+
+
 def _emit_insert_update(step: Step, el: Element, pipeline: Pipeline) -> None:
     outgoing = [h.to_step for h in pipeline.hops if h.from_step == step.name]
+    target, keys = _infer_update_keys(step, pipeline)
     SubElement(el, "connection")
     SubElement(el, "commit").text = "100"
     SubElement(el, "update_bypassed").text = "N"
     lookup = SubElement(el, "lookup")
     SubElement(lookup, "schema")
-    SubElement(lookup, "table").text = outgoing[0] if outgoing else step.name
-    # key columns are a business decision (Informatica's strategy flags don't
-    # name them) — left empty deliberately; the step description carries the TODO
-    for field in step.fields:
+    SubElement(lookup, "table").text = (
+        target.name if target is not None else (outgoing[0] if outgoing else step.name))
+    # match keys inferred from the target's PRIMARY KEY fields; = comparison
+    for key in keys:
+        k = SubElement(lookup, "key")
+        SubElement(k, "name").text = key
+        SubElement(k, "field").text = key
+        SubElement(k, "condition").text = "="
+        SubElement(k, "name2")
+    if not keys:
+        # no primary key on the target -> can't infer; the step description
+        # carries the TODO (added in the mapper notes)
+        step.notes.append("Insert/Update keys could not be inferred (target has "
+                           "no PRIMARY KEY) - set the match keys by hand in PDI")
+    # update columns: the target's non-key fields, or the step's own fields
+    update_fields = ([f.name for f in target.fields if f.name not in keys]
+                     if target is not None and target.fields
+                     else [f.name for f in step.fields])
+    for name in update_fields:
         value = SubElement(lookup, "value")
-        SubElement(value, "name").text = field.name
-        SubElement(value, "rename").text = field.name
+        SubElement(value, "name").text = name
+        SubElement(value, "rename").text = name
         SubElement(value, "update").text = "Y"
 
 
