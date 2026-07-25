@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\diego6bravo_CarteraEdadesFix.rpt" HasSavedData="False">
+<Report Name="" FileName="C:\Users\jpore\AppData\Local\Temp\rt-rpts\diego6bravo_CarteraEdadesFix.rpt" HasSavedData="False">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
   </Embedinfo>
@@ -150,6 +150,18 @@ drop table #TEMP
       <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Total31_60Asesor}" Kind="RunningTotalField" Name="Total31_60Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.31 - 60}" ValueType="NumberField" />
       <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Total61_90Asesor}" Kind="RunningTotalField" Name="Total61_90Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.61 - 90}" ValueType="NumberField" />
       <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotalMasde90Asesor}" Kind="RunningTotalField" Name="TotalMasde90Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Mas de 90}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition Name="TotSaldoCliente" FormulaName="{#TotSaldoCliente}" Operation="Sum" SummarizedField="{Command.Saldo}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="TotSaldoAsesor" FormulaName="{#TotSaldoAsesor}" Operation="Sum" SummarizedField="{Command.Saldo}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="Tot0_30" FormulaName="{#Tot0_30}" Operation="Sum" SummarizedField="{Command.0 - 30}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="Tot31_60" FormulaName="{#Tot31_60}" Operation="Sum" SummarizedField="{Command.31 - 60}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="Tot61_90" FormulaName="{#Tot61_90}" Operation="Sum" SummarizedField="{Command.61 - 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="TotMasde90" FormulaName="{#TotMasde90}" Operation="Sum" SummarizedField="{Command.Mas de 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="Total0_30Asesor" FormulaName="{#Total0_30Asesor}" Operation="Sum" SummarizedField="{Command.0 - 30}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="TotCorrienteCliente" FormulaName="{#TotCorrienteCliente}" Operation="Sum" SummarizedField="{Command.Corriente}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="TotCorrienteAsesor" FormulaName="{#TotCorrienteAsesor}" Operation="Sum" SummarizedField="{Command.Corriente}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="Total31_60Asesor" FormulaName="{#Total31_60Asesor}" Operation="Sum" SummarizedField="{Command.31 - 60}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="Total61_90Asesor" FormulaName="{#Total61_90Asesor}" Operation="Sum" SummarizedField="{Command.61 - 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="TotalMasde90Asesor" FormulaName="{#TotalMasde90Asesor}" Operation="Sum" SummarizedField="{Command.Mas de 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
     </RunningTotalFieldDefinitions>
     <SQLExpressionFields />
     <SummaryFields />
@@ -643,7 +655,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="DocNum1" Kind="FieldObject" Top="0" Left="600" Width="1200" Height="221" DataSource="{Command.DocNum}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -675,7 +687,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Total1" Kind="FieldObject" Top="0" Left="7200" Width="1200" Height="221" DataSource="{Command.Total}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -691,7 +703,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Abonos1" Kind="FieldObject" Top="0" Left="8630" Width="1200" Height="221" DataSource="{Command.Abonos}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -707,7 +719,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Saldo1" Kind="FieldObject" Top="0" Left="10080" Width="1294" Height="238" DataSource="{Command.Saldo}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -723,7 +735,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Corriente1" Kind="FieldObject" Top="0" Left="11520" Width="1320" Height="221" DataSource="{Command.Corriente}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -739,7 +751,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Field1" Kind="FieldObject" Top="0" Left="13080" Width="1200" Height="221" DataSource="{Command.0 - 30}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -755,7 +767,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Field2" Kind="FieldObject" Top="0" Left="16080" Width="1200" Height="221" DataSource="{Command.61 - 90}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -771,7 +783,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Field3" Kind="FieldObject" Top="0" Left="14520" Width="1320" Height="221" DataSource="{Command.31 - 60}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -787,7 +799,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Masde901" Kind="FieldObject" Top="0" Left="17520" Width="1205" Height="221" DataSource="{Command.Mas de 90}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -832,7 +844,7 @@ drop table #TEMP
             <ReportObjects>
               <FieldObject Name="TotSaldo1" Kind="FieldObject" Top="0" Left="9821" Width="1553" Height="238" DataSource="{#TotSaldoCliente}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Teal" A="255" R="0" G="128" B="128" />
@@ -858,7 +870,7 @@ drop table #TEMP
               </LineObject>
               <FieldObject Name="Tot0301" Kind="FieldObject" Top="0" Left="12986" Width="1294" Height="238" DataSource="{#Tot0_30}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -874,7 +886,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Tot31601" Kind="FieldObject" Top="0" Left="14635" Width="1205" Height="238" DataSource="{#Tot31_60}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -890,7 +902,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Tot61901" Kind="FieldObject" Top="0" Left="16080" Width="1200" Height="238" DataSource="{#Tot61_90}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -906,7 +918,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="TotMasde901" Kind="FieldObject" Top="0" Left="17400" Width="1320" Height="238" DataSource="{#TotMasde90}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Red" A="255" R="255" G="0" B="0" />
@@ -922,7 +934,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="TotCorrienteClietne1" Kind="FieldObject" Top="0" Left="11640" Width="1200" Height="221" DataSource="{#TotCorrienteCliente}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Teal" A="255" R="0" G="128" B="128" />
@@ -964,7 +976,7 @@ drop table #TEMP
             <ReportObjects>
               <FieldObject Name="TotSaldoAsesor1" Kind="FieldObject" Top="0" Left="9518" Width="1856" Height="263" DataSource="{#TotSaldoAsesor}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
@@ -1000,7 +1012,7 @@ drop table #TEMP
               </LineObject>
               <FieldObject Name="Total030Asesor1" Kind="FieldObject" Top="0" Left="12955" Width="1325" Height="263" DataSource="{#Total0_30Asesor}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
@@ -1016,7 +1028,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="TotCorrienteAsesor1" Kind="FieldObject" Top="0" Left="11520" Width="1320" Height="263" DataSource="{#TotCorrienteAsesor}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
@@ -1032,7 +1044,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Total3160Asesor1" Kind="FieldObject" Top="0" Left="14515" Width="1325" Height="221" DataSource="{#Total31_60Asesor}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
@@ -1048,7 +1060,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Total6190Aseosr1" Kind="FieldObject" Top="0" Left="15955" Width="1325" Height="221" DataSource="{#Total61_90Asesor}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />
@@ -1064,7 +1076,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="TotalMasde90Asesor1" Kind="FieldObject" Top="0" Left="17395" Width="1325" Height="221" DataSource="{#TotalMasde90Asesor}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Green" A="255" R="0" G="128" B="0" />

@@ -101,6 +101,14 @@
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph1" Kind="ChartObject" Top="1560" Left="480" Width="14160" Height="7080">
+                <ChartDefinition StyleType="crChartStyleTypeArea" ChartType="crChartTypeDetail" Title="Total Sales by Day" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{SalesOrderHeader.ShipDate}" Name="ShipDate" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({SalesOrderHeader.SubTotal}, {SalesOrderHeader.ShipDate}, &quot;daily&quot;)" Name="SubTotal" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

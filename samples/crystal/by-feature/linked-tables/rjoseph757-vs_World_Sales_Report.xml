@@ -188,6 +188,14 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph1" Kind="ChartObject" Top="120" Left="0" Width="5610" Height="3960">
+                <ChartDefinition StyleType="crChartStyleTypePie" ChartType="crChartTypeGroup" Title="Sum of Last Year's Sales / Country" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Customer.Country}" Name="Country" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({Customer.Last Year's Sales}, {Customer.Country})" Name="Last Year's Sales" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -291,6 +299,14 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph2" Kind="ChartObject" Top="240" Left="0" Width="6240" Height="3703">
+                <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeGroup" Title="Sum of Last Year's Sales / Region" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Customer.Region}" Name="Region" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({Customer.Last Year's Sales}, {Customer.Region})" Name="Last Year's Sales" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -365,6 +381,14 @@ numbervar test:=2</FormulaFieldDefinition>
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph3" Kind="ChartObject" Top="2040" Left="0" Width="6000" Height="3630">
+                <ChartDefinition StyleType="crChartStyleTypePie" ChartType="crChartTypeGroup" Title="Sum of Last Year's Sales / City" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Customer.City}" Name="City" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({Customer.Last Year's Sales}, {Customer.City})" Name="Last Year's Sales" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -533,7 +557,7 @@ numbervar test:=2</FormulaFieldDefinition>
             <ReportObjects>
               <FieldObject Name="Field5" Kind="FieldObject" Top="227" Left="7095" Width="1440" Height="210" DataSource="{Customer.Last Year's Sales}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="£" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="£ #,##0.00;-£ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -578,7 +602,7 @@ numbervar test:=2</FormulaFieldDefinition>
             <ReportObjects>
               <FieldObject Name="Field7" Kind="FieldObject" Top="0" Left="8280" Width="1455" Height="227" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.Customer Name})">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="£" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="£ #,##0.00;-£ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -639,7 +663,7 @@ numbervar test:=2</FormulaFieldDefinition>
               </FieldObject>
               <FieldObject Name="Field10" Kind="FieldObject" Top="55" Left="8310" Width="1425" Height="238" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.City})">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="£" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="£ #,##0.00;-£ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -700,7 +724,7 @@ numbervar test:=2</FormulaFieldDefinition>
               </FieldObject>
               <FieldObject Name="Field13" Kind="FieldObject" Top="85" Left="8415" Width="1320" Height="238" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.Region})">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="£" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="£ #,##0.00;-£ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -729,7 +753,7 @@ numbervar test:=2</FormulaFieldDefinition>
             <ReportObjects>
               <FieldObject Name="Field14" Kind="FieldObject" Top="55" Left="8355" Width="1379" Height="238" DataSource="Sum ({Customer.Last Year's Sales}, {Customer.Country})">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="£" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="£ #,##0.00;-£ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />

@@ -458,6 +458,62 @@ def _parse_data_definition(root, model):
                 "no PRD report-function mapping - rebuild by hand (custom "
                 "function or a pre-computed SQL column)")
 
+    _parse_running_totals(dd, model)
+
+
+def _parse_running_totals(dd, model):
+    """RunningTotalFieldDefinitions -> the same Summary machinery the {#name}
+    references already resolve through: Sum/Count/... running totals become
+    group-scoped Item* report functions (an Item*Function read mid-detail IS
+    the running value - the same live-verified mapping as the
+    WhilePrintingRecords variable rewrite). The fork emits engine AND RAS
+    variants; entries are deduped by name, preferring the one that names the
+    reset group (the engine loses it)."""
+    defs: dict = {}
+    for rt in dd.iter("RunningTotalFieldDefinition"):
+        name = _attr(rt, "Name", default="")
+        if not name:
+            continue
+        if name not in defs or (_attr(rt, "ResetCondition", default="")
+                                and not _attr(defs[name], "ResetCondition", default="")):
+            defs[name] = rt
+    for name, rt in defs.items():
+        op = _attr(rt, "Operation", default="Sum")
+        fref = _attr(rt, "SummarizedField", default="")
+        eval_type = _attr(rt, "EvaluationConditionType", default="NoCondition")
+        reset_type = _attr(rt, "ResetConditionType", default="NoCondition")
+        reset_ref = _attr(rt, "ResetCondition", default="")
+        if not fref:
+            continue
+        if op not in SUMMARY_CLASS_MAP or eval_type != "NoCondition":
+            model.issues.append(
+                f"running total '{name}' uses "
+                + (f"operation {op!r}" if op not in SUMMARY_CLASS_MAP
+                   else f"an evaluate condition ({eval_type})")
+                + " - no mechanical PRD equivalent, rebuild by hand")
+            continue
+        group_col = ""
+        if reset_type in ("OnChangeOfGroup", "OnChangeOfField"):
+            if reset_ref:
+                _, group_col = parse_field_ref(reset_ref)
+            elif model.groups:
+                # engine-emitted defs lose the reset group: assume the
+                # innermost report group (the overwhelmingly common design)
+                group_col = model.groups[-1].column or ""
+                model.issues.append(
+                    f"running total '{name}' resets on a group the dump does "
+                    f"not name - assumed the innermost group ({group_col}); "
+                    "verify in PRD (re-extract with the current fork to carry it)")
+        elif reset_type != "NoCondition":
+            model.issues.append(
+                f"running total '{name}' has reset condition {reset_type!r} - "
+                "no mechanical PRD equivalent, rebuild by hand")
+            continue
+        expr_name = re.sub(r"\W+", "_", f"RT_{name}")
+        model.summaries.append(Summary(
+            name=name, operation=op, field_ref=fref,
+            group_field=group_col, expression_name=expr_name))
+
 
 def _parse_print_options(root, model):
     po = root.find("PrintOptions")

@@ -528,6 +528,9 @@ namespace RptToXml
             {
                 GetFieldObject(field, report, writer);
             }
+			// fork: the ENGINE collection is empty for most .rpt files, but the
+			// RAS DataDefinition carries the real definitions - emit from there
+			WriteRasRunningTotals(report, writer);
 
             writer.WriteEndElement();
 
@@ -1079,7 +1082,7 @@ namespace RptToXml
                         WriteAttributeString(writer, "DataSource", fo.DataSource.FormulaName);
                     }
 
-					WriteFieldFormat(fo, writer);
+					WriteFieldFormat(fo, rasrdmFo, writer);
 
                     if ((ShowFormatTypes & FormatTypes.Color) == FormatTypes.Color)
                     {
@@ -1138,6 +1141,55 @@ namespace RptToXml
 			writer.WriteEndElement();
 		}
 
+		// ---- fork: running totals via RAS (engine collection is empty) --------
+		private void WriteRasRunningTotals(ReportDocument report, XmlWriter writer)
+		{
+			try
+			{
+				// emitted IN ADDITION to any engine entries: the engine walk
+				// loses the reset GROUP (rtf.Group is null even for
+				// OnChangeOfGroup) - the RAS ResetCondition carries it. The
+				// converter dedupes by Name, preferring reset-aware entries.
+				CRDataDefModel.ISCRDataDefinition dd;
+				if (report.IsSubreport)
+					dd = _report.ReportClientDocument.SubreportController
+						.GetSubreport(report.Name).DataDefController.DataDefinition;
+				else
+					dd = _rcd.DataDefinition;
+				var rts = dd.RunningTotalFields;
+				for (int i = 0; i < rts.Count; i++)
+				{
+					var rt = (CRDataDefModel.ISCRRunningTotalField) rts[i];
+					writer.WriteStartElement("RunningTotalFieldDefinition");
+					WriteAttributeString(writer, "Name", rt.Name);
+					try { WriteAttributeString(writer, "FormulaName", rt.FormulaForm); } catch { }
+					try { WriteAttributeString(writer, "Operation", StripEnumPrefix(rt.Operation.ToString(), "crSummaryOperation")); } catch { }
+					try { WriteAttributeString(writer, "SummarizedField", rt.SummarizedField == null ? "" : rt.SummarizedField.FormulaForm); } catch { }
+					try { WriteAttributeString(writer, "EvaluationConditionType", StripEnumPrefix(rt.EvaluateConditionType.ToString(), "crRunningTotalCondition")); } catch { }
+					try { WriteAttributeString(writer, "ResetConditionType", StripEnumPrefix(rt.ResetConditionType.ToString(), "crRunningTotalCondition")); } catch { }
+					try { WriteAttributeString(writer, "EvaluateCondition", RtConditionText(rt.EvaluateCondition)); } catch { }
+					try { WriteAttributeString(writer, "ResetCondition", RtConditionText(rt.ResetCondition)); } catch { }
+					writer.WriteEndElement();
+				}
+			}
+			catch { }
+		}
+
+		private static string StripEnumPrefix(string value, string prefix)
+		{
+			return value != null && value.StartsWith(prefix) ? value.Substring(prefix.Length) : value;
+		}
+
+		private static string RtConditionText(object condition)
+		{
+			if (condition == null) return "";
+			var group = condition as CRDataDefModel.ISCRGroup;
+			if (group != null && group.ConditionField != null) return group.ConditionField.FormulaForm;
+			var fieldCond = condition as CRDataDefModel.ISCRField;
+			if (fieldCond != null) return fieldCond.FormulaForm;
+			return condition.ToString();
+		}
+
 		// ---- fork: chart definition emission (missing from stock RptToXml) ----
 		private void WriteChartDefinition(CRReportDefModel.ChartObject rasChart, XmlWriter writer)
 		{
@@ -1189,12 +1241,28 @@ namespace RptToXml
 		}
 
 		// ---- fork: per-field format emission (missing from stock RptToXml) ----
-		private void WriteFieldFormat(FieldObject fo, XmlWriter writer)
+		private void WriteFieldFormat(FieldObject fo, CRReportDefModel.ISCRReportObject rasrdmRo, XmlWriter writer)
 		{
 			try
 			{
 				var ff = fo.FieldFormat;
 				if (ff == null) return;
+				// the actual currency symbol TEXT only exists in the RAS model
+				// (the engine API exposes just the No/Fixed/Floating enum)
+				string rasSymbol = null;
+				string rasPosition = "";
+				try
+				{
+					var rasField = rasrdmRo as CRReportDefModel.ISCRFieldObject;
+					var rasNf = rasField == null || rasField.FieldFormat == null
+						? null : rasField.FieldFormat.NumericFormat;
+					if (rasNf != null)
+					{
+						rasSymbol = rasNf.CurrencySymbol;
+						try { rasPosition = rasNf.CurrencyPosition.ToString(); } catch { }
+					}
+				}
+				catch { }
 				writer.WriteStartElement("FieldFormat");
 				try
 				{
@@ -1204,10 +1272,15 @@ namespace RptToXml
 						writer.WriteStartElement("NumericFieldFormat");
 						WriteAttributeString(writer, "DecimalPlaces", nf.DecimalPlaces.ToString(CultureInfo.InvariantCulture));
 						try { WriteAttributeString(writer, "CurrencySymbolFormat", nf.CurrencySymbolFormat.ToString()); } catch { }
+						if (!string.IsNullOrEmpty(rasSymbol))
+						{
+							WriteAttributeString(writer, "CurrencySymbol", rasSymbol);
+							WriteAttributeString(writer, "CurrencyPosition", rasPosition);
+						}
 						try { WriteAttributeString(writer, "EnableUseLeadingZero", nf.EnableUseLeadingZero.ToString()); } catch { }
 						try { WriteAttributeString(writer, "NegativeFormat", nf.NegativeFormat.ToString()); } catch { }
 						try { WriteAttributeString(writer, "RoundingFormat", nf.RoundingFormat.ToString()); } catch { }
-						WriteAttributeString(writer, "FormatString", BuildNumericFormatString(nf));
+						WriteAttributeString(writer, "FormatString", BuildNumericFormatString(nf, rasSymbol));
 						writer.WriteEndElement();
 					}
 				}
@@ -1231,7 +1304,7 @@ namespace RptToXml
 			catch { }
 		}
 
-		private static string BuildNumericFormatString(NumericFieldFormat nf)
+		private static string BuildNumericFormatString(NumericFieldFormat nf, string rasSymbol)
 		{
 			try
 			{
@@ -1240,10 +1313,10 @@ namespace RptToXml
 				string symbol = "";
 				try
 				{
-					// engine API exposes only the enum; the symbol text lives in the
-					// RAS model. "$" is a reasonable default when a symbol is enabled.
+					// prefer the REAL symbol text from the RAS model; "$" only as
+					// the fallback when a symbol is enabled but RAS gave nothing
 					if (nf.CurrencySymbolFormat != CrystalDecisions.Shared.CurrencySymbolFormat.NoSymbol)
-						symbol = "$";
+						symbol = string.IsNullOrEmpty(rasSymbol) ? "$" : rasSymbol;
 				}
 				catch { }
 				string positive = symbol.Length > 0 ? symbol + " " + body : body;

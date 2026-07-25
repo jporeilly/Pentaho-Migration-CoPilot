@@ -98,6 +98,14 @@
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph1" Kind="ChartObject" Top="1800" Left="240" Width="14520" Height="7800">
+                <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeDetail" Title="Total Sales by Year" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{@YearOfShipDate}" Name="YearOfShipDate" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({SalesOrderHeader.SubTotal}, {@YearOfShipDate})" Name="SubTotal" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

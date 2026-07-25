@@ -120,7 +120,18 @@ automatically after each extraction. Result on the corpus: **83 images
 recovered across all 44 image-bearing reports, zero misses**; each carries
 a verify note through conversion.
 
-Still open (smaller): currency symbol *text*
-(engine exposes only the No/Fixed/FloatingSymbol enum; "$" assumed when
-enabled), and cross-tab grid definitions (SDK-sealed — hand-add
+**Currency symbol text — RESOLVED (2026-07-25):** unlike PictureData, the
+RAS `NumericFieldFormat.CurrencySymbol` string IS populated in the embedded
+RAS. The fork reads it per FieldObject and bakes the real symbol into the
+computed `FormatString` ("$" only as the enabled-but-unnamed fallback), plus
+emits `CurrencySymbol`/`CurrencyPosition` attributes.
+
+**Running totals — RESOLVED (2026-07-25):** the ENGINE
+`DataDefinition.RunningTotalFields` walk loses the reset group (rtf.Group is
+null even for OnChangeOfGroup). The fork now ALSO emits RAS-side
+`<RunningTotalFieldDefinition>` entries carrying `ResetCondition` (the group
+field's FormulaForm); the converter dedupes by Name preferring reset-aware
+entries and maps plain running totals to group-scoped Item* functions.
+
+Still open (smaller): cross-tab grid definitions (SDK-sealed — hand-add
 `<CrossTabDefinition>`, see CRYSTAL-COVERAGE.md).

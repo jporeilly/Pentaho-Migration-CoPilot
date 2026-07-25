@@ -68,6 +68,36 @@ def test_autofit_scales_overflowing_band_to_printable_width():
     assert not [f for f in lint_layout(m).findings if f.code == "page-overflow"]
 
 
+def test_autofit_nudges_overlapping_text_apart():
+    """User ask: overlapping text should be spaced out and aligned - the
+    later element (reading order) moves right or down, minimally."""
+    from pentaho_migration.reports.layout_qa import autofit_layout
+
+    a = Element(kind="field", name="A", x=0, y=0, width=100, height=14)
+    b = Element(kind="field", name="B", x=10, y=0, width=100, height=14)   # same row
+    c = Element(kind="label", name="C", text="x", x=0, y=4, width=100, height=14)  # stacked
+    m = _model(a, b, c)
+    assert autofit_layout(m) >= 1
+    qa = lint_layout(m)
+    assert not [f for f in qa.findings if f.code == "overlap"]
+    assert b.x >= a.x + a.width          # pushed right, order kept
+    assert c.y >= a.y + a.height         # pushed down
+    assert any("nudged apart" in i for i in m.issues)
+
+
+def test_autofit_never_moves_conditionally_visible_alternates():
+    """Crystal stacks mutually-exclusive fields (one visible at runtime via a
+    suppression condition) - those must stay exactly where they are."""
+    from pentaho_migration.reports.layout_qa import autofit_layout
+
+    a = Element(kind="field", name="A", x=0, y=0, width=100, height=14)
+    b = Element(kind="field", name="B", x=0, y=0, width=100, height=14)
+    b.style_expressions.append(("visible", "=[MODE] = \"B\""))
+    m = _model(a, b)
+    autofit_layout(m)
+    assert (b.x, b.y) == (0, 0)          # untouched - it's a stacked alternate
+
+
 def test_autofit_leaves_fitting_and_suppressed_bands_alone():
     from pentaho_migration.reports.layout_qa import autofit_layout
 

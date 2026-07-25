@@ -44,6 +44,8 @@ semantic judgment is required):
 | Parameters (prompts) | PRD parameters; static pick-lists → list-parameters; multi-value → `IN (${p})`; a folded prompt becomes a **query-backed dropdown** (`SELECT DISTINCT` on the live database) | Deterministic |
 | Summary fields (Sum, Count, Avg, Max, Min, DistinctCount) | Item*/CountDistinct report functions, group-scoped (count functions correctly fieldless) | Deterministic |
 | **StdDev / Variance summaries** (incl. population variants) | PRD has no such function — folded into a **windowed SQL column** (`STDDEV_SAMP(col) OVER (PARTITION BY group)`, report SQL wrapped in a subquery, group ordering re-applied) that the footer field binds to. Live-verified. Dialect note: SQL Server uses `STDEV`/`VAR` | Deterministic → review |
+| **RunningTotalField objects** (`{#name}`) | Group-scoped **Item\* report functions** — the same live-verified mapping as the running-total variable rewrite (an `ItemSumFunction` read mid-detail IS the running value). Reset-on-group carried from the RAS model (fork); engine-emitted defs that lose the group assume the innermost one with a verify note. Evaluate conditions / non-group resets stay honest TODOs | Deterministic → review |
+| Currency symbol text | The REAL symbol from the RAS model (`NumericFieldFormat.CurrencySymbol` — readable, unlike PictureData) lands in the computed `FormatString`; "$" only as fallback when a symbol is enabled but unnamed | Deterministic |
 | **Layout auto-fit** | Page-overflow bands scale proportionally to the printable width; text boxes shorter than their font grow to fit (each repair is a review issue). Overlaps stay flagged — an image under text is usually intentional | Deterministic → review |
 | **Subreports** (linked & unlinked) | **Nested PRD sub-report bundles**: the child converts through the full pipeline (own query, groups, formulas, formatting); Crystal `Pm-<field>` links become `input-parameter` mappings and the child's record selection folds to a parameterized `WHERE` | Deterministic → review |
 | **Cross-tabs** (with a `<CrossTabDefinition>` block in the dump) | **Live PRD crosstab** hosted in a nested sub-report: row/column dimension groups + `wizard:aggregation-type` cells (Sum/Count/Average/Max/Min), child query auto-`ORDER BY`-ed over the dimensions (the crosstab runtime requires sorted data); the bundle declares prpt-spec 5.0 | Deterministic → review |
@@ -55,6 +57,8 @@ semantic judgment is required):
 | Formula language (If/Then/Else, operators, ~40 function mappings, string `+`→`&` by field type) | OpenFormula | Deterministic (`auto`, or `review` when a mapping has a caveat) |
 | `Select Case` (incl. multi-value branches, `a To b` ranges, `Is <op>` tests) | Nested `IF(...)` / `OR(...)` / `AND(...)` | Deterministic → review |
 | `x in a to b` range test | `AND(x >= a; x <= b)` | Deterministic |
+| Binary `%` ("percentage of": `x % y`) | `x * 100 / y` — rewritten explicitly, never passed to OpenFormula's postfix percent | Deterministic |
+| `Else crNoColor` / `Else DefaultAttribute` / If-without-Else in condition formulas | **2-arg `IF(cond;value)`** — the engine keeps the element's static style when the expression yields no value (live-verified: red branch fires, all other rows keep static ink) | Deterministic → review |
 | Running-total variable idiom (`x := x + {F}`) | **Generated `ItemSumFunction`/`ItemCountFunction`** wired to referencing elements | Deterministic → review |
 | Whole-formula aggregates (`Sum({F}, {G})` …) | Generated `Total*` report functions | Deterministic → review |
 | Single-assignment local variable (readability alias) | Inlined into the expression | Deterministic → review |
@@ -68,12 +72,12 @@ semantic judgment is required):
 | Subreports **in page bands** | TODO placeholder + note — the engine hard-forbids sub-reports in page headers/footers (verified) |
 | Subreports with no definition in the dump | TODO placeholder (re-extract with the fork) |
 | Cross-tabs **without** a definition block | TODO placeholder + issue naming the exact `<CrossTabDefinition>` XML to hand-add. **The free SAP .NET SDK cannot export cross-tab grids** (rows/columns/summaries sit behind reserved COM slots — verified by reflection; nothing surfaces in the DataDefinition either, across all 12 corpus cross-tab reports). Read the grid off the Crystal designer (~5 lines of XML), re-convert, and the pivot goes live |
-| RunningTotalField objects (`{#name}` with reset conditions) | Resolved via SummaryFields when present; the extractor emits empty definitions, so bespoke reset conditions need the fork extended |
+| RunningTotalField objects with an **evaluate condition** or non-group reset | Issue note + unresolved reference — no mechanical PRD equivalent (plain running totals **convert**, see the data table) |
 | Arrays, loops, multi-variable formula state | Original text preserved, `manual` status, LLM advice |
 | Group Sort Expert / Top N (groups ordered by a summary) | Review note — order in the query or rebuild with PRD group sorting |
 | Median / other summaries with no PRD function or SQL window aggregate | Review note + TODO placeholder for referencing elements (StdDev/Variance **convert** — see the data table above) |
 | Dynamic / cascading parameter pick-lists | Textbox parameter + note (rebuild as query-backed parameters) |
-| `crNoColor` / `DefaultAttribute` conditional branches | Condition kept as a note (means "keep the static value") |
+| `crNoColor` / `DefaultAttribute` in a position with no keep-static equivalent (e.g. bare, outside an If branch) | Condition kept as a note — the common `Else crNoColor` / `Else DefaultAttribute` / missing-Else forms **convert** to 2-arg IFs (engine keeps the static style, live-verified) |
 
 ## Proof, not promises
 

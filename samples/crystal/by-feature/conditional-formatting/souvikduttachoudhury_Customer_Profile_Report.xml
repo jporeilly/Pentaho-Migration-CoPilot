@@ -326,7 +326,7 @@ else
                 <ReportObjects>
                   <FieldObject Name="PRODUCTPRODUCT_ID" Kind="FieldObject" Top="0" Left="1955" Width="1224" Height="210" DataSource="{PRODUCT.PRODUCT_ID}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -374,7 +374,7 @@ else
                   </FieldObject>
                   <FieldObject Name="ORDERS_DETAILSUNIT_PRICE" Kind="FieldObject" Top="0" Left="7625" Width="1100" Height="205" DataSource="{ORDERS_DETAILS.UNIT_PRICE}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -390,7 +390,7 @@ else
                   </FieldObject>
                   <FieldObject Name="ORDERS_DETAILSQUANTITY" Kind="FieldObject" Top="0" Left="8775" Width="1410" Height="210" DataSource="{ORDERS_DETAILS.QUANTITY}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                      <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -406,7 +406,7 @@ else
                   </FieldObject>
                   <FieldObject Name="total" Kind="FieldObject" Top="0" Left="10140" Width="1229" Height="210" DataSource="{@total}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -497,7 +497,7 @@ else
                   </TextObject>
                   <FieldObject Name="Field" Kind="FieldObject" Top="180" Left="10290" Width="1049" Height="210" DataSource="Sum ({@total}, {ORDERS.ORDER_ID})">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FixedSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FixedSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -513,7 +513,7 @@ else
                   </FieldObject>
                   <FieldObject Name="tax" Kind="FieldObject" Top="405" Left="10290" Width="1049" Height="210" DataSource="{@tax}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -529,7 +529,7 @@ else
                   </FieldObject>
                   <FieldObject Name="shippingcost" Kind="FieldObject" Top="614" Left="10290" Width="1049" Height="210" DataSource="{@shipping cost}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -575,7 +575,7 @@ else
                   </LineObject>
                   <FieldObject Name="ordertotal" Kind="FieldObject" Top="974" Left="10290" Width="1049" Height="210" DataSource="{@order total}">
                     <FieldFormat>
-                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FixedSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                      <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FixedSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
                       <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                     </FieldFormat>
                     <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -1395,7 +1395,7 @@ else
             <ReportObjects>
               <FieldObject Name="ORDERSORDER_ID" Kind="FieldObject" Top="105" Left="660" Width="1710" Height="210" DataSource="{ORDERS.ORDER_ID}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -1475,7 +1475,7 @@ else
               </FieldObject>
               <FieldObject Name="ORDERSORDER_AMOUNT2" Kind="FieldObject" Top="90" Left="8085" Width="1590" Height="210" DataSource="{ORDERS.ORDER_AMOUNT}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -1512,7 +1512,7 @@ else
             <ReportObjects>
               <FieldObject Name="ORDERSORDER_ID2" Kind="FieldObject" Top="105" Left="660" Width="1710" Height="210" DataSource="{ORDERS.ORDER_ID}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -1592,7 +1592,7 @@ else
               </FieldObject>
               <FieldObject Name="ORDERSORDER_AMOUNT22" Kind="FieldObject" Top="90" Left="8085" Width="1590" Height="210" DataSource="{ORDERS.ORDER_AMOUNT}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -1744,7 +1744,7 @@ else
               </TextObject>
               <FieldObject Name="Field8" Kind="FieldObject" Top="120" Left="5100" Width="1890" Height="210" DataSource="Sum ({ORDERS.ORDER_AMOUNT}, {CUSTOMER.CUSTOMER_NAME})">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -1760,7 +1760,7 @@ else
               </FieldObject>
               <FieldObject Name="Field7" Kind="FieldObject" Top="375" Left="5115" Width="1890" Height="210" DataSource="PercentOfSum ({ORDERS.ORDER_AMOUNT}, {CUSTOMER.CUSTOMER_NAME}, {@region})">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="%" CurrencyPosition="crCurrencyPositionFormatTrailingCurrencyOutsideNegative" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="% #,##0.00;-% #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />

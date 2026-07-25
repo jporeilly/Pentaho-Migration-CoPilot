@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\workcontrolgit_OrderProcessingEfficiencyDashboard.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Users\jpore\AppData\Local\Temp\rt-rpts\workcontrolgit_OrderProcessingEfficiencyDashboard.rpt" HasSavedData="True">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
@@ -199,6 +199,8 @@ if requireddate &lt;= {@Order Date} then datetime(date({@Order Date}) + 2, time(
     <RunningTotalFieldDefinitions>
       <RunningTotalFieldDefinition EvaluationConditionType="OnFormula" FormulaName="{#LateOrdersCount}" Kind="RunningTotalField" Name="LateOrdersCount" NumberOfBytes="4" Operation="DistinctCount" OperationParameter="0" ResetConditionType="NoCondition" SummarizedField="{Orders.Order_ID}" ValueType="Int32sField" />
       <RunningTotalFieldDefinition EvaluationConditionType="OnFormula" FormulaName="{#OnTimeOrdersCount}" Kind="RunningTotalField" Name="OnTimeOrdersCount" NumberOfBytes="4" Operation="DistinctCount" OperationParameter="0" ResetConditionType="NoCondition" SummarizedField="{Orders.Order_ID}" ValueType="Int32sField" />
+      <RunningTotalFieldDefinition Name="LateOrdersCount" FormulaName="{#LateOrdersCount}" Operation="DistinctCount" SummarizedField="{Orders.Order_ID}" EvaluationConditionType="OnFormula" ResetConditionType="NoCondition" EvaluateCondition="{@Required Date} - {@Received Date} &lt; 0" ResetCondition="" />
+      <RunningTotalFieldDefinition Name="OnTimeOrdersCount" FormulaName="{#OnTimeOrdersCount}" Operation="DistinctCount" SummarizedField="{Orders.Order_ID}" EvaluationConditionType="OnFormula" ResetConditionType="NoCondition" EvaluateCondition="{@Required Date} - {@Received Date} &gt; 0" ResetCondition="" />
     </RunningTotalFieldDefinitions>
     <SQLExpressionFields />
     <SummaryFields />
@@ -544,6 +546,15 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </BoxObject>
               <ChartObject Name="Graph3" Kind="ChartObject" Top="440" Left="8148" Width="3120" Height="2340">
+                <ChartDefinition StyleType="crChartStyleTypeGauge" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{@Group 1}" Name="Group 1" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({@On-Time Orders}, {@Group 1})" Name="On-Time Orders" />
+                    <Field FormulaName="Sum ({@Late Orders}, {@Group 1})" Name="Late Orders" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -553,6 +564,15 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </ChartObject>
               <ChartObject Name="Graph4" Kind="ChartObject" Top="440" Left="4968" Width="3120" Height="2340">
+                <ChartDefinition StyleType="crChartStyleTypeGauge" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{@Group 1}" Name="Group 1" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Sum ({@On Time Order Count}, {@Group 1})" Name="On Time Order Count" />
+                    <Field FormulaName="Sum ({@Late Order Count}, {@Group 1})" Name="Late Order Count" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -716,7 +736,7 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
             <ReportObjects>
               <FieldObject Name="Field3" Kind="FieldObject" Top="0" Left="555" Width="819" Height="192" DataSource="{Orders.Order_ID}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="#,##0;(#,##0)" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="Bracketed" RoundingFormat="RoundToUnit" FormatString="#,##0;(#,##0)" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -849,7 +869,7 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
               </FieldObject>
               <FieldObject Name="OrderAmount1" Kind="FieldObject" Top="12" Left="3492" Width="1128" Height="228" DataSource="{Orders.Order_Amount}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="$ #,##0.00;-$ #,##0.00" />
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="FloatingSymbol" CurrencySymbol="£" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyOutsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="£ #,##0.00;-£ #,##0.00" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -924,6 +944,15 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <ChartObject Name="Graph5" Kind="ChartObject" Top="480" Left="240" Width="11064" Height="3024">
+                <ChartDefinition StyleType="crChartStyleTypeLine" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Orders.Ship_Date}" Name="Ship_Date" />
+                    <Field FormulaName="{@Late or On Time}" Name="Late or On Time" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="DistinctCount ({Orders.Order_ID}, {@Late or On Time})" Name="Order_ID" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -987,6 +1016,15 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </TextObject>
               <ChartObject Name="Graph6" Kind="ChartObject" Top="552" Left="360" Width="5232" Height="2976">
+                <ChartDefinition StyleType="crChartStyleTypeLine" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Product.Product_Name}" Name="Product_Name" />
+                    <Field FormulaName="{@Late or On Time}" Name="Late or On Time" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="DistinctCount ({Orders.Order_ID}, {@Late or On Time})" Name="Order_ID" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -996,6 +1034,15 @@ if scaler = "M" then totext(currencyfield/1000000,decimals) + "M"
                 <ObjectFormatConditionFormulas />
               </ChartObject>
               <ChartObject Name="Graph7" Kind="ChartObject" Top="552" Left="5988" Width="5232" Height="2976">
+                <ChartDefinition StyleType="crChartStyleTypeLine" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{Customer.Country}" Name="Country" />
+                    <Field FormulaName="{@Late or On Time}" Name="Late or On Time" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="DistinctCount ({Orders.Order_ID}, {@Late or On Time})" Name="Order_ID" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

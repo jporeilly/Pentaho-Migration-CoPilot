@@ -72,6 +72,14 @@
                     <ObjectFormatConditionFormulas />
                   </FieldObject>
                   <ChartObject Name="Graph1" Kind="ChartObject" Top="95" Left="2190" Width="7200" Height="4320">
+                    <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeDetail" Title="Sum of Product_Qty / Customer_Name" Subtitle="">
+                      <ConditionFields>
+                        <Field FormulaName="{DataTable1.Customer_Name}" Name="Customer_Name" />
+                      </ConditionFields>
+                      <DataFields>
+                        <Field FormulaName="Sum ({DataTable1.Product_Qty}, {DataTable1.Customer_Name})" Name="Product_Qty" />
+                      </DataFields>
+                    </ChartDefinition>
                     <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                       <BorderConditionFormulas />
                       <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

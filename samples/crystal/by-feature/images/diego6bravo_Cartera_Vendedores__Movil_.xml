@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\diego6bravo_Cartera_Vendedores__Movil_.rpt" HasSavedData="False">
+<Report Name="" FileName="C:\Users\jpore\AppData\Local\Temp\rt-rpts\diego6bravo_Cartera_Vendedores__Movil_.rpt" HasSavedData="False">
   <Embedinfo>
     <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
   </Embedinfo>
@@ -138,6 +138,7 @@ drop table #TEMP
     </ParameterFieldDefinitions>
     <RunningTotalFieldDefinitions>
       <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotSaldo}" Kind="RunningTotalField" Name="TotSaldo" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Saldo}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition Name="TotSaldo" FormulaName="{#TotSaldo}" Operation="Sum" SummarizedField="{Command.Saldo}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Codigo}" />
     </RunningTotalFieldDefinitions>
     <SQLExpressionFields />
     <SummaryFields />
@@ -391,7 +392,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="DocNum1" Kind="FieldObject" Top="0" Left="682" Width="950" Height="221" DataSource="{Command.DocNum}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -423,7 +424,7 @@ drop table #TEMP
               </FieldObject>
               <FieldObject Name="Saldo1" Kind="FieldObject" Top="0" Left="3600" Width="1440" Height="221" DataSource="{Command.Saldo}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />
@@ -468,7 +469,7 @@ drop table #TEMP
             <ReportObjects>
               <FieldObject Name="TotSaldo1" Kind="FieldObject" Top="120" Left="3600" Width="1440" Height="238" DataSource="{#TotSaldo}">
                 <FieldFormat>
-                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
                   <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
                 </FieldFormat>
                 <Color Name="Black" A="255" R="0" G="0" B="0" />

@@ -324,9 +324,15 @@ def test_string_plus_uses_field_types():
     assert f.translation == "=[A] + [A]"
 
 
-def test_percent_operator_is_not_silently_mistranslated():
+def test_percent_operator_translates_to_percentage_of():
+    """Crystal's binary % is 'percentage of' (x % y = x*100/y) — rewritten
+    explicitly, never passed through to OpenFormula's postfix percent."""
     f = translate_formula("t", "{O.A} % {O.B}")
-    assert f.status == "manual"
+    assert f.translation == "=[A] * 100 / [B]"
+    assert f.status == "auto"
+    # chains stay left-associative like Crystal
+    f = translate_formula("t", "{O.A} % {O.B} * 2")
+    assert f.translation == "=[A] * 100 / [B] * 2"
 
 
 def test_stddev_summary_folds_into_windowed_sql_column(tmp_path):

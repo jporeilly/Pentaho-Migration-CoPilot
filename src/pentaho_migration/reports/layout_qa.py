@@ -69,25 +69,85 @@ def _label(el) -> str:
 _CONTENT_KINDS = {"label", "field", "chart", "image", "special"}
 
 
+_DEOVERLAP_GAP = 2.0  # points of clearance between nudged elements
+
+
+def _movable_text(section):
+    """Text elements safe to nudge apart: always-visible labels/fields.
+    Anything with a visibility condition is exempt - Crystal designs stack
+    mutually-exclusive fields in the same spot and show one at runtime."""
+    return [el for el in section.elements
+            if el.kind in ("label", "field", "special")
+            and el.visible
+            and not any(key == "visible" for key, _ in el.style_expressions)
+            and not el.condition_formulas]
+
+
+def _deoverlap_text(section):
+    """Nudge overlapping always-visible text apart: the later element (by
+    reading order) moves right or down, whichever displacement is smaller.
+    Sweeps until stable; anything a sweep cap leaves stays lint-flagged."""
+    moved = set()
+    content = sorted(_movable_text(section), key=lambda e: (e.y, e.x))
+    for _ in range(4):
+        collided = False
+        for i, a in enumerate(content):
+            for b in content[i + 1:]:
+                ox = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
+                oy = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
+                if ox <= 0 or oy <= 0:
+                    continue
+                smaller = min(a.width * a.height, b.width * b.height)
+                if smaller <= 0 or (ox * oy) / smaller <= 0.4:
+                    continue
+                dx = a.x + a.width - b.x + _DEOVERLAP_GAP
+                dy = a.y + a.height - b.y + _DEOVERLAP_GAP
+                # keep visual structure: same-row neighbours spread RIGHT
+                # (a row of columns stays a row), same-column stacks go DOWN
+                same_row = oy >= 0.6 * min(a.height, b.height)
+                stacked = abs(a.x - b.x) < 4.0
+                if same_row and not stacked:
+                    b.x = round(b.x + dx, 1)   # a row of columns stays a row
+                elif stacked:
+                    b.y = round(b.y + dy, 1)   # a stack becomes clean rows
+                elif dx <= dy:
+                    b.x = round(b.x + dx, 1)   # otherwise: minimal displacement
+                else:
+                    b.y = round(b.y + dy, 1)
+                moved.add(id(b))
+                collided = True
+        if not collided:
+            break
+        content.sort(key=lambda e: (e.y, e.x))
+    return len(moved)
+
+
 def autofit_layout(model) -> int:
-    """Deterministic layout repair for the two mechanically-safe finding
-    classes:
+    """Deterministic layout repair for the mechanically-safe finding classes:
 
-    - page-overflow: any band whose content extends past the printable width
-      has ALL its elements' x/width scaled proportionally to fit (relative
-      alignment preserved, fonts untouched);
-    - font-clip: a text box shorter than its font (descenders clip) grows to
-      font size + 2pt, and the band grows with the content if needed.
+    - text overlaps: always-visible labels/fields that would print on top of
+      each other are nudged apart (right or down, minimal displacement) -
+      elements with a visibility condition are exempt (stacked alternates),
+      and image/chart overlaps stay flagged (usually intentional watermarks);
+    - page-overflow: a band whose content extends past the printable width
+      has ALL its elements' x/width scaled proportionally to fit (runs after
+      the de-overlap so nudges that pushed content wide are squeezed back);
+    - font-clip: a text box shorter than its font grows to font size + 2pt,
+      and the band grows with the content if needed.
 
-    Each repair lands in model.issues for review. Overlaps are deliberately
-    NOT auto-fixed: an image under text is usually an intentional
-    watermark/fade, and moving elements would guess at design intent - those
-    stay flagged by the lint. Returns the number of repairs."""
+    Each repair lands in model.issues for review. Returns repairs made."""
     width = usable_page_width(model.page)
     repaired = 0
     for section in model.sections:
         if section.suppressed:
             continue
+        nudged = _deoverlap_text(section)
+        if nudged:
+            repaired += 1
+            model.issues.append(
+                f"layout auto-fit: {_band(section)} - {nudged} overlapping text "
+                "element(s) nudged apart (right/down, reading order kept) - "
+                "verify against the original layout")
         extent = max((el.x + el.width for el in section.elements), default=0.0)
         if extent > width:
             factor = width / extent
@@ -107,14 +167,15 @@ def autofit_layout(model) -> int:
                 el.height = round(el.font.size + 2, 1)
                 grown += 1
         if grown:
-            bottom = max(el.y + el.height for el in section.elements)
-            if bottom > section.height:
-                section.height = round(bottom, 1)
             repaired += 1
             model.issues.append(
                 f"layout auto-fit: {_band(section)} - {grown} text box(es) grown "
                 "to fit their font (descenders would have clipped); verify "
                 "nothing now touches the element below")
+        if nudged or grown:
+            bottom = max((el.y + el.height for el in section.elements), default=0.0)
+            if bottom > section.height:
+                section.height = round(bottom, 1)
     return repaired
 
 

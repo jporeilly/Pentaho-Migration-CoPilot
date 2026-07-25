@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\worrallbrian_MostRecentStructuringOfCanadianCities.rpt" HasSavedData="True">
+<Report Name="" FileName="C:\Users\jpore\AppData\Local\Temp\rt-rpts\worrallbrian_MostRecentStructuringOfCanadianCities.rpt" HasSavedData="True">
   <Embedinfo />
   <Summaryinfo KeywordsinReport="" ReportAuthor="BW" ReportComments="" ReportSubject="Geography, History, Canada" ReportTitle="Most Recent Structuring of Canadian Cities" />
   <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
@@ -43,6 +43,7 @@
     <ParameterFieldDefinitions />
     <RunningTotalFieldDefinitions>
       <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#DateGroupTotal}" Kind="RunningTotalField" Name="DateGroupTotal" NumberOfBytes="4" Operation="Count" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{vw_major_cities_canada.Most_Recent_Structuring}" ValueType="Int32sField" />
+      <RunningTotalFieldDefinition Name="DateGroupTotal" FormulaName="{#DateGroupTotal}" Operation="Count" SummarizedField="{vw_major_cities_canada.Most_Recent_Structuring}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{vw_major_cities_canada.Most_Recent_Structuring}" />
     </RunningTotalFieldDefinitions>
     <SQLExpressionFields />
     <SummaryFields />
@@ -142,6 +143,14 @@
             </SectionFormat>
             <ReportObjects>
               <ChartObject Name="Graph1" Kind="ChartObject" Top="120" Left="240" Width="10920" Height="5160">
+                <ChartDefinition StyleType="crChartStyleTypeBar" ChartType="crChartTypeDetail" Title="Most Recent Structuring by Date" Subtitle="">
+                  <ConditionFields>
+                    <Field FormulaName="{vw_major_cities_canada.Most_Recent_Structuring}" Name="Most_Recent_Structuring" />
+                  </ConditionFields>
+                  <DataFields>
+                    <Field FormulaName="Count ({vw_major_cities_canada.Most_Recent_Structuring}, {vw_major_cities_canada.Most_Recent_Structuring})" Name="Most_Recent_Structuring" />
+                  </DataFields>
+                </ChartDefinition>
                 <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                   <BorderConditionFormulas />
                   <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />

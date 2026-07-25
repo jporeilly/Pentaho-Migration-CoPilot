@@ -7,6 +7,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.29.0] — 2026-07-25
+
+### Added
+
+- **Running totals convert** (`{#name}`). RunningTotalFieldDefinitions —
+  present in the dumps (and now also emitted from the RAS model by the
+  fork, which carries the reset GROUP the engine walk loses) — become
+  group-scoped Item* report functions: the same live-verified mapping as
+  the running-total variable rewrite. Entries dedupe by name preferring
+  reset-aware ones; engine-only defs assume the innermost group with a
+  verify note; evaluate conditions / non-group resets stay honest TODOs.
+- **Binary `%` translates**: Crystal's `x % y` means "percentage of" —
+  rewritten explicitly as `x * 100 / y` (never passed through to
+  OpenFormula's postfix divide-by-100).
+- **`crNoColor` / `DefaultAttribute` branches convert**: `Else crNoColor`,
+  `Else DefaultAttribute` and If-without-Else in condition formulas become
+  **2-arg IFs** — the engine keeps the element's static style when the
+  expression yields no value (live-verified: the red branch fires, every
+  other row keeps its static ink). Unexpressible positions stay honest.
+- **Real currency symbols**: the fork reads `NumericFieldFormat
+  .CurrencySymbol` from the RAS model (readable, unlike PictureData) and
+  bakes the actual symbol into the computed `FormatString` — "$" is now
+  only the fallback for an enabled-but-unnamed symbol.
+- **Text de-overlap in the layout auto-fit**: overlapping always-visible
+  labels/fields are nudged apart (same-row neighbours spread right, stacks
+  become rows, otherwise minimal displacement); elements with visibility
+  conditions are never moved (Crystal stacks mutually-exclusive fields).
+  Corpus triage after this round: **98 READY / 52 REVIEW** of 150 (was 7/143 three releases ago); todo-placeholders 61 -> 26.
+
 ## [1.28.0] — 2026-07-25
 
 ### Added

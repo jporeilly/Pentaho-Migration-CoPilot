@@ -154,11 +154,14 @@ _FIELD_REF_ONLY = re.compile(r"^\[(\w+)\]$")
 class _Parser:
     """Recursive-descent translator emitting OpenFormula text."""
 
-    def __init__(self, tokens, field_types=None):
+    def __init__(self, tokens, field_types=None, allow_keep=False):
         self.tokens = tokens
         self.pos = 0
         self.notes = []
         self.field_types = field_types or {}
+        # style-condition context: crNoColor/DefaultAttribute allowed as the
+        # "keep the static style" branch (2-arg IF)
+        self.allow_keep = allow_keep
 
     def _is_stringish(self, operand):
         """True when an emitted operand is knowably a string: a literal at
@@ -247,15 +250,18 @@ class _Parser:
                 return out
 
     def mul_expr(self):
-        # note: '%' is deliberately NOT an operator here — Crystal has no
-        # binary %, and OpenFormula's % is a postfix percent (divide by 100),
-        # so passing it through would silently change semantics
+        # Crystal's binary % is "percentage of": x % y = x * 100 / y. It must
+        # NOT pass through verbatim — OpenFormula's % is a postfix
+        # divide-by-100, which would silently change semantics — so it is
+        # rewritten explicitly. Same precedence/left-associativity as * and /.
         out = self.unary()
         while True:
             kind, val = self.peek()
-            if kind == "op" and val in ("*", "/"):
+            if kind == "op" and val in ("*", "/", "%"):
                 self.next()
-                out = f"{out} {val} {self.unary()}"
+                right = self.unary()
+                out = (f"{out} * 100 / {right}" if val == "%"
+                       else f"{out} {val} {right}")
             elif self._is_kw(self.peek(), "mod"):
                 self.next()
                 out = f"MOD({out};{self.unary()})"
@@ -295,8 +301,14 @@ class _Parser:
             if low in CR_COLORS:
                 return CR_COLORS[low]
             if low in ("crnocolor", "defaultattribute"):
+                if self.allow_keep:
+                    # 'keep the static value': becomes the omitted branch of a
+                    # 2-arg IF - the engine falls back to the element's static
+                    # style when a style expression yields no value
+                    return "__KEEP__"
                 raise TranslationError(
-                    f"{val} means 'keep the static value' - no style-expression equivalent")
+                    f"{val} means 'keep the static value' - only meaningful "
+                    "in a conditional-format formula")
             if low in KEYWORDS:
                 raise TranslationError(f"unexpected keyword {val!r}")
             raise TranslationError(f"unknown identifier {val!r} (undeclared variable?)")
@@ -312,9 +324,17 @@ class _Parser:
             self.next()
             else_val = self.expr()
         else:
+            if self.allow_keep:
+                # a condition formula without Else keeps the static style -
+                # exactly what a 2-arg IF does (no value -> engine fallback)
+                return f"IF({cond};{then_val})"
             else_val = '""' if then_val.lstrip().startswith('"') else "0"
             self.notes.append("Crystal If without Else: default branch emitted "
                               f"({else_val}) to match Crystal's implicit default")
+        if else_val == "__KEEP__":
+            return f"IF({cond};{then_val})"
+        if then_val == "__KEEP__":
+            return f"IF(NOT({cond});{else_val})"
         return f"IF({cond};{then_val};{else_val})"
 
     def func_call(self, low, original):
@@ -669,8 +689,10 @@ _STYLE_KEY_MAP = {
 def translate_style_condition(attr, text, field_types=None):
     """One Crystal conditional-format formula -> (prd_style_key, openformula).
     Raises TranslationError for attributes with no PRD style mapping or
-    formulas the deterministic translator cannot prove (crNoColor,
-    DefaultAttribute, variables, ...)."""
+    formulas the deterministic translator cannot prove (variables, ...).
+    crNoColor / DefaultAttribute branches ('keep the static value') become
+    the omitted branch of a 2-arg IF - the engine keeps the element's static
+    style when the expression yields no value (live-verified)."""
     mapping = _STYLE_KEY_MAP.get(attr.lower())
     if mapping is None:
         raise TranslationError(f"no PRD style mapping for conditional {attr}")
@@ -679,8 +701,14 @@ def translate_style_condition(attr, text, field_types=None):
     for pattern, why in BLOCKER_PATTERNS:
         if re.search(pattern, stripped):
             raise TranslationError(why)
-    parser = _Parser(_tokenize(text), field_types=field_types)
+    parser = _Parser(_tokenize(text), field_types=field_types, allow_keep=True)
     expr = parser.parse()
+    if "__KEEP__" in expr:
+        # the sentinel survived outside an If branch (bare crNoColor, or a
+        # position the 2-arg rewrite cannot express) - stay honest
+        raise TranslationError(
+            "crNoColor/DefaultAttribute in a position with no "
+            "keep-static-style equivalent")
     if invert:
         expr = f"NOT({expr})"
     return style_key, "=" + expr

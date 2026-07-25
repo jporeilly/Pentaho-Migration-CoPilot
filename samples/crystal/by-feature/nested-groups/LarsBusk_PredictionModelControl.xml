@@ -307,6 +307,12 @@ Where			par.Obsolete = 0
                 </SectionFormat>
                 <ReportObjects>
                   <ChartObject Name="Graph1" Kind="ChartObject" Top="0" Left="0" Width="9656" Height="4320">
+                    <ChartDefinition StyleType="crChartStyleTypeLine" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                      <ConditionFields />
+                      <DataFields>
+                        <Field FormulaName="Sum ({Kommando.Difference})" Name="Difference" />
+                      </DataFields>
+                    </ChartDefinition>
                     <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                       <BorderConditionFormulas />
                       <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
@@ -388,6 +394,15 @@ Where			par.Obsolete = 0
                 </SectionFormat>
                 <ReportObjects>
                   <ChartObject Name="Graph2" Kind="ChartObject" Top="0" Left="0" Width="9656" Height="4320">
+                    <ChartDefinition StyleType="crChartStyleTypeLine" ChartType="crChartTypeDetail" Title="" Subtitle="">
+                      <ConditionFields />
+                      <DataFields>
+                        <Field FormulaName="Sum ({Kommando.LowerWarning})" Name="LowerWarning" />
+                        <Field FormulaName="Sum ({Kommando.UpperWarning})" Name="UpperWarning" />
+                        <Field FormulaName="Sum ({Kommando.LowerError})" Name="LowerError" />
+                        <Field FormulaName="Sum ({Kommando.UpperError})" Name="UpperError" />
+                      </DataFields>
+                    </ChartDefinition>
                     <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
                       <BorderConditionFormulas />
                       <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
