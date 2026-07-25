@@ -43,6 +43,8 @@ semantic judgment is required):
 | Record selection formula | Folded into the SQL `WHERE` (alias-aware for `{Command.X}` refs) — converted prompts filter live | Deterministic |
 | Parameters (prompts) | PRD parameters; static pick-lists → list-parameters; multi-value → `IN (${p})`; a folded prompt becomes a **query-backed dropdown** (`SELECT DISTINCT` on the live database) | Deterministic |
 | Summary fields (Sum, Count, Avg, Max, Min, DistinctCount) | Item*/CountDistinct report functions, group-scoped (count functions correctly fieldless) | Deterministic |
+| **StdDev / Variance summaries** (incl. population variants) | PRD has no such function — folded into a **windowed SQL column** (`STDDEV_SAMP(col) OVER (PARTITION BY group)`, report SQL wrapped in a subquery, group ordering re-applied) that the footer field binds to. Live-verified. Dialect note: SQL Server uses `STDEV`/`VAR` | Deterministic → review |
+| **Layout auto-fit** | Page-overflow bands scale proportionally to the printable width; text boxes shorter than their font grow to fit (each repair is a review issue). Overlaps stay flagged — an image under text is usually intentional | Deterministic → review |
 | **Subreports** (linked & unlinked) | **Nested PRD sub-report bundles**: the child converts through the full pipeline (own query, groups, formulas, formatting); Crystal `Pm-<field>` links become `input-parameter` mappings and the child's record selection folds to a parameterized `WHERE` | Deterministic → review |
 | **Cross-tabs** (with a `<CrossTabDefinition>` block in the dump) | **Live PRD crosstab** hosted in a nested sub-report: row/column dimension groups + `wizard:aggregation-type` cells (Sum/Count/Average/Max/Min), child query auto-`ORDER BY`-ed over the dimensions (the crosstab runtime requires sorted data); the bundle declares prpt-spec 5.0 | Deterministic → review |
 
@@ -69,7 +71,7 @@ semantic judgment is required):
 | RunningTotalField objects (`{#name}` with reset conditions) | Resolved via SummaryFields when present; the extractor emits empty definitions, so bespoke reset conditions need the fork extended |
 | Arrays, loops, multi-variable formula state | Original text preserved, `manual` status, LLM advice |
 | Group Sort Expert / Top N (groups ordered by a summary) | Review note — order in the query or rebuild with PRD group sorting |
-| StdDev / Median / other summaries with no PRD function | Review note + TODO placeholder for referencing elements |
+| Median / other summaries with no PRD function or SQL window aggregate | Review note + TODO placeholder for referencing elements (StdDev/Variance **convert** — see the data table above) |
 | Dynamic / cascading parameter pick-lists | Textbox parameter + note (rebuild as query-backed parameters) |
 | `crNoColor` / `DefaultAttribute` conditional branches | Condition kept as a note (means "keep the static value") |
 

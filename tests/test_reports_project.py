@@ -60,6 +60,58 @@ def test_project_reports_api(store):
                        json={"file": "nope.xml", "status": "verified"}).status_code == 404
 
 
+# -------------------------------------------------- triage / parity agents
+
+LADDER = Path(__file__).resolve().parents[1] / "samples" / "cr_demo"
+
+
+def test_triage_endpoint_persists_verdicts(store):
+    record_report(_record(file="01_member_roster.xml", name="Roster",
+                          source_path=str(LADDER / "01_member_roster.xml")))
+    record_report(_record(file="gone.xml", name="Gone",
+                          source_path=str(LADDER / "does_not_exist.xml")))
+    res = client.post("/project/reports/triage")
+    assert res.status_code == 200
+    rows = {r["file"]: r for r in res.json()}
+    # a clean rung triages READY without a database
+    assert rows["01_member_roster.xml"]["triage_verdict"] == "READY"
+    # a report whose source dump vanished is BLOCKED with the reason recorded
+    assert rows["gone.xml"]["triage_verdict"] == "BLOCKED"
+    assert "not found" in rows["gone.xml"]["triage_json"]
+    # verdicts persist in the store
+    stored = {r.file: r for r in list_reports()}
+    assert stored["01_member_roster.xml"].triage_verdict == "READY"
+
+
+def test_triage_records_review_reasons(store):
+    record_report(_record(file="06_suspicious_activity.xml", name="SAR",
+                          source_path=str(LADDER / "06_suspicious_activity.xml")))
+    client.post("/project/reports/triage")
+    import json as _json
+
+    (row,) = list_reports()
+    assert row.triage_verdict == "REVIEW"
+    detail = _json.loads(row.triage_json)
+    assert any("TODO" in reason for reason in detail["reasons"])
+    assert detail["sql_status"] == "unchecked"  # no JNDI given
+
+
+def test_parity_endpoint_gating(store, monkeypatch):
+    # unknown report -> 404
+    res = client.post("/project/report-parity?file=nope.xml",
+                      files={"reference": ("ref.csv", b"A\n1\n", "text/csv")})
+    assert res.status_code == 404
+    # known report but no PRD environment -> 503, verdict NOT persisted
+    record_report(_record(file="01_member_roster.xml", name="Roster",
+                          source_path=str(LADDER / "01_member_roster.xml")))
+    monkeypatch.setattr(
+        "pentaho_migration.reports.prpt_validator.validator_available", lambda: False)
+    res = client.post("/project/report-parity?file=01_member_roster.xml",
+                      files={"reference": ("ref.csv", b"A\n1\n", "text/csv")})
+    assert res.status_code == 503
+    assert list_reports()[0].parity_verdict == ""
+
+
 def test_summary_carries_wireframe_geometry():
     res = client.post("/reports/inspect",
                       files={"dump": ("b.xml", SAMPLE.read_bytes(), "text/xml")})

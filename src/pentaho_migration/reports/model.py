@@ -22,6 +22,18 @@ SUMMARY_CLASS_MAP = {
     "DistinctCount": "org.pentaho.reporting.engine.classic.core.function.CountDistinctFunction",
 }
 
+# Crystal summary operations with NO PRD report function but a standard SQL
+# window aggregate: folded into the report SQL as a computed column
+# (FUNC(col) OVER (PARTITION BY group)) that the footer field binds to.
+# Crystal's StdDev/Variance are the SAMPLE variants (N-1). Dialect note:
+# PostgreSQL/Oracle/MySQL 8 use these names; SQL Server uses STDEV/VAR.
+WINDOW_AGG_MAP = {
+    "StdDeviation": "STDDEV_SAMP",
+    "Variance": "VAR_SAMP",
+    "PopStandardDeviation": "STDDEV_POP",
+    "PopVariance": "VAR_POP",
+}
+
 
 @dataclass
 class Font:
@@ -204,6 +216,7 @@ class ReportModel:
     record_sorts: list = field(default_factory=list)  # (bare column, descending) detail ordering
     table_links: list = field(default_factory=list)   # ((table, col), (table, col)) visual links
     param_sql_columns: dict = field(default_factory=dict)  # param name -> folded SQL column expr
+    window_columns: list = field(default_factory=list)  # (alias, sql func, column, group column) folded window aggregates
     subreports: dict = field(default_factory=dict)    # subreport name -> child ReportModel
     page: PageSetup = field(default_factory=PageSetup)
     issues: list = field(default_factory=list)       # global conversion warnings

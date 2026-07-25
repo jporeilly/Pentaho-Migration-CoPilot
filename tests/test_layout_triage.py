@@ -52,6 +52,35 @@ def test_lint_skips_suppressed_bands_and_decor():
     assert lint_layout(m).findings == []
 
 
+def test_autofit_scales_overflowing_band_to_printable_width():
+    """User ask: 'can't the agent adjust printable widths?' - page-overflow
+    is repaired deterministically by proportional band scaling."""
+    from pentaho_migration.reports.layout_qa import autofit_layout
+
+    wide = Element(kind="field", name="Wide", x=500, y=0, width=400, height=14)
+    ok = Element(kind="label", name="Ok", text="x", x=0, y=0, width=100, height=14)
+    m = _model(wide, ok)                      # A4 landscape: printable 806pt
+    assert autofit_layout(m) == 1
+    factor = 806.0 / 900.0
+    assert abs((wide.x + wide.width) - 806.0) < 0.5
+    assert abs(ok.width - 100 * factor) < 0.5  # whole band scales together
+    assert any("auto-fit" in i for i in m.issues)
+    assert not [f for f in lint_layout(m).findings if f.code == "page-overflow"]
+
+
+def test_autofit_leaves_fitting_and_suppressed_bands_alone():
+    from pentaho_migration.reports.layout_qa import autofit_layout
+
+    fits = Element(kind="field", name="F", x=0, y=0, width=300, height=14)
+    m = _model(fits)
+    assert autofit_layout(m) == 0
+    assert fits.width == 300
+    wide = Element(kind="field", name="W", x=0, y=0, width=900, height=14)
+    m2 = _model(wide)
+    m2.sections[0].suppressed = True
+    assert autofit_layout(m2) == 0             # suppressed bands never print
+
+
 def test_demo_ladder_is_layout_clean():
     """The QA agent found real overflows in the authored demos (TotRule at
     900pt on an 806pt page); they are fixed - only intentional TODO
@@ -113,7 +142,7 @@ def test_triage_report_markdown():
     assert len(results) == 9
     md = build_triage_report(results, jndi="")
     assert md.startswith("# Migration Triage Report")
-    assert "READY 5 | REVIEW 4 | BLOCKED 0" in md
+    assert "READY 6 | REVIEW 3 | BLOCKED 0" in md
     assert "Member Statement" in md
     assert "## Needs review" in md
 

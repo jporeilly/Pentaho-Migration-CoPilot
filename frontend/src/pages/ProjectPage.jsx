@@ -1,13 +1,20 @@
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import EffortPanel from '../components/EffortPanel.jsx'
 import Explain from '../components/Explain.jsx'
 
 const STATUSES = ['converted', 'in_review', 'verified', 'failed']
 const STATUS_ICON = { converted: '·', in_review: '⚠', verified: '✓', failed: '✋' }
 
+const TRIAGE_ICON = { READY: '✓', REVIEW: '⚠', BLOCKED: '✋' }
+
 export default function ProjectPage({ onBack, onOpen }) {
   const [rows, setRows] = useState(null)
   const [reports, setReports] = useState([])
+  const [jndi, setJndi] = useState(localStorage.getItem('triageJndi') || '')
+  const [triaging, setTriaging] = useState(false)
+  const [expanded, setExpanded] = useState(null)     // report file with open detail
+  const [parityBusy, setParityBusy] = useState(null) // report file being checked
+  const [agentError, setAgentError] = useState('')
 
   const refresh = useCallback(async () => {
     const res = await fetch('/project')
@@ -34,6 +41,49 @@ export default function ProjectPage({ onBack, onOpen }) {
       body: JSON.stringify({ file: row.file, status }),
     })
     refresh()
+  }
+
+  async function runTriage() {
+    setTriaging(true)
+    setAgentError('')
+    localStorage.setItem('triageJndi', jndi)
+    try {
+      const res = await fetch(`/project/reports/triage?jndi=${encodeURIComponent(jndi)}`,
+                              { method: 'POST' })
+      if (!res.ok) throw new Error((await res.json()).detail || res.statusText)
+      setReports(await res.json())
+    } catch (err) {
+      setAgentError(`Triage failed: ${err.message}`)
+    } finally {
+      setTriaging(false)
+    }
+  }
+
+  async function runParity(row, file) {
+    if (!file) return
+    setParityBusy(row.file)
+    setAgentError('')
+    try {
+      const body = new FormData()
+      body.append('reference', file)
+      const res = await fetch(
+        `/project/report-parity?file=${encodeURIComponent(row.file)}&jndi=${encodeURIComponent(jndi)}`,
+        { method: 'POST', body })
+      if (!res.ok) throw new Error((await res.json()).detail || res.statusText)
+      refresh()
+    } catch (err) {
+      setAgentError(`Parity failed for ${row.name}: ${err.message}`)
+    } finally {
+      setParityBusy(null)
+    }
+  }
+
+  function triageDetail(row) {
+    try {
+      return JSON.parse(row.triage_json || '{}')
+    } catch {
+      return {}
+    }
   }
 
   if (rows === null) return <p className="loading">Loading project…</p>
@@ -158,25 +208,92 @@ export default function ProjectPage({ onBack, onOpen }) {
 
     {reports.length > 0 && (
       <section className="card">
-        <header><h2>Crystal reports <span>{reports.length} converted</span></h2></header>
+        <header>
+          <h2>Crystal reports <span>{reports.length} converted</span></h2>
+          <div className="triage-bar">
+            <input
+              className="jndi-input"
+              placeholder="JNDI for SQL check (optional)"
+              value={jndi}
+              onChange={(e) => setJndi(e.target.value)}
+              title="With a JNDI name the triage also EXPLAIN-validates each report's SQL against that live connection"
+            />
+            <button className="primary" onClick={runTriage} disabled={triaging}>
+              {triaging ? 'Triaging…' : '🔎 Run triage'}
+            </button>
+          </div>
+        </header>
+        <Explain>
+          <b>Run triage</b> sweeps every stored report with the batch-triage
+          agent: formula counts, TODO placeholders, <b>layout QA lint</b>
+          (page overflow, collisions, font clipping) and — with a JNDI name —
+          the report SQL <b>EXPLAIN-validated against the live database</b>.
+          Verdicts: <b>✓ READY</b> (convert-and-go), <b>⚠ REVIEW</b> (click
+          the chip for the exact review reasons), <b>✋ BLOCKED</b> (SQL fails
+          or the dump no longer parses). <b>Parity</b> takes the customer's
+          original Crystal export (PDF or CSV) per report and diffs the real
+          numbers rendered from the converted .prpt — PASS / NEAR / FAIL.
+          Re-run triage after re-converting; verdicts persist in the store.
+        </Explain>
+        {agentError && <div className="error">{agentError}</div>}
         <div className="table-scroll">
           <table className="project-table">
             <thead>
               <tr>
                 <th>Report</th><th>Dump file</th>
+                <th title="Batch-triage verdict — click a chip for reasons">Triage</th>
+                <th title="Output parity vs the customer's Crystal export (upload PDF/CSV)">Parity</th>
                 <th className="num" title="Formulas translated deterministically">✓ auto</th>
                 <th className="num" title="Formulas needing a human glance">⚠ review</th>
                 <th className="num" title="Formulas to rebuild by hand">✋ manual</th>
-                <th className="num" title="TODO placeholders (subreports, images, conditional formatting)">TODOs</th>
+                <th className="num" title="TODO placeholders (subreports, images, cross-tabs)">TODOs</th>
                 <th className="num" title="Estimated hours saved vs a manual rebuild">Saved</th>
                 <th>Status</th><th>Updated</th>
               </tr>
             </thead>
             <tbody>
-              {reports.map((r) => (
-                <tr key={r.file}>
+              {reports.map((r) => {
+                const detail = triageDetail(r)
+                const reasons = detail.reasons || []
+                return (
+                <React.Fragment key={r.file}>
+                <tr>
                   <td className="cell-clip" title={r.name}>{r.name}</td>
                   <td className="notes cell-clip" title={r.file}>{r.file}</td>
+                  <td>
+                    {r.triage_verdict ? (
+                      <button
+                        className={`triage-chip verdict-${r.triage_verdict.toLowerCase()}`}
+                        title={reasons.length ? 'Show review reasons' : 'No findings'}
+                        onClick={() => setExpanded(expanded === r.file ? null : r.file)}
+                      >
+                        {TRIAGE_ICON[r.triage_verdict] || ''} {r.triage_verdict}
+                        {reasons.length > 0 && ` (${reasons.length})`}
+                      </button>
+                    ) : <span className="muted">—</span>}
+                  </td>
+                  <td>
+                    {parityBusy === r.file ? (
+                      <span className="muted">checking…</span>
+                    ) : r.parity_verdict ? (
+                      <span
+                        className={`triage-chip parity-${r.parity_verdict.toLowerCase()}`}
+                        title={r.parity_note}
+                      >
+                        {r.parity_verdict}
+                      </span>
+                    ) : (
+                      <label className="parity-upload" title="Upload the customer's Crystal export (PDF or CSV) to diff the numbers">
+                        📄 check
+                        <input
+                          type="file"
+                          accept=".pdf,.csv"
+                          style={{ display: 'none' }}
+                          onChange={(e) => { runParity(r, e.target.files[0]); e.target.value = '' }}
+                        />
+                      </label>
+                    )}
+                  </td>
                   <td className="num">{r.formulas_auto}</td>
                   <td className="num">{r.formulas_review}</td>
                   <td className="num">{r.formulas_manual}</td>
@@ -198,7 +315,27 @@ export default function ProjectPage({ onBack, onOpen }) {
                   </td>
                   <td className="cell-time">{r.updated_at.slice(0, 16)}</td>
                 </tr>
-              ))}
+                {expanded === r.file && (
+                  <tr className="triage-detail-row">
+                    <td colSpan={11}>
+                      <div className="triage-detail">
+                        {detail.sql_status && (
+                          <p className={`sql-line sql-${detail.sql_status}`}>
+                            SQL vs live DB: <b>{detail.sql_status}</b>
+                            {detail.sql_error ? ` — ${detail.sql_error}` : ''}
+                          </p>
+                        )}
+                        {reasons.length ? (
+                          <ul>
+                            {reasons.map((reason, i) => <li key={i}>{reason}</li>)}
+                          </ul>
+                        ) : <p className="muted">No findings — ready to hand over.</p>}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
+              )})}
             </tbody>
           </table>
         </div>

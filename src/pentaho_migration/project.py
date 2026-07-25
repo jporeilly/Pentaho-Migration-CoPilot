@@ -126,9 +126,25 @@ CREATE TABLE IF NOT EXISTS reports (
     copilot_hours   REAL NOT NULL,
     manual_hours    REAL NOT NULL,
     status          TEXT NOT NULL DEFAULT 'converted',
+    triage_verdict  TEXT NOT NULL DEFAULT '',
+    triage_json     TEXT NOT NULL DEFAULT '',
+    parity_verdict  TEXT NOT NULL DEFAULT '',
+    parity_note     TEXT NOT NULL DEFAULT '',
     updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 """
+
+# agent-result columns added after the table first shipped (auto-migrated)
+_REPORTS_AGENT_COLUMNS = ("triage_verdict", "triage_json",
+                          "parity_verdict", "parity_note")
+
+
+def _ensure_reports(conn) -> None:
+    conn.execute(REPORTS_SCHEMA)
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(reports)")}
+    for col in _REPORTS_AGENT_COLUMNS:
+        if col not in columns:
+            conn.execute(f"ALTER TABLE reports ADD COLUMN {col} TEXT NOT NULL DEFAULT ''")
 
 
 class ReportRecord(BaseModel):
@@ -142,12 +158,16 @@ class ReportRecord(BaseModel):
     copilot_hours: float
     manual_hours: float
     status: str = "converted"
+    triage_verdict: str = ""   # READY | REVIEW | BLOCKED | '' (never triaged)
+    triage_json: str = ""      # TriageResult detail as JSON (reasons, sql, layout)
+    parity_verdict: str = ""   # PASS | NEAR | FAIL | '' (never checked)
+    parity_note: str = ""
     updated_at: str = ""
 
 
 def record_report(record: ReportRecord) -> None:
     with _connect() as conn:
-        conn.execute(REPORTS_SCHEMA)
+        _ensure_reports(conn)
         conn.execute(
             """INSERT INTO reports
                (file, name, source_path, formulas_auto, formulas_review,
@@ -169,7 +189,7 @@ def record_report(record: ReportRecord) -> None:
 
 def list_reports() -> list[ReportRecord]:
     with _connect() as conn:
-        conn.execute(REPORTS_SCHEMA)
+        _ensure_reports(conn)
         rows = conn.execute(
             "SELECT * FROM reports ORDER BY formulas_manual DESC, file"
         ).fetchall()
@@ -180,9 +200,33 @@ def set_report_status(file: str, status: str) -> bool:
     if status not in STATUSES:
         raise ValueError(f"status must be one of {STATUSES}")
     with _connect() as conn:
-        conn.execute(REPORTS_SCHEMA)
+        _ensure_reports(conn)
         cursor = conn.execute(
             "UPDATE reports SET status=?, updated_at=datetime('now') WHERE file=?",
             (status, file),
+        )
+    return cursor.rowcount > 0
+
+
+def set_report_triage(file: str, verdict: str, detail_json: str) -> bool:
+    """Persist a batch-triage verdict (READY/REVIEW/BLOCKED + detail JSON)."""
+    with _connect() as conn:
+        _ensure_reports(conn)
+        cursor = conn.execute(
+            "UPDATE reports SET triage_verdict=?, triage_json=?, "
+            "updated_at=datetime('now') WHERE file=?",
+            (verdict, detail_json, file),
+        )
+    return cursor.rowcount > 0
+
+
+def set_report_parity(file: str, verdict: str, note: str) -> bool:
+    """Persist an output-parity verdict (PASS/NEAR/FAIL + note)."""
+    with _connect() as conn:
+        _ensure_reports(conn)
+        cursor = conn.execute(
+            "UPDATE reports SET parity_verdict=?, parity_note=?, "
+            "updated_at=datetime('now') WHERE file=?",
+            (verdict, note, file),
         )
     return cursor.rowcount > 0

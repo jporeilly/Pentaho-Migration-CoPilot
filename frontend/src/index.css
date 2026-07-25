@@ -689,3 +689,38 @@ th.num { text-align: right; }
 .wf-legend span { display: inline-flex; align-items: center; gap: .35rem; }
 .wf-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
+
+/* ---------- Project page: triage / parity agents ---------- */
+.triage-bar { display: flex; gap: .5rem; align-items: center; }
+.jndi-input {
+  background: var(--surface-2); color: var(--text-primary);
+  border: none; border-radius: 8px; padding: .45rem .7rem; font-size: .82rem;
+  width: 200px;
+}
+.triage-chip {
+  display: inline-flex; align-items: center; gap: .3rem;
+  border: none; border-radius: 99px; padding: .18rem .6rem;
+  font-size: .74rem; font-weight: 700; letter-spacing: .02em;
+  cursor: pointer; white-space: nowrap;
+}
+span.triage-chip { cursor: default; }
+.triage-chip.verdict-ready   { color: var(--status-good);    background: rgba(12, 163, 12, 0.14); }
+.triage-chip.verdict-review  { color: var(--status-warning); background: rgba(250, 178, 25, 0.13); }
+.triage-chip.verdict-blocked { color: var(--status-serious); background: rgba(236, 131, 90, 0.16); }
+.triage-chip.parity-pass { color: var(--status-good);    background: rgba(12, 163, 12, 0.14); }
+.triage-chip.parity-near { color: var(--status-warning); background: rgba(250, 178, 25, 0.13); }
+.triage-chip.parity-fail { color: var(--status-serious); background: rgba(236, 131, 90, 0.16); }
+.parity-upload {
+  display: inline-block; cursor: pointer; font-size: .76rem; font-weight: 600;
+  color: var(--text-muted); border-radius: 99px; padding: .18rem .55rem;
+  background: var(--surface-2); white-space: nowrap;
+}
+.parity-upload:hover { color: var(--text-primary); }
+.triage-detail-row td { background: var(--surface-2); }
+.triage-detail { padding: .5rem .75rem; font-size: .8rem; }
+.triage-detail ul { margin: .3rem 0 .2rem 1.1rem; padding: 0; }
+.triage-detail li { margin: .15rem 0; color: var(--text-secondary); }
+.sql-line.sql-valid b { color: var(--status-good); }
+.sql-line.sql-invalid b { color: var(--status-serious); }
+.sql-line.sql-unchecked b { color: var(--text-muted); }
+.muted { color: var(--text-muted); }

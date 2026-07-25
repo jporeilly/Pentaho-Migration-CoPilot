@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.27.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.28.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -73,7 +73,11 @@ detail:
    markdown, and JSON.
 
 Also in the UI: a **📁 Project** page (the batch-converted portfolio — click any
-mapping to walk through its conversion; track review status per mapping), multi-mapping
+mapping to walk through its conversion; track review status per mapping; **run the
+batch-triage agent over every stored Crystal report** for persistent
+READY/REVIEW/BLOCKED chips with click-through reasons — layout lint, TODO counts,
+and optional live-database SQL validation — plus **per-report output parity**:
+upload the customer's Crystal export and get a PASS/NEAR/FAIL chip), multi-mapping
 selector (real exports hold up to 32 mappings per file), four color themes, a version
 badge that pops up the changelog, and a **⚙ Settings** page that auto-detects your
 hardware (RAM, NVIDIA GPUs — multi-GPU VRAM aggregates), `OLLAMA_*` environment, and

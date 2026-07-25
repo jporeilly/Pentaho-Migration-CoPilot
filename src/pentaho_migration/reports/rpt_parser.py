@@ -30,7 +30,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from .model import (
-    SUMMARY_CLASS_MAP, Element, Formula, Group,
+    SUMMARY_CLASS_MAP, WINDOW_AGG_MAP, Element, Formula, Group,
     PageSetup, Parameter, ReportModel, Section, Summary,
 )
 from .rpt_xml import (
@@ -452,7 +452,7 @@ def _parse_data_definition(root, model):
         model.summaries.append(Summary(
             name=name.strip("{}#"), operation=op, field_ref=fref,
             group_field=gcolumn, expression_name=expr_name))
-        if op not in SUMMARY_CLASS_MAP:
+        if op not in SUMMARY_CLASS_MAP and op not in WINDOW_AGG_MAP:
             model.issues.append(
                 f"summary '{name.strip('{}#')}' uses operation {op!r}, which has "
                 "no PRD report-function mapping - rebuild by hand (custom "
@@ -585,6 +585,55 @@ def _resolve_crosstab(el, model):
     el.crosstab_summaries = sums
 
 
+def _bind_window_summary(el, summ, model):
+    """Bind an element referencing a StdDev/Variance-family summary to a
+    windowed SQL column (PRD has no report function for these). The column is
+    added to model.window_columns; apply_window_columns() folds it into the
+    SQL at load time."""
+    _, column = parse_field_ref(summ.field_ref)
+    alias = f"WF_{summ.expression_name}"
+    entry = (alias, WINDOW_AGG_MAP[summ.operation], column, summ.group_field)
+    if entry not in model.window_columns:
+        model.window_columns.append(entry)
+    summ.expression_name = alias
+    el.column = alias
+    el.value_type = "NumberField"
+    el.notes.append(
+        f"summary '{summ.name}' ({summ.operation}) has no PRD report function - "
+        f"computed as a windowed SQL column ({WINDOW_AGG_MAP[summ.operation]} OVER "
+        + (f"PARTITION BY {summ.group_field}" if summ.group_field else "()")
+        + ") - verify dialect (SQL Server uses STDEV/VAR)")
+
+
+def apply_window_columns(model):
+    """Fold the collected window aggregates into the report SQL: wrap it in a
+    subquery and select FUNC(col) OVER (PARTITION BY group) AS alias next to
+    every original column. The outer query re-applies the group/record sort
+    (PRD needs group-ordered rows and a window computation may reorder them).
+    Runs once at load time, after model.sql is final."""
+    if not model.window_columns:
+        return
+
+    def ref(column):
+        # Command SQL exposes quoted SELECT aliases; generated SQL exposes
+        # the bare column names of the qualified SELECT list
+        return column if model.sql_generated else f'"{column}"'
+
+    inner = re.sub(r"\s+ORDER\s+BY\b.*$", "", model.sql, flags=re.I | re.S)
+    extras = ", ".join(
+        f"{func}(q.{ref(col)}) OVER ("
+        + (f"PARTITION BY q.{ref(grp)}" if grp else "")
+        + f') AS "{alias}"'
+        for alias, func, col, grp in model.window_columns)
+    order_cols = [(g.column, g.descending) for g in model.groups]
+    order_cols += [(c, d) for c, d in model.record_sorts
+                   if c not in {g.column for g in model.groups}]
+    order = (", ".join(f"q.{ref(c)}" + (" DESC" if d else "") for c, d in order_cols)
+             if order_cols else "")
+    model.sql = (f"SELECT q.*, {extras}\nFROM (\n{inner}\n) q"
+                 + (f"\nORDER BY {order}" if order else ""))
+
+
 def _resolve_format(el):
     """Pick the explicit format candidate matching the field's value type."""
     if el.format_string:
@@ -623,7 +672,9 @@ def _resolve_references(model):
                         el.value_type = formula.value_type
             elif kind == "summary":
                 summ = summary_by_name.get(name)
-                if summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
+                if summ is not None and summ.operation in WINDOW_AGG_MAP:
+                    _bind_window_summary(el, summ, model)
+                elif summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
                     # the writer will not emit a function for this operation —
                     # a number-field referencing it would break the bundle
                     el.kind = "unknown"
@@ -640,7 +691,9 @@ def _resolve_references(model):
             else:
                 # maybe it is a summary referenced by display name
                 summ = summary_by_name.get(el.field_ref.strip("{}#"))
-                if summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
+                if summ is not None and summ.operation in WINDOW_AGG_MAP:
+                    _bind_window_summary(el, summ, model)
+                elif summ is not None and summ.operation not in SUMMARY_CLASS_MAP:
                     el.kind = "unknown"
                     el.text = f"summary '{summ.name}' ({summ.operation}) - no PRD function"
                     el.notes.append(

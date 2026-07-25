@@ -329,21 +329,44 @@ def test_percent_operator_is_not_silently_mistranslated():
     assert f.status == "manual"
 
 
-def test_unsupported_summary_becomes_todo_not_broken_reference(tmp_path):
+def test_stddev_summary_folds_into_windowed_sql_column(tmp_path):
+    """StdDev/Variance have no PRD function - they become a windowed SQL
+    column (STDDEV_SAMP OVER ...) that the footer field binds to."""
     dump = tmp_path / "r.xml"
     dump.write_text(SAMPLE.read_text(encoding="utf-8").replace(
         'Operation="Sum" SummarizedField="{Command.AMOUNT}"/>',
         'Operation="StdDeviation" SummarizedField="{Command.AMOUNT}"/>'),
         encoding="utf-8")
     model = load_report_model(dump)
-    assert any("StdDeviation" in issue for issue in model.issues)
+    assert not any("StdDeviation" in issue for issue in model.issues)
+    assert "STDDEV_SAMP" in model.sql and "FROM (" in model.sql
     footer = model.sections_of("ReportFooter")[0]
     el = next(e for e in footer.elements if e.name == "RFVal")
-    assert el.kind == "unknown"  # rendered as TODO placeholder, not number-field
+    assert el.kind == "field"
+    assert el.column.startswith("WF_")
+    assert any("windowed SQL column" in n for n in el.notes)
     out = tmp_path / "r.prpt"
     write_prpt(model, out)
-    dd = zipfile.ZipFile(out).read("datadefinition.xml").decode()
-    assert "StdDeviation" not in dd
+    z = zipfile.ZipFile(out)
+    # no bogus function reference; the layout binds the computed column
+    assert "StdDeviation" not in z.read("datadefinition.xml").decode()
+    assert f'core:field="{el.column}"' in z.read("layout.xml").decode()
+    assert "STDDEV_SAMP" in z.read("datasources/sql-ds.xml").decode()
+
+
+def test_truly_unsupported_summary_stays_todo(tmp_path):
+    """An operation with neither a PRD function nor a window aggregate
+    (e.g. Median) still becomes an honest TODO."""
+    dump = tmp_path / "r.xml"
+    dump.write_text(SAMPLE.read_text(encoding="utf-8").replace(
+        'Operation="Sum" SummarizedField="{Command.AMOUNT}"/>',
+        'Operation="Median" SummarizedField="{Command.AMOUNT}"/>'),
+        encoding="utf-8")
+    model = load_report_model(dump)
+    assert any("Median" in issue for issue in model.issues)
+    footer = model.sections_of("ReportFooter")[0]
+    el = next(e for e in footer.elements if e.name == "RFVal")
+    assert el.kind == "unknown"
 
 
 def test_real_dump_suppression_and_margins():

@@ -7,6 +7,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.28.0] — 2026-07-25
+
+### Added
+
+- **Project-page agents.** The 📁 Project page's Crystal table now runs the
+  **batch-triage agent** in place (🔎 Run triage, optional JNDI for live
+  SQL validation): persistent ✓ READY / ⚠ REVIEW / ✋ BLOCKED chips with
+  click-to-expand reasons (layout lint findings, manual formulas, TODOs,
+  SQL verdict), and **per-report output parity** — upload the customer's
+  Crystal export (PDF/CSV) for a persistent PASS/NEAR/FAIL chip. New
+  endpoints POST /project/reports/triage and /project/report-parity;
+  verdicts stored in the project DB (auto-migrated columns).
+- **StdDev/Variance summaries convert.** PRD has no such report function,
+  so they fold into a **windowed SQL column** — the report SQL wraps in a
+  subquery selecting `STDDEV_SAMP(col) OVER (PARTITION BY group)` (sample
+  variants, matching Crystal; population variants map to `*_POP`), the
+  group ordering is re-applied outside, and the footer field binds to the
+  column. Live-verified against CSCU. Elements carry a dialect note
+  (SQL Server: STDEV/VAR); ops with no window equivalent (Median) stay
+  honest TODOs.
+- **Layout auto-fit.** Two mechanically-safe lint classes now repair
+  themselves at load: page-overflow bands scale proportionally to the
+  printable width, and text boxes shorter than their font grow to fit.
+  Every repair is a review issue; overlaps stay flagged (an image under
+  text is usually an intentional watermark). **Corpus effect: triage went
+  from 7 READY / 143 REVIEW to 82 READY / 68 REVIEW.**
+- Conversion report shows the datasource SQL **line by line** (one
+  select-list column per line — mirrors the Inspect page's formatter).
+
 ## [1.27.0] — 2026-07-25
 
 ### Added

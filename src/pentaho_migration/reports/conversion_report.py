@@ -4,7 +4,59 @@ The report is the honest half of the tool: everything the converter could
 not translate mechanically lands here as an explicit work item.
 """
 
+import re
+
 STATUS_ICON = {"auto": "OK", "review": "REVIEW", "manual": "MANUAL"}
+
+_CLAUSE_RE = re.compile(
+    r"\s+(FROM|WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|UNION(?:\s+ALL)?|"
+    r"LEFT\s+(?:OUTER\s+)?JOIN|RIGHT\s+(?:OUTER\s+)?JOIN|INNER\s+JOIN|JOIN|AND|ON)\s+",
+    re.IGNORECASE)
+
+
+def _split_top_level(text):
+    parts, depth, start = [], 0, 0
+    for i, ch in enumerate(text):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            parts.append(text[start:i].strip())
+            start = i + 1
+    parts.append(text[start:].strip())
+    return [p for p in parts if p]
+
+
+def format_sql_display(sql):
+    """Display-only pretty print: one select-list column per line, major
+    clauses on their own lines (mirrors frontend/src/lib/formatSql.js).
+    Never applied to the SQL that lands in the bundle."""
+    if not sql:
+        return sql
+    s = re.sub(r"\s+", " ", sql).strip()
+    m = re.match(r"^SELECT\s+(DISTINCT\s+)?", s, re.IGNORECASE)
+    if m:
+        head, rest = s[:m.end()].strip(), s[m.end():]
+        depth = 0
+        from_idx = -1
+        for fm in re.finditer(r"\bFROM\b", rest, re.IGNORECASE):
+            if rest[:fm.start()].count("(") == rest[:fm.start()].count(")"):
+                from_idx = fm.start()
+                break
+        if from_idx > 0:
+            cols = _split_top_level(rest[:from_idx])
+            s = head + "\n  " + ",\n  ".join(cols) + "\n" + rest[from_idx:]
+
+    def _clause(match):
+        kw = re.sub(r"\s+", " ", match.group(1).upper())
+        if kw == "ON":
+            return " ON "
+        if kw == "AND":
+            return "\n  AND "
+        return "\n" + kw + " "
+
+    return _CLAUSE_RE.sub(_clause, s)
 
 
 def build_conversion_report(model, source_path, output_path):
@@ -37,7 +89,7 @@ def build_conversion_report(model, source_path, output_path):
         add("- SQL taken from the Crystal command object:")
     add("")
     add("```sql")
-    add(model.sql)
+    add(format_sql_display(model.sql))
     add("```")
     add("")
     if model.record_selection and model.record_selection_folded:

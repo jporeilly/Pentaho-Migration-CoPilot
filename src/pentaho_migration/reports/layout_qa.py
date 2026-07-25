@@ -69,6 +69,55 @@ def _label(el) -> str:
 _CONTENT_KINDS = {"label", "field", "chart", "image", "special"}
 
 
+def autofit_layout(model) -> int:
+    """Deterministic layout repair for the two mechanically-safe finding
+    classes:
+
+    - page-overflow: any band whose content extends past the printable width
+      has ALL its elements' x/width scaled proportionally to fit (relative
+      alignment preserved, fonts untouched);
+    - font-clip: a text box shorter than its font (descenders clip) grows to
+      font size + 2pt, and the band grows with the content if needed.
+
+    Each repair lands in model.issues for review. Overlaps are deliberately
+    NOT auto-fixed: an image under text is usually an intentional
+    watermark/fade, and moving elements would guess at design intent - those
+    stay flagged by the lint. Returns the number of repairs."""
+    width = usable_page_width(model.page)
+    repaired = 0
+    for section in model.sections:
+        if section.suppressed:
+            continue
+        extent = max((el.x + el.width for el in section.elements), default=0.0)
+        if extent > width:
+            factor = width / extent
+            for el in section.elements:
+                el.x = round(el.x * factor, 1)
+                el.width = round(el.width * factor, 1)
+            repaired += 1
+            model.issues.append(
+                f"layout auto-fit: {_band(section)} content ended at {extent:.0f}pt "
+                f"but the printable width is {width:.0f}pt ({model.page.paper} "
+                f"{model.page.orientation}) - every element in the band was scaled "
+                f"by {factor:.2f} to fit; verify label wrapping (fonts unchanged)")
+        grown = 0
+        for el in section.elements:
+            if (el.kind in ("label", "field") and el.font.size > 0
+                    and el.height > 0 and el.font.size + 2 > el.height):
+                el.height = round(el.font.size + 2, 1)
+                grown += 1
+        if grown:
+            bottom = max(el.y + el.height for el in section.elements)
+            if bottom > section.height:
+                section.height = round(bottom, 1)
+            repaired += 1
+            model.issues.append(
+                f"layout auto-fit: {_band(section)} - {grown} text box(es) grown "
+                "to fit their font (descenders would have clipped); verify "
+                "nothing now touches the element below")
+    return repaired
+
+
 def lint_layout(model) -> LayoutQA:
     """Deterministic geometry lint over every non-suppressed band."""
     qa = LayoutQA()

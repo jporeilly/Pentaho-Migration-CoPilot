@@ -79,7 +79,9 @@ def test_ladder_exercises_increasing_complexity():
     assert running.rewrite_class.endswith("ItemSumFunction")  # report function
 
     loans = models["05_loan_portfolio"]
-    assert any("StdDeviation" in i for i in loans.issues)   # unsupported aggregate flagged
+    # StdDev has no PRD function -> folded into a windowed SQL column
+    assert not any("StdDeviation" in i for i in loans.issues)
+    assert "STDDEV_SAMP" in loans.sql
     # conditional font color -> paint style expression on the balance field
     balance = next(el for s in loans.sections for el in s.elements
                    if el.name == "d_Balance")

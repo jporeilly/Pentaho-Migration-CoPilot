@@ -49,7 +49,9 @@ from pentaho_migration.project import (
     get_mapping,
     list_mappings,
     list_reports,
+    set_report_parity,
     set_report_status,
+    set_report_triage,
     set_status,
 )
 from pentaho_migration.sandbox import SandboxKit, build_sandbox_kit
@@ -335,6 +337,81 @@ def project_report_status(update: ReportStatusUpdate) -> dict[str, bool]:
     if not set_report_status(update.file, update.status):
         raise HTTPException(status_code=404, detail="report not found in project store")
     return {"ok": True}
+
+
+@app.post("/project/reports/triage", response_model=list[ReportRecord],
+          dependencies=[Depends(require_api_key)])
+def project_reports_triage(jndi: str = "") -> list[ReportRecord]:
+    """Run the batch-triage agent over every stored report whose source dump
+    still exists, persist each verdict (READY/REVIEW/BLOCKED + reasons), and
+    return the refreshed records. With a JNDI name the report SQL is also
+    EXPLAIN-validated against that live connection (a database-unreachable
+    check stays 'unchecked' — never the report's fault)."""
+    from pathlib import Path as _Path
+
+    from pentaho_migration.reports.triage import triage_one
+
+    for record in list_reports():
+        source = _Path(record.source_path) if record.source_path else None
+        if source is None or not source.is_file():
+            if record.source_path:
+                set_report_triage(record.file, "BLOCKED", json.dumps(
+                    {"reasons": [f"source dump not found: {record.source_path}"],
+                     "sql_status": "unchecked"}))
+            continue
+        result = triage_one(source, jndi=jndi, check_sql=bool(jndi))
+        set_report_triage(record.file, result.verdict, json.dumps({
+            "reasons": result.reasons,
+            "sql_status": result.sql_status,
+            "sql_error": result.sql_error,
+            "layout_errors": result.layout_errors,
+            "layout_warnings": result.layout_warnings,
+            "rewrites": result.rewrites,
+        }))
+    return list_reports()
+
+
+@app.post("/project/report-parity", dependencies=[Depends(require_api_key)])
+async def project_report_parity(
+    file: str, reference: UploadFile, jndi: str = ""
+) -> dict:
+    """Measured output parity for one stored report: convert its source dump,
+    render against the live JNDI database, diff the numbers against the
+    uploaded customer export (PDF or CSV), and persist the verdict."""
+    from pentaho_migration.reports import load_report_model
+    from pentaho_migration.reports.parity import (
+        compare_numbers, numbers_from_csv, numbers_from_pdf)
+    from pentaho_migration.reports.prpt_validator import (
+        render_prpt_pdf_live, validator_available)
+    from pentaho_migration.reports.prpt_writer import write_prpt
+
+    record = next((r for r in list_reports() if r.file == file), None)
+    if record is None:
+        raise HTTPException(status_code=404, detail="report not found in project store")
+    source = Path(record.source_path)
+    if not record.source_path or not source.is_file():
+        raise HTTPException(status_code=404,
+                            detail=f"source dump not found: {record.source_path}")
+    if not validator_available():
+        raise HTTPException(status_code=503,
+                            detail="parity needs a local PRD install + Java")
+    ref_data = await reference.read()
+    ref_name = (reference.filename or "").lower()
+    try:
+        model = load_report_model(source, jndi or None)
+        ref_numbers = (numbers_from_csv(ref_data) if ref_name.endswith(".csv")
+                       else numbers_from_pdf(ref_data))
+        with tempfile.TemporaryDirectory() as td:
+            prpt = Path(td) / "parity.prpt"
+            write_prpt(model, prpt)
+            rendered = numbers_from_pdf(render_prpt_pdf_live(prpt))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    result = compare_numbers(ref_numbers, rendered)
+    set_report_parity(file, result.verdict, result.note)
+    return {"verdict": result.verdict, "note": result.note,
+            "matched": result.matched, "reference_total": result.reference_total,
+            "rendered_total": result.rendered_total}
 
 
 @app.post("/translate", response_model=ConversionResult, dependencies=[Depends(require_api_key)])
