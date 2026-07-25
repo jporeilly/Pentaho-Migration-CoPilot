@@ -754,6 +754,31 @@ def report_scrub(directory: Path = typer.Argument(Path("samples/crystal/real")))
     typer.echo(f"scrubbed {attrs} credential attribute(s) in {files_changed} file(s)")
 
 
+@app.command("report-images")
+def report_images(
+    dump: Path = typer.Argument(..., help="RptToXml dump (.xml) to enrich"),
+    rpt: Path = typer.Argument(None, help=".rpt binary (default: same stem in samples/crystal-rpt)"),
+    out: Path = typer.Option(None, "-o", help="write enriched dump here (default: in place)"),
+) -> None:
+    """Carve embedded pictures out of the .rpt binary and inject them into the
+    dump's PictureObjects as base64 <ImageData> (the free SAP SDK cannot read
+    picture bytes - PictureData returns null in the embedded RAS). Carved
+    images are decode-proven and matched by aspect ratio; each carries a
+    verify note through conversion."""
+    from pentaho_migration.reports.rpt_images import enrich_dump
+
+    if rpt is None:
+        rpt = Path("samples/crystal-rpt") / (dump.stem + ".rpt")
+    if not rpt.is_file():
+        typer.echo(f"no .rpt found at {rpt}")
+        raise typer.Exit(code=2)
+    injected = enrich_dump(dump, rpt, out)
+    typer.echo(f"{dump.name}: injected {injected} image(s) from {rpt.name}"
+               + (f" -> {out}" if out else " (in place)"))
+    if injected == 0:
+        raise typer.Exit(code=1)
+
+
 @app.command("report-env")
 def report_env() -> None:
     """Preflight for the Crystal pipeline: is everything installed?"""

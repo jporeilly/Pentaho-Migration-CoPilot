@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | `sub-reports/` | nested subreport definitions (converted to PRD sub-reports) | 22 |
 | `charts/` | chart objects (converted to PRD legacy charts) | 2 |
-| `cross-tabs/` | cross-tab objects (honest TODO placeholders) | 12 |
+| `cross-tabs/` | cross-tab objects (live PRD crosstab when the definition block is present, honest TODO otherwise) | 12 |
 | `parameters/` | prompted parameters | 50 |
 | `multi-value-params/` | multi-select prompts (IN-list folding) | 4 |
 | `record-selection/` | record selection formulas (SQL WHERE folding) | 28 |

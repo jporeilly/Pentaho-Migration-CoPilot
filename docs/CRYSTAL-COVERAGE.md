@@ -30,7 +30,7 @@ semantic judgment is required):
 | **Conditional formatting** (font color, background) | **Style expressions** (`paint`, `background-color`) with the condition translated | Deterministic → review |
 | **Conditional suppression** (object & section) | **`visible` style expression** (`=NOT(condition)`) on the element/band | Deterministic → review |
 | Page size, orientation, margins | page-definition | Deterministic |
-| Embedded images (logo etc.) | Embedded bundle resource | Deterministic (needs image bytes in the dump) |
+| Embedded images (logo etc.) | Embedded bundle resource. Bytes come from `report-images`: the free SAP SDK cannot read picture bytes (`PictureData` is null in the embedded RAS — verified), so the raster is **carved from the .rpt binary** (PNG/JPEG/DIB signature scan, decode-proven with Pillow, converted to PNG) and matched to its PictureObject by aspect ratio. 83 images recovered across all 44 image-bearing corpus reports, zero misses. Auto-run by `extract-rpt.ps1` | Deterministic → review (verify the matched picture) |
 | Charts (bar, line, area, pie, doughnut) | Legacy-chart element + dataset collector + JFreeChart expression | Deterministic → review (verify aggregation) |
 | Special fields (page N of M, print date) | PageOfPagesFunction / report.date message fields | Deterministic |
 

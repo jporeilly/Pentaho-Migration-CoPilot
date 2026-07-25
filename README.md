@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.26.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.27.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -232,6 +232,7 @@ pentaho-migrate report-parity <prpt|dump> <crystal-export.pdf|csv> # measured ou
 pentaho-migrate report-classify [dir]       # classify a corpus by feature into by-feature/ folders (demo picking)
 pentaho-migrate report-triage <dir> --jndi <ds> # batch triage agent: READY/REVIEW/BLOCKED verdict per report
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
+pentaho-migrate report-images <dump> [rpt]  # carve embedded logos/pictures from the .rpt binary into the dump (SDK can't read them)
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
 pentaho-migrate report-batch [directory]    # convert a Crystal corpus into the project store (joins the portfolio)
 ```
@@ -267,7 +268,9 @@ avg confidence 62/100.
 harvested from public GitHub repositories, with fork-extracted, credential-scrubbed
 dumps in `samples/crystal/real/`. All 150 parse with zero errors; of their 726
 formulas, **80% translate deterministically** (auto + review, including idiom
-rewrites) before any LLM assist. `samples/cr_demo/` is the demo set: nine authored
+rewrites) before any LLM assist. Embedded logos survive too: `report-images`
+carves the raster bytes out of the .rpt binary (the free SAP SDK cannot read
+them) — **83 images recovered across all 44 image-bearing corpus reports**. `samples/cr_demo/` is the demo set: nine authored
 CSCU credit-union reports of increasing complexity (A4 portrait) that convert
 *and render live* against the CSCU Postgres database — working parameter
 prompts, a bar chart, a running balance rebuilt as a PRD report function, live

@@ -176,6 +176,12 @@ def _parse_object(obj):
             data_node = obj.find("ImageData")
             if data_node is not None and data_node.text:
                 raw_b64 = data_node.text.strip()
+                if data_node.get("Carved", "").lower() == "true":
+                    # injected by report-images: bytes carved from the .rpt
+                    # binary and matched by aspect ratio, not read via the SDK
+                    el.notes.append(
+                        "image carved from the .rpt binary and matched by "
+                        "aspect ratio - verify it is the right picture")
         if raw_b64:
             import base64
             try:

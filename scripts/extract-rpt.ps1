@@ -47,16 +47,27 @@ Write-Host "Extracting $($files.Count) .rpt file(s) with $rptToXml"
 $ok = 0
 $failed = 0
 $failures = @()
+# python for image carving (the free SAP SDK cannot read picture bytes, so
+# embedded logos are carved from the .rpt binary and injected into the dump)
+$python = Join-Path $repoRoot ".venv\Scripts\python.exe"
+$carve = Test-Path $python
+
 foreach ($file in $files) {
     $outFile = Join-Path $OutDir ($file.BaseName + ".xml")
     & $rptToXml $file.FullName $outFile | Out-Null
     if ($LASTEXITCODE -eq 0 -and (Test-Path $outFile) -and (Get-Item $outFile).Length -gt 0) {
         $ok = $ok + 1
+        if ($carve) {
+            & $python -m pentaho_migration.cli report-images $outFile $file.FullName | Out-Null
+        }
     } else {
         $failed = $failed + 1
         $failures += $file.Name
         if (Test-Path $outFile) { Remove-Item $outFile -Force }
     }
+}
+if (-not $carve) {
+    Write-Host "note: .venv python not found - embedded images not carved (run report-images later)"
 }
 
 Write-Host ""

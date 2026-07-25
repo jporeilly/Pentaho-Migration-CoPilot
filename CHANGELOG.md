@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.27.0] — 2026-07-25
+
+### Added
+
+- **Embedded images carved from .rpt binaries** (`report-images`, auto-run
+  by `extract-rpt.ps1`). Investigation finding: the RAS model declares
+  `ISCRPictureObject.PictureData`, but it returns **null in the embedded
+  in-proc RAS** the free runtime uses (verified with typed access) — the
+  same SDK truncation family as cross-tab grids. So the raster is recovered
+  from the .rpt file itself: signature-scan for PNG/JPEG/DIB blobs, prove
+  every candidate by decoding it with Pillow (DIBs get a BITMAPFILEHEADER
+  and convert to PNG), dedupe multi-bit-depth renditions, and match blobs
+  to `PictureObject`s by aspect ratio (greedy best-score — layout boxes
+  stretch; single-box/single-image matches unconditionally; Crystal's
+  page-shaped preview thumbnails never win). Injected as
+  `<ImageData Carved="true">`, which the parser/writer already consume;
+  each carved image carries a "verify it is the right picture" note.
+  **Corpus result: 83 images recovered across all 44 image-bearing
+  reports, zero misses**; live-verified end-to-end (LarsBusk_GeneralIrma's
+  213×39 logo renders in the converted .prpt). Pillow promoted to a core
+  dependency.
+
 ## [1.26.0] — 2026-07-25
 
 ### Added
