@@ -133,6 +133,24 @@ def safe_name(repo, path):
     return re.sub(r"[^\w.\-]+", "_", f"{owner}_{stem}")
 
 
+_SECRET_NAME = r"(?:PASS|PASSWORD|SECRET|TOKEN|APIKEY|API_KEY|ACCESS_KEY|PRIVATE_KEY|CREDENTIAL|CLIENT_ID)"
+
+
+def scrub_passwords(blob: bytes) -> bytes:
+    """Blank every credential-named parameter value — elementParameter AND
+    contextParameter (an AAD client secret shipped in a contextParameter in
+    the wild; GitHub push protection caught it). Talend 'encrypts' stored
+    passwords with a publicly-known routine key, so treat all of these like
+    the Crystal scrub treats ConnectionInfo credentials: never commit them."""
+    text = blob.decode("utf-8", errors="replace")
+    text, _ = re.subn(r'(name="[^"]*' + _SECRET_NAME + r'[^"]*"\s+value=")[^"]*(")',
+                      r"\1\2", text, flags=re.IGNORECASE)
+    text, _ = re.subn(
+        r'(<contextParameter[^>]*name="[^"]*' + _SECRET_NAME + r'[^"]*"[^>]*value=")[^"]*(")',
+        r"\1\2", text, flags=re.IGNORECASE)
+    return text.encode("utf-8")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--target", type=int, default=100, help="new jobs to add")
@@ -163,6 +181,7 @@ def main():
         time.sleep(0.35)
         if not blob or b"ProcessType" not in blob[:4000]:
             continue
+        blob = scrub_passwords(blob)
         digest = hashlib.sha256(blob).hexdigest()
         if digest in existing_hashes:
             continue

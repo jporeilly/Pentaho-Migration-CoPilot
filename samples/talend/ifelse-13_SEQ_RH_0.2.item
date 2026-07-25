@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ProcessType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" defaultContext="Default" jobType="Standard">
+  <context confirmationNeeded="false" name="Default">
+    <contextParameter comment="" name="file_in_client_id" prompt="file_in_client_id?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="" internalId="_G-QnoOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="file_in_google_drive" prompt="file_in_google_drive?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Fichiers/in/Formation/Moodle/list_files_drive.json" internalId="_G-QnoeHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_archives_root" prompt="folder_archives_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/90_Développement/Fichiers/archives/" internalId="_G-QnouHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_in_root" prompt="folder_in_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/90_Développement/Fichiers/in/" internalId="_G-Qno-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_out_log_sequenceur" prompt="folder_out_log_sequenceur?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Logs/Sequenceur_moodle_log.csv" internalId="_G-QnpOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_out_root" prompt="folder_out_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/90_Développement/Fichiers/out/" internalId="_G-QnpeHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="script_python" prompt="script_python?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Scripts/Python/" internalId="_G-QnpuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_AdditionalParams" prompt="MYSQL_BOOND_AdditionalParams?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-Qnp-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Database" prompt="MYSQL_BOOND_Database?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="boond" internalId="_G-QnqOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Login" prompt="MYSQL_BOOND_Login?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-QnqeHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Password" prompt="MYSQL_BOOND_Password?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-QnquHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Port" prompt="MYSQL_BOOND_Port?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-Qnq-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Server" prompt="MYSQL_BOOND_Server?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-QnrOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_AdditionalParams" prompt="MYSQL_DWH_AdditionalParams?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-QnreHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Database" prompt="MYSQL_DWH_Database?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="datawarehouse_dev" internalId="_G-QnruHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Login" prompt="MYSQL_DWH_Login?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-Qnr-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Password" prompt="MYSQL_DWH_Password?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-QnsOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Port" prompt="MYSQL_DWH_Port?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-QnseHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Server" prompt="MYSQL_DWH_Server?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-QnsuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_AdditionalParams" prompt="MYSQL_ODS_AdditionalParams?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-Qns-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Database" prompt="MYSQL_ODS_Database?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="ods" internalId="_G-QntOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Login" prompt="MYSQL_ODS_Login?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-QnteHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Password" prompt="MYSQL_ODS_Password?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-QntuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Port" prompt="MYSQL_ODS_Port?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-Qnt-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Server" prompt="MYSQL_ODS_Server?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-QnuOHtEe6ritJIUejNVQ"/>
+  </context>
+  <context confirmationNeeded="false" name="PROD">
+    <contextParameter comment="" name="file_in_client_id" prompt="file_in_client_id?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="" internalId="_G-QnueHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="file_in_google_drive" prompt="file_in_google_drive?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Fichiers/in/Formation/Moodle/list_files_drive.json" internalId="_G-QnuuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_archives_root" prompt="folder_archives_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Fichiers/archives/" internalId="_G-Qnu-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_in_root" prompt="folder_in_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Fichiers/in/" internalId="_G-QnvOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_out_log_sequenceur" prompt="folder_out_log_sequenceur?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Logs/Sequenceur_moodle_log.csv" internalId="_G-QnveHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_out_root" prompt="folder_out_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Fichiers/out/" internalId="_G-QnvuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="script_python" prompt="script_python?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Scripts/Python/" internalId="_G-Qnv-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_AdditionalParams" prompt="MYSQL_BOOND_AdditionalParams?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-QnwOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Database" prompt="MYSQL_BOOND_Database?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="boond" internalId="_G-QnweHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Login" prompt="MYSQL_BOOND_Login?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-QnwuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Password" prompt="MYSQL_BOOND_Password?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-Qnw-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Port" prompt="MYSQL_BOOND_Port?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-QnxOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Server" prompt="MYSQL_BOOND_Server?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-QnxeHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_AdditionalParams" prompt="MYSQL_DWH_AdditionalParams?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-QnxuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Database" prompt="MYSQL_DWH_Database?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="datawarehouse" internalId="_G-Qnx-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Login" prompt="MYSQL_DWH_Login?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-QnyOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Password" prompt="MYSQL_DWH_Password?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-QnyeHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Port" prompt="MYSQL_DWH_Port?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-QnyuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Server" prompt="MYSQL_DWH_Server?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-Qny-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_AdditionalParams" prompt="MYSQL_ODS_AdditionalParams?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-QnzOHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Database" prompt="MYSQL_ODS_Database?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="ods" internalId="_G-QnzeHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Login" prompt="MYSQL_ODS_Login?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-QnzuHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Password" prompt="MYSQL_ODS_Password?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-Qnz-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Port" prompt="MYSQL_ODS_Port?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-Qn0OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Server" prompt="MYSQL_ODS_Server?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-Qn0eHtEe6ritJIUejNVQ"/>
+  </context>
+  <context confirmationNeeded="false" name="DEV">
+    <contextParameter comment="" name="file_in_client_id" prompt="file_in_client_id?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="" internalId="_G-Qn0uHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="file_in_google_drive" prompt="file_in_google_drive?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Fichiers/in/Formation/Moodle/list_files_drive.json" internalId="_G-Qn0-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_archives_root" prompt="folder_archives_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/90_Développement/Fichiers/archives/" internalId="_G-Qn1OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_in_root" prompt="folder_in_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/90_Développement/Fichiers/in/" internalId="_G-Qn1eHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_out_log_sequenceur" prompt="folder_out_log_sequenceur?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Logs/Sequenceur_moodle_log.csv" internalId="_G-Qn1uHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="folder_out_root" prompt="folder_out_root?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/90_Développement/Fichiers/out/" internalId="_G-Qn1-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="script_python" prompt="script_python?" promptNeeded="false" repositoryContextId="_k3qikIMOEeqgBYBLXZT7kg" type="id_String" value="D:/00_Production/Scripts/Python/" internalId="_G-Qn2OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_AdditionalParams" prompt="MYSQL_BOOND_AdditionalParams?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-Qn2eHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Database" prompt="MYSQL_BOOND_Database?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="boond" internalId="_G-Qn2uHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Login" prompt="MYSQL_BOOND_Login?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-Qn2-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Password" prompt="MYSQL_BOOND_Password?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-Qn3OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Port" prompt="MYSQL_BOOND_Port?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-Qn3eHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_BOOND_Server" prompt="MYSQL_BOOND_Server?" promptNeeded="false" repositoryContextId="_nShicIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-Qn3uHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_AdditionalParams" prompt="MYSQL_DWH_AdditionalParams?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-Qn3-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Database" prompt="MYSQL_DWH_Database?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="datawarehouse_dev" internalId="_G-Qn4OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Login" prompt="MYSQL_DWH_Login?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-Qn4eHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Password" prompt="MYSQL_DWH_Password?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-Qn4uHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Port" prompt="MYSQL_DWH_Port?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-Qn4-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_DWH_Server" prompt="MYSQL_DWH_Server?" promptNeeded="false" repositoryContextId="_gWe9YIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-Qn5OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_AdditionalParams" prompt="MYSQL_ODS_AdditionalParams?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="serverTimezone=GMT" internalId="_G-Qn5eHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Database" prompt="MYSQL_ODS_Database?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="ods_dev" internalId="_G-Qn5uHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Login" prompt="MYSQL_ODS_Login?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="etl" internalId="_G-Qn5-HtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Password" prompt="MYSQL_ODS_Password?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_Password" value="" internalId="_G-Qn6OHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Port" prompt="MYSQL_ODS_Port?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="3308" internalId="_G-Qn6eHtEe6ritJIUejNVQ"/>
+    <contextParameter comment="" name="MYSQL_ODS_Server" prompt="MYSQL_ODS_Server?" promptNeeded="false" repositoryContextId="_QZKlEIUyEeqE6qPVdZxMBw" type="id_String" value="apps-interne-2" internalId="_G-Qn6uHtEe6ritJIUejNVQ"/>
+  </context>
+  <parameters>
+    <elementParameter field="CLOSED_LIST" name="LOG4J_RUN_LEVEL" value="Info" show="false"/>
+    <elementParameter field="TEXT" name="SCREEN_OFFSET_X" value="0" show="false"/>
+    <elementParameter field="TEXT" name="SCREEN_OFFSET_Y" value="0" show="false"/>
+    <elementParameter field="TEXT" name="REPOSITORY_CONNECTION_ID" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_PROPERTY_TYPENAME" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_HADOOP_DISTRIBUTION" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_HADOOP_VERSION" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_ENABLE_KERBEROS" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_NAME_NODE_PRINCIPAL" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_USERNAME" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_GROUP" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_USE_KEYTAB" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_KT_PRINCIPAL" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_KEY_TAB" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_ENABLE_OO_KERBEROS" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_NAME_NODE_END_POINT" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_JOB_TRACKER_ENDPOINT" value="" show="false"/>
+    <elementParameter field="TEXT" name="OOZIE_END_POINT" value="" show="false"/>
+    <elementParameter field="CHECK" name="IMPLICITCONTEXT_USE_PROJECT_SETTINGS" value="true" show="false"/>
+    <elementParameter field="CHECK" name="STATANDLOG_USE_PROJECT_SETTINGS" value="true" show="false"/>
+    <elementParameter field="CHECK" name="MULTI_THREAD_EXECATION" value="false"/>
+    <elementParameter field="CHECK" name="IMPLICIT_TCONTEXTLOAD" value="false"/>
+    <elementParameter field="RADIO" name="FROM_FILE_FLAG_IMPLICIT_CONTEXT" value="false" show="false"/>
+    <elementParameter field="RADIO" name="FROM_DATABASE_FLAG_IMPLICIT_CONTEXT" value="false" show="false"/>
+    <elementParameter field="FILE" name="IMPLICIT_TCONTEXTLOAD_FILE" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value="&quot;&quot;" show="false"/>
+    <elementParameter field="CHECK" name="OVERRIDE_ENCODING_FLAG" value="false" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="OVERRIDE_ENCODING_IN_EXTRA" value="ISO-8859-15" show="false"/>
+    <elementParameter field="TECHNICAL" name="OVERRIDE_ENCODING_IN_EXTRA:ENCODING_TYPE" value="ISO-8859-15" show="false"/>
+    <elementParameter field="CLOSED_LIST" name="DB_TYPE_IMPLICIT_CONTEXT" value="" show="false"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION_IMPLICIT_CONTEXT" value="" show="false"/>
+    <elementParameter field="TEXT" name="URL_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TABLE" name="DRIVER_JAR_IMPLICIT_CONTEXT" show="false"/>
+    <elementParameter field="TEXT" name="DRIVER_CLASS_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="HOST_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="PORT_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="DBNAME_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="USER_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="PASSWORD" name="PASS_IMPLICIT_CONTEXT" value="" show="false"/>
+    <elementParameter field="FILE" name="DBFILE_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="DBTABLE" name="DBTABLE_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="QUERY_CONDITION_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="CLOSED_LIST" name="LOAD_NEW_VARIABLE" value="Warning" show="false"/>
+    <elementParameter field="CLOSED_LIST" name="NOT_LOAD_OLD_VARIABLE" value="Warning" show="false"/>
+    <elementParameter field="CHECK" name="PRINT_OPERATIONS" value="false" show="false"/>
+    <elementParameter field="CHECK" name="DISABLE_ERROR" value="false" show="false"/>
+    <elementParameter field="CHECK" name="DISABLE_WARNINGS" value="false" show="false"/>
+    <elementParameter field="CHECK" name="DISABLE_INFO" value="false" show="false"/>
+    <elementParameter field="CHECK" name="ON_STATCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_LOGCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_METERCATCHER_FLAG" value="false"/>
+    <elementParameter field="CHECK" name="ON_CONSOLE_FLAG" value="false" show="false"/>
+    <elementParameter field="CHECK" name="ON_FILES_FLAG" value="false" show="false"/>
+    <elementParameter field="DIRECTORY" name="FILE_PATH" value="&quot;C:/TOS_DI-20211109_1610-V8.0.1/TOS_DI-20211109_1610-V8.0.1/workspace/.metadata&quot;" show="false"/>
+    <elementParameter field="TEXT" name="FILENAME_STATS" value="&quot;stats_file.txt&quot;" show="false"/>
+    <elementParameter field="TEXT" name="FILENAME_LOGS" value="&quot;logs_file.txt&quot;" show="false"/>
+    <elementParameter field="TEXT" name="FILENAME_METTER" value="&quot;meter_file.txt&quot;" show="false"/>
+    <elementParameter field="ENCODING_TYPE" name="ENCODING" value="ISO-8859-15" show="false"/>
+    <elementParameter field="TECHNICAL" name="ENCODING:ENCODING_TYPE" value="ISO-8859-15" show="false"/>
+    <elementParameter field="CHECK" name="ON_DATABASE_FLAG" value="false" show="false"/>
+    <elementParameter field="CLOSED_LIST" name="DB_TYPE" value="tJDBCOutput" show="false"/>
+    <elementParameter field="CLOSED_LIST" name="DB_VERSION" value="ORACLE_12" show="false"/>
+    <elementParameter field="TEXT" name="URL" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TABLE" name="DRIVER_JAR" show="false"/>
+    <elementParameter field="TEXT" name="DRIVER_CLASS" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="HOST" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="PORT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="DATASOURCE" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="DBNAME" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="LOCAL_SERVICE_NAME" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="PROPERTIES" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="USER" value="&quot;&quot;" show="false"/>
+    <elementParameter field="PASSWORD" name="PASS" value="" show="false"/>
+    <elementParameter field="FILE" name="DBFILE" value="&quot;&quot;" show="false"/>
+    <elementParameter field="DBTABLE" name="TABLE_STATS" value="&quot;&quot;" show="false"/>
+    <elementParameter field="DBTABLE" name="TABLE_LOGS" value="&quot;&quot;" show="false"/>
+    <elementParameter field="DBTABLE" name="TABLE_METER" value="&quot;&quot;" show="false"/>
+    <elementParameter field="CHECK" name="CATCH_RUNTIME_ERRORS" value="true" show="false"/>
+    <elementParameter field="CHECK" name="CATCH_USER_ERRORS" value="true" show="false"/>
+    <elementParameter field="CHECK" name="CATCH_USER_WARNING" value="true" show="false"/>
+    <elementParameter field="CHECK" name="CATCH_REALTIME_STATS" value="false" show="false"/>
+    <elementParameter field="TEXT" name="HEADERFOOTER_HEADERID" value="" show="false"/>
+    <elementParameter field="CHECK" name="HEADER_ENABLED" value="false" show="false"/>
+    <elementParameter field="TEXT" name="HEADER_LIBRARY" value="" show="false"/>
+    <elementParameter field="TEXT" name="HEADER_CODE" value="" show="false"/>
+    <elementParameter field="TEXT" name="HEADER_IMPORT" value="" show="false"/>
+    <elementParameter field="TEXT" name="HEADERFOOTER_FOOTERID" value="" show="false"/>
+    <elementParameter field="CHECK" name="FOOTER_ENABLED" value="false" show="false"/>
+    <elementParameter field="TEXT" name="FOOTER_LIBRARY" value="" show="false"/>
+    <elementParameter field="TEXT" name="FOOTER_CODE" value="" show="false"/>
+    <elementParameter field="TEXT" name="FOOTER_IMPORT" value="" show="false"/>
+    <routinesParameter id="_a6gW0IPHEeqE6qPVdZxMBw" name="DataOperation"/>
+    <routinesParameter id="_a7P9sIPHEeqE6qPVdZxMBw" name="Mathematical"/>
+    <routinesParameter id="_a7P9uoPHEeqE6qPVdZxMBw" name="Numeric"/>
+    <routinesParameter id="_a7ZusIPHEeqE6qPVdZxMBw" name="Relational"/>
+    <routinesParameter id="_a7ZuuoPHEeqE6qPVdZxMBw" name="StringHandling"/>
+    <routinesParameter id="_a7jfsIPHEeqE6qPVdZxMBw" name="TalendDataGenerator"/>
+    <routinesParameter id="_a7jfuoPHEeqE6qPVdZxMBw" name="TalendDate"/>
+    <routinesParameter id="_a7spqYPHEeqE6qPVdZxMBw" name="TalendStringUtil"/>
+    <routinesParameter id="_a7jfxIPHEeqE6qPVdZxMBw" name="TalendString"/>
+  </parameters>
+  <node componentName="tRunJob" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="96" posY="32">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_1" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_JOB" value="false"/>
+    <elementParameter field="TEXT" name="CONTEXT_JOB" value="" show="false"/>
+    <elementParameter field="PROCESS_TYPE" name="PROCESS" value="ods_export_solde_repos"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_CONTEXT" value="DEV"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_PROCESS" value="BI_INTERNE:_WYlXkDWxEe2ZF52xtAIWSA"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_VERSION" value="Latest"/>
+    <elementParameter field="TEXT" name="CONTEXT_NAME" value="Default" show="false"/>
+    <elementParameter field="CHECK" name="USE_INDEPENDENT_PROCESS" value="false"/>
+    <elementParameter field="CHECK" name="DIE_ON_CHILD_ERROR" value="true"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="true"/>
+    <elementParameter field="TABLE" name="CONTEXTPARAMS"/>
+    <elementParameter field="CHECK" name="PROPAGATE_CHILD_RESULT" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_PARAMETER" value="false"/>
+    <elementParameter field="CHECK" name="TRANSMIT_ORIGINAL_CONTEXT" value="true" show="false"/>
+    <elementParameter field="RADIO" name="USE_CHILD_JVM_SETTING" value="true" show="false"/>
+    <elementParameter field="RADIO" name="USE_CUSTOM_JVM_SETTING" value="false" show="false"/>
+    <elementParameter field="TABLE" name="JVM_ARGUMENTS" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_CONTEXT" value="false"/>
+    <elementParameter field="TEXT" name="DYNAMIC_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="CHECK" name="USE_EXTRA_CLASSPATH" value="false" show="false"/>
+    <elementParameter field="TEXT" name="EXTRA_CLASSPATH" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="__PROCESS__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tRunJob_1"/>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="96" posY="288">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_2" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_JOB" value="false"/>
+    <elementParameter field="TEXT" name="CONTEXT_JOB" value="" show="false"/>
+    <elementParameter field="PROCESS_TYPE" name="PROCESS" value="dwh_faits_solde_repos"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_CONTEXT" value="DEV"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_PROCESS" value="BI_INTERNE:_WxSDgFxVEe2UkPdNolAl2w"/>
+    <elementParameter field="TECHNICAL" name="PROCESS:PROCESS_TYPE_VERSION" value="Latest"/>
+    <elementParameter field="TEXT" name="CONTEXT_NAME" value="Default" show="false"/>
+    <elementParameter field="CHECK" name="USE_INDEPENDENT_PROCESS" value="false"/>
+    <elementParameter field="CHECK" name="DIE_ON_CHILD_ERROR" value="true"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="true"/>
+    <elementParameter field="TABLE" name="CONTEXTPARAMS"/>
+    <elementParameter field="CHECK" name="PROPAGATE_CHILD_RESULT" value="false"/>
+    <elementParameter field="CHECK" name="PRINT_PARAMETER" value="false"/>
+    <elementParameter field="CHECK" name="TRANSMIT_ORIGINAL_CONTEXT" value="true" show="false"/>
+    <elementParameter field="RADIO" name="USE_CHILD_JVM_SETTING" value="true" show="false"/>
+    <elementParameter field="RADIO" name="USE_CUSTOM_JVM_SETTING" value="false" show="false"/>
+    <elementParameter field="TABLE" name="JVM_ARGUMENTS" show="false"/>
+    <elementParameter field="CHECK" name="USE_DYNAMIC_CONTEXT" value="false"/>
+    <elementParameter field="TEXT" name="DYNAMIC_CONTEXT" value="&quot;&quot;" show="false"/>
+    <elementParameter field="CHECK" name="USE_EXTRA_CLASSPATH" value="false" show="false"/>
+    <elementParameter field="TEXT" name="EXTRA_CLASSPATH" value="&quot;&quot;" show="false"/>
+    <elementParameter field="TEXT" name="LABEL" value="__PROCESS__"/>
+    <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
+    <metadata connector="FLOW" name="tRunJob_2"/>
+  </node>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tRunJob_1" offsetLabelX="0" offsetLabelY="0" source="tRunJob_1" target="tRunJob_2">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="OnSubjobOk1" show="false"/>
+  </connection>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_1" show="false"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" value="92;131;150" show="false"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+  <subjob>
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_2" show="false"/>
+    <elementParameter field="COLOR" name="SUBJOB_TITLE_COLOR" value="92;131;150" show="false"/>
+    <elementParameter field="COLOR" name="SUBJOB_COLOR" value="207;226;236"/>
+  </subjob>
+</talendfile:ProcessType>

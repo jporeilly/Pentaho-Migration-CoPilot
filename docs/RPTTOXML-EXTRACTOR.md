@@ -135,3 +135,19 @@ entries and maps plain running totals to group-scoped Item* functions.
 
 Still open (smaller): cross-tab grid definitions (SDK-sealed — hand-add
 `<CrossTabDefinition>`, see CRYSTAL-COVERAGE.md).
+
+**Evaluated alternative — rpt-rs (2026-07-25):**
+[MrSrsen/rpt-rs](https://github.com/MrSrsen/rpt-rs) (MPL-2.0) is a pure-Rust
+.rpt reader/renderer with no SAP runtime: `rpt xml-dump` emits
+RptToXml-compatible XML and the codebase parses **cross-tab row/column
+dimensions and measures from the binary** — exactly what the SAP SDK seals
+behind reserved slots. Evaluation of the pinned v0.2.0 release (Windows
+binary, checksum-verified, AND a from-source cargo build): **broken on
+Windows** — 0 records decoded from every corpus file *including the
+project's own README fixture* (stream names surface as `\\/Contents`,
+pointing at a path-separator bug in the CFB layer), renders blank pages.
+The project self-describes as experimental/unstable. Decision: keep the
+SAP-based fork pipeline (corpus-proven), re-evaluate rpt-rs at its next
+tag — if the Windows CFB bug is fixed, an adapter that injects
+`<CrossTabDefinition>` from its output would close the last manual
+cross-tab step. Evaluation trees live untracked under `tools/rpt-rs*`.
