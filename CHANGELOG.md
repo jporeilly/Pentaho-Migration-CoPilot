@@ -7,6 +7,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.32.0] — 2026-07-25
+
+### Added
+
+- **CSCU Talend demo set** (`samples/talend_demo/`): four authored .item
+  jobs on the live cscu_core schema — members_export (query → sort →
+  file), branch_balances (aggregate; the new **Try Talend** sample),
+  high_value_txns (filter), and cscu_nightly (tPrejob + three tRunJob
+  calls → a real .kjb). The ETL twin of the Crystal demo ladder; all four
+  convert at 88/100 average.
+- **ETL consultant portfolio report** (`GET /project/portfolio?family=`,
+  📊 button per family): confidence-grade distribution, step-outcome bar,
+  **remaining manual work by source component** (with affected-export
+  counts, re-parsed live), review-load histogram, 10 heaviest mappings,
+  hours/$ at the engagement rate — the Informatica/Talend counterpart of
+  the Crystal report.
+- **Project page is context-aware and per-family**: separate cards for
+  Informatica pipelines, Talend jobs and Crystal reports, each with its
+  **own** effort/cost summary; opening the page while an artifact is
+  loaded shows that family first (one click to show everything).
+- Try buttons moved under the drop panel and split by source:
+  **Try Informatica · Try Talend · Try Crystal Reports**.
+
+### Fixed
+
+- **Stale source paths after the repo rename**: the project store held
+  dead `PDI-Migration` absolute paths, so the walkthrough click ("source
+  export not found") and Crystal triage could not reach their sources.
+  Paths now self-heal on read — exact path, rebase from the `samples`
+  segment onto the current repo root, then basename search across the
+  sample directories — and the healed value is written back. All 148
+  stored ETL mappings resolve again.
+
 ## [1.31.0] — 2026-07-25
 
 ### Added

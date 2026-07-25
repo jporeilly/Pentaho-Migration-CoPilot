@@ -105,6 +105,12 @@ export default function App() {
     convert(new File([blob], 'm_load_sales.xml', { type: 'text/xml' }))
   }
 
+  async function loadTalendSample() {
+    const res = await fetch('/sample-talend', { cache: 'no-store' })
+    const blob = await res.blob()
+    convert(new File([blob], 'branch_balances_0.1.item', { type: 'text/xml' }))
+  }
+
   async function loadCrystalSample() {
     const res = await fetch('/reports/sample', { cache: 'no-store' })
     const blob = await res.blob()
@@ -189,7 +195,13 @@ export default function App() {
       {view === 'settings' ? (
         <SettingsPage onBack={() => setView('workflow')} />
       ) : view === 'project' ? (
-        <ProjectPage onBack={() => setView('workflow')} onOpen={openFromProject} />
+        <ProjectPage
+          onBack={() => setView('workflow')}
+          onOpen={openFromProject}
+          context={report ? 'crystal'
+            : results.length ? (results[0].pipeline.source_tool === 'talend' ? 'talend' : 'informatica')
+            : null}
+        />
       ) : (
         <>
           <Stepper step={step} maxStep={maxStep} onStep={setStep} steps={report ? REPORT_STEPS : undefined} />
@@ -253,6 +265,7 @@ export default function App() {
             <UploadPage
               onFile={convert}
               onSample={loadSample}
+              onTalendSample={loadTalendSample}
               onCrystalSample={loadCrystalSample}
               error={error}
               loading={loading}

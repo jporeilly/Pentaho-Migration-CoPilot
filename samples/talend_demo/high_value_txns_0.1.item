@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ProcessType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" defaultContext="Default" jobType="Standard">
+  <context confirmationNeeded="false" name="Default"/>
+  <node componentName="tPostgresqlInput" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="100" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tPostgresqlInput_1"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value='"SELECT t.txn_dt AS \"TXN_DT\", a.acct_no AS \"ACCT_NO\",&#10;       t.txn_type_cd AS \"TXN_TYPE_CD\", t.txn_amt AS \"TXN_AMT\"&#10;FROM cscu_core.transactions t JOIN cscu_core.accounts a ON a.acct_id = t.acct_id"'/>
+    <elementParameter field="TEXT" name="HOST" value='"192.168.1.200"'/>
+    <elementParameter field="TEXT" name="PORT" value='"5433"'/>
+    <elementParameter field="TEXT" name="DBNAME" value='"cscu_core"'/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" value='"cscu_core"'/>
+    <metadata connector="FLOW" name="tPostgresqlInput_1">
+      <column name="TXN_DT" type="id_Date" nullable="true" length="0" precision="0"/>
+      <column name="ACCT_NO" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TXN_TYPE_CD" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TXN_AMT" type="id_BigDecimal" nullable="true" length="0" precision="0"/>
+    </metadata>
+  </node>
+  <node componentName="tFilterRow" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="400" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tFilterRow_1"/>
+    <elementParameter field="TEXT" name="LOGICAL_OP" value="&amp;&amp;"/>
+    <elementParameter field="CHECK" name="USE_ADVANCED" value="false"/>
+    <elementParameter field="TABLE" name="CONDITIONS">
+      <elementValue elementRef="INPUT_COLUMN" value="TXN_AMT"/>
+      <elementValue elementRef="FUNCTION" value=""/>
+      <elementValue elementRef="OPERATOR" value="&gt;="/>
+      <elementValue elementRef="RVALUE" value="10000"/>
+    </elementParameter>
+    <metadata connector="FLOW" name="tFilterRow_1">
+      <column name="TXN_DT" type="id_Date" nullable="true" length="0" precision="0"/>
+      <column name="ACCT_NO" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TXN_TYPE_CD" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TXN_AMT" type="id_BigDecimal" nullable="true" length="0" precision="0"/>
+    </metadata>
+  </node>
+  <node componentName="tFileOutputDelimited" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="700" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tFileOutputDelimited_1"/>
+    <elementParameter field="TEXT" name="FILENAME" value='"C:/cscu/out/high_value_txns.csv"'/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value='";"'/>
+    <elementParameter field="CHECK" name="INCLUDEHEADER" value="true"/>
+    <metadata connector="FLOW" name="tFileOutputDelimited_1">
+      <column name="TXN_DT" type="id_Date" nullable="true" length="0" precision="0"/>
+      <column name="ACCT_NO" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TXN_TYPE_CD" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TXN_AMT" type="id_BigDecimal" nullable="true" length="0" precision="0"/>
+    </metadata>
+  </node>
+  <connection connectorName="FLOW" label="row1" lineStyle="0" metaname="tPostgresqlInput_1" source="tPostgresqlInput_1" target="tFilterRow_1"/>
+  <connection connectorName="FLOW" label="row2" lineStyle="0" metaname="tFilterRow_1" source="tFilterRow_1" target="tFileOutputDelimited_1"/>
+</talendfile:ProcessType>

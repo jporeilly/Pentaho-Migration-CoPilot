@@ -48,6 +48,46 @@ class MappingRecord(BaseModel):
     updated_at: str
 
 
+def resolve_source_path(raw: str) -> Path | None:
+    """Find a recorded source file even after the repo moved or was renamed
+    (the store predating the PDI-Migration -> Pentaho-Migration rename held
+    dead absolute paths). Strategy: exact path, then rebase everything from
+    the 'samples' segment onto the current repo root, then a basename search
+    across the standard sample directories."""
+    if not raw:
+        return None
+    p = Path(raw)
+    if p.is_file():
+        return p
+    parts = p.parts
+    if "samples" in parts:
+        candidate = REPO_ROOT.joinpath(*parts[parts.index("samples"):])
+        if candidate.is_file():
+            return candidate
+    for base in ("samples/informatica", "samples/talend", "samples/talend_demo",
+                 "samples/crystal/real", "samples/cr_demo", "samples/crystal"):
+        candidate = REPO_ROOT / base / p.name
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _repair_paths(conn, table: str) -> int:
+    """Heal stale source_path values in place (runs lazily on list reads)."""
+    fixed = 0
+    for row in conn.execute(
+            f"SELECT rowid, source_path FROM {table} WHERE source_path != ''").fetchall():
+        raw = row["source_path"]
+        if Path(raw).is_file():
+            continue
+        resolved = resolve_source_path(raw)
+        if resolved is not None:
+            conn.execute(f"UPDATE {table} SET source_path=? WHERE rowid=?",
+                         (str(resolved), row["rowid"]))
+            fixed += 1
+    return fixed
+
+
 def _db_path() -> Path:
     config_dir = Path(os.environ.get("PENTAHO_MIGRATION_CONFIG_DIR")
                       or os.environ.get("PDI_MIGRATION_CONFIG_DIR")  # pre-rename fallback
@@ -95,6 +135,7 @@ def get_mapping(file: str, mapping: str) -> MappingRecord | None:
 
 def list_mappings() -> list[MappingRecord]:
     with _connect() as conn:
+        _repair_paths(conn, "mappings")  # heal paths from before a repo move/rename
         rows = conn.execute(
             "SELECT * FROM mappings ORDER BY score ASC, file, mapping"
         ).fetchall()
@@ -190,6 +231,7 @@ def record_report(record: ReportRecord) -> None:
 def list_reports() -> list[ReportRecord]:
     with _connect() as conn:
         _ensure_reports(conn)
+        _repair_paths(conn, "reports")  # heal paths from before a repo move/rename
         rows = conn.execute(
             "SELECT * FROM reports ORDER BY formulas_manual DESC, file"
         ).fetchall()

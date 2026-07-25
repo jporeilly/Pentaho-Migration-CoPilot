@@ -30,7 +30,7 @@ const PHASES = [
   { name: 'Phase 2 — Multi-source', text: 'Complete Talend; then SSIS and DataStage.' },
 ]
 
-export default function UploadPage({ onFile, onSample, onCrystalSample, error, loading, source, onShowPractices, family }) {
+export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, error, loading, source, onShowPractices, family }) {
   const stages = family === 'reports' ? REPORTS : family === 'etl' ? ETL : GENERIC
 
   return (
@@ -47,7 +47,7 @@ export default function UploadPage({ onFile, onSample, onCrystalSample, error, l
         <button className="ghost" onClick={onShowPractices}>📘 Migration best practices</button>
       </p>
 
-      <DropZone onFile={onFile} onSample={onSample} onCrystalSample={onCrystalSample} />
+      <DropZone onFile={onFile} onSample={onSample} onTalendSample={onTalendSample} onCrystalSample={onCrystalSample} />
       {error && <div className="error">Conversion failed: {error}</div>}
       {loading && <p className="loading">Converting…</p>}
       {source && <SourceCard source={source} />}

@@ -112,8 +112,16 @@ class ConversionResponse(BaseModel):
 
 @app.get("/sample", include_in_schema=False)
 def sample() -> FileResponse:
-    """The bundled demo export, used by the UI's 'Try the sample' button."""
+    """The bundled demo export, used by the UI's 'Try Informatica' button."""
     return FileResponse(SAMPLE_FILE, media_type="text/xml")
+
+
+@app.get("/sample-talend", include_in_schema=False)
+def sample_talend() -> FileResponse:
+    """The CSCU Talend demo job, used by the UI's 'Try Talend' button."""
+    talend_sample = (Path(__file__).resolve().parents[3]
+                     / "samples" / "talend_demo" / "branch_balances_0.1.item")
+    return FileResponse(talend_sample, media_type="text/xml")
 
 
 @app.get("/health")
@@ -253,8 +261,10 @@ def project_open(file: str, mapping: str) -> ConversionResponse:
     record = get_mapping(file, mapping)
     if record is None:
         raise HTTPException(status_code=404, detail="mapping not found in project store")
-    source_path = Path(record.source_path)
-    if not record.source_path or not source_path.exists():
+    from pentaho_migration.project import resolve_source_path
+
+    source_path = resolve_source_path(record.source_path)
+    if source_path is None:
         raise HTTPException(
             status_code=410,
             detail=f"source export not found at '{record.source_path}' — "
@@ -369,6 +379,23 @@ def project_reports_triage(jndi: str = "") -> list[ReportRecord]:
             "rewrites": result.rewrites,
         }))
     return list_reports()
+
+
+@app.get("/project/portfolio")
+def project_etl_portfolio(family: str = "informatica", rate: float = 150.0):
+    """The ETL consultant portfolio report for one source family
+    (informatica | talend): grades, unmapped-component breakdown,
+    review-load distribution, focus list, $ at the rate."""
+    from fastapi.responses import HTMLResponse
+
+    from pentaho_migration.etl_portfolio import build_etl_portfolio_report_html
+
+    records = [_project_row(r) for r in list_mappings()
+               if (r.file.lower().endswith(".item")) == (family == "talend")]
+    if not records:
+        raise HTTPException(status_code=404,
+                            detail=f"no {family} mappings in the project store")
+    return HTMLResponse(build_etl_portfolio_report_html(records, family=family, rate=rate))
 
 
 @app.get("/project/reports/portfolio")

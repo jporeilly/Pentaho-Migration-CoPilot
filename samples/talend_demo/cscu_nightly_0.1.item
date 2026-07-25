@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ProcessType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" defaultContext="Default" jobType="Standard">
+  <context confirmationNeeded="false" name="Default"/>
+  <node componentName="tPrejob" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="100" posY="20">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tPrejob_1"/>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="100" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_1"/>
+    <elementParameter field="TEXT" name="PROCESS" value="members_export"/>
+    <elementParameter field="TEXT" name="PROCESS:PROCESS_TYPE_CONTEXT" value="Default"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="true"/>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="400" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_2"/>
+    <elementParameter field="TEXT" name="PROCESS" value="branch_balances"/>
+    <elementParameter field="TEXT" name="PROCESS:PROCESS_TYPE_CONTEXT" value="Default"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="true"/>
+  </node>
+  <node componentName="tRunJob" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="700" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tRunJob_3"/>
+    <elementParameter field="TEXT" name="PROCESS" value="high_value_txns"/>
+    <elementParameter field="TEXT" name="PROCESS:PROCESS_TYPE_CONTEXT" value="Default"/>
+    <elementParameter field="CHECK" name="TRANSMIT_WHOLE_CONTEXT" value="true"/>
+  </node>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tPrejob_1" source="tPrejob_1" target="tRunJob_1"/>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tRunJob_1" source="tRunJob_1" target="tRunJob_2"/>
+  <connection connectorName="SUBJOB_OK" label="OnSubjobOk" lineStyle="1" metaname="tRunJob_2" source="tRunJob_2" target="tRunJob_3"/>
+</talendfile:ProcessType>

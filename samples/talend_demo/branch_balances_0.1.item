@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ProcessType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" defaultContext="Default" jobType="Standard">
+  <context confirmationNeeded="false" name="Default"/>
+  <node componentName="tPostgresqlInput" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="100" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tPostgresqlInput_1"/>
+    <elementParameter field="MEMO_SQL" name="QUERY" value='"SELECT b.br_name AS \"BR_NAME\", a.bal_amt AS \"BAL_AMT\"&#10;FROM cscu_core.accounts a JOIN cscu_core.branches b ON b.br_id = a.br_id"'/>
+    <elementParameter field="TEXT" name="HOST" value='"192.168.1.200"'/>
+    <elementParameter field="TEXT" name="PORT" value='"5433"'/>
+    <elementParameter field="TEXT" name="DBNAME" value='"cscu_core"'/>
+    <elementParameter field="TEXT" name="SCHEMA_DB" value='"cscu_core"'/>
+    <metadata connector="FLOW" name="tPostgresqlInput_1">
+      <column name="BR_NAME" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="BAL_AMT" type="id_BigDecimal" nullable="true" length="0" precision="0"/>
+    </metadata>
+  </node>
+  <node componentName="tAggregateRow" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="400" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tAggregateRow_1"/>
+    <elementParameter field="TABLE" name="GROUPBYS">
+      <elementValue elementRef="OUTPUT_COLUMN" value="BR_NAME"/>
+      <elementValue elementRef="INPUT_COLUMN" value="BR_NAME"/>
+    </elementParameter>
+    <elementParameter field="TABLE" name="OPERATIONS">
+      <elementValue elementRef="OUTPUT_COLUMN" value="TOTAL_BAL"/>
+      <elementValue elementRef="FUNCTION" value="sum"/>
+      <elementValue elementRef="INPUT_COLUMN" value="BAL_AMT"/>
+      <elementValue elementRef="IGNORE_NULL" value="false"/>
+      <elementValue elementRef="OUTPUT_COLUMN" value="ACCOUNTS"/>
+      <elementValue elementRef="FUNCTION" value="count"/>
+      <elementValue elementRef="INPUT_COLUMN" value="BAL_AMT"/>
+      <elementValue elementRef="IGNORE_NULL" value="false"/>
+    </elementParameter>
+    <metadata connector="FLOW" name="tAggregateRow_1">
+      <column name="BR_NAME" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TOTAL_BAL" type="id_BigDecimal" nullable="true" length="0" precision="0"/>
+      <column name="ACCOUNTS" type="id_Integer" nullable="true" length="0" precision="0"/>
+    </metadata>
+  </node>
+  <node componentName="tFileOutputDelimited" componentVersion="0.1" offsetLabelX="0" offsetLabelY="0" posX="700" posY="100">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tFileOutputDelimited_1"/>
+    <elementParameter field="TEXT" name="FILENAME" value='"C:/cscu/out/branch_balances.csv"'/>
+    <elementParameter field="TEXT" name="FIELDSEPARATOR" value='";"'/>
+    <elementParameter field="CHECK" name="INCLUDEHEADER" value="true"/>
+    <metadata connector="FLOW" name="tFileOutputDelimited_1">
+      <column name="BR_NAME" type="id_String" nullable="true" length="0" precision="0"/>
+      <column name="TOTAL_BAL" type="id_BigDecimal" nullable="true" length="0" precision="0"/>
+      <column name="ACCOUNTS" type="id_Integer" nullable="true" length="0" precision="0"/>
+    </metadata>
+  </node>
+  <connection connectorName="FLOW" label="row1" lineStyle="0" metaname="tPostgresqlInput_1" source="tPostgresqlInput_1" target="tAggregateRow_1"/>
+  <connection connectorName="FLOW" label="row2" lineStyle="0" metaname="tAggregateRow_1" source="tAggregateRow_1" target="tFileOutputDelimited_1"/>
+</talendfile:ProcessType>

@@ -1,11 +1,11 @@
 # Version
 
-**1.31.0** — 2026-07-25
+**1.32.0** — 2026-07-25
 
 **Phase 1 COMPLETE** — Informatica PowerCenter, SAP Crystal Reports, and
-Talend. The Talend production pass: real .ktr configs carried from the
-.item (CSV input, text output, filter, sort, aggregate), **tRunJob
-orchestration → .kjb** (12 corpus jobs convert), and rules v3 (95
-components; corpus manual steps 42 → 28, the rest are service hosts with
-no PDI equivalent). Phase 2 next: SSIS, then DataStage.
+Talend. The demo/consultant round: **CSCU Talend demo set** (four .item
+jobs incl. a tRunJob orchestrator → .kjb), **ETL consultant portfolio
+report** per family, a **context-aware Project page** with per-family
+metrics, source-split Try buttons, and **self-healing source paths**
+(the store's pre-rename absolute paths resolve again).
 See [CHANGELOG.md](CHANGELOG.md) for history.
