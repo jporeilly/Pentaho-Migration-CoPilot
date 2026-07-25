@@ -50,14 +50,24 @@ def _style_block(el, sp):
 
 def _border_styles(el, sp):
     """A border-styles element carrying background fill and/or a border, when
-    the element defines them. PRD paints element backgrounds this way."""
+    the element defines them. PRD paints element backgrounds this way.
+    Crystal borders are per-side (a column header usually has only a bottom
+    rule), so only the authored sides are emitted — a full box would draw
+    vertical lines between adjacent cells that Crystal never showed."""
     attrs = []
     if el.bg_color:
         attrs.append(f"background-color={quoteattr(el.bg_color)}")
     if el.border_width and el.border_color:
-        attrs.append(f'border-width="{_num(el.border_width)}"')
-        attrs.append(f"border-color={quoteattr(el.border_color)}")
-        attrs.append('border-style="solid"')
+        sides = el.border_sides or ("top", "bottom", "left", "right")
+        if len(sides) == 4:
+            attrs.append(f'border-width="{_num(el.border_width)}"')
+            attrs.append(f"border-color={quoteattr(el.border_color)}")
+            attrs.append('border-style="solid"')
+        else:
+            for side in sides:
+                attrs.append(f'border-{side}-width="{_num(el.border_width)}"')
+                attrs.append(f"border-{side}-color={quoteattr(el.border_color)}")
+                attrs.append(f'border-{side}-style="solid"')
     return f'<{sp}border-styles {" ".join(attrs)}/>' if attrs else ""
 
 
@@ -135,10 +145,11 @@ def render_element(el, tp="", sp="style:"):
                 f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}text-field>")
     if el.kind == "chart":
         return _render_chart(el, tp, sp)
-    if el.kind == "subreport":
+    if el.kind in ("subreport", "crosstab"):
         if el.subreport_href:
-            # a converted nested sub-report: banded, linked to the parent row
-            # via input-parameter mappings (master column -> child parameter)
+            # a converted nested sub-report (or a cross-tab hosted in one):
+            # banded, linked to the parent via input-parameter mappings
+            # (master column/parameter -> child parameter)
             links = "".join(
                 f"<input-parameter master-fieldname={quoteattr(m)} "
                 f"detail-fieldname={quoteattr(d)}/>"
@@ -148,6 +159,9 @@ def render_element(el, tp="", sp="style:"):
                     f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
                     f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
                     f"</{sp}element-style>{links}</{tp}sub-report>")
+        if el.kind == "crosstab":
+            return render_element(
+                _todo_label(el, f"[TODO cross-tab: {el.name or 'CrossTab'}]"), tp, sp)
         return render_element(_todo_label(el, f"[TODO subreport: {el.text} - convert separately]"), tp, sp)
     if el.kind == "image":
         if el.image_bytes and el.resource_path:

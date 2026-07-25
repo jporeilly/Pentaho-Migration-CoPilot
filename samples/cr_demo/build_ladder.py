@@ -1,6 +1,7 @@
-"""Generate the CSCU Crystal-migration ladder: six RptToXml-shaped dumps of
+"""Generate the CSCU Crystal-migration ladder: nine RptToXml-shaped dumps of
 increasing complexity, backed by the live cscu_core schema so each converts
-AND renders end-to-end. Styled as polished, professional credit-union reports
+AND renders end-to-end. Pages are A4 PORTRAIT (PAGE_W content width);
+column sets are auto-fitted via fit(). Styled as polished, professional credit-union reports
 using the SAME formatting elements real RptToXml emits — nested <Color>,
 <BackgroundColor>, <Border> line styles, and a base64 <ImageData> logo — so
 the polish is genuinely carried from the "Crystal source" through conversion,
@@ -15,6 +16,10 @@ from xml.sax.saxutils import escape, quoteattr
 
 OUT = Path(__file__).parent
 TW = 20  # twips per point
+
+# A4 PORTRAIT content width in points: 595pt page - 2 x 18pt margins.
+# Every band anchors to this so the demos render print-ready in portrait.
+PAGE_W = 559
 
 # ---- CSCU professional theme -------------------------------------------------
 NAVY = (19, 51, 70)      # #133346
@@ -140,7 +145,7 @@ def build(name, filename, sql, fields, *, groups=None, formulas=None, params=Non
         for sn, op, col, grp in (summaries or [])) + '</SummaryFields>')
     dd.append('</DataDefinition>')
     p.append("".join(dd))
-    p.append('<PrintOptions PaperOrientation="Landscape" PaperSize="PaperA4">'
+    p.append('<PrintOptions PaperOrientation="Portrait" PaperSize="PaperA4">'
              '<PageMargins topMargin="360" leftMargin="360" bottomMargin="360" rightMargin="360"/></PrintOptions>')
     p.append(f'<ReportDefinition><Areas>{"".join(areas)}</Areas></ReportDefinition></Report>')
     xml = "".join(p)
@@ -157,27 +162,41 @@ def masthead(title, subtitle):
     """Navy report-header band with logo, white title, gold subtitle + rule."""
     return section("ReportHeader", "RH", 58, [
         logo("Logo", 8, 6, 120, 44),
-        text("Title", title, 150, 8, 400, 26, size=18, bold=True, color=WHITE),
-        text("Sub", subtitle, 152, 34, 560, 16, size=10, color=GOLD),
-        text("Org", "Copperstate Credit Union", 556, 10, 244, 16, size=9,
+        text("Title", title, 150, 8, 300, 26, size=18, bold=True, color=WHITE),
+        text("Sub", subtitle, 152, 34, PAGE_W - 160, 16, size=10, color=GOLD),
+        text("Org", "Copperstate Credit Union", PAGE_W - 150, 10, 144, 16, size=9,
              color=WHITE, align="RightAlign"),
-        box("GoldRule", 0, 55, 806, 2, GOLD),
+        box("GoldRule", 0, 55, PAGE_W, 2, GOLD),
     ], bg=NAVY)
 
 
-def column_header(cols):
+def fit(cols, width=None):
+    """Scale column widths proportionally so they fill exactly `width`
+    (default: the portrait content width). Keeps every rung's column set
+    print-ready without hand-tuning each layout."""
+    width = width or PAGE_W
+    total = sum(w for _, _, w, _, _ in cols)
+    scaled, x = [], 0
+    for i, (label, ref, w, align, vt) in enumerate(cols):
+        w2 = width - x if i == len(cols) - 1 else round(w * width / total)
+        scaled.append((label, ref, w2, align, vt))
+        x += w2
+    return scaled
+
+
+def column_header(cols, reserve=0):
     """Dark column-label row with white bold labels and a bottom border."""
     labels, x = [], 0
-    for label, _ref, w, align, _vt in cols:
+    for label, _ref, w, align, _vt in fit(cols, PAGE_W - reserve):
         labels.append(text(f"h_{label}", label, x, 2, w, 18, size=9, bold=True,
                            color=WHITE, align=align, border=SLATE))
         x += w
     return section("PageHeader", "PH", 22, labels, bg=NAVY)
 
 
-def detail(cols, extra=None, zebra=False):
+def detail(cols, extra=None, zebra=False, reserve=0):
     objs, x = [], 0
-    for label, ref, w, align, vt in cols:
+    for label, ref, w, align, vt in fit(cols, PAGE_W - reserve):
         objs.append(field(f"d_{label}", ref, x, 0, w, 15, size=9, align=align, color=INK))
         x += w
     objs.extend(extra or [])
@@ -186,28 +205,28 @@ def detail(cols, extra=None, zebra=False):
 
 def group_header(ref, extra=None):
     return section("GroupHeader", "GH", 22, [
-        box("GhBar", 0, 0, 806, 20, LIGHT),
-        field("GroupVal", ref, 6, 2, 500, 17, size=11, bold=True, color=NAVY),
+        box("GhBar", 0, 0, PAGE_W, 20, LIGHT),
+        field("GroupVal", ref, 6, 2, 400, 17, size=11, bold=True, color=NAVY),
         *(extra or []),
     ])
 
 
 def totals_footer(kind, name, label, ref, size=9, big=False):
     return section(kind, name, 22, [
-        box("TotRule", 500, 0, 306, 1, GOLD),
-        text(f"{name}Lbl", label, 500, 3, 150, 16, size=size, bold=True, color=NAVY),
-        field(f"{name}Val", ref, 660, 3, 130, 16, size=size, bold=True,
+        box("TotRule", PAGE_W - 306, 0, 306, 1, GOLD),
+        text(f"{name}Lbl", label, PAGE_W - 306, 3, 150, 16, size=size, bold=True, color=NAVY),
+        field(f"{name}Val", ref, PAGE_W - 146, 3, 130, 16, size=size, bold=True,
               color=(GOLD if big else NAVY), align="RightAlign"),
     ])
 
 
 def page_footer():
     return section("PageFooter", "PF", 22, [
-        box("PfRule", 0, 0, 806, 1, SLATE),
-        field("PrintDate", "PrintDate", 0, 4, 200, 14, size=8, color=SLATE),
-        text("Conf", "Confidential — Copperstate Credit Union", 300, 4, 320, 14,
+        box("PfRule", 0, 0, PAGE_W, 1, SLATE),
+        field("PrintDate", "PrintDate", 0, 4, 140, 14, size=8, color=SLATE),
+        field("PageNum", "PageNumber", PAGE_W - 106, 4, 100, 14, size=8, color=SLATE, align="RightAlign"),
+        text("Conf", "Confidential — Copperstate Credit Union", 145, 4, PAGE_W - 300, 14,
              size=8, color=SLATE, align="HorizontalCenterAlign"),
-        field("PageNum", "PageNumber", 700, 4, 100, 14, size=8, color=SLATE, align="RightAlign"),
     ])
 
 
@@ -249,11 +268,11 @@ def r2():
                  column_header(cols), group_header("{Command.BR_NAME}"), detail(cols),
                  totals_footer("GroupFooter","GF","Branch total:","{#Sum of BAL_AMT}"),
                  section("ReportFooter", "RF", 262, [
-                     box("RfRule", 500, 0, 306, 1, GOLD),
-                     text("GtLbl", "Grand total:", 500, 3, 150, 16, size=10, bold=True, color=NAVY),
-                     field("GtVal", "{#Grand Total BAL_AMT}", 660, 3, 130, 16, size=10,
+                     box("RfRule", PAGE_W - 306, 0, 306, 1, GOLD),
+                     text("GtLbl", "Grand total:", PAGE_W - 306, 3, 150, 16, size=10, bold=True, color=NAVY),
+                     field("GtVal", "{#Grand Total BAL_AMT}", PAGE_W - 146, 3, 130, 16, size=10,
                            bold=True, color=GOLD, align="RightAlign"),
-                     chart("BalChart", 40, 26, 560, 230, "Bar",
+                     chart("BalChart", 20, 26, PAGE_W - 40, 230, "Bar",
                            "Deposit balances by branch", "BR_NAME", "BAL_AMT"),
                  ]),
                  page_footer()])
@@ -266,7 +285,7 @@ def r3():
             ("Type", "{Command.TXN_TYPE_CD}", 80, None, "StringField"),
             ("Merchant", "{Command.MERCH_NM}", 170, None, "StringField"),
             ("Amount", "{Command.TXN_AMT}", 120, "RightAlign", "CurrencyField")]
-    extra = [field("Flow", "{@FlowType}", 756, 0, 50, 15, size=9,
+    extra = [field("Flow", "{@FlowType}", PAGE_W - 50, 0, 50, 15, size=9,
                    align="HorizontalCenterAlign", color=SLATE)]
     build("Transaction Register - Formulas", "03_transaction_register.xml",
           'SELECT b.br_name AS "BR_NAME", t.txn_dt AS "TXN_DT", a.acct_no AS "ACCT_NO",\n'
@@ -286,7 +305,8 @@ def r3():
           summaries=[("Sum of TXN_AMT","Sum","TXN_AMT","BR_NAME"),
                      ("Grand Total TXN_AMT","Sum","TXN_AMT",None)],
           areas=[masthead("Transaction Register", "Demo: multi-join SQL and translated formulas"),
-                 column_header(cols), group_header("{Command.BR_NAME}"), detail(cols, extra),
+                 column_header(cols, reserve=52), group_header("{Command.BR_NAME}"),
+                 detail(cols, extra, reserve=52),
                  totals_footer("GroupFooter","GF","Branch net:","{#Sum of TXN_AMT}"),
                  totals_footer("ReportFooter","RF","Net movement:","{#Grand Total TXN_AMT}",size=10,big=True),
                  page_footer()])
@@ -299,9 +319,9 @@ def r4():
             ("Amount", "{Command.TXN_AMT}", 120, "RightAlign", "CurrencyField"),
             ("Balance", "{@RunningBalance}", 120, "RightAlign", "NumberField")]
     gh1 = section("GroupHeader", "GH1", 26, [
-        box("M1", 0, 0, 806, 24, NAVY),
-        field("MemberHdr", "{@FullName}", 8, 3, 400, 18, size=12, bold=True, color=WHITE),
-        field("MemberNo", "{Command.MBR_NO}", 606, 4, 200, 16, size=9, color=GOLD, align="RightAlign")])
+        box("M1", 0, 0, PAGE_W, 24, NAVY),
+        field("MemberHdr", "{@FullName}", 8, 3, 300, 18, size=12, bold=True, color=WHITE),
+        field("MemberNo", "{Command.MBR_NO}", PAGE_W - 206, 4, 200, 16, size=9, color=GOLD, align="RightAlign")])
     gh2 = section("GroupHeader", "GH2", 20, [
         text("AcctLbl", "Account", 20, 2, 70, 16, size=9, bold=True, color=SLATE),
         field("AcctNo", "{Command.ACCT_NO}", 90, 2, 160, 16, size=9, bold=True, color=NAVY)])
@@ -336,10 +356,11 @@ def r5():
             ("Balance", "{Command.PRIN_BAL_AMT}", 130, "RightAlign", "CurrencyField"),
             ("APR %", "{Command.APR_RT}", 90, "RightAlign", "NumberField"),
             ("Status", "{Command.LN_STATUS}", 110, None, "StringField")]
-    # detail with a conditional font-color on the balance (delinquent = red)
+    # detail with a conditional font-color on the balance (delinquent = red);
+    # built from the SAME fitted columns the header row uses
     det = []
     x = 0
-    for lbl, ref, w, al, vt in cols:
+    for lbl, ref, w, al, vt in fit(cols):
         if lbl == "Balance":
             det.append('<FieldObject Name="d_Balance" DataSource="{Command.PRIN_BAL_AMT}" '
                        f'Left="{x*TW}" Top="0" Width="{w*TW}" Height="{15*TW}" HorizontalAlignment="RightAlign">'
@@ -350,13 +371,13 @@ def r5():
             det.append(field(f"d_{lbl}", ref, x, 0, w, 15, size=9, align=al, color=INK))
         x += w
     gf = section("GroupFooter", "GF", 40, [
-        box("Rule", 300, 0, 506, 1, GOLD),
-        text("SumLbl", "Portfolio balance:", 300, 3, 150, 14, size=8, bold=True, color=NAVY),
-        field("SumBal", "{#Sum of PRIN_BAL_AMT}", 460, 3, 130, 14, size=8, bold=True, color=NAVY, align="RightAlign"),
-        text("AvgLbl", "Avg APR:", 300, 20, 150, 14, size=8, color=SLATE),
-        field("AvgApr", "{#Average of APR_RT}", 460, 20, 130, 14, size=8, color=SLATE, align="RightAlign"),
-        text("SdLbl", "APR std dev:", 620, 20, 100, 14, size=8, color=SLATE),
-        field("SdApr", "{#StdDev of APR_RT}", 716, 20, 90, 14, size=8, color=SLATE, align="RightAlign")])
+        box("Rule", PAGE_W - 506, 0, 506, 1, GOLD),
+        text("SumLbl", "Portfolio balance:", PAGE_W - 506, 3, 150, 14, size=8, bold=True, color=NAVY),
+        field("SumBal", "{#Sum of PRIN_BAL_AMT}", PAGE_W - 346, 3, 130, 14, size=8, bold=True, color=NAVY, align="RightAlign"),
+        text("AvgLbl", "Avg APR:", PAGE_W - 506, 20, 150, 14, size=8, color=SLATE),
+        field("AvgApr", "{#Average of APR_RT}", PAGE_W - 346, 20, 130, 14, size=8, color=SLATE, align="RightAlign"),
+        text("SdLbl", "APR std dev:", PAGE_W - 196, 20, 100, 14, size=8, color=SLATE),
+        field("SdApr", "{#StdDev of APR_RT}", PAGE_W - 91, 20, 90, 14, size=8, color=SLATE, align="RightAlign")])
     build("Loan Portfolio - Conditional Formatting", "05_loan_portfolio.xml",
           'SELECT b.br_name AS "BR_NAME", l.ln_no AS "LN_NO", l.ln_type_cd AS "LN_TYPE_CD",\n'
           '       l.orig_amt AS "ORIG_AMT", l.prin_bal_amt AS "PRIN_BAL_AMT",\n'
@@ -404,7 +425,7 @@ def r6():
     extra = ['<SubreportObject Name="KycSub" SubreportName="sar_kyc" '
              f'Left="0" Top="{17*TW}" Width="{500*TW}" Height="{30*TW}"/>']
     rf = section("ReportFooter", "RF", 60, [
-        box("PivotBar", 0, 0, 806, 1, GOLD),
+        box("PivotBar", 0, 0, PAGE_W, 1, GOLD),
         '<CrossTabObject Name="ActivityPivot" Left="0" Top="200" Width="8060" Height="1000"/>',
         text("Note", "Activity type x status pivot (rebuild as PRD crosstab)", 0, 4, 500, 14,
              size=8, color=SLATE)])
@@ -518,10 +539,10 @@ def r8():
             ("Tier", "{@Tier}", 110, None, "StringField"),
             ("Flag", "{@BigTxn}", 80, None, "StringField"),
             ("Bal", "{@RunBal}", 110, "RightAlign", "NumberField")]
-    gf2 = section("GroupFooter", "SGF2", 34, [
+    gf2 = section("GroupFooter", "SGF2", 56, [
         text("KycHdr", "Member due diligence:", 20, 2, 200, 12, size=8, bold=True, color=NAVY),
-        f'<SubreportObject Name="KycSub" SubreportName="stress_kyc" Left="{20*TW}" Top="{14*TW}" Width="{380*TW}" Height="{18*TW}"/>',
-        f'<SubreportObject Name="TxnSub" SubreportName="stress_txns" Left="{420*TW}" Top="{14*TW}" Width="{380*TW}" Height="{18*TW}"/>'])
+        f'<SubreportObject Name="KycSub" SubreportName="stress_kyc" Left="{20*TW}" Top="{14*TW}" Width="{(PAGE_W - 40)*TW}" Height="{18*TW}"/>',
+        f'<SubreportObject Name="TxnSub" SubreportName="stress_txns" Left="{20*TW}" Top="{36*TW}" Width="{(PAGE_W - 40)*TW}" Height="{18*TW}"/>'])
     pf = section("PageFooter", "SPF", 30, [
         text("pfl", "Branch directory:", 0, 2, 120, 10, size=7, color=SLATE),
         f'<SubreportObject Name="BranchSub" SubreportName="stress_branches" Left="{130*TW}" Top="0" Width="{300*TW}" Height="{28*TW}"/>'])
@@ -556,7 +577,7 @@ def r8():
           areas=[masthead("Stress Lab", "Demo: boundary hunting - nested groups, multi-link subreports, page-band subreport"),
                  column_header(cols),
                  section("GroupHeader", "SGH1", 20, [
-                     box("g1bar", 0, 0, 806, 18, LIGHT),
+                     box("g1bar", 0, 0, PAGE_W, 18, LIGHT),
                      field("g1", "{Command.BR_NAME}", 6, 2, 400, 15, size=10, bold=True, color=NAVY)]),
                  section("GroupHeader", "SGH2", 16, [
                      field("g2", "{@FullName}", 20, 1, 300, 14, size=9, bold=True, color=SLATE)]),
@@ -565,6 +586,35 @@ def r8():
                  detail(cols), gf2,
                  totals_footer("ReportFooter", "SRF", "Grand total:", "{#Grand Total TXN_AMT}", big=True),
                  pf])
+
+
+def r9():
+    """Rung 9 - a cross-tab that CONVERTS: the CrossTabObject carries the
+    <CrossTabDefinition> block (rows/columns/summaries), which is exactly what
+    a consultant hand-adds to a real dump (the free SAP SDK cannot export it).
+    Converts to a live PRD crosstab: branches x transaction types, summed."""
+    build("Branch Activity Matrix - Cross-tab", "09_branch_activity_matrix.xml",
+          'SELECT b.br_name AS "BR_NAME", t.txn_type_cd AS "TXN_TYPE",\n'
+          '       t.txn_amt AS "TXN_AMT"\n'
+          'FROM cscu_core.transactions t\n'
+          'JOIN cscu_core.accounts a ON a.acct_id = t.acct_id\n'
+          'JOIN cscu_core.branches b ON b.br_id = a.br_id',
+          [("BR_NAME", "StringField"), ("TXN_TYPE", "StringField"),
+           ("TXN_AMT", "CurrencyField")],
+          areas=[masthead("Branch Activity Matrix",
+                          "Demo: cross-tab converted to a live PRD crosstab"),
+                 section("ReportHeader", "RH2", 240, [
+                     text("XtLbl", "Transaction amounts by branch and type",
+                          0, 4, 400, 14, size=9, bold=True, color=SLATE),
+                     '<CrossTabObject Name="ActivityMatrix" Left="0" Top="440" '
+                     f'Width="{520*TW}" Height="{200*TW}">'
+                     '<CrossTabDefinition>'
+                     '<RowFields><Field FieldName="{Command.BR_NAME}"/></RowFields>'
+                     '<ColumnFields><Field FieldName="{Command.TXN_TYPE}"/></ColumnFields>'
+                     '<SummaryFields><Field FieldName="{Command.TXN_AMT}" Operation="Sum"/></SummaryFields>'
+                     '</CrossTabDefinition></CrossTabObject>',
+                 ]),
+                 page_footer()])
 
 
 def flagship():
@@ -624,7 +674,7 @@ def flagship():
 
 
 if __name__ == "__main__":
-    for fn in (r1, r2, r3, r4, r5, r6, r7, r8):
+    for fn in (r1, r2, r3, r4, r5, r6, r7, r8, r9):
         fn()
     flagship()
     for f in sorted(OUT.glob("0*.xml")):

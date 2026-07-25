@@ -136,7 +136,7 @@ def _parse_object(obj):
         _attr(obj, "VerticalAlignment", default="").lower().replace("align", ""), "")
     # formatting carried from the Crystal object (real RptToXml color children)
     el.bg_color = _find_color(obj, "BackgroundColor")
-    el.border_color, el.border_width = _parse_border(obj)
+    el.border_color, el.border_width, el.border_sides = _parse_border(obj)
     objfmt = next((c for c in obj if _local(c.tag) == "ObjectFormat"), None)
     if objfmt is not None:
         el.visible = _attr(objfmt, "EnableSuppress", default="false").lower() not in ("true", "1")
@@ -206,6 +206,40 @@ def _parse_object(obj):
         else:
             el.kind = "unknown"
             el.text = f"ChartObject ({style or 'no definition in dump'})"
+    elif tag == "CrossTabObject":
+        # The free SAP .NET SDK does not expose a cross-tab's grid definition
+        # (rows/columns/summaries sit behind reserved COM slots), so the dump
+        # only carries this block when hand-added (or from a future extractor):
+        #   <CrossTabDefinition>
+        #     <RowFields><Field FieldName="{T.COL}"/></RowFields>
+        #     <ColumnFields><Field FieldName="{T.COL}"/></ColumnFields>
+        #     <SummaryFields><Field FieldName="{T.COL}" Operation="Sum"/></SummaryFields>
+        #   </CrossTabDefinition>
+        ct = next((c for c in obj.iter() if _local(c.tag) == "CrossTabDefinition"), None)
+
+        def _ct_fields(parent_tag):
+            if ct is None:
+                return []
+            return [_attr(f, "FieldName", "FormulaName", default="")
+                    for parent in ct if _local(parent.tag) == parent_tag
+                    for f in parent if _attr(f, "FieldName", "FormulaName", default="")]
+
+        rows, cols = _ct_fields("RowFields"), _ct_fields("ColumnFields")
+        summaries = ([( _attr(f, "FieldName", "FormulaName", default=""),
+                        _attr(f, "Operation", default="Sum"))
+                      for parent in ct if _local(parent.tag) == "SummaryFields"
+                      for f in parent] if ct is not None else [])
+        if rows and cols and summaries:
+            el.kind = "crosstab"
+            el.crosstab_rows = rows
+            el.crosstab_columns = cols
+            el.crosstab_summaries = summaries
+            el.notes.append(
+                "cross-tab converted to a nested PRD crosstab sub-report - "
+                "verify row/column grouping and aggregation in PRD")
+        else:
+            el.kind = "unknown"
+            el.text = f"CrossTabObject ({el.name or 'cross-tab'} - definition not in dump)"
     elif tag == "SubreportObject":
         el.kind = "subreport"
         el.text = _attr(obj, "SubreportName", "Name", default="subreport")
@@ -509,6 +543,42 @@ def _chart_column(ref, model):
     return ref.strip("{}@?#").split(".")[-1]
 
 
+def _resolve_crosstab(el, model):
+    """Resolve a cross-tab's dimension/measure refs to bare query columns.
+    Anything unresolvable (or an unsupported summary operation) downgrades the
+    element to an honest TODO - the writer never guesses a pivot."""
+    from pentaho_migration.reports.model import CROSSTAB_AGG_MAP
+
+    def _bare(ref):
+        column = _chart_column(ref, model)
+        return column if column in model.field_types else ""
+
+    rows = [_bare(r) for r in el.crosstab_rows]
+    cols = [_bare(c) for c in el.crosstab_columns]
+    sums = [(_bare(f), op) for f, op in el.crosstab_summaries]
+    problems = [ref for ref, ok in
+                list(zip(el.crosstab_rows, rows)) + list(zip(el.crosstab_columns, cols))
+                + [(f, c) for (f, _), (c, _) in zip(el.crosstab_summaries, sums)]
+                if not ok]
+    bad_ops = sorted({op for _, op in sums if op not in CROSSTAB_AGG_MAP})
+    if problems or bad_ops:
+        el.kind = "unknown"
+        el.text = f"CrossTabObject ({el.name or 'cross-tab'})"
+        if problems:
+            el.notes.append(
+                "cross-tab fields not found in the report's query: "
+                + ", ".join(repr(p) for p in problems))
+        if bad_ops:
+            el.notes.append(
+                "cross-tab summary operation(s) with no PRD crosstab aggregation: "
+                + ", ".join(bad_ops)
+                + f" (supported: {', '.join(CROSSTAB_AGG_MAP)})")
+        return
+    el.crosstab_rows = rows
+    el.crosstab_columns = cols
+    el.crosstab_summaries = sums
+
+
 def _resolve_format(el):
     """Pick the explicit format candidate matching the field's value type."""
     if el.format_string:
@@ -529,6 +599,9 @@ def _resolve_references(model):
             if el.kind == "chart":
                 el.chart_category = _chart_column(el.chart_category, model)
                 el.chart_value = _chart_column(el.chart_value, model)
+                continue
+            if el.kind == "crosstab":
+                _resolve_crosstab(el, model)
                 continue
             if el.kind != "field":
                 continue
@@ -574,6 +647,20 @@ def _resolve_references(model):
                     el.notes.append(f"Unresolved field reference: {el.field_ref!r}")
             _resolve_format(el)
 
+    # cross-tabs without a definition get a global issue naming the exact
+    # block to hand-add (the free SAP SDK cannot export it - see coverage doc)
+    for section in model.sections:
+        for el in section.elements:
+            if el.kind == "unknown" and "definition not in dump" in (el.text or ""):
+                model.issues.append(
+                    f"{el.text}: the free SAP SDK does not export cross-tab "
+                    "definitions. Read the grid off the Crystal designer and add "
+                    "<CrossTabDefinition><RowFields><Field FieldName=\"{T.COL}\"/>"
+                    "</RowFields><ColumnFields>...</ColumnFields><SummaryFields>"
+                    "<Field FieldName=\"{T.COL}\" Operation=\"Sum\"/></SummaryFields>"
+                    "</CrossTabDefinition> inside the CrossTabObject in the dump, "
+                    "then re-convert for a live PRD crosstab.")
+
     # conditional formatting -> PRD style expressions (needs field types,
     # so it runs here rather than at parse time)
     band_counts: dict = {}
@@ -603,6 +690,15 @@ def _resolve_references(model):
 def generate_sql(model):
     """Build a SELECT statement from the columns the layout actually uses."""
     used = []
+
+    def _add(column):
+        if not column or column not in model.field_types:
+            return
+        qualified = next((f"{t}.{column}" for t, fs in model.tables.items()
+                          if column in fs), column)
+        if qualified not in used:
+            used.append(qualified)
+
     for section in model.sections:
         for el in section.elements:
             if el.kind == "field" and el.column and el.column in model.field_types:
@@ -614,6 +710,16 @@ def generate_sql(model):
                 item = qualified or el.column
                 if item not in used:
                     used.append(item)
+            elif el.kind == "chart":
+                # chart / crosstab columns are not field elements but must be
+                # in the SELECT for the collector or pivot to see them
+                for c in (el.chart_category, el.chart_series, el.chart_value):
+                    _add(c)
+            elif el.kind == "crosstab":
+                for c in el.crosstab_rows + el.crosstab_columns:
+                    _add(c)
+                for c, _op in el.crosstab_summaries:
+                    _add(c)
     for g in model.groups:
         for tname, fields in model.tables.items():
             if g.column in fields:

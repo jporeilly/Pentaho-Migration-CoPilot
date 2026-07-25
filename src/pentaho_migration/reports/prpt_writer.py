@@ -42,8 +42,11 @@ PARAM_TYPE_MAP = {
     "BooleanField": "java.lang.Boolean",
 }
 
-from pentaho_migration.reports.model import SUMMARY_CLASS_MAP
+from pentaho_migration.reports.model import CROSSTAB_AGG_MAP, SUMMARY_CLASS_MAP
 from pentaho_migration.reports.prpt_render import _num, render_element
+
+NS_CROSSTAB = "http://reporting.pentaho.org/namespaces/engine/attributes/crosstab"
+NS_WIZARD = "http://reporting.pentaho.org/namespaces/engine/attributes/wizard"
 
 
 def _needs_page_function(model):
@@ -167,6 +170,129 @@ def build_layout_xml(model, root_type="master-report"):
         f"{group_xml}"
         f"<report-footer>{_root_band(model.sections_of('ReportFooter'), 'report-footer')}</report-footer>"
         "</layout>")
+
+
+# ------------------------------------------------------- crosstab layout.xml
+# The exact shapes below were produced by the ENGINE's own bundle writer from
+# CrosstabBuilder-built reports (tools/CrosstabRef*.java) and verified to
+# parse, render and aggregate - mimic them precisely.
+
+_CT_CELL = ('<style:element-style><style:spatial-styles min-width="80" '
+            'min-height="20" max-width="80" max-height="20"/></style:element-style>')
+_CT_FULL = ('<style:element-style><style:spatial-styles min-height="100%"/>'
+            "</style:element-style>")
+
+
+def _ct_group_headers(column):
+    """title-header / header / summary-header triple every crosstab group carries."""
+    return (
+        f"<crosstab-title-header>{_CT_FULL}"
+        f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(column)}>'
+        f"{_CT_CELL}<core:value>{escape(column)}</core:value></label></crosstab-title-header>"
+        f"<crosstab-header>{_CT_FULL}"
+        f"<text-field core:field={quoteattr(column)}>{_CT_CELL}</text-field></crosstab-header>"
+        f"<crosstab-summary-header>{_CT_FULL}"
+        f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(column)}>'
+        f"{_CT_CELL}<core:value>Summary</core:value></label></crosstab-summary-header>")
+
+
+def _ct_cell_body(summaries):
+    """details-header labels + the details cell, one number-field per measure."""
+    headers = "".join(
+        f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(c)}>'
+        f"{_CT_CELL}<core:value>{escape(f'{op} of {c}')}</core:value></label>"
+        for c, op in summaries)
+    fields = "".join(
+        f'<number-field core:format-string={quoteattr("#,##0" if op == "Count" else "#,##0.00")} '
+        f"core:field={quoteattr(c)} "
+        f"wizard:aggregation-type={quoteattr(CROSSTAB_AGG_MAP[op])}>{_CT_CELL}</number-field>"
+        for c, op in summaries)
+    return (
+        '<crosstab-cell-body><style:element-style>'
+        '<style:common-styles avoid-page-break="false"/></style:element-style>'
+        '<details-header><style:element-style><style:band-styles layout="row"/>'
+        '<style:common-styles avoid-page-break="true"/>'
+        '<style:spatial-styles min-height="100%"/></style:element-style>'
+        f"{headers}</details-header>"
+        '<crosstab-cell core:name="details-cell"><style:element-style>'
+        '<style:band-styles layout="row"/><style:spatial-styles min-height="100%"/>'
+        f"</style:element-style>{fields}</crosstab-cell></crosstab-cell-body>")
+
+
+def _ct_column_chain(columns, summaries):
+    inner = _ct_cell_body(summaries)
+    for column in reversed(columns):
+        inner = (
+            f'<crosstab-column-group-body><crosstab-column-group '
+            f"core:name={quoteattr(column)} core:field={quoteattr(column)} "
+            f'crosstab:print-summary="false">'
+            f"<field>{escape(column)}</field>{_ct_group_headers(column)}{inner}"
+            "</crosstab-column-group></crosstab-column-group-body>")
+    return inner
+
+
+def _ct_row_chain(rows, columns, summaries):
+    inner = _ct_column_chain(columns, summaries)
+    for column in reversed(rows):
+        inner = (
+            f'<crosstab-row-group-body><crosstab-row-group '
+            f"core:name={quoteattr(column)} core:field={quoteattr(column)} "
+            f'crosstab:print-summary="false">'
+            f"<field>{escape(column)}</field>{_ct_group_headers(column)}{inner}"
+            "</crosstab-row-group></crosstab-row-group-body>")
+    return inner
+
+
+def build_crosstab_layout_xml(child, el, root_type="sub-report"):
+    """layout.xml for a bundle whose ROOT GROUP is the crosstab - PRD pivots
+    are a group structure, not a band element, so each Crystal cross-tab
+    becomes a nested sub-report carrying this layout."""
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<layout xmlns="{NS_LAYOUT}" xmlns:style="{NS_STYLE}" xmlns:core="{NS_CORE}" '
+        f'xmlns:crosstab="{NS_CROSSTAB}" xmlns:wizard="{NS_WIZARD}" '
+        f'core:element-type="{root_type}" core:name={quoteattr(child.name)}>'
+        '<style:element-style><style:text-styles font-face="Arial"/></style:element-style>'
+        '<report-header><root-level-content core:element-type="report-header"/></report-header>'
+        "<crosstab>"
+        '<group-header><root-level-content core:element-type="group-header"/></group-header>'
+        '<no-data><root-level-content core:element-type="no-data-band"/></no-data>'
+        f"{_ct_row_chain(el.crosstab_rows, el.crosstab_columns, el.crosstab_summaries)}"
+        '<group-footer><root-level-content core:element-type="group-footer"/></group-footer>'
+        "</crosstab>"
+        '<report-footer><root-level-content core:element-type="report-footer"/></report-footer>'
+        "</layout>")
+
+
+def _crosstab_child_model(model, el):
+    """Synthetic child ReportModel for one cross-tab element: the parent's
+    datasource and SQL, no bands/groups of its own (the crosstab group IS the
+    report body). Parent parameters stay so ${P} in the SQL resolves - they
+    are imported through the sub-report's parameter mappings, not re-prompted.
+
+    The crosstab runtime REQUIRES rows sorted by row dims then column dims
+    ('Unsorted column dimension data' InvalidReportStateException otherwise),
+    so the child SQL gets its own ORDER BY over the dimensions."""
+    import copy
+
+    child = copy.deepcopy(model)
+    child.name = el.name or "CrossTab"
+    child.sections = []
+    child.groups = []
+    child.subreports = {}
+    child.record_sorts = []
+    child.summaries = []
+
+    def _order_expr(column):
+        if model.sql_generated:
+            return next((f"{t}.{column}" for t, fs in model.tables.items()
+                         if column in fs), column)
+        return f'"{column}"'  # Command SQL exposes the quoted SELECT aliases
+
+    dims = el.crosstab_rows + el.crosstab_columns
+    base = re.sub(r"\s+ORDER\s+BY\b.*$", "", child.sql, flags=re.I | re.S)
+    child.sql = base + "\nORDER BY " + ", ".join(_order_expr(c) for c in dims)
+    return child
 
 
 # ---------------------------------------------------------------- styles.xml
@@ -367,9 +493,23 @@ DATASCHEMA_XML = ('<?xml version="1.0" encoding="UTF-8"?>\n'
                   '<data-schema xmlns="http://reporting.pentaho.org/namespaces/engine/classic/dataschema/1.0"></data-schema>')
 
 
-def build_meta_xml(model):
+def build_meta_xml(model, spec_version=None):
+    """spec_version (major, minor, patch) declares the prpt-spec the bundle
+    targets. Without it the engine runs the report in pre-4.0 legacy layout
+    mode - fine for banded reports (and what every existing conversion is
+    verified against), but crosstabs use table layouts which legacy mode
+    refuses ('IncompatibleFeatureException'), so bundles containing a
+    crosstab declare 5.0.0."""
     from pentaho_migration import __version__
     now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    ns = "http://reporting.pentaho.org/namespaces/engine/classic/metadata/1.0"
+    spec = ""
+    if spec_version:
+        major, minor, patch = spec_version
+        spec = "".join(
+            f'<autoGenNs:prpt-spec.version.{part} xmlns:autoGenNs="{ns}">{value}'
+            f"</autoGenNs:prpt-spec.version.{part}>"
+            for part, value in (("major", major), ("minor", minor), ("patch", patch)))
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" '
@@ -381,6 +521,7 @@ def build_meta_xml(model):
         f"<dc:title>{escape(model.name)}</dc:title>"
         "<dc:description>Converted from SAP Crystal Reports</dc:description>"
         f"<dc:date>{now}</dc:date>"
+        f"{spec}"
         "</office:meta></office:document-meta>")
 
 
@@ -419,21 +560,31 @@ SUBREPORT_MIMETYPE = "application/vnd.pentaho.reporting.classic.subreport"
 def _collect_subreports(model):
     """Assign each converted subreport its bundle directory (mutates
     el.subreport_href so the layout can reference it) and return
-    [(dirname, element)]."""
+    [(dirname, element, child_model)]. Cross-tab elements ride the same
+    machinery: a synthetic child (parent datasource, crosstab root group) is
+    generated per pivot, and every parent parameter is mapped through so
+    ${P} in the shared SQL resolves without re-prompting."""
     subs, idx = [], 0
     for section in model.sections:
         for el in section.elements:
             if el.kind == "subreport" and el.subreport is not None:
-                dirname = "subreport" if idx == 0 else f"subreport-{idx}"
-                el.subreport_href = f"/{dirname}/content.xml"
-                subs.append((dirname, el))
-                idx += 1
+                child = el.subreport
+            elif el.kind == "crosstab":
+                child = _crosstab_child_model(model, el)
+                el.subreport_links = [(p.name, p.name) for p in model.parameters]
+            else:
+                continue
+            dirname = "subreport" if idx == 0 else f"subreport-{idx}"
+            el.subreport_href = f"/{dirname}/content.xml"
+            subs.append((dirname, el, child))
+            idx += 1
     return subs
 
 
 def write_prpt(model, out_path):
     images = _collect_images(model)  # assigns resource paths before layout is built
     subreports = _collect_subreports(model)  # assigns hrefs before layout is built
+    has_crosstab = any(el.kind == "crosstab" for _, el, _ in subreports)
     docs = {
         "content.xml": CONTENT_XML,
         "layout.xml": build_layout_xml(model),
@@ -441,16 +592,18 @@ def write_prpt(model, out_path):
         "datadefinition.xml": build_datadefinition_xml(model),
         "dataschema.xml": DATASCHEMA_XML,
         "settings.xml": SETTINGS_XML,
-        "meta.xml": build_meta_xml(model),
+        "meta.xml": build_meta_xml(
+            model, spec_version=(5, 0, 0) if has_crosstab else None),
         "datasources/sql-ds.xml": build_sql_ds_xml(model),
         "datasources/compound-ds.xml": build_compound_ds_xml(),
     }
     media = {name: "text/xml" for name in docs}
-    for dirname, el in subreports:
-        child = el.subreport
+    for dirname, el, child in subreports:
+        layout = (build_crosstab_layout_xml(child, el) if el.kind == "crosstab"
+                  else build_layout_xml(child, root_type="sub-report"))
         child_docs = {
             f"{dirname}/content.xml": CONTENT_XML,
-            f"{dirname}/layout.xml": build_layout_xml(child, root_type="sub-report"),
+            f"{dirname}/layout.xml": layout,
             f"{dirname}/styles.xml": build_styles_xml(child),
             f"{dirname}/datadefinition.xml": build_datadefinition_xml(
                 child, parameter_mappings=el.subreport_links),

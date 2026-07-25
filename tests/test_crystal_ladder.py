@@ -20,7 +20,7 @@ RUNGS = sorted(LADDER.glob("0*.xml"))
 
 
 def test_ladder_present():
-    assert len(RUNGS) == 8, "expected 8 ladder rungs"
+    assert len(RUNGS) == 9, "expected 9 ladder rungs"
 
 
 @pytest.mark.parametrize("dump", RUNGS, ids=lambda p: p.stem)

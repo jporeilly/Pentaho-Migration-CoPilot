@@ -1,8 +1,8 @@
 # CSCU Crystal Reports demo set (cr_demo)
 
-Eight authored RptToXml dumps of **increasing complexity**, all backed by the
+Nine authored RptToXml dumps of **increasing complexity**, all backed by the
 live `cscu_core` credit-union schema so each one **converts and renders
-end-to-end** against the real database. This is the pipeline's golden-path
+end-to-end** against the real database. All pages are **A4 portrait**. This is the pipeline's golden-path
 regression and demo set; the 150-file GitHub corpus (`samples/crystal/real/`)
 stays the parser's real-world *variety* test.
 
@@ -20,15 +20,19 @@ Regenerate with `python samples/cr_demo/build_ladder.py`.
 | 6 | Suspicious Activity **- Subreport & Cross-tab** | **linked subreport → nested PRD sub-report** (member KYC history filtered per row, live), cross-tab | cross-tab stays TODO |
 | 7 | Card Program Review **- Select Case, Ranges & Sorts** | multi-value Select Case → IF/OR, `in a to b` range, local-alias inlining, **descending group + record sorts** | all deterministic (auto/review) |
 | 8 | Stress Lab **- Boundaries** | 3 nested groups (one on a formula), **two-field-linked subreport**, complex child (own group + summary + cond. format), page-band subreport (engine-forbidden → TODO), query-backed pick-list, full formula zoo | maps the boundaries — see [docs/CRYSTAL-COVERAGE.md](../../docs/CRYSTAL-COVERAGE.md) |
+| 9 | Branch Activity Matrix **- Cross-tab** | `<CrossTabDefinition>` block → **live PRD crosstab** (branches × txn types, summed) hosted in a nested sub-report | all auto (review the pivot) |
 
 The flagship UI sample **Branch Transaction Summary - Prompt**
 (`../crystal/branch_transactions.xml`) demonstrates the working parameter
 prompt: the record selection folds into the SQL WHERE, so changing the Branch
 prompt in Report Designer re-filters the report live.
 
-Rungs 1–4 and 7 convert cleanly on the auto/review path; 5–6 deliberately
+Rungs 1–4, 7 and 9 convert cleanly on the auto/review path; 5–6 deliberately
 exercise the honest-flagging path (unsupported aggregates and TODO
 placeholders) — the tool never silently drops what PRD can't do mechanically.
+Rung 6's cross-tab carries NO definition block (the manual-path demo: the
+conversion report names the exact XML to add), while rung 9's does — showing
+both sides of the cross-tab workflow.
 The full feature map is in [docs/CRYSTAL-COVERAGE.md](../../docs/CRYSTAL-COVERAGE.md).
 
 ## Rendering against live CSCU

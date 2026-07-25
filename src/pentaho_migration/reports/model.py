@@ -56,6 +56,7 @@ class Element:
     bg_color: str = ""        # #rrggbb fill behind the element / box fill
     border_color: str = ""    # #rrggbb
     border_width: float = 0.0 # points; 0 = no border
+    border_sides: tuple = ()  # sides that carry a line, e.g. ('bottom',); Crystal borders are per-side
     image_bytes: bytes = b""  # embedded raster for kind="image"
     image_mime: str = ""      # image/png | image/jpeg
     resource_path: str = ""   # bundle path assigned by the writer for the image
@@ -66,6 +67,9 @@ class Element:
     chart_category: str = ""   # resolved category column
     chart_series: str = ""     # resolved series column (optional)
     chart_value: str = ""      # resolved value column
+    crosstab_rows: list = field(default_factory=list)      # row dimension columns (kind="crosstab")
+    crosstab_columns: list = field(default_factory=list)   # column dimension columns
+    crosstab_summaries: list = field(default_factory=list) # (measure column, Crystal op)
     condition_formulas: list = field(default_factory=list)  # raw (attr, crystal_text)
     style_expressions: list = field(default_factory=list)   # converted (style_key, openformula)
     subreport: object = None       # attached child ReportModel (kind="subreport")
@@ -79,12 +83,26 @@ def is_todo_element(el) -> bool:
     Images whose bytes were migrated into the bundle are converted work,
     not TODOs - only byte-less images (extractor couldn't reach the RAS
     picture data) still need a hand. Same for subreports: one with an
-    attached child model converts into a nested PRD sub-report."""
+    attached child model converts into a nested PRD sub-report. A
+    kind="crosstab" element is always converted work - a cross-tab whose
+    definition is missing or unsupported stays kind="unknown"."""
     if el.kind == "subreport":
         return el.subreport is None
     if el.kind == "unknown":
         return True
     return el.kind == "image" and not el.image_bytes and not el.resource_path
+
+
+# Crystal cross-tab summary operation -> the wizard:aggregation-type string
+# PRD's own bundle writer emits for the matching Item*Function (discovered by
+# generating reference bundles through the engine - see tools/CrosstabRef.java).
+CROSSTAB_AGG_MAP = {
+    "Sum": "Sum (Running)",
+    "Count": "Count (Running)",
+    "Average": "Average (Running)",
+    "Maximum": "Maximum (Running)",
+    "Minimum": "Minimum (Running)",
+}
 
 
 @dataclass

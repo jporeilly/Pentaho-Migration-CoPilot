@@ -76,21 +76,27 @@ LINE_STYLE_ATTRS = ("TopLineStyle", "BottomLineStyle", "LeftLineStyle", "RightLi
 
 
 def _parse_border(obj):
-    """(border_color, border_width) from an object's <Border> child. A border
-    exists when any side has a line style other than NoLine."""
+    """(border_color, border_width, sides) from an object's <Border> child.
+    Crystal borders are per-side (a column-header label typically has ONLY a
+    bottom rule); sides is the tuple of lowercase side names that actually
+    carry a line ('top', 'bottom', 'left', 'right') so the writer can emit
+    per-edge borders instead of boxing every element."""
     border = None
     for child in obj.iter():
         if child.tag.endswith("Border"):
             border = child
             break
     if border is None:
-        return "", 0.0
-    has_line = any(_attr(border, a, default="NoLine") not in ("NoLine", "", "0")
-                   for a in LINE_STYLE_ATTRS)
-    if not has_line:
-        return "", 0.0
+        return "", 0.0, ()
+    sides = tuple(
+        a[: -len("LineStyle")].lower()
+        for a in LINE_STYLE_ATTRS
+        if _attr(border, a, default="NoLine") not in ("NoLine", "", "0")
+    )
+    if not sides:
+        return "", 0.0, ()
     color = _find_color(border, "BorderColor") or "#000000"
-    return color, 1.0
+    return color, 1.0, sides
 
 
 # ---------------------------------------------------------------- font

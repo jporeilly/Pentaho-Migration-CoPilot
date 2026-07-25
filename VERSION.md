@@ -1,13 +1,12 @@
 # Version
 
-**1.25.0** — 2026-07-25
+**1.26.0** — 2026-07-25
 
 **Phase 1** — Informatica PowerCenter & SAP Crystal Reports complete;
-Talend in progress. The provider round: **cloud LLM providers** (Anthropic
-Claude, OpenAI GPT, Google Gemini, Azure OpenAI) selectable in Settings
-alongside local Ollama — one provider powers every AI feature across both
-the ETL and Crystal Reports flows. Informatica closers: **Insert/Update key
-inference** from target PRIMARY KEYs, **Email/Command workflow tasks** to
-real Mail/Shell job entries, and **mapplet expansion** inline into the
-parent pipeline.
+Talend in progress. The cross-tab round: **cross-tabs convert to live PRD
+crosstabs** (engine-verified shapes, sorted-data and prpt-spec requirements
+handled; the free SAP SDK can't export grids, so definition-less pivots get
+the exact XML block to hand-add), the **demo set is A4 portrait** with a new
+cross-tab rung (9 reports), and **per-side border fidelity** (no more boxed
+column headers).
 See [CHANGELOG.md](CHANGELOG.md) for history.

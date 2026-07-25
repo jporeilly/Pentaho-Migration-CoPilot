@@ -17,7 +17,8 @@ from pentaho_migration.reports import load_report_model
 FEATURES = {
     "subreports": ("sub-reports", "nested subreport definitions (converted to PRD sub-reports)"),
     "charts": ("charts", "chart objects (converted to PRD legacy charts)"),
-    "crosstabs": ("cross-tabs", "cross-tab objects (honest TODO placeholders)"),
+    "crosstabs": ("cross-tabs", "cross-tab objects (live PRD crosstab when the "
+                  "definition block is present, honest TODO otherwise)"),
     "parameters": ("parameters", "prompted parameters"),
     "multi-value-params": ("multi-value-params", "multi-select prompts (IN-list folding)"),
     "record-selection": ("record-selection", "record selection formulas (SQL WHERE folding)"),
@@ -42,7 +43,9 @@ def detect_features(model) -> list[str]:
         found.add("subreports")
     if any(el.kind == "chart" for el in elements):
         found.add("charts")
-    if any("CrossTab" in (el.text or "") for el in elements if el.kind == "unknown"):
+    if any(el.kind == "crosstab" or
+           (el.kind == "unknown" and "CrossTab" in (el.text or ""))
+           for el in elements):
         found.add("crosstabs")
     if model.parameters:
         found.add("parameters")

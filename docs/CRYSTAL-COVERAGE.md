@@ -44,6 +44,7 @@ semantic judgment is required):
 | Parameters (prompts) | PRD parameters; static pick-lists → list-parameters; multi-value → `IN (${p})`; a folded prompt becomes a **query-backed dropdown** (`SELECT DISTINCT` on the live database) | Deterministic |
 | Summary fields (Sum, Count, Avg, Max, Min, DistinctCount) | Item*/CountDistinct report functions, group-scoped (count functions correctly fieldless) | Deterministic |
 | **Subreports** (linked & unlinked) | **Nested PRD sub-report bundles**: the child converts through the full pipeline (own query, groups, formulas, formatting); Crystal `Pm-<field>` links become `input-parameter` mappings and the child's record selection folds to a parameterized `WHERE` | Deterministic → review |
+| **Cross-tabs** (with a `<CrossTabDefinition>` block in the dump) | **Live PRD crosstab** hosted in a nested sub-report: row/column dimension groups + `wizard:aggregation-type` cells (Sum/Count/Average/Max/Min), child query auto-`ORDER BY`-ed over the dimensions (the crosstab runtime requires sorted data); the bundle declares prpt-spec 5.0 | Deterministic → review |
 
 ## Formulas
 
@@ -64,7 +65,7 @@ semantic judgment is required):
 | --- | --- |
 | Subreports **in page bands** | TODO placeholder + note — the engine hard-forbids sub-reports in page headers/footers (verified) |
 | Subreports with no definition in the dump | TODO placeholder (re-extract with the fork) |
-| Cross-tabs | TODO placeholder (rebuild as a PRD crosstab) |
+| Cross-tabs **without** a definition block | TODO placeholder + issue naming the exact `<CrossTabDefinition>` XML to hand-add. **The free SAP .NET SDK cannot export cross-tab grids** (rows/columns/summaries sit behind reserved COM slots — verified by reflection; nothing surfaces in the DataDefinition either, across all 12 corpus cross-tab reports). Read the grid off the Crystal designer (~5 lines of XML), re-convert, and the pivot goes live |
 | RunningTotalField objects (`{#name}` with reset conditions) | Resolved via SummaryFields when present; the extractor emits empty definitions, so bespoke reset conditions need the fork extended |
 | Arrays, loops, multi-variable formula state | Original text preserved, `manual` status, LLM advice |
 | Group Sort Expert / Top N (groups ordered by a summary) | Review note — order in the query or rebuild with PRD group sorting |
