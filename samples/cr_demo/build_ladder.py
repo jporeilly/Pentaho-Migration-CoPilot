@@ -426,7 +426,11 @@ def flagship():
                         ("RunningBalance","NumberField",
                          "WhilePrintingRecords;\nShared NumberVar balance;\nbalance := balance + {Command.AMOUNT};\nbalance"),
                         ("TxnRiskBand","StringField",
-                         'Select {Command.TXN_TYPE}\nCase "WIRE": "High risk"\nCase "ATM": "Low risk"\nDefault: "Standard"')],
+                         'Select {Command.TXN_TYPE}\nCase "WIRE": "High risk"\nCase "ATM": "Low risk"\nDefault: "Standard"'),
+                        # genuinely manual (local variable + assignment):
+                        # keeps the ✨ AI-assist demo honest
+                        ("AuditNote","StringField",
+                         'Local StringVar note;\nnote := {Command.TXN_TYPE} + " flagged for " + {Command.FIRST_NAME};\nnote')],
               summaries=[("Sum of Command.AMOUNT","Sum","AMOUNT","BRANCH_NAME"),
                          ("Grand Total AMOUNT","Sum","AMOUNT",None)],
               areas=[masthead("Branch Transaction Summary", "Demo: working prompt - change the Branch parameter"),

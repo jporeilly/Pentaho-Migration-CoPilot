@@ -78,13 +78,14 @@ export default function ReportsFormulasPage({ summary, file, onUpdate }) {
       <Explain>
         Crystal formulas are translated to PRD&apos;s <b>OpenFormula</b> language.
         <b> ✓ auto</b> = translated deterministically by rules, no review
-        expected. <b>⚠ review</b> = translated, but a mapping deserves a human
-        glance (the note says why) — every ✨ AI translation lands here, never
-        higher. <b>✋ manual</b> = not mechanically translatable (variables,
-        running totals, arrays); the original Crystal text is preserved and the
-        notes say what to build instead — running totals, for example, are
-        <b> report functions</b> in PRD, not formulas. The tool never guesses:
-        anything uncertain is flagged, not hidden.
+        expected. <b>⚠ review</b> = the PRD result shown needs a human glance:
+        a translated formula with a caveat, a <b>Select Case</b> rewritten as
+        nested IF, or a known idiom (running totals, whole-formula aggregates)
+        rebuilt as a <b>report function</b> generated in the bundle — every
+        ✨ AI translation also lands here, never higher. <b>✋ manual</b> = not
+        mechanically translatable (variables, arrays); the original Crystal
+        text is preserved and the notes say what to build instead. The tool
+        never guesses: anything uncertain is flagged, not hidden.
       </Explain>
 
       {formulas.length > 0 ? (
@@ -115,9 +116,18 @@ export default function ReportsFormulasPage({ summary, file, onUpdate }) {
                       </span>
                     </td>
                     <td>
-                      {f.translation && <code>{f.translation}</code>}
+                      {/* the PRD side: OpenFormula translation, or the report
+                          function generated in the bundle */}
+                      {f.prd && (
+                        <div>
+                          <code>{f.prd}</code>
+                          {!f.translation && (
+                            <span className="muted"> — report function generated in the bundle (Data tab → Functions in PRD)</span>
+                          )}
+                        </div>
+                      )}
                       {f.notes.length > 0 && (
-                        <div className={`muted ${f.translation ? 'formula-note' : ''}`}>
+                        <div className={`muted ${f.prd ? 'formula-note' : ''}`}>
                           {f.notes.join('; ')}
                         </div>
                       )}

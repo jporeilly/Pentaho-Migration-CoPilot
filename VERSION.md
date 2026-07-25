@@ -1,11 +1,12 @@
 # Version
 
-**1.19.1** — 2026-07-25
+**1.20.0** — 2026-07-25
 
 Phase 2 multi-source in progress — Talend + Crystal Reports shipped, with
-the agent trio (schema-aware SQL, layout QA, batch triage). This release:
-guided `install` / `uninstall` scripts (about, version, prerequisite checks,
-Crystal-environment preflight, next steps), the Crystal source shown on
-review-status formulas, non-wrapping status badges, and embedded images no
-longer counted as manual work anywhere.
-See [CHANGELOG.md](CHANGELOG.md) for history.
+the agent trio (schema-aware SQL, layout QA, batch triage). New: **Select
+Case converts deterministically to nested IF()** (review-flagged PRD
+formula, honest manual fallback for ranges), and every review row now shows
+its **PRD-side artifact** — the OpenFormula translation or the generated
+report function (e.g. `RunningBalance = ItemSumFunction(field: AMOUNT)`) —
+in the UI and the conversion report, so there is always something concrete
+to review. See [CHANGELOG.md](CHANGELOG.md) for history.

@@ -100,7 +100,7 @@ TOKEN_RE = re.compile(r"""
   | (?P<str>"(?:[^"]|"")*"|'(?:[^']|'')*')
   | (?P<num>\d+(?:\.\d+)?)
   | (?P<field>\{[^}]+\})
-  | (?P<op><=|>=|<>|[=<>+\-*/&%(),])
+  | (?P<op><=|>=|<>|[=<>+\-*/&%(),:])
   | (?P<ident>[A-Za-z_][A-Za-z0-9_]*)
 """, re.VERBOSE)
 
@@ -352,6 +352,97 @@ class _Parser:
             raise TranslationError(f"expected {symbol!r}, found {val!r}")
 
 
+def _parse_slice(tokens, field_types, notes):
+    p = _Parser(tokens, field_types=field_types)
+    out = p.parse()
+    notes.extend(p.notes)
+    return out
+
+
+def _split_on_op(tokens, symbol):
+    """Split a token list on a top-level operator (paren-depth 0)."""
+    parts, current, depth = [], [], 0
+    for tok in tokens:
+        kind, val = tok
+        if kind == "op" and val == "(":
+            depth += 1
+        elif kind == "op" and val == ")":
+            depth -= 1
+        if kind == "op" and val == symbol and depth == 0:
+            parts.append(current)
+            current = []
+        else:
+            current.append(tok)
+    parts.append(current)
+    return parts
+
+
+def translate_select_case(text, field_types=None):
+    """Crystal `Select {x} Case v1: r1 Case v2, v3: r2 Default: rd` ->
+    nested IF(...). Returns (openformula, notes); raises TranslationError on
+    shapes that do not map (ranges `1 To 5`, `Is < x`, missing parts)."""
+    notes = []
+    tokens = _tokenize(re.sub(r"//[^\n]*", "", text))
+    if not tokens or not (tokens[0][0] == "ident" and tokens[0][1].lower() == "select"):
+        raise TranslationError("not a Select Case formula")
+
+    # split into: selector, then (case ...)+, optional (default ...)
+    segments, current, seg_kind, depth = [], [], "select", 0
+    for tok in tokens[1:]:
+        kind, val = tok
+        if kind == "op" and val == "(":
+            depth += 1
+        elif kind == "op" and val == ")":
+            depth -= 1
+        if kind == "ident" and depth == 0 and val.lower() in ("case", "default"):
+            segments.append((seg_kind, current))
+            current, seg_kind = [], val.lower()
+        else:
+            current.append(tok)
+    segments.append((seg_kind, current))
+
+    selector_tokens = segments[0][1]
+    if not selector_tokens:
+        raise TranslationError("Select without a selector expression")
+    selector = _parse_slice(selector_tokens, field_types, notes)
+
+    branches, default = [], None
+    for seg_kind, seg in segments[1:]:
+        if seg_kind == "default":
+            if not seg or seg[0] != ("op", ":"):
+                raise TranslationError("Default without ':'")
+            default = _parse_slice(seg[1:], field_types, notes)
+            continue
+        halves = _split_on_op(seg, ":")
+        if len(halves) != 2:
+            raise TranslationError("Case branch is not 'values : result'")
+        value_tokens, result_tokens = halves
+        for kind, val in value_tokens:
+            if kind == "ident" and val.lower() in ("to", "is"):
+                raise TranslationError(
+                    f"Case range ({val} ...) has no direct IF() equivalent")
+        conditions = []
+        for value in _split_on_op(value_tokens, ","):
+            if not value:
+                raise TranslationError("empty Case value")
+            conditions.append(f"{selector} = {_parse_slice(value, field_types, notes)}")
+        cond = conditions[0] if len(conditions) == 1 else "OR(" + ";".join(conditions) + ")"
+        branches.append((cond, _parse_slice(result_tokens, field_types, notes)))
+
+    if not branches:
+        raise TranslationError("Select without any Case branch")
+    if default is None:
+        default = "NA()"
+        notes.append("Select Case without Default returns NA() when nothing "
+                     "matches (Crystal returns Null) - verify downstream handling")
+    out = default
+    for cond, result in reversed(branches):
+        out = f"IF({cond};{result};{out})"
+    notes.append("Select Case rewritten as nested IF(...) - verify branch "
+                 "order and comparison semantics")
+    return out, notes
+
+
 # the classic Crystal running-total idiom:
 #   [WhilePrintingRecords;] [Shared|Global|Local] NumberVar X; X := X + <term>; X
 _RUNNING_TOTAL_RE = re.compile(
@@ -432,6 +523,20 @@ def translate_formula(name, text, field_types=None):
         f.notes.append(note)
         return f
     stripped = re.sub(r"//[^\n]*", "", text)
+    if re.match(r"(?i)\s*select\b", stripped):
+        # Select Case maps mechanically onto nested IF() - generate the PRD
+        # formula for review instead of flagging it manual
+        try:
+            translation, notes = translate_select_case(text, field_types)
+            f.translation = "=" + translation
+            f.notes = notes
+            f.status = "review"
+        except TranslationError as e:
+            f.status = "manual"
+            f.notes.append(f"Select Case not mechanically translatable ({e}). "
+                           "Rebuild by hand in PRD (often as a report function "
+                           "or a pre-computed SQL column).")
+        return f
     for pattern, why in BLOCKER_PATTERNS:
         if re.search(pattern, stripped):
             f.status = "manual"

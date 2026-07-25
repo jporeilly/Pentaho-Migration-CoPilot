@@ -86,6 +86,23 @@ def test_blocked_idioms_rewritten_as_report_functions(crystal, cls, field, group
     assert any("rewritten as a PRD" in n for n in f.notes)
 
 
+def test_select_case_becomes_nested_if_for_review():
+    """Select Case maps mechanically onto nested IF() - the user gets the
+    actual PRD formula to review, not just a 'rebuild by hand' note."""
+    f = translate_formula(
+        "Band",
+        'Select {O.TXN_TYPE}\nCase "WIRE": "High"\nCase "ATM", "POS": "Low"\nDefault: "Std"')
+    assert f.status == "review"
+    assert f.translation == ('=IF([TXN_TYPE] = "WIRE";"High";'
+                             'IF(OR([TXN_TYPE] = "ATM";[TXN_TYPE] = "POS");"Low";"Std"))')
+
+
+def test_select_case_range_stays_manual():
+    f = translate_formula("Band", 'Select {O.N} Case 1 To 5: "low" Default: "high"')
+    assert f.status == "manual"
+    assert f.translation == ""
+
+
 # ---------------------------------------------------------------- parser
 
 def test_parse_sample_model():
@@ -131,7 +148,8 @@ def test_prpt_bundle_shape(tmp_path):
     assert 'name="PageofPages"' in dd
     # the running total ships as a generated ItemSumFunction, review-flagged
     assert 'name="RunningBalance"' in dd
-    assert "TxnRiskBand" not in dd  # truly blocked formula stays out of the bundle
+    assert 'name="TxnRiskBand"' in dd  # Select Case ships as nested IF()
+    assert "AuditNote" not in dd  # truly blocked formula stays out of the bundle
     assert "CSCU" in zf.read("datasources/sql-ds.xml").decode()
 
 
@@ -196,7 +214,7 @@ def test_reports_inspect():
     assert summary["jndi"] == "CSCU"
     assert summary["counts"] == {
         "sections": 7, "elements": 31, "groups": 1, "parameters": 1,
-        "summaries": 2, "auto": 2, "review": 1, "manual": 1}
+        "summaries": 2, "auto": 2, "review": 2, "manual": 1}
 
 
 def test_reports_convert_full_flow():

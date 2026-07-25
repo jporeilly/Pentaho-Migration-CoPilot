@@ -102,6 +102,21 @@ class Formula:
     status: str = "manual"    # auto | review | manual
     notes: list = field(default_factory=list)
 
+    def prd_target(self) -> str:
+        """What this formula became on the PRD side, for display: the
+        OpenFormula translation, or the generated report function."""
+        if self.translation:
+            return self.translation
+        if self.rewrite_class:
+            kind = self.rewrite_class.rsplit(".", 1)[-1]
+            args = []
+            if self.rewrite_field:
+                args.append(f"field: {self.rewrite_field}")
+            if self.rewrite_group:
+                args.append(f"group: {self.rewrite_group}")
+            return f"{self.name} = {kind}({', '.join(args)})"
+        return ""
+
 
 @dataclass
 class Parameter:

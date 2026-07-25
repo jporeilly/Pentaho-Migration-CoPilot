@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.20.0] — 2026-07-25
+
+### Added
+
+- **Select Case → nested IF(), deterministically**: a whole-formula
+  `Select {x} Case v1: r1 Case v2, v3: r2 Default: rd` now translates to
+  the real PRD formula (`IF(...;...;IF(...))`, multi-value cases become
+  `OR(...)`), review-flagged with a branch-semantics note — the reviewer
+  sees the actual Report Designer formula instead of "rebuild by hand".
+  A missing Default returns `NA()` (noted, mirrors Crystal's Null); range
+  cases (`1 To 5`, `Is < x`) honestly stay manual.
+- **Every review row now shows its PRD-side artifact** (`Formula.
+  prd_target()`), in the UI and the conversion report: the OpenFormula
+  translation when there is one, or the generated report function —
+  `RunningBalance = ItemSumFunction(field: AMOUNT) — report function
+  generated in the bundle (Data tab > Functions in PRD)`. This closes the
+  gap where an idiom rewrite displayed only its note (and the conversion
+  report showed an empty backtick), leaving nothing concrete to review.
+- The flagship demo gained `{@AuditNote}` (local string variable — genuinely
+  manual) so the ✨ AI-assist flow still has something to demonstrate now
+  that `{@TxnRiskBand}` converts on its own.
+
 ## [1.19.1] — 2026-07-25
 
 ### Added

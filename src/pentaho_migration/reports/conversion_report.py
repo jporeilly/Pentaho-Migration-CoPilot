@@ -63,7 +63,11 @@ def build_conversion_report(model, source_path, output_path):
         add("|---|---|---|")
         for f in model.formulas.values():
             notes = "; ".join(f.notes)
-            if f.status == "manual":
+            if f.rewrite_class:
+                detail = (f"`{f.prd_target()}` — report function generated in "
+                          f"the bundle (Data tab > Functions in PRD)"
+                          + (f" — {notes}" if notes else ""))
+            elif f.status == "manual":
                 detail = notes or "requires manual conversion"
             else:
                 detail = f"`{f.translation}`" + (f" — {notes}" if notes else "")

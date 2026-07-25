@@ -48,8 +48,8 @@ class AdviceOnlyTranslator(ExpressionTranslator):
 def test_manual_formula_becomes_review():
     model = load_report_model(SAMPLE)
     count = translate_manual_formulas(model, FakeTranslator(OLLAMA_SETTINGS))
-    assert count == 1                       # only TxnRiskBand is still manual
-    f = model.formulas["TxnRiskBand"]
+    assert count == 1                       # only AuditNote is still manual
+    f = model.formulas["AuditNote"]
     assert f.status == "review"
     assert f.translation == "=[AMOUNT] * 1"
     assert any("AI-translated" in n for n in f.notes)
@@ -65,7 +65,7 @@ def test_untranslatable_keeps_manual_but_gains_advice():
     model = load_report_model(SAMPLE)
     count = translate_manual_formulas(model, AdviceOnlyTranslator(OLLAMA_SETTINGS))
     assert count == 0
-    f = model.formulas["TxnRiskBand"]
+    f = model.formulas["AuditNote"]
     assert f.status == "manual"
     assert f.translation == ""
     assert any("ItemSumFunction" in n for n in f.notes)
@@ -103,7 +103,7 @@ def test_api_translate_job(monkeypatch):
     result = state["result"]
     counts = result["summary"]["counts"]
     assert counts["manual"] == 0
-    assert counts["review"] == 2
+    assert counts["review"] == 3   # rewrite + Select Case + the assisted flip
 
     # the assisted formula is baked into the regenerated .prpt
     prpt = base64.b64decode(result["prpt_base64"])

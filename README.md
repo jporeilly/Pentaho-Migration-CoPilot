@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.19.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.20.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -31,10 +31,11 @@ structure and datasource SQL, per-formula translation with ✨ LLM assist for
 what rules cannot prove, engine-verifiable .prpt + conversion report, effort &
 cost estimate). Formulas the translator *can* prove but OpenFormula can't
 express are rewritten into native PRD report functions instead of being left
-manual: running-total variables become `ItemSumFunction` / `ItemCountFunction`
-and whole-formula aggregates (`Sum`, `Count`, `Maximum`, `Minimum`) become
-`Total*` functions — generated, wired to their referencing elements, and
-flagged for review. Simple record selections fold into the SQL `WHERE`
+manual: running-total variables become `ItemSumFunction` / `ItemCountFunction`,
+whole-formula aggregates (`Sum`, `Count`, `Maximum`, `Minimum`) become
+`Total*` functions, and `Select Case` becomes nested `IF()` — generated,
+wired to their referencing elements, and flagged for review with the
+PRD-side artifact always shown, so there is something concrete to review. Simple record selections fold into the SQL `WHERE`
 (alias-aware for Command-based reports), so converted parameter prompts filter
 live data. The Inspect page carries the **schema-aware SQL agent**: the report
 SQL is `EXPLAIN`-validated against the live JNDI target automatically, and a
