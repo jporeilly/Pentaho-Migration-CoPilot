@@ -142,7 +142,7 @@ def masthead(title, subtitle):
     """Navy report-header band with logo, white title, gold subtitle + rule."""
     return section("ReportHeader", "RH", 58, [
         logo("Logo", 8, 6, 120, 44),
-        text("Title", title, 150, 8, 560, 26, size=18, bold=True, color=WHITE),
+        text("Title", title, 150, 8, 400, 26, size=18, bold=True, color=WHITE),
         text("Sub", subtitle, 152, 34, 560, 16, size=10, color=GOLD),
         text("Org", "Copperstate Credit Union", 556, 10, 244, 16, size=9,
              color=WHITE, align="RightAlign"),
@@ -179,7 +179,7 @@ def group_header(ref, extra=None):
 
 def totals_footer(kind, name, label, ref, size=9, big=False):
     return section(kind, name, 22, [
-        box("TotRule", 500, 0, 400, 1, GOLD),
+        box("TotRule", 500, 0, 306, 1, GOLD),
         text(f"{name}Lbl", label, 500, 3, 150, 16, size=size, bold=True, color=NAVY),
         field(f"{name}Val", ref, 660, 3, 130, 16, size=size, bold=True,
               color=(GOLD if big else NAVY), align="RightAlign"),
@@ -251,7 +251,7 @@ def r3():
             ("Type", "{Command.TXN_TYPE_CD}", 80, None, "StringField"),
             ("Merchant", "{Command.MERCH_NM}", 170, None, "StringField"),
             ("Amount", "{Command.TXN_AMT}", 120, "RightAlign", "CurrencyField")]
-    extra = [field("Flow", "{@FlowType}", 760, 0, 50, 15, size=9,
+    extra = [field("Flow", "{@FlowType}", 756, 0, 50, 15, size=9,
                    align="HorizontalCenterAlign", color=SLATE)]
     build("Transaction Register - Formulas", "03_transaction_register.xml",
           'SELECT b.br_name AS "BR_NAME", t.txn_dt AS "TXN_DT", a.acct_no AS "ACCT_NO",\n'
@@ -286,7 +286,7 @@ def r4():
     gh1 = section("GroupHeader", "GH1", 26, [
         box("M1", 0, 0, 806, 24, NAVY),
         field("MemberHdr", "{@FullName}", 8, 3, 400, 18, size=12, bold=True, color=WHITE),
-        field("MemberNo", "{Command.MBR_NO}", 620, 4, 200, 16, size=9, color=GOLD, align="RightAlign")])
+        field("MemberNo", "{Command.MBR_NO}", 606, 4, 200, 16, size=9, color=GOLD, align="RightAlign")])
     gh2 = section("GroupHeader", "GH2", 20, [
         text("AcctLbl", "Account", 20, 2, 70, 16, size=9, bold=True, color=SLATE),
         field("AcctNo", "{Command.ACCT_NO}", 90, 2, 160, 16, size=9, bold=True, color=NAVY)])
@@ -335,13 +335,13 @@ def r5():
             det.append(field(f"d_{lbl}", ref, x, 0, w, 15, size=9, align=al, color=INK))
         x += w
     gf = section("GroupFooter", "GF", 40, [
-        box("Rule", 300, 0, 600, 1, GOLD),
+        box("Rule", 300, 0, 506, 1, GOLD),
         text("SumLbl", "Portfolio balance:", 300, 3, 150, 14, size=8, bold=True, color=NAVY),
         field("SumBal", "{#Sum of PRIN_BAL_AMT}", 460, 3, 130, 14, size=8, bold=True, color=NAVY, align="RightAlign"),
         text("AvgLbl", "Avg APR:", 300, 20, 150, 14, size=8, color=SLATE),
         field("AvgApr", "{#Average of APR_RT}", 460, 20, 130, 14, size=8, color=SLATE, align="RightAlign"),
         text("SdLbl", "APR std dev:", 620, 20, 100, 14, size=8, color=SLATE),
-        field("SdApr", "{#StdDev of APR_RT}", 720, 20, 90, 14, size=8, color=SLATE, align="RightAlign")])
+        field("SdApr", "{#StdDev of APR_RT}", 716, 20, 90, 14, size=8, color=SLATE, align="RightAlign")])
     build("Loan Portfolio - Conditional Formatting", "05_loan_portfolio.xml",
           'SELECT b.br_name AS "BR_NAME", l.ln_no AS "LN_NO", l.ln_type_cd AS "LN_TYPE_CD",\n'
           '       l.orig_amt AS "ORIG_AMT", l.prin_bal_amt AS "PRIN_BAL_AMT",\n'

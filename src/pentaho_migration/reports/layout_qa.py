@@ -1,0 +1,170 @@
+"""Layout QA agent: catch visual defects before anyone opens PRD.
+
+Two layers, deterministic first:
+
+1. lint_layout(model)  - geometry lint on the parsed report model: elements
+   that overflow the printable page width (the classic masthead-wider-than-
+   A4 defect), elements taller than their band, colliding fields, fonts too
+   large for their box, charts missing their data columns, and TODO
+   placeholders that will print as boxes.
+2. render_qa(model, prpt) - proof from the real engine: render the bundle's
+   design-time PDF, then verify the page count and that every band label
+   actually made it onto the page (pypdf text extraction). Optional - needs
+   a local PRD install; the lint alone needs nothing.
+
+Findings feed the batch triage agent, the report-qa CLI, and the conversion
+report. Severities: error (broken output), warning (probably wrong), info
+(known manual work).
+"""
+
+from dataclasses import dataclass, field
+
+# printable paper sizes in points (width, height), portrait orientation
+PAPER_SIZES = {
+    "LETTER": (612.0, 792.0),
+    "LEGAL": (612.0, 1008.0),
+    "A4": (595.0, 842.0),
+}
+
+
+@dataclass
+class Finding:
+    severity: str          # error | warning | info
+    code: str              # page-overflow | band-overflow | overlap | ...
+    band: str = ""
+    element: str = ""
+    message: str = ""
+
+
+@dataclass
+class LayoutQA:
+    findings: list = field(default_factory=list)
+
+    @property
+    def errors(self):
+        return [f for f in self.findings if f.severity == "error"]
+
+    @property
+    def warnings(self):
+        return [f for f in self.findings if f.severity == "warning"]
+
+
+def usable_page_width(page) -> float:
+    w, h = PAPER_SIZES.get(page.paper, PAPER_SIZES["LETTER"])
+    if page.orientation == "landscape":
+        w, h = h, w
+    return w - page.margin_left - page.margin_right
+
+
+def _band(section) -> str:
+    if section.group_index >= 0:
+        return f"{section.area_kind} G{section.group_index + 1}"
+    return section.area_kind
+
+
+def _label(el) -> str:
+    return el.name or el.text or el.column or el.field_ref or el.kind
+
+
+_CONTENT_KINDS = {"label", "field", "chart", "image", "special"}
+
+
+def lint_layout(model) -> LayoutQA:
+    """Deterministic geometry lint over every non-suppressed band."""
+    qa = LayoutQA()
+    page_width = usable_page_width(model.page)
+
+    for section in model.sections:
+        if section.suppressed:
+            continue
+        band = _band(section)
+        visible = [el for el in section.elements if el.visible]
+
+        for el in visible:
+            if el.x < 0 or el.y < 0:
+                qa.findings.append(Finding(
+                    "error", "off-page", band, _label(el),
+                    f"element starts at ({el.x}, {el.y}) - negative positions "
+                    "land outside the printable area"))
+            if el.x + el.width > page_width + 0.5:
+                qa.findings.append(Finding(
+                    "error", "page-overflow", band, _label(el),
+                    f"element ends at {el.x + el.width:.0f}pt but the printable "
+                    f"width is {page_width:.0f}pt ({model.page.paper} "
+                    f"{model.page.orientation}) - it will clip or push a blank page"))
+            if (el.y + el.height > section.height + 0.5
+                    and not el.can_grow and el.kind in _CONTENT_KINDS):
+                qa.findings.append(Finding(
+                    "warning", "band-overflow", band, _label(el),
+                    f"element bottom ({el.y + el.height:.0f}pt) exceeds the "
+                    f"{section.height:.0f}pt band - PRD will clip it"))
+            if (el.kind in ("label", "field") and el.font.size > 0
+                    and el.height > 0 and el.font.size + 2 > el.height):
+                qa.findings.append(Finding(
+                    "warning", "font-clip", band, _label(el),
+                    f"{el.font.size:.0f}pt text in a {el.height:.0f}pt box - "
+                    "descenders will clip"))
+            if el.kind == "chart" and not (el.chart_category and el.chart_value):
+                qa.findings.append(Finding(
+                    "error", "chart-columns", band, _label(el),
+                    "chart is missing its category/value columns - it will "
+                    "render empty"))
+            if el.kind in ("subreport", "unknown"):
+                qa.findings.append(Finding(
+                    "info", "todo-placeholder", band, _label(el),
+                    f"{el.kind} prints as a TODO placeholder - rebuild by hand"))
+
+        # pairwise collision check between content elements
+        content = [el for el in visible if el.kind in _CONTENT_KINDS]
+        for i, a in enumerate(content):
+            for b in content[i + 1:]:
+                ox = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
+                oy = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
+                if ox <= 0 or oy <= 0:
+                    continue
+                smaller = min(a.width * a.height, b.width * b.height)
+                if smaller > 0 and (ox * oy) / smaller > 0.4:
+                    qa.findings.append(Finding(
+                        "warning", "overlap", band, _label(a),
+                        f"overlaps '{_label(b)}' by more than 40% - "
+                        "one of them will print on top of the other"))
+    return qa
+
+
+def render_qa(model, prpt_path) -> LayoutQA:
+    """Engine ground truth: render the design-time PDF and verify every band
+    label made it onto the page. Raises RuntimeError when no PRD install or
+    pypdf is available - callers treat that as 'render check skipped'."""
+    from pentaho_migration.reports.prpt_validator import render_prpt_pdf, validator_available
+
+    if not validator_available():
+        raise RuntimeError("render QA needs a local PRD install + Java")
+    try:
+        from io import BytesIO
+
+        from pypdf import PdfReader
+    except ImportError:
+        raise RuntimeError("render QA needs pypdf - `pip install pypdf`")
+
+    qa = LayoutQA()
+    pdf = render_prpt_pdf(prpt_path)
+    reader = PdfReader(BytesIO(pdf))
+    if not reader.pages:
+        qa.findings.append(Finding(
+            "error", "render-empty", message="engine produced a PDF with no pages"))
+        return qa
+    text = "".join(page.extract_text() or "" for page in reader.pages)
+    flat = " ".join(text.split()).lower()
+
+    for section in model.sections:
+        if section.suppressed:
+            continue
+        for el in section.elements:
+            if el.kind != "label" or not el.visible:
+                continue
+            expected = " ".join(el.text.split()).lower()
+            if len(expected) >= 3 and expected not in flat:
+                qa.findings.append(Finding(
+                    "warning", "label-missing", _band(section), _label(el),
+                    f"label text {el.text!r} did not appear in the rendered PDF"))
+    return qa

@@ -1,11 +1,12 @@
 # Version
 
-**1.18.0** — 2026-07-24
+**1.19.0** — 2026-07-25
 
 Phase 2 multi-source in progress — Talend + Crystal Reports shipped. New:
-the **schema-aware SQL agent** — report SQL is EXPLAIN-validated against the
-live JNDI target before PRD ever opens it, and a schema-grounded chat on the
-Inspect page answers join/column questions and proposes corrected SQL as a
-reviewable diff (never auto-applied). Crystal also rewrites blocked idioms
-into native PRD report functions (running totals, whole-formula aggregates).
+the **batch triage agent** (`report-triage`: READY/REVIEW/BLOCKED verdict +
+reasons for every report in a corpus, so consultants review a summary
+instead of 150 reports) and the **layout QA agent** (`report-qa`: geometry
+lint — page overflow, collisions, clipped fonts — plus optional engine
+render verification). The schema chat got a roomier full-width card, and
+`run.sh` / `run.bat` / `run.ps1` one-command launchers were added.
 See [CHANGELOG.md](CHANGELOG.md) for history.

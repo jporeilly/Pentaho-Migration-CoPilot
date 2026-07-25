@@ -7,6 +7,46 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.19.0] — 2026-07-25
+
+### Added
+
+- **Layout QA agent** (`reports/layout_qa.py`, `pentaho-migrate report-qa`):
+  deterministic geometry lint over every band — elements overflowing the
+  printable page width, elements taller than their band, colliding fields
+  (>40% overlap), fonts too large for their box, charts missing data
+  columns, TODO placeholders — plus optional `--render` verification through
+  the real engine (design-time PDF rendered and scanned so every label is
+  proven to appear; needs a local PRD + pypdf). Findings carry
+  error/warning/info severities; errors exit nonzero for CI use.
+  *It earned its keep immediately: it found six real page-overflow defects
+  in our own authored demo reports (rules and fields ending at 810–900pt on
+  an 806pt page), all fixed at the source — the demo set now lints clean.*
+- **Batch triage agent** (`reports/triage.py`, `pentaho-migrate
+  report-triage <dir> --jndi <ds> [-t]`): sweeps a corpus and drafts the
+  review verdict per report — **BLOCKED** (SQL fails against the live
+  target, or parse failure), **REVIEW** (manual formulas, idiom rewrites to
+  verify, TODO placeholders, layout findings), **READY** (clean + SQL
+  proven). Combines the schema agent's EXPLAIN validation, the layout QA
+  lint, formula stats, and effort into one markdown triage report with a
+  sortable verdict table; an unreachable database never penalizes a report
+  (SQL marked `unchecked`, noted in the header). Optional `--llm` adds a
+  two-to-four-sentence "what to check first" brief per non-READY report.
+  Demo set: 3 READY / 3 REVIEW (the intentional manual-work rungs); the
+  150-file real corpus triages in seconds.
+- **One-command launchers**: `run.sh`, `run.bat`, `run.ps1` — create the
+  venv and install extras on first run, build the frontend if missing, then
+  serve the app on port 8321 (`COPILOT_PORT` overrides).
+
+### Changed
+
+- **Schema assistant moved to its own full-width card** on the Inspect page
+  (it was squashed into the half-width Data source card): spacious
+  validation banner, larger chat bubbles with sensible max-widths, and a
+  full-width input row.
+- Triage/QA no longer count embedded images as TODOs — an image with
+  migrated bytes is converted work, not manual work.
+
 ## [1.18.0] — 2026-07-24
 
 ### Added

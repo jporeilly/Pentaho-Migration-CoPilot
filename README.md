@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.18.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.19.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -96,6 +96,19 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 
 ## Quick start
 
+One command — creates the venv, installs everything, builds the UI on first
+run, then serves http://localhost:8321 (override with `COPILOT_PORT`):
+
+```powershell
+.\run.ps1        # Windows PowerShell (or double-click run.bat)
+```
+
+```bash
+./run.sh         # Linux / macOS / Git Bash
+```
+
+Step-by-step alternative (identical helpers across `make`, `dev.ps1`, `dev.sh`):
+
 ```powershell
 # Windows 11
 .\scripts\dev.ps1 setup       # venv + all Python deps
@@ -129,6 +142,8 @@ pentaho-migrate report  <rpttoxml.xml> -t   # Crystal dump -> .prpt + report; -t
 pentaho-migrate report ... --validate       # load the .prpt through the real Pentaho Reporting engine
 pentaho-migrate report-env                  # preflight: PRD, Java, SAP Crystal runtime, RptToXml
 pentaho-migrate report-sql <dump> --jndi <ds> # validate the report SQL against the live JNDI target (EXPLAIN)
+pentaho-migrate report-qa <dump> [--render] # layout QA agent: geometry lint + optional engine render verification
+pentaho-migrate report-triage <dir> --jndi <ds> # batch triage agent: READY/REVIEW/BLOCKED verdict per report
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
 pentaho-migrate report-batch [directory]    # convert a Crystal corpus into the project store (joins the portfolio)
@@ -216,8 +231,10 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] SAP Crystal Reports → PRD (v1.11 → 1.18): RptToXml parser, formula
   translator with idiom rewrites, LLM assist, record-selection folding,
   Crystal-faithful layout, charts, engine round-trip validation, forked
-  extractor, CSCU live-render demo ladder, schema-aware SQL agent
-  (live-database validation + grounded chat)
+  extractor, CSCU live-render demo ladder, and the agent trio: schema-aware
+  SQL agent (live-database validation + grounded chat), layout QA agent
+  (geometry lint + render verification), batch triage agent
+  (per-report READY/REVIEW/BLOCKED verdicts over a whole corpus)
 - [ ] SSIS (.dtsx)
 - [ ] IBM DataStage (.dsx)
 

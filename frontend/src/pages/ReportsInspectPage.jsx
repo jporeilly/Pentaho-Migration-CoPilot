@@ -119,18 +119,22 @@ export default function ReportsInspectPage({ summary, file, onUpdate }) {
               <pre className="sql-pre">{summary.record_selection}</pre>
             </div>
           )}
-          <Explain label="Schema assistant — what is this?">
-            The SQL above is checked <b>deterministically</b> against the live
-            JNDI target: the query is <code>EXPLAIN</code>ed with parameter
-            defaults substituted, so missing tables, wrong columns, and dialect
-            errors surface <b>before</b> the report ever opens in PRD. The chat
-            below sees the <b>real database schema</b> and the validation
-            verdict — ask it why a query fails or how tables join. Proposed SQL
-            is a <b>reviewable diff</b>: nothing changes until you click Apply,
-            and applying is recorded as a review item in the conversion report.
-          </Explain>
-          <SqlAssistant summary={summary} file={file} onUpdate={onUpdate} />
         </div>
+      </div>
+
+      <div className="card">
+        <header><h2>🛢 Schema assistant</h2></header>
+        <Explain>
+          The report SQL is checked <b>deterministically</b> against the live
+          JNDI target: the query is <code>EXPLAIN</code>ed with parameter
+          defaults substituted, so missing tables, wrong columns, and dialect
+          errors surface <b>before</b> the report ever opens in PRD. The chat
+          sees the <b>real database schema</b> and the validation verdict —
+          ask it why a query fails or how tables join. Proposed SQL is a
+          <b> reviewable diff</b>: nothing changes until you click Apply, and
+          applying is recorded as a review item in the conversion report.
+        </Explain>
+        <SqlAssistant summary={summary} file={file} onUpdate={onUpdate} />
       </div>
 
       <div className="report-grid">

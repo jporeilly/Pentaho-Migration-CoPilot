@@ -492,37 +492,45 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
   font: .8rem/1.5 Consolas, "Cascadia Mono", monospace; color: var(--text-secondary);
   overflow-x: auto; white-space: pre;
 }
-/* schema-aware SQL assistant */
-.sql-assistant { margin-top: .6rem; }
+/* schema-aware SQL assistant (full-width card on the Inspect page) */
+.sql-assistant { margin-top: .8rem; display: flex; flex-direction: column; gap: .9rem; }
 .sql-verdict {
-  display: block; padding: .5rem .8rem; border-radius: 8px; font-size: .82rem;
-  margin-bottom: .6rem; white-space: normal; line-height: 1.4;
+  display: block; padding: .7rem 1rem; border-radius: 10px; font-size: .88rem;
+  white-space: normal; line-height: 1.5; font-weight: 500;
 }
 .sql-chat-log {
-  display: flex; flex-direction: column; gap: .55rem; margin: .6rem 0;
-  max-height: 24rem; overflow-y: auto;
+  display: flex; flex-direction: column; gap: .8rem;
+  max-height: 32rem; overflow-y: auto; padding: .2rem .1rem;
 }
-.sql-chat-msg { border-radius: 10px; padding: .55rem .8rem; font-size: .86rem; line-height: 1.5; }
-.sql-chat-msg.user { background: var(--surface-2); align-self: flex-end; max-width: 85%; }
-.sql-chat-msg.assistant { background: var(--surface-2); align-self: flex-start; max-width: 100%; }
+.sql-chat-msg { border-radius: 12px; padding: .75rem 1rem; font-size: .9rem; line-height: 1.6; }
+.sql-chat-msg.user {
+  background: var(--surface-2); align-self: flex-end; max-width: 46rem;
+  border-bottom-right-radius: 4px;
+}
+.sql-chat-msg.assistant {
+  background: var(--surface-2); align-self: flex-start; max-width: 100%;
+  border-bottom-left-radius: 4px;
+}
 .sql-chat-msg.assistant .sql-chat-text { color: var(--text-secondary); }
-.sql-chat-proposal { margin-top: .45rem; }
+.sql-chat-proposal { margin-top: .7rem; }
+.sql-chat-proposal .sql-pre { margin: 0 0 .6rem; }
 .sql-chat-proposal button {
-  border: none; border-radius: 99px; padding: .35rem 1rem; cursor: pointer;
-  background: var(--text-primary); color: var(--page); font-size: .82rem; font-weight: 600;
+  border: none; border-radius: 99px; padding: .45rem 1.2rem; cursor: pointer;
+  background: var(--text-primary); color: var(--page); font-size: .85rem; font-weight: 600;
 }
 .sql-chat-proposal button:disabled { opacity: .5; cursor: default; }
-.sql-chat-input { display: flex; gap: .5rem; margin-top: .5rem; }
+.sql-chat-input { display: flex; gap: .6rem; }
 .sql-chat-input input {
-  flex: 1; background: var(--surface-2); border: none; border-radius: 8px;
-  color: var(--text-primary); padding: .55rem .8rem; font-size: .86rem; outline: none;
+  flex: 1; background: var(--surface-2); border: none; border-radius: 10px;
+  color: var(--text-primary); padding: .75rem 1rem; font-size: .9rem; outline: none;
 }
 .sql-chat-input button {
-  border: none; border-radius: 8px; padding: .55rem 1rem; cursor: pointer;
-  background: var(--surface-2); color: var(--text-primary); font-size: .86rem; font-weight: 600;
+  border: none; border-radius: 10px; padding: .75rem 1.3rem; cursor: pointer;
+  background: var(--surface-2); color: var(--text-primary); font-size: .9rem; font-weight: 600;
+  white-space: nowrap;
 }
 .sql-chat-input button:disabled { opacity: .5; cursor: default; }
-.error-text { color: var(--status-serious); font-size: .82rem; margin: .4rem 0 0; }
+.error-text { color: var(--status-serious); font-size: .84rem; margin: 0; }
 
 .formula-original {
   background: var(--surface-2); border-radius: 6px; padding: .5rem .7rem; margin: .4rem 0 0;

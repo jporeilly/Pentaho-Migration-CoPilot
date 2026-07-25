@@ -434,6 +434,95 @@ def report_sql(
         raise typer.Exit(code=1)
 
 
+@app.command("report-qa")
+def report_qa(
+    dump: Path,
+    jndi: str = typer.Option("", "--jndi", help="JNDI name baked into the bundle"),
+    render: bool = typer.Option(
+        False, "--render",
+        help="Also render the design-time PDF through the real engine and "
+             "verify every label appears (needs a local PRD install + pypdf)"),
+) -> None:
+    """Layout QA agent: geometry lint (page overflow, collisions, clipped
+    fonts, TODO placeholders) and optional engine render verification."""
+    from pentaho_migration.reports import load_report_model, write_prpt
+    from pentaho_migration.reports.layout_qa import lint_layout, render_qa
+
+    model = load_report_model(dump, jndi or None)
+    qa = lint_layout(model)
+    findings = list(qa.findings)
+
+    if render:
+        import tempfile
+
+        from pentaho_migration.reports.layout_qa import LayoutQA  # noqa: F401
+        with tempfile.TemporaryDirectory() as td:
+            prpt = Path(td) / "qa.prpt"
+            write_prpt(model, prpt)
+            try:
+                findings.extend(render_qa(model, prpt).findings)
+                typer.echo("render check: engine PDF produced and scanned")
+            except RuntimeError as exc:
+                typer.echo(f"render check skipped: {exc}", err=True)
+
+    if not findings:
+        typer.echo(f"CLEAN: no layout findings for {model.name}")
+        return
+    icons = {"error": "E", "warning": "W", "info": "i"}
+    for f in sorted(findings, key=lambda f: ("EWi".index(icons[f.severity]))):
+        where = " / ".join(x for x in (f.band, f.element) if x)
+        typer.echo(f"[{icons[f.severity]}] {f.code:16} {where}: {f.message}")
+    errors = sum(1 for f in findings if f.severity == "error")
+    typer.echo(f"{len(findings)} finding(s), {errors} error(s) - {model.name}")
+    if errors:
+        raise typer.Exit(code=1)
+
+
+@app.command("report-triage")
+def report_triage(
+    directory: Path = typer.Argument(Path("samples/cr_demo")),
+    jndi: str = typer.Option("", "--jndi", help="Validate each report's SQL against this JNDI target"),
+    out: Path = typer.Option(
+        Path("output/triage.md"), "--out", "-o", help="Where to write the triage report"),
+    llm: bool = typer.Option(
+        False, "--llm", "-t",
+        help="Add an LLM 'what to check first' brief to every non-READY report"),
+) -> None:
+    """Batch triage agent: verdict (READY/REVIEW/BLOCKED) + reasons for every
+    report in DIRECTORY, so the consultant reviews a summary, not 150 reports."""
+    from pentaho_migration.reports.triage import (
+        build_triage_report, llm_brief, triage_corpus)
+
+    def progress(done: int, total: int) -> None:
+        typer.echo(f"  triaged {done}/{total}", err=True)
+
+    results = triage_corpus(directory, jndi, progress=progress)
+    if not results:
+        typer.echo(f"no RptToXml dumps found in {directory}")
+        raise typer.Exit(code=1)
+
+    if llm:
+        pending = [r for r in results if r.verdict != "READY"]
+        for i, r in enumerate(pending):
+            try:
+                r.brief = llm_brief(r)
+            except Exception as exc:
+                typer.echo(f"  brief failed for {r.file}: {exc}", err=True)
+            typer.echo(f"  briefs {i + 1}/{len(pending)}", err=True)
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(build_triage_report(results, jndi), encoding="utf-8")
+
+    counts = {"READY": 0, "REVIEW": 0, "BLOCKED": 0}
+    for r in results:
+        counts[r.verdict] += 1
+    typer.echo(f"{len(results)} reports: READY {counts['READY']} | "
+               f"REVIEW {counts['REVIEW']} | BLOCKED {counts['BLOCKED']}")
+    typer.echo(f"triage report: {out}")
+    if counts["BLOCKED"]:
+        raise typer.Exit(code=1)
+
+
 @app.command("report-gaps")
 def report_gaps(
     directory: Path = typer.Argument(Path("samples/crystal/real")),
