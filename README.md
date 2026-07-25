@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.21.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.21.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -97,8 +97,32 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 
 ## Quick start
 
-Guided setup — explains the app, checks prerequisites, installs everything,
-and runs the Crystal-environment preflight:
+**One command does everything** — downloads the app from GitHub into
+`C:\Pentaho-Migration`, runs the guided installer (venv, dependencies, web
+UI, Crystal-environment preflight), detects your hardware (NVIDIA GPU VRAM,
+or CPU + RAM) and configures the matching local LLM model automatically:
+
+```powershell
+irm https://raw.githubusercontent.com/jporeilly/Pentaho-Migration-CoPilot/main/bootstrap.ps1 | iex
+```
+
+Or with the script in hand (options: `-InstallDir <path>`, `-Branch <name>`,
+`-PullModel` to also download the chosen Ollama model):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File bootstrap.ps1
+```
+
+Then start it:
+
+```powershell
+cd C:\Pentaho-Migration
+.\run.ps1        # -> http://localhost:8321
+```
+
+Already have a checkout? The guided installer alone — explains the app,
+checks prerequisites, installs everything, and runs the Crystal-environment
+preflight:
 
 ```powershell
 .\install.ps1    # Windows PowerShell (or double-click install.bat)

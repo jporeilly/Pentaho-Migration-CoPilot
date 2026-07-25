@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.21.1] — 2026-07-25
+
+### Added
+
+- **`bootstrap.ps1` — the one-command installer**: downloads the app from
+  GitHub into `C:\Pentaho-Migration` (git clone, or a zip snapshot when
+  git is absent; safe re-run pulls the latest), runs the guided
+  `install.ps1` (venv, dependencies, web UI, Crystal preflight), detects
+  the hardware — NVIDIA VRAM aggregated across GPUs via `nvidia-smi`, or
+  CPU RAM — and writes `config/settings.json` with the matching
+  qwen2.5-coder model and Ollama tuning env, mirroring the app's own
+  recommendation ladder exactly (24 GB+ → 32b, 12 GB+ → 14b, 6 GB+ → 7b,
+  CPU 32 GB+ → 7b, 16 GB+ → 3b, else 1.5b; multi-GPU adds
+  `OLLAMA_SCHED_SPREAD`). Existing settings are never overwritten;
+  `-PullModel` also downloads the model; `-InstallDir`/`-Branch` override
+  the defaults. Verified end-to-end on this machine: fresh clone →
+  install → 2× RTX 3060 detected → 32b configured → settings parsed by
+  the app. README Quick start now leads with it (`irm ... | iex`).
+  Fixed along the way: PowerShell 5.1's `Out-File -Encoding utf8` writes
+  a BOM that the app's strict JSON parser rejects — the bootstrap writes
+  BOM-less UTF-8.
+
 ## [1.21.0] — 2026-07-25
 
 ### Added
