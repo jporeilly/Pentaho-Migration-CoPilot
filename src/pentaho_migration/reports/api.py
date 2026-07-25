@@ -118,10 +118,12 @@ class ReportConversionResponse(BaseModel):
 
 
 def _summarize(model, source_name: str) -> ReportSummary:
+    from pentaho_migration.reports.model import is_todo_element
+
     todos: list[str] = []
     for s in model.sections:
         for el in s.elements:
-            if el.kind in ("subreport", "image", "unknown"):
+            if is_todo_element(el):
                 todos.append(f"{s.area_kind}: {el.kind} '{el.text or el.name}'")
             todos.extend(el.notes)
     todos.extend(model.issues)

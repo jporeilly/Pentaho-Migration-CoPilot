@@ -556,9 +556,11 @@ def report_gaps(
         elements += sum(len(s.elements) for s in model.sections)
         params += len(model.parameters)
         summaries += len(model.summaries)
+        from pentaho_migration.reports.model import is_todo_element
+
         for section in model.sections:
             for el in section.elements:
-                if el.kind in ("subreport", "image", "unknown"):
+                if is_todo_element(el):
                     todos += 1
         effort = build_report_effort(model)
         copilot_h += effort.copilot_hours

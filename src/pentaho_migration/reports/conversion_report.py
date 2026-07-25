@@ -99,10 +99,12 @@ def build_conversion_report(model, source_path, output_path):
             "Converted as a textbox parameter; wire it into the query as `${" + p.name + "}`.")
         add("")
 
+    from pentaho_migration.reports.model import is_todo_element
+
     todo = []
     for s in model.sections:
         for el in s.elements:
-            if el.kind in ("subreport", "image", "unknown"):
+            if is_todo_element(el):
                 todo.append(f"- `{s.area_kind}`: {el.kind} \"{el.text or el.name}\" "
                             "emitted as a red TODO placeholder label.")
             for note in el.notes:

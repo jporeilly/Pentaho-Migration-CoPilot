@@ -35,10 +35,12 @@ MANUAL_TEST_OVERHEAD = 0.10
 
 
 def count_todos(model: ReportModel) -> int:
+    from pentaho_migration.reports.model import is_todo_element
+
     todos = 0
     for section in model.sections:
         for el in section.elements:
-            if el.kind in ("subreport", "image", "unknown"):
+            if is_todo_element(el):
                 todos += 1
             todos += len(el.notes)
     return todos + len(model.issues)

@@ -7,6 +7,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.19.1] — 2026-07-25
+
+### Added
+
+- **Guided install/uninstall scripts**: `install.ps1` / `install.sh` (+
+  `.bat` delegator) print what the app is and its version, check
+  prerequisites (Python, Node) with download links, set up the venv +
+  extras + UI build, run the Crystal-environment preflight (`report-env`)
+  with an "optional — the app works without it" explanation, and finish
+  with next steps (run script, sample, CLI highlights, docs).
+  `uninstall.ps1` / `uninstall.sh` list exactly what they will remove and
+  what they keep, confirm before acting, and support `-Force`/`--force`,
+  `-DryRun`/`--dry-run`, and `-All`/`--all` (also removes converted
+  output and the project database — kept by default).
+
+### Fixed
+
+- **The Crystal source is now shown on review-status formulas** — an idiom
+  rewrite like `{@RunningBalance}` displayed only its note, so there was
+  nothing to actually review; the original formula text now appears on
+  every row that needs a human (review and manual).
+- **Status badges no longer wrap** (the ✋ sat above the word "manual");
+  the status column keeps a minimum width.
+- **Embedded images are no longer counted as manual work anywhere** — the
+  API todos list, effort estimate, conversion report, and `report-gaps`
+  now share the triage rule (`is_todo_element`): an image whose bytes were
+  migrated into the bundle is converted work; only byte-less images are
+  TODOs. The flagship no longer lists its own logo as "other manual work".
+
 ## [1.19.0] — 2026-07-25
 
 ### Added

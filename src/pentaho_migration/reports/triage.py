@@ -71,10 +71,10 @@ def triage_one(dump: Path, jndi: str = "", check_sql: bool = True) -> TriageResu
         result.review += f.status == "review"
         result.manual += f.status == "manual"
         result.rewrites += bool(f.rewrite_class)
-    result.todos = sum(
-        1 for s in model.sections for el in s.elements
-        if el.kind in ("subreport", "unknown")
-        or (el.kind == "image" and not el.image_bytes and not el.resource_path))
+    from pentaho_migration.reports.model import is_todo_element
+
+    result.todos = sum(1 for s in model.sections for el in s.elements
+                       if is_todo_element(el))
     effort = build_report_effort(model)
     result.copilot_hours = effort.copilot_hours
     result.manual_hours = effort.manual_hours

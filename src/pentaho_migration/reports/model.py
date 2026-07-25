@@ -69,6 +69,16 @@ class Element:
     notes: list = field(default_factory=list)
 
 
+def is_todo_element(el) -> bool:
+    """True when this element remains manual work after conversion.
+    Images whose bytes were migrated into the bundle are converted work,
+    not TODOs - only byte-less images (extractor couldn't reach the RAS
+    picture data) still need a hand."""
+    if el.kind in ("subreport", "unknown"):
+        return True
+    return el.kind == "image" and not el.image_bytes and not el.resource_path
+
+
 @dataclass
 class Section:
     area_kind: str            # ReportHeader | PageHeader | GroupHeader | Detail | GroupFooter | ReportFooter | PageFooter

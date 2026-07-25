@@ -71,7 +71,7 @@ def test_ladder_exercises_increasing_complexity():
     assert any("conditional" in n.lower() for n in element_notes)  # conditional format flagged
 
     sar = models["06_suspicious_activity"]
-    assert count_todos(sar) >= 3                            # subreport + image + crosstab
+    assert count_todos(sar) >= 2   # subreport + crosstab (embedded logo is migrated, not a TODO)
 
 
 @pytest.mark.skipif(os.environ.get("CSCU_LIVE") != "1",

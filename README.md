@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.19.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.19.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -96,8 +96,18 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 
 ## Quick start
 
-One command — creates the venv, installs everything, builds the UI on first
-run, then serves http://localhost:8321 (override with `COPILOT_PORT`):
+Guided setup — explains the app, checks prerequisites, installs everything,
+and runs the Crystal-environment preflight:
+
+```powershell
+.\install.ps1    # Windows PowerShell (or double-click install.bat)
+```
+
+```bash
+./install.sh     # Linux / macOS / Git Bash
+```
+
+Then start the app (also self-installs on first run — `COPILOT_PORT` overrides the port):
 
 ```powershell
 .\run.ps1        # Windows PowerShell (or double-click run.bat)
@@ -106,6 +116,10 @@ run, then serves http://localhost:8321 (override with `COPILOT_PORT`):
 ```bash
 ./run.sh         # Linux / macOS / Git Bash
 ```
+
+`uninstall.ps1` / `uninstall.sh` remove what the installer created (with a
+`--dry-run` preview; converted output and the project database are kept
+unless you pass `--all`).
 
 Step-by-step alternative (identical helpers across `make`, `dev.ps1`, `dev.sh`):
 

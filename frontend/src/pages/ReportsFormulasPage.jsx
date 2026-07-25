@@ -109,24 +109,22 @@ export default function ReportsFormulasPage({ summary, file, onUpdate }) {
                 {visible.map((f) => (
                   <tr key={f.name}>
                     <td className="cell-clip">{'{@'}{f.name}{'}'}</td>
-                    <td>
+                    <td className="cell-status">
                       <span className={`badge ${f.status}`} title={TIPS[f.status]}>
                         {BADGES[f.status]} {f.status}
                       </span>
                     </td>
                     <td>
-                      {f.status === 'manual' ? (
-                        <>
-                          <span className="muted">{f.notes.join('; ')}</span>
-                          <pre className="formula-original">{f.original}</pre>
-                        </>
-                      ) : (
-                        <>
-                          <code>{f.translation}</code>
-                          {f.notes.length > 0 && (
-                            <div className="muted formula-note">{f.notes.join('; ')}</div>
-                          )}
-                        </>
+                      {f.translation && <code>{f.translation}</code>}
+                      {f.notes.length > 0 && (
+                        <div className={`muted ${f.translation ? 'formula-note' : ''}`}>
+                          {f.notes.join('; ')}
+                        </div>
+                      )}
+                      {/* the Crystal source IS what you review — show it on
+                          every row that needs a human (review + manual) */}
+                      {f.status !== 'auto' && (
+                        <pre className="formula-original">{f.original}</pre>
                       )}
                     </td>
                   </tr>
