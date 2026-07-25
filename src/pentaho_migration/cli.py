@@ -779,6 +779,31 @@ def report_images(
         raise typer.Exit(code=1)
 
 
+@app.command("report-portfolio")
+def report_portfolio(
+    directory: Path = typer.Argument(Path("samples/crystal/real")),
+    jndi: str = typer.Option("", help="validate each report's SQL against this live JNDI target"),
+    rate: float = typer.Option(150.0, help="consultant rate $/h for the cost figures"),
+    out: Path = typer.Option(None, "-o", help="output HTML (default: <dir>/portfolio-report.html)"),
+) -> None:
+    """The consultant's portfolio report: one self-contained HTML page with
+    verdict charts, TODO breakdown by category, review-load distribution,
+    formula success rates, the 10 heaviest reports, and $ figures at your
+    rate. Prints straight to PDF for the customer meeting."""
+    from pentaho_migration.reports.portfolio_report import build_portfolio_report_html
+    from pentaho_migration.reports.triage import triage_corpus
+
+    results = triage_corpus(directory, jndi=jndi, check_sql=bool(jndi))
+    if not results:
+        typer.echo(f"no RptToXml dumps found in {directory}")
+        raise typer.Exit(code=1)
+    html = build_portfolio_report_html(results, rate=rate, jndi=jndi)
+    target = out or (directory / "portfolio-report.html")
+    target.write_text(html, encoding="utf-8")
+    ready = sum(1 for r in results if r.verdict == "READY")
+    typer.echo(f"{len(results)} report(s) triaged ({ready} READY) -> {target}")
+
+
 @app.command("report-env")
 def report_env() -> None:
     """Preflight for the Crystal pipeline: is everything installed?"""

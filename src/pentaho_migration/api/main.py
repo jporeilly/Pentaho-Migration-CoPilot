@@ -371,6 +371,28 @@ def project_reports_triage(jndi: str = "") -> list[ReportRecord]:
     return list_reports()
 
 
+@app.get("/project/reports/portfolio")
+def project_reports_portfolio(jndi: str = "", rate: float = 150.0):
+    """The consultant's portfolio report (self-contained HTML with charts):
+    triages every stored report's source dump live, buckets the remaining
+    manual work, and prices the engagement at the given rate."""
+    from fastapi.responses import HTMLResponse
+
+    from pentaho_migration.reports.portfolio_report import build_portfolio_report_html
+    from pentaho_migration.reports.triage import triage_one
+
+    results = []
+    for record in list_reports():
+        source = Path(record.source_path) if record.source_path else None
+        if source is None or not source.is_file():
+            continue
+        results.append(triage_one(source, jndi=jndi, check_sql=bool(jndi)))
+    if not results:
+        raise HTTPException(status_code=404,
+                            detail="no stored reports with reachable source dumps")
+    return HTMLResponse(build_portfolio_report_html(results, rate=rate, jndi=jndi))
+
+
 @app.post("/project/report-parity", dependencies=[Depends(require_api_key)])
 async def project_report_parity(
     file: str, reference: UploadFile, jndi: str = ""

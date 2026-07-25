@@ -98,6 +98,21 @@ def test_autofit_never_moves_conditionally_visible_alternates():
     assert (b.x, b.y) == (0, 0)          # untouched - it's a stacked alternate
 
 
+def test_backdrop_image_moves_behind_and_lint_goes_quiet():
+    """Fade/watermark images over text are intentional: the agent promotes
+    them to the front of the band (PRD paints in order - first = behind)
+    and the overlap stops being flagged."""
+    from pentaho_migration.reports.layout_qa import autofit_layout
+
+    text1 = Element(kind="field", name="T1", x=10, y=5, width=120, height=14)
+    fade = Element(kind="image", name="RO_Header_Fade1", x=0, y=0, width=500, height=30)
+    m = _model(text1, fade)                    # image AFTER text = paints on top
+    assert autofit_layout(m) >= 1
+    assert m.sections[0].elements[0] is fade   # now first = behind
+    assert any("backdrop" in i for i in m.issues)
+    assert not [f for f in lint_layout(m).findings if f.code == "overlap"]
+
+
 def test_autofit_leaves_fitting_and_suppressed_bands_alone():
     from pentaho_migration.reports.layout_qa import autofit_layout
 

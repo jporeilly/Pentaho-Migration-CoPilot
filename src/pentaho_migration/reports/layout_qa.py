@@ -122,6 +122,42 @@ def _deoverlap_text(section):
     return len(moved)
 
 
+_BACKDROP_RATIO = 1.5  # an image this much larger than overlapped content is a backdrop
+
+
+def _is_backdrop_pair(img, other):
+    """True when `img` acts as a backdrop for `other`: substantially larger
+    and overlapping it (fade/watermark images behind text)."""
+    if img.kind != "image":
+        return False
+    ox = min(img.x + img.width, other.x + other.width) - max(img.x, other.x)
+    oy = min(img.y + img.height, other.y + other.height) - max(img.y, other.y)
+    if ox <= 0 or oy <= 0:
+        return False
+    return img.width * img.height >= _BACKDROP_RATIO * max(other.width * other.height, 1.0)
+
+
+def _promote_backdrops(section):
+    """Move backdrop images to the FRONT of the band: PRD paints elements in
+    document order, so first = behind - the fade renders under the text it
+    overlaps, exactly the original design intent."""
+    backdrops = []
+    for el in section.elements:
+        if el.kind != "image":
+            continue
+        if any(_is_backdrop_pair(el, other) for other in section.elements
+               if other is not el and other.kind in ("label", "field", "special", "image")):
+            backdrops.append(el)
+    promoted = 0
+    for el in backdrops:
+        idx = section.elements.index(el)
+        if any(o.kind != "image" for o in section.elements[:idx]):
+            section.elements.remove(el)
+            section.elements.insert(0, el)
+            promoted += 1
+    return promoted
+
+
 def autofit_layout(model) -> int:
     """Deterministic layout repair for the mechanically-safe finding classes:
 
@@ -141,6 +177,13 @@ def autofit_layout(model) -> int:
     for section in model.sections:
         if section.suppressed:
             continue
+        promoted = _promote_backdrops(section)
+        if promoted:
+            repaired += 1
+            model.issues.append(
+                f"layout auto-fit: {_band(section)} - {promoted} backdrop "
+                "image(s) moved behind the content they overlap (paint order) "
+                "- the fade/watermark renders under the text, as designed")
         nudged = _deoverlap_text(section)
         if nudged:
             repaired += 1
@@ -231,6 +274,11 @@ def lint_layout(model) -> LayoutQA:
                 ox = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
                 oy = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
                 if ox <= 0 or oy <= 0:
+                    continue
+                # a backdrop image painting BEHIND the content it overlaps
+                # (earlier in the band = under, in PRD paint order) is the
+                # intentional fade/watermark pattern, not a defect
+                if _is_backdrop_pair(a, b) or _is_backdrop_pair(b, a):
                     continue
                 smaller = min(a.width * a.height, b.width * b.height)
                 if smaller > 0 and (ox * oy) / smaller > 0.4:

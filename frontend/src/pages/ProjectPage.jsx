@@ -221,6 +221,15 @@ export default function ProjectPage({ onBack, onOpen }) {
             <button className="primary" onClick={runTriage} disabled={triaging}>
               {triaging ? 'Triaging…' : '🔎 Run triage'}
             </button>
+            <a
+              className="ghost portfolio-link"
+              href={`/project/reports/portfolio?jndi=${encodeURIComponent(jndi)}&rate=${encodeURIComponent(localStorage.getItem('consultantRate') || '150')}`}
+              target="_blank"
+              rel="noreferrer"
+              title="Self-contained HTML consultant report: verdict charts, TODO breakdown by category, review-load distribution, focus list, $ figures — prints to PDF"
+            >
+              📊 Consultant report
+            </a>
           </div>
         </header>
         <Explain>

@@ -120,8 +120,30 @@ class TalendParser:
         component = node.get("componentName", "Unknown")
         params: dict[str, str] = {}
         for param in node.iter():
-            if _local(param.tag) == "elementParameter" and param.get("name"):
-                params[param.get("name")] = param.get("value", "")
+            if _local(param.tag) != "elementParameter" or not param.get("name"):
+                continue
+            if param.get("field") == "TABLE":
+                # TABLE params (filter conditions, aggregate operations, sort
+                # criteria...) are flattened <elementValue elementRef= value=>
+                # runs; a repeated elementRef starts the next row. Stored as
+                # JSON so the generator gets structured rows.
+                rows, current = [], {}
+                for ev in param:
+                    if _local(ev.tag) != "elementValue":
+                        continue
+                    ref = ev.get("elementRef", "")
+                    if ref in current:
+                        rows.append(current)
+                        current = {}
+                    current[ref] = ev.get("value", "")
+                if current:
+                    rows.append(current)
+                if rows:
+                    import json as _json
+
+                    params[param.get("name")] = _json.dumps(rows)
+                    continue
+            params[param.get("name")] = param.get("value", "")
         name = params.get("UNIQUE_NAME", component)
 
         step = Step(name=name, source_type=component, properties=params)

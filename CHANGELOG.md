@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.30.0] — 2026-07-25
+
+### Added
+
+- **Consultant portfolio report** (`report-portfolio` CLI, GET
+  /project/reports/portfolio, 📊 button on the Project page): one
+  self-contained HTML page (inline SVG charts, prints to PDF) with the
+  verdict split, formula-translation success bar, **remaining manual work
+  bucketed by category** (cross-tab / subreport / image / unsupported
+  summary / unmapped component, with affected-report counts), a
+  **review-load histogram** (reports needing 0/1/2/3-5/6+ touches), the
+  10 heaviest reports with reasons and cost, and hours/$ at a
+  configurable rate. TriageResult now carries todo_kinds.
+- **Backdrop images auto-repair**: a fade/watermark image overlapping the
+  text it sits behind is the intentional Crystal pattern — the layout
+  agent now moves such images to the front of the band (PRD paints in
+  document order, first = behind) and the lint stops flagging
+  backdrop-vs-content pairs as defects.
+- Talend groundwork for the production pass: TABLE-style component
+  parameters (filter CONDITIONS, aggregate GROUPBYS/OPERATIONS, sort
+  CRITERIA) now parse into structured JSON rows on the step.
+
 ## [1.29.0] — 2026-07-25
 
 ### Added

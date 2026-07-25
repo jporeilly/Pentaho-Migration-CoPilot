@@ -43,6 +43,7 @@ class TriageResult:
     manual: int = 0
     rewrites: int = 0
     todos: int = 0
+    todo_kinds: dict = field(default_factory=dict)  # category -> count (cross-tab/subreport/image/...)
     layout_errors: int = 0
     layout_warnings: int = 0
     sql_status: str = "unchecked"  # valid | invalid | unchecked
@@ -51,6 +52,20 @@ class TriageResult:
     manual_hours: float = 0.0
     brief: str = ""                # optional LLM "what to check first"
     parse_error: str = ""
+
+
+def _todo_category(el) -> str:
+    """Consultant-facing bucket for one TODO placeholder."""
+    if el.kind == "subreport":
+        return "subreport"
+    if el.kind == "image":
+        return "image (bytes not carved)"
+    text = el.text or ""
+    if "CrossTab" in text:
+        return "cross-tab (needs definition block)"
+    if "summary" in text:
+        return "unsupported summary"
+    return f"unmapped: {text.split('(')[0].strip() or 'component'}"
 
 
 def triage_one(dump: Path, jndi: str = "", check_sql: bool = True) -> TriageResult:
@@ -72,8 +87,13 @@ def triage_one(dump: Path, jndi: str = "", check_sql: bool = True) -> TriageResu
         result.rewrites += bool(f.rewrite_class)
     from pentaho_migration.reports.model import is_todo_element
 
-    result.todos = sum(1 for s in model.sections for el in s.elements
-                       if is_todo_element(el))
+    for section in model.sections:
+        for el in section.elements:
+            if not is_todo_element(el):
+                continue
+            result.todos += 1
+            kind = _todo_category(el)
+            result.todo_kinds[kind] = result.todo_kinds.get(kind, 0) + 1
     effort = build_report_effort(model)
     result.copilot_hours = effort.copilot_hours
     result.manual_hours = effort.manual_hours
