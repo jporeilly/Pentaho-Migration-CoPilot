@@ -4,12 +4,13 @@
 # Governance: bump _meta.version and record provenance on every change.
 
 _meta:
-  version: 2
-  updated: "2026-07-17"
+  version: 3
+  updated: "2026-07-25"
   provenance:
     - "v1 (2026-07-17): initial component set from Talend Open Studio docs and PDI step inventory; to be validated against the real .item corpus."
     - "v2 (2026-07-17): +18 components from gap analysis on the real corpus (40 jobs, 763 steps): hash staging, per-row SQL, connection/commit management, catchers, REST/JSON/XML extraction, tJavaFlex, tSetGlobalVar, tFlowToIterate."
     - "v2b (2026-07-17): +9 from the harvest frequency table incl. Talend 8 TCK components without the t prefix (JDBCOutput)."
+    - "v3 (2026-07-25): +12 long-tail closers from the 42 remaining manual corpus steps (Excel output, property files, HSQLDb, Vertica/rollback connection mgmt, AMC logging, tMemorizeRows->AnalyticQuery, tSOAP->WebServiceLookup, tLibraryLoad); ESB/service-host components stay honestly manual."
 
 # ---- database I/O (family rule: any t<Db>Input behaves the same) ----
 "tOracleInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
@@ -125,3 +126,23 @@ _meta:
 "tPostjob": { pdi_type: Dummy, confidence: review, notes: "Post-job actions belong in the PDI job (.kjb) end flow." }
 "tDie": { pdi_type: Abort, confidence: auto }
 "tWarn": { pdi_type: WriteToLog, confidence: auto }
+
+# ---- v3: long-tail closers from the 42 remaining manual steps ----
+"tFileOutputExcel": { pdi_type: ExcelOutput, confidence: review, notes: "Sheet name and cell formatting must be reviewed." }
+"tFileInputProperties": { pdi_type: PropertyInput, confidence: auto, notes: "Reads key=value property files - same contract as PDI Property Input." }
+"tHSQLDbInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
+"tHSQLDbRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row SQL - verify statement and commit behavior." }
+"tVerticaConnection": { pdi_type: Dummy, confidence: auto, notes: "PDI manages connections per step - define a Vertica connection in the .ktr instead." }
+"tVerticaClose": { pdi_type: Dummy, confidence: auto, notes: "PDI closes connections automatically." }
+"tPostgresqlRollback": { pdi_type: Dummy, confidence: review, notes: "PDI transaction semantics differ - use the 'Make the transformation database transactional' option instead of explicit rollback." }
+"tJobLog": { pdi_type: WriteToLog, confidence: review, notes: "Talend AMC job logging - PDI logs via the job log tables (Edit > Settings > Logging); this step only writes to the PDI log." }
+"tContextDump": { pdi_type: WriteToLog, confidence: review, notes: "Context variables become PDI parameters/variables - dump them with Write to log or a Get Variables step." }
+"tMemorizeRows": { pdi_type: AnalyticQuery, confidence: review, notes: "Previous-row access maps to Analytic Query (LAG); recreate the memorized-column configuration." }
+"tSOAP": { pdi_type: WebServiceLookup, confidence: review, notes: "Recreate the WSDL operation and field mappings in Web services lookup." }
+"tLibraryLoad": { pdi_type: Dummy, confidence: review, notes: "Loads a Java jar for tJava* code - PDI equivalent is a jar in lib/ (or a UDJC dependency); nothing to execute at runtime." }
+
+# ---- v3: honest manual - no PDI equivalent, with the WHY on record ----
+# (tESBConsumer / tRESTRequest / tRESTResponse / tDataprepRun /
+#  tDataStewardshipTaskOutput / iNetCDF* stay unmapped: PDI is not a service
+#  host and has no Talend-cloud/NetCDF integrations - the impact knowledge
+#  base carries the rebuild guidance.)

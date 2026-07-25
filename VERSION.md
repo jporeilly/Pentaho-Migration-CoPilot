@@ -1,12 +1,11 @@
 # Version
 
-**1.30.0** — 2026-07-25
+**1.31.0** — 2026-07-25
 
-**Phase 1** — Informatica PowerCenter & SAP Crystal Reports complete;
-Talend on hold pending Crystal sign-off. The consultant round: **portfolio
-report** (self-contained HTML with charts — verdict split, manual work by
-category, review-load histogram, focus list, $ at your rate; CLI + API +
-Project-page 📊 button) and **backdrop-image auto-repair** (fade/watermark
-images move behind the text they overlap — paint order — and stop being
-flagged). Corpus: 98/150 READY.
+**Phase 1 COMPLETE** — Informatica PowerCenter, SAP Crystal Reports, and
+Talend. The Talend production pass: real .ktr configs carried from the
+.item (CSV input, text output, filter, sort, aggregate), **tRunJob
+orchestration → .kjb** (12 corpus jobs convert), and rules v3 (95
+components; corpus manual steps 42 → 28, the rest are service hosts with
+no PDI equivalent). Phase 2 next: SSIS, then DataStage.
 See [CHANGELOG.md](CHANGELOG.md) for history.

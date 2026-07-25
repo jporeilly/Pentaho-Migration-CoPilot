@@ -7,6 +7,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.31.0] — 2026-07-25
+
+### Added
+
+- **Talend production pass — Phase 1 complete.** (1) Component configs
+  carried from the .item into the .ktr: tFileInputDelimited → CSV input
+  (filename, separator, enclosure, header, typed schema),
+  tFileOutputDelimited → Text file output, tFilterRow → Filter rows
+  (simple conditions incl. IS NULL, AND/OR; advanced Java mode stays an
+  honest TODO), tSortRow criteria with direction, tAggregateRow
+  GROUPBYS/OPERATIONS → Group By aggregates. (2) **tRunJob → .kjb**: jobs
+  that call other jobs generate a PDI Job with TRANS entries wired to the
+  called jobs' .ktr files, ordered by the OnSubjobOk/... links (traversed
+  through intermediate components; success links map to follow-on-success)
+  — 12 orchestration jobs in the corpus convert; the assess warning
+  becomes an INFO. (3) **Rules v3** (95 components): Excel output,
+  property files, HSQLDb, Vertica/rollback connection management, AMC
+  logging → Write to log, tMemorizeRows → Analytic Query, tSOAP → Web
+  services lookup, tLibraryLoad; ESB/service-host components stay
+  honestly manual. Corpus: manual steps 42 → 28, avg confidence 62 → 64.
+- Generator fix: step descriptions are now built AFTER the config
+  emitters run, so emitter honesty notes land in the .ktr.
+
 ## [1.30.0] — 2026-07-25
 
 ### Added

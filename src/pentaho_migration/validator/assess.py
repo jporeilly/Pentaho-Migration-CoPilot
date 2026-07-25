@@ -25,10 +25,10 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
     if source.workflows or source.sessions:
         if source.tool == "Talend":
             warn(SourceWarning(
-                level=WarningLevel.WARNING,
-                text=f"{source.workflows} orchestration component(s) (tRunJob/joblets) call other "
-                     "jobs — recreate the calling structure as PDI Job entries (.kjb) and convert "
-                     "the called jobs separately.",
+                level=WarningLevel.INFO,
+                text=f"{source.workflows} orchestration component(s) (tRunJob) call other jobs — "
+                     "a PDI Job (.kjb) is generated with the calling structure wired to the "
+                     "called jobs' .ktr files; convert each called job so the references resolve.",
             ))
         else:
             warn(SourceWarning(

@@ -18,6 +18,9 @@ from pentaho_migration.ir import (
     Expression,
     FieldDef,
     Hop,
+    Job,
+    JobEntry,
+    JobHop,
     Pipeline,
     SourceInfo,
     SourceTool,
@@ -107,6 +110,77 @@ class TalendParser:
                 f"got <{_local(root.tag)}>"
             )
         return root
+
+    # orchestration connectors that order subjobs (≈ PDI job hops)
+    ORCH_CONNECTORS = {"SUBJOB_OK", "SUBJOB_ERROR", "COMPONENT_OK",
+                       "COMPONENT_ERROR", "RUN_IF", "ITERATE"}
+
+    def parse_workflows(self, path: str | Path) -> list[Job]:
+        """tRunJob orchestration -> Job IR (≈ PDI .kjb). A job that calls
+        other jobs becomes a .kjb whose TRANS entries reference the called
+        jobs' converted .ktr files, ordered by the OnSubjobOk/... links
+        (traversed through intermediate components). Jobs without tRunJob
+        return [] - they are pure transformations."""
+        root = self._root(path)
+        components: dict[str, str] = {}
+        called: dict[str, str] = {}
+        for node in root.iter():
+            if _local(node.tag) != "node":
+                continue
+            step = self._parse_node(node)
+            components[step.name] = step.source_type
+            if step.source_type == "tRunJob":
+                called[step.name] = step.properties.get("PROCESS", "") or step.name
+        if not called:
+            return []
+
+        edges: list[tuple[str, str, str]] = []
+        for conn in root.iter():
+            if _local(conn.tag) != "connection":
+                continue
+            kind = conn.get("connectorName", "")
+            if kind in self.ORCH_CONNECTORS:
+                edges.append((conn.get("source", ""), conn.get("target", ""), kind))
+
+        job = Job(name=self._job_name(path))
+        job.entries.append(JobEntry(name="Start", task_type="Start"))
+        for name, process in called.items():
+            entry = JobEntry(name=name, task_type="Session", mapping=process)
+            entry.notes.append(
+                f"tRunJob {name} calls job '{process}' - convert that job and "
+                "keep its .ktr beside this .kjb; context params become PDI "
+                "parameters")
+            job.entries.append(entry)
+
+        # connect tRunJobs through any intermediate components: BFS along the
+        # orchestration edges until the next tRunJob(s)
+        outgoing: dict[str, list[tuple[str, str]]] = {}
+        for src, dst, kind in edges:
+            outgoing.setdefault(src, []).append((dst, kind))
+        linked = set()
+        for source in called:
+            seen, frontier = {source}, [(source, "")]
+            while frontier:
+                current, first_kind = frontier.pop()
+                for dst, kind in outgoing.get(current, []):
+                    if dst in seen:
+                        continue
+                    seen.add(dst)
+                    label = first_kind or kind
+                    if dst in called:
+                        condition = ("Succeeded" if label.endswith("_OK")
+                                     else label)  # kjb maps 'Succeeded' -> follow-on-success
+                        job.hops.append(JobHop(from_entry=source, to_entry=dst,
+                                               condition=condition))
+                        linked.add(dst)
+                    else:
+                        frontier.append((dst, label))
+        # entries nothing links to start from START
+        for name in called:
+            if name not in linked:
+                job.hops.append(JobHop(from_entry="Start", to_entry=name,
+                                       condition=None))
+        return [job]
 
     def _job_name(self, path: str | Path) -> str:
         # process/<JobName>_<major>.<minor>.item -> JobName

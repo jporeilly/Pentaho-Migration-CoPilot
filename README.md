@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.30.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.31.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -353,11 +353,13 @@ Completed sources — Informatica PowerCenter and SAP Crystal Reports:
   one provider powers expression translation, Crystal formula assist, the
   schema-SQL chat, triage briefs, and per-step AI suggestions
 
-Outstanding — Talend completion:
-
-- [ ] Talend: core shipped in v1.10.0 (.item parser, 60+ component rules
-  validated against a 40-job real corpus, Java→JavaScript translation,
-  🤖 per-step AI suggestions) — production-completion pass outstanding
+- [x] Talend — production-complete: .item parser (TABLE params as structured
+  rows), **rules v3** (95 components; the remaining 28 manual corpus steps
+  are service hosts with no PDI equivalent — honestly flagged), real .ktr
+  configs for CSV input / text output / filter / sort / aggregate carried
+  from the .item, and **tRunJob orchestration → .kjb** with TRANS entries
+  wired to the called jobs' .ktr files (12 orchestration jobs in the corpus
+  convert)
 
 **Phase 2 — multi-source, next:**
 

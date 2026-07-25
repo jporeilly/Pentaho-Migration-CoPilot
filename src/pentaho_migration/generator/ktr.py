@@ -110,18 +110,21 @@ class KtrGenerator:
         step_el = Element("step")
         SubElement(step_el, "name").text = step.name
         SubElement(step_el, "type").text = pdi_type
+        SubElement(step_el, "distribute").text = "Y"
+        SubElement(step_el, "copies").text = "1"
+
+        if emitter := STEP_CONFIG_EMITTERS.get(pdi_type):
+            emitter(step, step_el, pipeline)  # may append step.notes
+
         description = [f"[confidence: {step.confidence.value}]", *step.notes]
         for expr in step.expressions:
             if expr.translated is None:
                 description.append(f"TODO expression [{expr.field}]: {expr.raw}")
             else:
                 description.append(f"translated [{expr.field}] — verify: {expr.raw}")
-        SubElement(step_el, "description").text = "\n".join(description)
-        SubElement(step_el, "distribute").text = "Y"
-        SubElement(step_el, "copies").text = "1"
-
-        if emitter := STEP_CONFIG_EMITTERS.get(pdi_type):
-            emitter(step, step_el, pipeline)
+        desc_el = Element("description")
+        desc_el.text = "\n".join(description)
+        step_el.insert(1, desc_el)  # right after <name> for readability
 
         gui = SubElement(step_el, "GUI")
         SubElement(gui, "xloc").text = str(100 + position * 200)
@@ -171,11 +174,45 @@ def _emit_table_output(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "use_batch").text = "Y"
 
 
+def _table_rows(step: Step, key: str) -> list[dict]:
+    """Talend TABLE params are stored as JSON rows by the parser."""
+    import json
+
+    raw = step.properties.get(key, "")
+    if raw.startswith("["):
+        try:
+            return json.loads(raw)
+        except ValueError:
+            pass
+    return []
+
+
+# PDI datatype names for text-file field configs (IR datatype -> PDI type).
+PDI_FIELD_TYPES = {
+    "string": "String",
+    "integer": "Integer",
+    "small integer": "Integer",
+    "bigint": "Integer",
+    "double": "Number",
+    "decimal": "BigNumber",
+    "date/time": "Date",
+}
+
+
 def _emit_sort_rows(step: Step, el: Element, pipeline: Pipeline) -> None:
     SubElement(el, "directory").text = "%%java.io.tmpdir%%"
     SubElement(el, "prefix").text = "out"
     SubElement(el, "sort_size").text = "1000000"
     fields = SubElement(el, "fields")
+    criteria = _table_rows(step, "CRITERIA")  # Talend tSortRow sort table
+    if criteria:
+        for row in criteria:
+            field = SubElement(fields, "field")
+            SubElement(field, "name").text = row.get("COLNAME", "")
+            SubElement(field, "ascending").text = (
+                "N" if row.get("ORDER", "asc").lower().startswith("desc") else "Y")
+            SubElement(field, "case_sensitive").text = "N"
+        return
     for f in step.fields:
         field = SubElement(fields, "field")
         SubElement(field, "name").text = f.name
@@ -183,7 +220,37 @@ def _emit_sort_rows(step: Step, el: Element, pipeline: Pipeline) -> None:
         SubElement(field, "case_sensitive").text = "N"
 
 
+# Talend aggregate FUNCTION values -> PDI Group By aggregate type codes.
+TALEND_AGGREGATES = {
+    "sum": "SUM", "count": "COUNT_ALL", "avg": "AVERAGE", "average": "AVERAGE",
+    "min": "MIN", "max": "MAX", "first": "FIRST", "last": "LAST",
+    "count_distinct": "COUNT_DISTINCT", "list": "CONCAT_COMMA",
+    "std_dev": "STD_DEV",
+}
+
+
 def _emit_group_by(step: Step, el: Element, pipeline: Pipeline) -> None:
+    groupbys = _table_rows(step, "GROUPBYS")     # Talend tAggregateRow tables
+    operations = _table_rows(step, "OPERATIONS")
+    if groupbys or operations:
+        SubElement(el, "all_rows").text = "N"
+        group = SubElement(el, "group")
+        for row in groupbys:
+            field = SubElement(group, "field")
+            SubElement(field, "name").text = row.get("INPUT_COLUMN", "")
+        fields = SubElement(el, "fields")
+        for row in operations:
+            func = row.get("FUNCTION", "").lower()
+            pdi_type = TALEND_AGGREGATES.get(func)
+            field = SubElement(fields, "field")
+            SubElement(field, "aggregate").text = row.get("OUTPUT_COLUMN", "")
+            SubElement(field, "subject").text = row.get("INPUT_COLUMN", "")
+            SubElement(field, "type").text = pdi_type or "COUNT_ALL"
+            if pdi_type is None:
+                step.notes.append(
+                    f"aggregate function {func!r} has no direct Group By type - "
+                    f"emitted COUNT_ALL for '{row.get('OUTPUT_COLUMN', '')}', fix in Spoon")
+        return
     SubElement(el, "all_rows").text = "N"
     expression_fields = {e.field for e in step.expressions}
     group = SubElement(el, "group")
@@ -353,6 +420,120 @@ def _emit_db_proc(step: Step, el: Element, pipeline: Pipeline) -> None:
         SubElement(arg, "type").text = PDI_DATATYPES.get(field.datatype.lower(), "String")
 
 
+def _talend_literal(step: Step, *keys: str, default: str = "") -> str:
+    for key in keys:
+        value = step.properties.get(key, "")
+        if value:
+            return _clean_java_string(value)
+    return default
+
+
+def _emit_csv_input(step: Step, el: Element, pipeline: Pipeline) -> None:
+    """tFileInputDelimited -> CSV file input, config carried from the .item:
+    filename, separator, enclosure, header, and the typed schema."""
+    SubElement(el, "filename").text = _talend_literal(step, "FILENAME", "FILENAMETEXT")
+    SubElement(el, "separator").text = _talend_literal(step, "FIELDSEPARATOR", default=";")
+    SubElement(el, "enclosure").text = _talend_literal(step, "TEXT_ENCLOSURE", default='"')
+    header = step.properties.get("HEADER", "0").strip('"')
+    SubElement(el, "header").text = "Y" if header not in ("", "0") else "N"
+    SubElement(el, "buffer_size").text = "50000"
+    SubElement(el, "lazy_conversion").text = "N"
+    SubElement(el, "add_filename_result").text = "N"
+    SubElement(el, "parallel").text = "N"
+    SubElement(el, "encoding").text = _talend_literal(step, "ENCODING", default="UTF-8")
+    fields = SubElement(el, "fields")
+    for f in step.fields:
+        field = SubElement(fields, "field")
+        SubElement(field, "name").text = f.name
+        SubElement(field, "type").text = PDI_FIELD_TYPES.get(f.datatype, "String")
+        SubElement(field, "length").text = "-1"
+        SubElement(field, "precision").text = "-1"
+        SubElement(field, "trim_type").text = "none"
+
+
+def _emit_text_file_output(step: Step, el: Element, pipeline: Pipeline) -> None:
+    """tFileOutputDelimited -> Text file output with the .item config."""
+    SubElement(el, "separator").text = _talend_literal(step, "FIELDSEPARATOR", default=";")
+    SubElement(el, "enclosure").text = _talend_literal(step, "TEXT_ENCLOSURE", default='"')
+    SubElement(el, "enclosure_forced").text = "N"
+    SubElement(el, "header").text = (
+        "Y" if step.properties.get("INCLUDEHEADER", "false") == "true" else "N")
+    SubElement(el, "footer").text = "N"
+    SubElement(el, "format").text = "DOS"
+    SubElement(el, "encoding").text = _talend_literal(step, "ENCODING", default="UTF-8")
+    SubElement(el, "append").text = (
+        "Y" if step.properties.get("APPEND", "false") == "true" else "N")
+    filename = SubElement(el, "file")
+    name = _talend_literal(step, "FILENAME")
+    stem, dot, ext = name.rpartition(".")
+    SubElement(filename, "name").text = stem if dot else name
+    SubElement(filename, "extention").text = ext if dot else "txt"
+    SubElement(filename, "add_date").text = "N"
+    SubElement(filename, "add_time").text = "N"
+    fields = SubElement(el, "fields")
+    for f in step.fields:
+        field = SubElement(fields, "field")
+        SubElement(field, "name").text = f.name
+        SubElement(field, "type").text = PDI_FIELD_TYPES.get(f.datatype, "String")
+        SubElement(field, "format").text = ""
+        SubElement(field, "length").text = "-1"
+        SubElement(field, "precision").text = "-1"
+
+
+# Talend filter operators -> PDI Filter rows functions.
+FILTER_OPERATORS = {
+    "==": "=", "!=": "<>", ">": ">", "<": "<", ">=": ">=", "<=": "<=",
+}
+
+
+def _emit_filter_rows(step: Step, el: Element, pipeline: Pipeline) -> None:
+    """tFilterRow simple conditions -> Filter rows condition tree. Advanced
+    (Java) mode stays a TODO in the step description; the true/false targets
+    are wired in Spoon (Talend FILTER/REJECT hops carry no PDI equivalent
+    metadata here)."""
+    conditions = _table_rows(step, "CONDITIONS")
+    if step.properties.get("USE_ADVANCED") == "true" or not conditions:
+        step.notes.append(
+            "tFilterRow uses advanced (Java) mode or has no simple conditions - "
+            "recreate the condition in Filter rows"
+            if step.properties.get("USE_ADVANCED") == "true"
+            else "tFilterRow carried no simple conditions - configure Filter rows in Spoon")
+        return
+    logical = "OR" if step.properties.get("LOGICAL_OP", "&&") == "||" else "AND"
+
+    def _condition_el(parent, row, operator=None):
+        cond = SubElement(parent, "condition")
+        SubElement(cond, "negation").text = "N"
+        if operator:
+            SubElement(cond, "operator").text = operator
+        SubElement(cond, "leftvalue").text = row.get("INPUT_COLUMN", "")
+        rvalue = row.get("RVALUE", "").strip()
+        if rvalue in ("null", "None", ""):
+            SubElement(cond, "function").text = (
+                "IS NULL" if row.get("OPERATOR") == "==" else "IS NOT NULL")
+            SubElement(cond, "rightvalue")
+            return
+        SubElement(cond, "function").text = FILTER_OPERATORS.get(
+            row.get("OPERATOR", "=="), "=")
+        value = SubElement(cond, "value")
+        SubElement(value, "name").text = "constant"
+        SubElement(value, "type").text = "String"
+        SubElement(value, "text").text = rvalue.strip('"')
+        SubElement(value, "isnull").text = "N"
+
+    compare = SubElement(el, "compare")
+    if len(conditions) == 1:
+        _condition_el(compare, conditions[0])
+    else:
+        outer = SubElement(compare, "condition")
+        SubElement(outer, "negation").text = "N"
+        for i, row in enumerate(conditions):
+            _condition_el(outer, row, operator=None if i == 0 else logical)
+    step.notes.append(
+        "Filter rows condition carried from tFilterRow - wire the true/false "
+        "target steps (Talend FILTER/REJECT flows) in Spoon")
+
+
 STEP_CONFIG_EMITTERS = {
     "TableInput": _emit_table_input,
     "TableOutput": _emit_table_output,
@@ -363,4 +544,7 @@ STEP_CONFIG_EMITTERS = {
     "StreamLookup": _emit_stream_lookup,
     "InsertUpdate": _emit_insert_update,
     "DBProc": _emit_db_proc,
+    "CsvInput": _emit_csv_input,
+    "TextFileOutput": _emit_text_file_output,
+    "FilterRows": _emit_filter_rows,
 }
