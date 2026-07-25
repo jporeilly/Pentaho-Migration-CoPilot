@@ -118,6 +118,12 @@ export default function ReportsFormulasPage({ summary, file, onUpdate }) {
                     <td>
                       {/* the PRD side: OpenFormula translation, or the report
                           function generated in the bundle */}
+                      {f.source === 'llm' && (
+                        <div className={`llm-chip conf-${f.llm_confidence}`}
+                             title="Translated by the local LLM — the confidence is the model's own estimate; always verify in PRD">
+                          ✨ LLM-translated · confidence: {f.llm_confidence}
+                        </div>
+                      )}
                       {f.prd && (
                         <div>
                           <code>{f.prd}</code>

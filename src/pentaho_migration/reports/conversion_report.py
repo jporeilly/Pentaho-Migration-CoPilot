@@ -69,6 +69,9 @@ def build_conversion_report(model, source_path, output_path):
                           + (f" — {notes}" if notes else ""))
             elif f.status == "manual":
                 detail = notes or "requires manual conversion"
+            elif f.source == "llm":
+                detail = (f"`{f.translation}` — ✨ LLM-translated, confidence "
+                          f"**{f.llm_confidence}**" + (f" — {notes}" if notes else ""))
             else:
                 detail = f"`{f.translation}`" + (f" — {notes}" if notes else "")
             detail = detail.replace("|", "\\|").replace("\n", " ")

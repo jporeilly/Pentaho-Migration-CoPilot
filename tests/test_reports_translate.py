@@ -53,7 +53,11 @@ def test_manual_formula_becomes_review():
     assert f.status == "review"
     assert f.translation == "=[AMOUNT] * 1"
     assert any("AI-translated" in n for n in f.notes)
-    assert any("LLM confidence: medium" in n for n in f.notes)
+    # provenance + confidence travel as structured fields (shown as a chip
+    # in the UI and in the conversion report), not buried in a note
+    assert f.source == "llm"
+    assert f.llm_confidence == "medium"
+    assert not any("LLM confidence" in n for n in f.notes)
     # the auto formulas were never sent to the LLM
     assert model.formulas["FullName"].status == "auto"
     # the pre-rewritten running total was never sent either

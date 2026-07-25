@@ -100,6 +100,8 @@ class Formula:
     rewrite_group: str = ""   # optional group scope for the rewritten function
     translation: str = ""     # OpenFormula text (with leading =) when translated
     status: str = "manual"    # auto | review | manual
+    source: str = "rules"     # rules | llm - who produced the translation
+    llm_confidence: str = ""  # the LLM's self-reported confidence (high/medium/low)
     notes: list = field(default_factory=list)
 
     def prd_target(self) -> str:

@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.20.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · Phase 0 complete · Phase 2: Talend shipped ·
+Version **1.20.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -203,7 +203,7 @@ chart, and a running balance rebuilt as a PRD report function.
 ## Tests & CI
 
 ```powershell
-.venv\Scripts\python -m pytest      # 187 tests, incl. docs-consistency enforcement
+.venv\Scripts\python -m pytest      # 214 tests, incl. docs-consistency enforcement
 ```
 
 GitHub Actions runs the suite and the frontend build on every push.
@@ -238,23 +238,34 @@ all mutating endpoints; uploads are capped at 50 MB.
 - [x] Workflow/Session → PDI Job (.kjb) conversion: sessions wired to sibling .ktr files, placeholders for unconvertible tasks, link conditions preserved
 - [x] PDF migration report (branded, per mapping)
 
-**Phase 2 — multi-source, in progress:**
+**Phase 1 — assisted product, in progress (you are here):**
 
-- [x] Talend (v1.10.0): .item parser, 60+ component rules validated against a 40-job
-  real corpus (versions 5.1 → 8.0.1), Java→JavaScript expression translation,
-  Talend impact knowledge, 🤖 per-step AI solution suggestions
-- [x] SAP Crystal Reports → PRD (v1.11 → 1.18): RptToXml parser, formula
-  translator with idiom rewrites, LLM assist, record-selection folding,
+Completed sources — Informatica PowerCenter and SAP Crystal Reports:
+
+- [x] SAP Crystal Reports → PRD (v1.11 → 1.20): RptToXml parser, formula
+  translator with idiom rewrites (running totals, aggregates, Select Case),
+  LLM assist with per-formula confidence, record-selection folding,
   Crystal-faithful layout, charts, engine round-trip validation, forked
   extractor, CSCU live-render demo ladder, and the agent trio: schema-aware
   SQL agent (live-database validation + grounded chat), layout QA agent
   (geometry lint + render verification), batch triage agent
   (per-report READY/REVIEW/BLOCKED verdicts over a whole corpus)
+
+Outstanding — Talend completion and known Informatica gaps:
+
+- [ ] Talend: core shipped in v1.10.0 (.item parser, 60+ component rules
+  validated against a 40-job real corpus, Java→JavaScript translation,
+  🤖 per-step AI suggestions) — production-completion pass outstanding
+- [ ] Informatica mapplets (currently a pre-migration warning, not converted)
+- [ ] Informatica workflow tasks beyond sessions — Email/Command tasks emit
+  labeled placeholders in the .kjb
+- [ ] Insert/Update key inference (keys are an explicit TODO in the step config)
+- [ ] Anthropic API provider (Ollama is the working provider today)
+
+**Phase 2 — multi-source, next:**
+
 - [ ] SSIS (.dtsx)
 - [ ] IBM DataStage (.dsx)
-
-**Phase 1** — assisted customer product packaging (multi-user, confidence scoring and
-mandatory review are already built) — sequenced after Phase 2 sources per demand.
 
 ## Project documents
 

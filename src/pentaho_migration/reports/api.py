@@ -40,6 +40,8 @@ class ReportFormula(BaseModel):
     status: str            # auto | review | manual
     translation: str = ""
     prd: str = ""          # PRD-side artifact: translation or generated function
+    source: str = "rules"  # rules | llm
+    llm_confidence: str = ""
     original: str = ""
     notes: list[str] = []
 
@@ -156,7 +158,9 @@ def _summarize(model, source_name: str) -> ReportSummary:
                 for el in s.elements])
             for s in model.sections],
         formulas=[ReportFormula(name=f.name, status=f.status, translation=f.translation,
-                                prd=f.prd_target(), original=f.text, notes=f.notes)
+                                prd=f.prd_target(), source=f.source,
+                                llm_confidence=f.llm_confidence,
+                                original=f.text, notes=f.notes)
                   for f in model.formulas.values()],
         todos=todos,
         effort=build_report_effort(model),

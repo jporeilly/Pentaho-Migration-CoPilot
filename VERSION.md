@@ -1,12 +1,11 @@
 # Version
 
-**1.20.0** — 2026-07-25
+**1.20.1** — 2026-07-25
 
-Phase 2 multi-source in progress — Talend + Crystal Reports shipped, with
-the agent trio (schema-aware SQL, layout QA, batch triage). New: **Select
-Case converts deterministically to nested IF()** (review-flagged PRD
-formula, honest manual fallback for ranges), and every review row now shows
-its **PRD-side artifact** — the OpenFormula translation or the generated
-report function (e.g. `RunningBalance = ItemSumFunction(field: AMOUNT)`) —
-in the UI and the conversion report, so there is always something concrete
-to review. See [CHANGELOG.md](CHANGELOG.md) for history.
+**Phase 1** — Informatica PowerCenter & SAP Crystal Reports complete;
+Talend in progress. This release: ✨ LLM-translated formulas carry an
+explicit provenance chip with the model's self-reported **confidence**
+(high / medium / low) in the UI and the conversion report, and the
+roadmap/phase messaging is corrected (Phase 1, not Phase 2 — Talend and
+several Informatica items remain open).
+See [CHANGELOG.md](CHANGELOG.md) for history.

@@ -7,9 +7,13 @@ untranslatable keeps its `manual` status, but gains the LLM's rebuild advice
 (e.g. "use ItemSumFunction") in its notes.
 """
 
+import re
+
 from pentaho_migration.ir import Expression
 from pentaho_migration.llm import ExpressionTranslator
 from pentaho_migration.reports.model import ReportModel
+
+_CONFIDENCE_RE = re.compile(r"^LLM confidence:\s*(\w+)$", re.IGNORECASE)
 
 
 def translate_manual_formulas(
@@ -30,9 +34,18 @@ def translate_manual_formulas(
         expr = Expression(field=formula.name, raw=formula.text, language="crystal")
         translator.translate(expr)
         llm_notes = [n for n in (expr.notes or "").split("; ") if n]
+        # confidence travels as a structured field, not a buried note
+        confidence = ""
+        for n in list(llm_notes):
+            m = _CONFIDENCE_RE.match(n)
+            if m:
+                confidence = m.group(1).lower()
+                llm_notes.remove(n)
         if expr.translated:
             formula.translation = "=" + expr.translated.lstrip("=")
             formula.status = "review"
+            formula.source = "llm"
+            formula.llm_confidence = confidence or "unknown"
             formula.notes = ["AI-translated — verify semantics in PRD", *llm_notes]
             translated += 1
         elif llm_notes:

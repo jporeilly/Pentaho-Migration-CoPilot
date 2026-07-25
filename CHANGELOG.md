@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.20.1] — 2026-07-25
+
+### Added
+
+- **LLM provenance + confidence, back and structured**: formulas translated
+  by ✨ AI-assist now carry `source: llm` and the model's self-reported
+  confidence as fields (parsed out of the note text). The Formulas page
+  shows a color-coded chip — *✨ LLM-translated · confidence: medium* —
+  (green high / amber medium / red low) and the conversion report row says
+  *✨ LLM-translated, confidence **medium***. Deterministic translations
+  stay unmarked: if there is no chip, rules produced it.
+
+### Changed
+
+- **Phase messaging corrected — this is Phase 1, not Phase 2**: Informatica
+  PowerCenter and SAP Crystal Reports are the completed sources; Talend's
+  core shipped but a production-completion pass is outstanding, and known
+  Informatica gaps are now listed honestly in the roadmap (mapplets,
+  Email/Command workflow tasks as placeholders, Insert/Update key
+  inference, Anthropic provider). README masthead, roadmap, and the
+  Upload-page phase strip all updated.
+
 ## [1.20.0] — 2026-07-25
 
 ### Added
