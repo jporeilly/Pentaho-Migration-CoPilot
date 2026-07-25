@@ -20,7 +20,7 @@ RUNGS = sorted(LADDER.glob("0*.xml"))
 
 
 def test_ladder_present():
-    assert len(RUNGS) == 7, "expected 7 ladder rungs"
+    assert len(RUNGS) == 8, "expected 8 ladder rungs"
 
 
 @pytest.mark.parametrize("dump", RUNGS, ids=lambda p: p.stem)
@@ -38,6 +38,19 @@ def test_rung_converts_to_valid_bundle(dump, tmp_path):
             ET.fromstring(zf.read(name))  # well-formed
     # the JNDI the report will use is the CSCU credit-union database
     assert "CSCU" in zf.read("datasources/sql-ds.xml").decode()
+
+    if any(el.subreport is not None
+           for s in model.sections for el in s.elements):
+        # nested sub-report bundle: child layout + mapping + manifest marker
+        sub_layout = zf.read("subreport/layout.xml").decode()
+        assert 'core:element-type="sub-report"' in sub_layout
+        dd = zf.read("subreport/datadefinition.xml").decode()
+        assert "<parameter-mapping>" in dd
+        manifest = zf.read("META-INF/manifest.xml").decode()
+        assert "application/vnd.pentaho.reporting.classic.subreport" in manifest
+        parent_layout = zf.read("layout.xml").decode()
+        assert '<sub-report href="/subreport/content.xml">' in parent_layout
+        assert "input-parameter master-fieldname" in parent_layout
 
 
 def test_ladder_exercises_increasing_complexity():
@@ -77,7 +90,14 @@ def test_ladder_exercises_increasing_complexity():
     assert ("visible", "=NOT([PRIN_BAL_AMT] = 0)") in detail_band.style_expressions
 
     sar = models["06_suspicious_activity"]
-    assert count_todos(sar) >= 2   # subreport + crosstab (embedded logo is migrated, not a TODO)
+    # the linked subreport now CONVERTS: child model attached, parent MBR_ID
+    # mapped to the sanitized Pm_ parameter, child WHERE folded
+    sub_el = next(el for s in sar.sections for el in s.elements if el.kind == "subreport")
+    assert sub_el.subreport is not None
+    assert sub_el.subreport_links == [("MBR_ID", "Pm_Command_MBR_ID")]
+    assert sub_el.subreport.record_selection_folded
+    assert "${Pm_Command_MBR_ID}" in sub_el.subreport.sql
+    assert count_todos(sar) >= 1   # the cross-tab honestly remains manual
 
     cards = models["07_card_program"]
     assert cards.groups[0].descending                       # group sort direction consumed
@@ -86,6 +106,21 @@ def test_ladder_exercises_increasing_complexity():
     assert statuses == {"CardAction": "review",   # Select Case multi-value -> IF/OR
                         "ExpiryWindow": "auto",   # in-range -> AND(>=;<=)
                         "Holder": "review"}       # local alias inlined
+
+    stress = models["08_stress_lab"]
+    assert len(stress.groups) == 3                          # incl. a formula group
+    assert stress.groups[2].condition_field == "{@Tier}"
+    subs = [el for s in stress.sections for el in s.elements if el.kind == "subreport"]
+    assert len(subs) == 3
+    two_link = next(el for el in subs if el.name == "TxnSub")
+    assert two_link.subreport_links == [("MBR_ID", "Pm_Command_MBR_ID"),
+                                        ("BR_ID", "Pm_Command_BR_ID")]
+    # engine boundary (verified live): sub-reports cannot live in page bands
+    page_sub = next(el for el in subs if el.name == "BranchSub")
+    assert page_sub.subreport is None
+    assert any("page band" in n for n in page_sub.notes)
+    # the folded prompt gains a query-backed pick-list
+    assert stress.param_sql_columns == {"TxnType": "t.txn_type_cd"}
 
 
 @pytest.mark.skipif(os.environ.get("CSCU_LIVE") != "1",

@@ -16,6 +16,7 @@ The XML shapes below were reverse-engineered from the sample reports that
 ship with Pentaho Report Designer CE (pentaho/pentaho-reporting on GitHub).
 """
 
+import re
 import zipfile
 from datetime import datetime
 from xml.sax.saxutils import escape, quoteattr
@@ -101,7 +102,7 @@ def _root_band(sections, element_type):
 
 # ---------------------------------------------------------------- layout.xml
 
-def build_layout_xml(model):
+def build_layout_xml(model, root_type="master-report"):
     def group_block(i):
         if i < len(model.groups):
             g = model.groups[i]
@@ -160,7 +161,7 @@ def build_layout_xml(model):
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<layout xmlns="{NS_LAYOUT}" xmlns:style="{NS_STYLE}" xmlns:core="{NS_CORE}" '
-        f'core:element-type="master-report" core:name={quoteattr(model.name)}>'
+        f'core:element-type="{root_type}" core:name={quoteattr(model.name)}>'
         "<style:element-style><style:text-styles font-face=\"Arial\"/></style:element-style>"
         f"<report-header>{_root_band(model.sections_of('ReportHeader'), 'report-header')}</report-header>"
         f"{group_xml}"
@@ -196,14 +197,29 @@ def build_styles_xml(model):
 
 # ------------------------------------------------------- datadefinition.xml
 
-def _parameter_xml(prm):
+def _parameter_xml(prm, lov_query=None):
     """A Crystal parameter -> PRD parameter. Multi-value or pick-list (LOV)
-    parameters become list-parameters; simple prompts stay plain textboxes.
+    parameters become list-parameters; a prompt whose record selection folded
+    against a known column becomes a QUERY-BACKED dropdown (SELECT DISTINCT
+    from the live database); simple prompts stay plain textboxes.
     Optional Crystal prompts map to mandatory=false."""
     jtype = PARAM_TYPE_MAP.get(prm.value_type, "java.lang.String")
     mandatory = "false" if prm.optional else "true"
     label = (f'<attribute namespace="{NS_PARAM}" name="label">'
              f'{escape(prm.prompt or prm.name)}</attribute>')
+    if lov_query and not prm.default_values:
+        default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
+        jtype_list = f"[L{jtype};" if prm.multi_value else jtype
+        render = "checkbox" if prm.multi_value else "dropdown"
+        return (
+            f'<list-parameter name={quoteattr(prm.name)} '
+            f'allow-multi-selection="{str(prm.multi_value).lower()}" '
+            f'strict-values="false" mandatory="{mandatory}" '
+            f'type={quoteattr(jtype_list)} query={quoteattr(lov_query)} '
+            f'key-column="LOV" value-column="LOV"{default}>'
+            f'{label}'
+            f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">{render}</attribute>'
+            "</list-parameter>")
     if prm.multi_value or prm.default_values:
         # a static pick-list built from the Crystal default-value list
         items = "".join(
@@ -230,12 +246,33 @@ def _parameter_xml(prm):
         f"</plain-parameter>")
 
 
-def build_datadefinition_xml(model):
+def _is_fieldless(cls):
+    """Row-count functions have no 'field' bean property (they count rows) -
+    the engine rejects the property outright. CountDistinct DOES take one."""
+    return cls.endswith(("ItemCountFunction", "TotalGroupCountFunction",
+                         "TotalItemCountFunction", "GroupCountFunction"))
+
+
+def build_datadefinition_xml(model, parameter_mappings=None):
+    """parameter_mappings: [(master_column, child_param)] for a subreport's
+    imported parameters - those arrive from the parent row, so they are
+    declared as mappings, not prompts."""
     parts = ['<?xml version="1.0" encoding="UTF-8"?>\n'
              f'<data-definition xmlns="{NS_DATA}">']
+    imported = set()
+    if parameter_mappings:
+        parts.append("<parameter-mapping>")
+        for master, alias in parameter_mappings:
+            imported.add(alias)
+            parts.append(f'<input-parameter name={quoteattr(master)} '
+                         f'alias={quoteattr(alias)}/>')
+        parts.append("</parameter-mapping>")
     parts.append("<parameter-definition>")
     for prm in model.parameters:
-        parts.append(_parameter_xml(prm))
+        if prm.name in imported:
+            continue  # supplied by the parent row, never prompted
+        lov = f"lov_{prm.name}" if prm.name in model.param_sql_columns else None
+        parts.append(_parameter_xml(prm, lov_query=lov))
     parts.append("</parameter-definition>")
     parts.append('<data-source report-query="default" limit="-1" timout="0" '
                  'ref="datasources/compound-ds.xml"/>')
@@ -245,7 +282,7 @@ def build_datadefinition_xml(model):
             # blocked Crystal idiom rewritten as a native PRD report function
             # (e.g. running-total variable -> ItemSumFunction); review-flagged
             props = []
-            if f.rewrite_field:
+            if f.rewrite_field and not _is_fieldless(f.rewrite_class):
                 props.append(f'<property name="field">{escape(f.rewrite_field)}</property>')
             if f.rewrite_group:
                 props.append(f'<property name="group">{escape(f.rewrite_group)}</property>')
@@ -261,7 +298,8 @@ def build_datadefinition_xml(model):
             continue
         from .rpt_parser import parse_field_ref
         _, column = parse_field_ref(s.field_ref)
-        props = [f'<property name="field">{escape(column)}</property>']
+        props = ([] if _is_fieldless(cls)
+                 else [f'<property name="field">{escape(column)}</property>'])
         if s.group_field:
             props.append(f'<property name="group">{escape(s.group_field)}</property>')
         parts.append(f"<expression name={quoteattr(s.expression_name)} class=\"{cls}\">"
@@ -290,8 +328,24 @@ def build_sql_ds_xml(model):
         '<data:query name="default"><data:static-query>'
         f"{escape(model.sql)}"
         "</data:static-query></data:query>"
-        "</data:query-definitions>"
+        + "".join(
+            f'<data:query name="lov_{escape(name)}"><data:static-query>'
+            f'{escape(_lov_sql(model, column))}'
+            "</data:static-query></data:query>"
+            for name, column in model.param_sql_columns.items())
+        + "</data:query-definitions>"
         "</data:sql-datasource>")
+
+
+def _lov_sql(model, column):
+    """Pick-list query for a folded prompt: SELECT DISTINCT the filtered
+    column over the report's own FROM clause (before WHERE/ORDER BY), so the
+    dropdown offers exactly the values the report can filter on."""
+    m = re.search(r"\bFROM\b(.*?)(?:\bWHERE\b|\bORDER\s+BY\b|\bGROUP\s+BY\b|$)",
+                  model.sql, flags=re.IGNORECASE | re.DOTALL)
+    from_clause = m.group(1).strip() if m else "TABLE"
+    return (f'SELECT DISTINCT {column} AS "LOV"\nFROM {from_clause}\n'
+            f"ORDER BY 1")
 
 
 def build_compound_ds_xml():
@@ -359,8 +413,27 @@ def _collect_images(model):
 
 # ------------------------------------------------------------------ bundle
 
+SUBREPORT_MIMETYPE = "application/vnd.pentaho.reporting.classic.subreport"
+
+
+def _collect_subreports(model):
+    """Assign each converted subreport its bundle directory (mutates
+    el.subreport_href so the layout can reference it) and return
+    [(dirname, element)]."""
+    subs, idx = [], 0
+    for section in model.sections:
+        for el in section.elements:
+            if el.kind == "subreport" and el.subreport is not None:
+                dirname = "subreport" if idx == 0 else f"subreport-{idx}"
+                el.subreport_href = f"/{dirname}/content.xml"
+                subs.append((dirname, el))
+                idx += 1
+    return subs
+
+
 def write_prpt(model, out_path):
     images = _collect_images(model)  # assigns resource paths before layout is built
+    subreports = _collect_subreports(model)  # assigns hrefs before layout is built
     docs = {
         "content.xml": CONTENT_XML,
         "layout.xml": build_layout_xml(model),
@@ -373,6 +446,20 @@ def write_prpt(model, out_path):
         "datasources/compound-ds.xml": build_compound_ds_xml(),
     }
     media = {name: "text/xml" for name in docs}
+    for dirname, el in subreports:
+        child = el.subreport
+        child_docs = {
+            f"{dirname}/content.xml": CONTENT_XML,
+            f"{dirname}/layout.xml": build_layout_xml(child, root_type="sub-report"),
+            f"{dirname}/styles.xml": build_styles_xml(child),
+            f"{dirname}/datadefinition.xml": build_datadefinition_xml(
+                child, parameter_mappings=el.subreport_links),
+            f"{dirname}/datasources/sql-ds.xml": build_sql_ds_xml(child),
+            f"{dirname}/datasources/compound-ds.xml": build_compound_ds_xml(),
+        }
+        docs.update(child_docs)
+        media.update({name: "text/xml" for name in child_docs})
+        media[f"/{dirname}/"] = SUBREPORT_MIMETYPE  # marks the nested bundle
     for path, data in images.items():
         media[path] = "image/png" if path.endswith(".png") else "image/jpeg"
     manifest = build_manifest_xml(media)

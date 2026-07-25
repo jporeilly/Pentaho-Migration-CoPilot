@@ -1,6 +1,6 @@
 # CSCU Crystal Reports demo set (cr_demo)
 
-Seven authored RptToXml dumps of **increasing complexity**, all backed by the
+Eight authored RptToXml dumps of **increasing complexity**, all backed by the
 live `cscu_core` credit-union schema so each one **converts and renders
 end-to-end** against the real database. This is the pipeline's golden-path
 regression and demo set; the 150-file GitHub corpus (`samples/crystal/real/`)
@@ -17,8 +17,9 @@ Regenerate with `python samples/cr_demo/build_ladder.py`.
 | 3 | Transaction Register **- Formulas** | multi-join via `accounts`, translated formulas | formulas auto |
 | 4 | Member Statement **- Nested Groups & Running Total** | parameter, nested groups | running total → **generated ItemSumFunction** (review) |
 | 5 | Loan Portfolio **- Conditional Formatting** | conditional font color → **paint style expression** (delinquent = red, live), conditional suppression → **visible expression** (paid-off rows hidden, live), StdDev aggregate | StdDev flagged honestly |
-| 6 | Suspicious Activity **- Subreport & Cross-tab** | subreport, cross-tab | two TODO placeholders |
+| 6 | Suspicious Activity **- Subreport & Cross-tab** | **linked subreport → nested PRD sub-report** (member KYC history filtered per row, live), cross-tab | cross-tab stays TODO |
 | 7 | Card Program Review **- Select Case, Ranges & Sorts** | multi-value Select Case → IF/OR, `in a to b` range, local-alias inlining, **descending group + record sorts** | all deterministic (auto/review) |
+| 8 | Stress Lab **- Boundaries** | 3 nested groups (one on a formula), **two-field-linked subreport**, complex child (own group + summary + cond. format), page-band subreport (engine-forbidden → TODO), query-backed pick-list, full formula zoo | maps the boundaries — see [docs/CRYSTAL-COVERAGE.md](../../docs/CRYSTAL-COVERAGE.md) |
 
 The flagship UI sample **Branch Transaction Summary - Prompt**
 (`../crystal/branch_transactions.xml`) demonstrates the working parameter

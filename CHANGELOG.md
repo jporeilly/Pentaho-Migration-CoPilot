@@ -7,6 +7,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.22.0] — 2026-07-25
+
+### Added
+
+- **Subreports convert into nested PRD sub-report bundles.** RptToXml dumps
+  carry the full child report definitions; the parser now recurses into
+  `<SubReports>` (detached first, so child tables/formulas never leak into
+  the parent), runs each child through the complete pipeline (formula
+  translation, SQL generation, WHERE folding), and the writer emits the
+  nested bundle exactly as PRD's own samples do: `subreport/layout.xml`
+  (root `element-type="sub-report"`), `parameter-mapping` in the child's
+  data definition, the subreport manifest media-type, and a
+  `<sub-report href>` element with `input-parameter` mappings in the parent
+  band. Crystal's `Pm-<field>` linked parameters are sanitized to PRD-safe
+  names and rewritten through the child's record selection, which then folds
+  to a parameterized `WHERE`. **Live-verified**: the SAR demo's per-member
+  KYC history filters correctly row by row; a two-field link (member AND
+  branch) also verified. Corpus impact: TODO placeholders drop 176 → 133.
+- **Visual table links → real JOINs**: linked-tables reports (no SQL
+  command) now generate `JOIN ... ON` from the Database Expert's links
+  instead of a cross join.
+- **Query-backed parameter pick-lists**: a prompt whose record selection
+  folded against a known column becomes a PRD dropdown backed by
+  `SELECT DISTINCT <col>` over the report's own FROM clause — converted
+  prompts offer real values from the live database.
+- **Stress Lab (demo rung 8)** — deliberate boundary hunting, every finding
+  verified against the real engine and documented in
+  docs/CRYSTAL-COVERAGE.md: (1) count functions have no `field` property —
+  writer fixed to emit them fieldless; (2) sub-reports in page bands make
+  the engine throw — the converter now guards them into honest TODOs;
+  (3) mandatory prompts without defaults block headless rendering;
+  (4) formula groups render in data order; (5) group-scoped summaries
+  referenced outside their group show the last group's value.
+- **`report-classify`**: classifies a corpus by migration feature into
+  `by-feature/` folders (a multi-feature report appears in each) with a
+  generated README index — pick real-world demo reports by feature
+  (this corpus: 22 with subreports, 35 with conditional formatting,
+  12 with cross-tabs, ...).
+- Formula stragglers: `DateSerial(y,m,d)` → `DATE(y;m;d)`;
+  `DateAdd("d", n, date)` → date arithmetic (other intervals honestly
+  manual).
+
 ## [1.21.1] — 2026-07-25
 
 ### Added

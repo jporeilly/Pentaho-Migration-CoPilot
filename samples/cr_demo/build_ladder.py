@@ -106,10 +106,12 @@ _NAME_TO_FILE = {}
 
 
 def build(name, filename, sql, fields, *, groups=None, formulas=None, params=None,
-          summaries=None, record_selection=None, sorts=None, areas):
-    _NAME_TO_FILE[name] = filename
-    p = [f'<?xml version="1.0" encoding="utf-8"?>',
-         f'<Report Name={quoteattr(name)} FileName={quoteattr(name + ".rpt")} HasSavedData="False">']
+          summaries=None, record_selection=None, sorts=None, subreports=None, areas):
+    """Emit one Report. filename=None returns the bare <Report> XML instead of
+    writing a file - used to nest a report inside a parent's <SubReports>."""
+    p = [f'<Report Name={quoteattr(name)} FileName={quoteattr(name + ".rpt")} HasSavedData="False">']
+    if subreports:
+        p.append("<SubReports>" + "".join(subreports) + "</SubReports>")
     fx = "".join(f'<Field Name="{c}" ValueType="{vt}"/>' for c, vt in fields)
     p.append('<Database><Tables>'
              '<Table Name="Command" Alias="Command" ClassName="CommandTable">'
@@ -118,7 +120,10 @@ def build(name, filename, sql, fields, *, groups=None, formulas=None, params=Non
     dd = ['<DataDefinition>']
     if record_selection:
         dd.append(f'<RecordSelectionFormula>{escape(record_selection)}</RecordSelectionFormula>')
-    dd.append('<Groups>' + "".join(f'<Group ConditionField="{{Command.{g}}}"/>' for g in (groups or [])) + '</Groups>')
+    dd.append('<Groups>' + "".join(
+        (f'<Group ConditionField="{{{g}}}"/>' if g.startswith("@")
+         else f'<Group ConditionField="{{Command.{g}}}"/>')
+        for g in (groups or [])) + '</Groups>')
     dd.append('<SortFields>' + "".join(
         f'<SortField Field={quoteattr(fld)} SortDirection="{d}" SortType="{st}"/>'
         for fld, d, st in (sorts or [])) + '</SortFields>')
@@ -138,7 +143,12 @@ def build(name, filename, sql, fields, *, groups=None, formulas=None, params=Non
     p.append('<PrintOptions PaperOrientation="Landscape" PaperSize="PaperA4">'
              '<PageMargins topMargin="360" leftMargin="360" bottomMargin="360" rightMargin="360"/></PrintOptions>')
     p.append(f'<ReportDefinition><Areas>{"".join(areas)}</Areas></ReportDefinition></Report>')
-    (OUT / filename).write_text("".join(p), encoding="utf-8")
+    xml = "".join(p)
+    if filename:
+        _NAME_TO_FILE[name] = filename
+        (OUT / filename).write_text('<?xml version="1.0" encoding="utf-8"?>' + xml,
+                                    encoding="utf-8")
+    return xml
 
 
 # ---- shared professional bands ----------------------------------------------
@@ -374,24 +384,42 @@ def r6():
             ("Activity", "{Command.ACTIVITY_TYPE_CD}", 150, None, "StringField"),
             ("Amount", "{Command.SAR_AMT}", 120, "RightAlign", "CurrencyField"),
             ("Status", "{Command.SAR_STATUS}", 120, None, "StringField")]
-    extra = ['<SubreportObject Name="NarrativeSub" SubreportName="sar_narrative" '
-             f'Left="0" Top="{17*TW}" Width="{806*TW}" Height="{36*TW}"/>']
+    # linked subreport: the member's KYC history, filtered by the parent row's
+    # MBR_ID through Crystal's Pm-<field> linked-parameter convention
+    kyc = build("sar_kyc", None,
+                'SELECT k.mbr_id AS "MBR_ID", k.review_dt AS "REVIEW_DT",\n'
+                '       k.risk_rating_cd AS "RISK_RATING_CD", k.kyc_status AS "KYC_STATUS"\n'
+                'FROM cscu_core.kyc_reviews k',
+                [("MBR_ID","NumberField"),("REVIEW_DT","DateField"),
+                 ("RISK_RATING_CD","StringField"),("KYC_STATUS","StringField")],
+                params=[("Pm-Command.MBR_ID","NumberField","","")],
+                record_selection="{Command.MBR_ID} = {?Pm-Command.MBR_ID}",
+                areas=[section("ReportHeader", "KH", 14, [
+                           text("KycLbl", "KYC review history", 20, 0, 200, 12,
+                                size=8, bold=True, color=SLATE)]),
+                       section("Detail", "KD", 13, [
+                           field("k_dt", "{Command.REVIEW_DT}", 20, 0, 110, 12, size=8, color=INK),
+                           field("k_risk", "{Command.RISK_RATING_CD}", 140, 0, 120, 12, size=8, color=INK),
+                           field("k_status", "{Command.KYC_STATUS}", 270, 0, 140, 12, size=8, color=INK)])])
+    extra = ['<SubreportObject Name="KycSub" SubreportName="sar_kyc" '
+             f'Left="0" Top="{17*TW}" Width="{500*TW}" Height="{30*TW}"/>']
     rf = section("ReportFooter", "RF", 60, [
         box("PivotBar", 0, 0, 806, 1, GOLD),
         '<CrossTabObject Name="ActivityPivot" Left="0" Top="200" Width="8060" Height="1000"/>',
         text("Note", "Activity type x status pivot (rebuild as PRD crosstab)", 0, 4, 500, 14,
              size=8, color=SLATE)])
     build("Suspicious Activity - Subreport & Cross-tab", "06_suspicious_activity.xml",
-          'SELECT s.filed_dt AS "FILED_DT", m.first_nm AS "FIRST_NM", m.last_nm AS "LAST_NM",\n'
-          '       s.activity_type_cd AS "ACTIVITY_TYPE_CD", s.sar_amt AS "SAR_AMT",\n'
-          '       s.sar_status AS "SAR_STATUS", s.narrative_txt AS "NARRATIVE_TXT"\n'
+          'SELECT s.mbr_id AS "MBR_ID", s.filed_dt AS "FILED_DT", m.first_nm AS "FIRST_NM",\n'
+          '       m.last_nm AS "LAST_NM", s.activity_type_cd AS "ACTIVITY_TYPE_CD",\n'
+          '       s.sar_amt AS "SAR_AMT", s.sar_status AS "SAR_STATUS", s.narrative_txt AS "NARRATIVE_TXT"\n'
           'FROM cscu_core.suspicious_activity s JOIN cscu_core.members m ON m.mbr_id = s.mbr_id\n'
           'ORDER BY s.filed_dt',
-          [("FILED_DT","DateField"),("FIRST_NM","StringField"),("LAST_NM","StringField"),
-           ("ACTIVITY_TYPE_CD","StringField"),("SAR_AMT","CurrencyField"),
+          [("MBR_ID","NumberField"),("FILED_DT","DateField"),("FIRST_NM","StringField"),
+           ("LAST_NM","StringField"),("ACTIVITY_TYPE_CD","StringField"),("SAR_AMT","CurrencyField"),
            ("SAR_STATUS","StringField"),("NARRATIVE_TXT","StringField")],
           formulas=[("FullName","StringField","{Command.FIRST_NM} + ' ' + {Command.LAST_NM}")],
-          areas=[masthead("Suspicious Activity Report (SAR)", "Demo: subreport, image and cross-tab TODO placeholders"),
+          subreports=[kyc],
+          areas=[masthead("Suspicious Activity Report (SAR)", "Demo: linked subreport and cross-tab TODO"),
                  column_header(cols), detail(cols, extra), rf, page_footer()])
 
 
@@ -434,6 +462,109 @@ def r7():
           areas=[masthead("Card Program Review", "Demo: Select Case, ranges, alias inlining and sort directions"),
                  column_header(cols), group_header("{Command.CARD_TYPE_CD}"),
                  detail(cols), page_footer()])
+
+
+def r8():
+    """Rung 8 - the STRESS LAB: deliberately stacks complexity to map the
+    converter's boundaries. Three nested groups (one on a FORMULA - a known
+    boundary for generated ORDER BY), a linked subreport in a group footer
+    whose child has its own group + summary + conditional formatting, a
+    second subreport with TWO link fields, an unlinked subreport in the
+    PAGE footer (PRD forbids subreports in page bands - boundary), the full
+    formula zoo, and a multi-value prompt."""
+    # child 1: member KYC history WITH its own group + summary + cond. format
+    kyc = build("stress_kyc", None,
+                'SELECT k.mbr_id AS "MBR_ID", k.review_dt AS "REVIEW_DT",\n'
+                '       k.risk_rating_cd AS "RISK_RATING_CD", k.kyc_status AS "KYC_STATUS"\n'
+                'FROM cscu_core.kyc_reviews k',
+                [("MBR_ID","NumberField"),("REVIEW_DT","DateField"),
+                 ("RISK_RATING_CD","StringField"),("KYC_STATUS","StringField")],
+                groups=["RISK_RATING_CD"],
+                summaries=[("Count of KYC_ID","Count","MBR_ID","RISK_RATING_CD")],
+                formulas=[("RiskTag","StringField",
+                           'Select {Command.RISK_RATING_CD} Case "HIGH": "!" Default: ""')],
+                params=[("Pm-Command.MBR_ID","NumberField","","")],
+                record_selection="{Command.MBR_ID} = {?Pm-Command.MBR_ID}",
+                areas=[section("GroupHeader", "KGH", 13, [
+                           field("kg", "{Command.RISK_RATING_CD}", 20, 0, 150, 12, size=8, bold=True, color=SLATE)]),
+                       section("Detail", "KD", 12, [
+                           field("kd1", "{Command.REVIEW_DT}", 40, 0, 100, 11, size=8, color=INK),
+                           field("kd2", "{Command.KYC_STATUS}", 150, 0, 120, 11, size=8, color=INK),
+                           field("kd3", "{@RiskTag}", 280, 0, 20, 11, size=8, color=INK)])])
+    # child 2: transactions for the member AT a branch - TWO link fields
+    txns = build("stress_txns", None,
+                 'SELECT a.mbr_id AS "MBR_ID", a.br_id AS "BR_ID", t.txn_dt AS "TXN_DT",\n'
+                 '       t.txn_amt AS "TXN_AMT"\n'
+                 'FROM cscu_core.transactions t JOIN cscu_core.accounts a ON a.acct_id = t.acct_id',
+                 [("MBR_ID","NumberField"),("BR_ID","NumberField"),
+                  ("TXN_DT","DateField"),("TXN_AMT","CurrencyField")],
+                 params=[("Pm-Command.MBR_ID","NumberField","",""),
+                         ("Pm-Command.BR_ID","NumberField","","")],
+                 record_selection="{Command.MBR_ID} = {?Pm-Command.MBR_ID} and {Command.BR_ID} = {?Pm-Command.BR_ID}",
+                 areas=[section("Detail", "TD", 12, [
+                            field("td1", "{Command.TXN_DT}", 40, 0, 100, 11, size=8, color=INK),
+                            field("td2", "{Command.TXN_AMT}", 150, 0, 110, 11, size=8,
+                                  align="RightAlign", color=INK)])])
+    # child 3: unlinked branch directory - goes in the PAGE footer (boundary)
+    branches = build("stress_branches", None,
+                     'SELECT b.br_name AS "BR_NAME" FROM cscu_core.branches b',
+                     [("BR_NAME","StringField")],
+                     areas=[section("Detail", "BD", 11, [
+                                field("bd1", "{Command.BR_NAME}", 0, 0, 200, 10, size=7, color=SLATE)])])
+    cols = [("Date", "{Command.TXN_DT}", 100, None, "DateField"),
+            ("Member", "{@FullName}", 160, None, "StringField"),
+            ("Type", "{Command.TXN_TYPE_CD}", 90, None, "StringField"),
+            ("Amount", "{Command.TXN_AMT}", 110, "RightAlign", "CurrencyField"),
+            ("Tier", "{@Tier}", 110, None, "StringField"),
+            ("Flag", "{@BigTxn}", 80, None, "StringField"),
+            ("Bal", "{@RunBal}", 110, "RightAlign", "NumberField")]
+    gf2 = section("GroupFooter", "SGF2", 34, [
+        text("KycHdr", "Member due diligence:", 20, 2, 200, 12, size=8, bold=True, color=NAVY),
+        f'<SubreportObject Name="KycSub" SubreportName="stress_kyc" Left="{20*TW}" Top="{14*TW}" Width="{380*TW}" Height="{18*TW}"/>',
+        f'<SubreportObject Name="TxnSub" SubreportName="stress_txns" Left="{420*TW}" Top="{14*TW}" Width="{380*TW}" Height="{18*TW}"/>'])
+    pf = section("PageFooter", "SPF", 30, [
+        text("pfl", "Branch directory:", 0, 2, 120, 10, size=7, color=SLATE),
+        f'<SubreportObject Name="BranchSub" SubreportName="stress_branches" Left="{130*TW}" Top="0" Width="{300*TW}" Height="{28*TW}"/>'])
+    build("Stress Lab - Boundaries", "08_stress_lab.xml",
+          'SELECT b.br_name AS "BR_NAME", m.mbr_id AS "MBR_ID", a.br_id AS "BR_ID",\n'
+          '       m.mbr_no AS "MBR_NO", m.first_nm AS "FIRST_NM", m.last_nm AS "LAST_NM",\n'
+          '       t.txn_dt AS "TXN_DT", t.txn_type_cd AS "TXN_TYPE_CD", t.txn_amt AS "TXN_AMT"\n'
+          'FROM cscu_core.transactions t\n'
+          'JOIN cscu_core.accounts a ON a.acct_id = t.acct_id\n'
+          'JOIN cscu_core.members  m ON m.mbr_id = a.mbr_id\n'
+          'JOIN cscu_core.branches b ON b.br_id = a.br_id\n'
+          'ORDER BY b.br_name, m.mbr_no, t.txn_dt',
+          [("BR_NAME","StringField"),("MBR_ID","NumberField"),("BR_ID","NumberField"),
+           ("MBR_NO","StringField"),("FIRST_NM","StringField"),("LAST_NM","StringField"),
+           ("TXN_DT","DateField"),("TXN_TYPE_CD","StringField"),("TXN_AMT","CurrencyField")],
+          groups=["BR_NAME", "MBR_NO", "@Tier"],   # group ON A FORMULA = boundary
+          params=[("TxnType","StringField","Transaction type","POS")],
+          record_selection="{Command.TXN_TYPE_CD} = {?TxnType}",
+          summaries=[("Sum of TXN_AMT","Sum","TXN_AMT","MBR_NO"),
+                     ("Grand Total TXN_AMT","Sum","TXN_AMT",None),
+                     ("StdDev of TXN_AMT","StdDeviation","TXN_AMT","BR_NAME")],
+          formulas=[("FullName","StringField","{Command.FIRST_NM} + ' ' + {Command.LAST_NM}"),
+                    ("Tier","StringField",
+                     'Select {Command.TXN_AMT}\nCase 0 To 500: "Retail"\nCase Is > 5000: "Large"\nDefault: "Mid"'),
+                    ("BigTxn","StringField",
+                     'If {Command.TXN_AMT} in 5000 to 20000 Then "check" Else ""'),
+                    ("RunBal","NumberField",
+                     "WhilePrintingRecords;\nShared NumberVar rb;\nrb := rb + {Command.TXN_AMT};\nrb"),
+                    ("Impossible","StringField",
+                     'Local StringVar a;\nLocal StringVar b;\nb := "x";\na := {Command.TXN_TYPE_CD} + b;\na')],
+          subreports=[kyc, txns, branches],
+          areas=[masthead("Stress Lab", "Demo: boundary hunting - nested groups, multi-link subreports, page-band subreport"),
+                 column_header(cols),
+                 section("GroupHeader", "SGH1", 20, [
+                     box("g1bar", 0, 0, 806, 18, LIGHT),
+                     field("g1", "{Command.BR_NAME}", 6, 2, 400, 15, size=10, bold=True, color=NAVY)]),
+                 section("GroupHeader", "SGH2", 16, [
+                     field("g2", "{@FullName}", 20, 1, 300, 14, size=9, bold=True, color=SLATE)]),
+                 section("GroupHeader", "SGH3", 13, [
+                     field("g3", "{@Tier}", 40, 0, 200, 12, size=8, color=GOLD)]),
+                 detail(cols), gf2,
+                 totals_footer("ReportFooter", "SRF", "Grand total:", "{#Grand Total TXN_AMT}", big=True),
+                 pf])
 
 
 def flagship():
@@ -493,7 +624,7 @@ def flagship():
 
 
 if __name__ == "__main__":
-    for fn in (r1, r2, r3, r4, r5, r6, r7):
+    for fn in (r1, r2, r3, r4, r5, r6, r7, r8):
         fn()
     flagship()
     for f in sorted(OUT.glob("0*.xml")):

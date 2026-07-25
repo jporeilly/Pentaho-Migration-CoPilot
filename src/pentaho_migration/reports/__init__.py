@@ -28,9 +28,7 @@ __all__ = [
 ]
 
 
-def load_report_model(source: str | Path, jndi: str | None = None) -> ReportModel:
-    """Parse an RptToXml dump and run formula translation — the full read side."""
-    model = parse_rpttoxml(source)
+def _finish_model(model: ReportModel, jndi: str | None) -> None:
     if jndi:
         model.jndi = jndi
     translate_all(model)
@@ -39,4 +37,13 @@ def load_report_model(source: str | Path, jndi: str | None = None) -> ReportMode
         model.sql_generated = True
     from pentaho_migration.reports.record_selection import try_fold_record_selection
     try_fold_record_selection(model)
+
+
+def load_report_model(source: str | Path, jndi: str | None = None) -> ReportModel:
+    """Parse an RptToXml dump and run formula translation — the full read side.
+    Subreport definitions run through the same pipeline recursively."""
+    model = parse_rpttoxml(source)
+    _finish_model(model, jndi)
+    for child in model.subreports.values():
+        _finish_model(child, jndi)
     return model

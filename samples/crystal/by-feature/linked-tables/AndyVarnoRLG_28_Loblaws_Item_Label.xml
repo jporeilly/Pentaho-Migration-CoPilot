@@ -1,0 +1,958 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\AndyVarnoRLG_28_Loblaws_Item_Label.rpt" HasSavedData="True">
+  <Embedinfo />
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="4920" PageContentWidth="7920" PaperOrientation="Portrait" PaperSize="256" PaperSource="FormSource" PrinterDuplex="Simplex" PrinterName="">
+    <PageMargins bottomMargin="360" leftMargin="360" rightMargin="360" topMargin="480" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks>
+      <TableLink JoinType="LeftOuter">
+        <SourceFields>
+          <Field FormulaName="{PM_Item1.CompNum}" Kind="DatabaseField" Name="CompNum" NumberOfBytes="4" ValueType="Int32sField" />
+          <Field FormulaName="{PM_Item1.ItemCode}" Kind="DatabaseField" Name="ItemCode" NumberOfBytes="102" ValueType="StringField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{PV_ItemCustomers1.CompNum}" Kind="DatabaseField" Name="CompNum" NumberOfBytes="4" ValueType="Int32sField" />
+          <Field FormulaName="{PV_ItemCustomers1.ItemCode}" Kind="DatabaseField" Name="ItemCode" NumberOfBytes="102" ValueType="StringField" />
+        </DestinationFields>
+      </TableLink>
+    </TableLinks>
+    <Tables>
+      <Table Alias="PM_Item1" ClassName="CrystalReports.Table" Name="PM_Item">
+        <ConnectionInfo Database_DLL="crdb_odbc.dll" QE_DatabaseName="" QE_DatabaseType="ODBC (RDO)" QE_LogonProperties="" QE_ServerDescription="Vision" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{PM_Item1.ItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.ItemCode" Name="ItemCode" ShortName="ItemCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.ItemDesc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4002" LongName="PM_Item1.ItemDesc" Name="ItemDesc" ShortName="ItemDesc" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.LastUserCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.LastUserCode" Name="LastUserCode" ShortName="LastUserCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.ItemGroupCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.ItemGroupCode" Name="ItemGroupCode" ShortName="ItemGroupCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ItemTypeCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.ItemTypeCode" Name="ItemTypeCode" ShortName="ItemTypeCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TableRecId}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.TableRecId" Name="TableRecId" ShortName="TableRecId" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.UnitCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.UnitCode" Name="UnitCode" ShortName="UnitCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ClassId}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ClassId" Name="ClassId" ShortName="ClassId" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.IssueToJob}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.IssueToJob" Name="IssueToJob" ShortName="IssueToJob" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.GSM}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.GSM" Name="GSM" ShortName="GSM" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.caliper}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.caliper" Name="caliper" ShortName="caliper" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.WetWeight}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.WetWeight" Name="WetWeight" ShortName="WetWeight" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.VolumeRatio}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.VolumeRatio" Name="VolumeRatio" ShortName="VolumeRatio" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.UnitStandard}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.UnitStandard" Name="UnitStandard" ShortName="UnitStandard" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ItemShortDesc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PM_Item1.ItemShortDesc" Name="ItemShortDesc" ShortName="ItemShortDesc" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.Depth}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Depth" Name="Depth" ShortName="Depth" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ReqGroupCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.ReqGroupCode" Name="ReqGroupCode" ShortName="ReqGroupCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.OutsideDiam}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.OutsideDiam" Name="OutsideDiam" ShortName="OutsideDiam" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Purchased}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.Purchased" Name="Purchased" ShortName="Purchased" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Produced}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.Produced" Name="Produced" ShortName="Produced" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Issued}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.Issued" Name="Issued" ShortName="Issued" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Sold}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.Sold" Name="Sold" ShortName="Sold" Type="crFieldValueTypeBooleanField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.CompNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CompNum" Name="CompNum" ShortName="CompNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DimA}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.DimA" Name="DimA" ShortName="DimA" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.DimB}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.DimB" Name="DimB" ShortName="DimB" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.DimC}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.DimC" Name="DimC" ShortName="DimC" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FixedCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.FixedCost" Name="FixedCost" ShortName="FixedCost" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.AutoActual}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.AutoActual" Name="AutoActual" ShortName="AutoActual" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.est-kitemkey}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.est-kitemkey" Name="est-kitemkey" ShortName="est-kitemkey" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.AutoRequisition}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.AutoRequisition" Name="AutoRequisition" ShortName="AutoRequisition" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.EstimateUse}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.EstimateUse" Name="EstimateUse" ShortName="EstimateUse" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DimFormat}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.DimFormat" Name="DimFormat" ShortName="DimFormat" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Length}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Length" Name="Length" ShortName="Length" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Width}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Width" Name="Width" ShortName="Width" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.InsideDiam}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.InsideDiam" Name="InsideDiam" ShortName="InsideDiam" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.BW}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.BW" Name="BW" ShortName="BW" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.BWCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.BWCode" Name="BWCode" ShortName="BWCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ImagePath}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="PM_Item1.ImagePath" Name="ImagePath" ShortName="ImagePath" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CustCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.CustCode" Name="CustCode" ShortName="CustCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CustItemRef}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PM_Item1.CustItemRef" Name="CustItemRef" ShortName="CustItemRef" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ProdGroupCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="PM_Item1.ProdGroupCode" Name="ProdGroupCode" ShortName="ProdGroupCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.SetItem}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.SetItem" Name="SetItem" ShortName="SetItem" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ItemLink}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ItemLink" Name="ItemLink" ShortName="ItemLink" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterItemNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MasterItemNum" Name="MasterItemNum" ShortName="MasterItemNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterEstimateCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.MasterEstimateCode" Name="MasterEstimateCode" ShortName="MasterEstimateCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterEstimateRoute}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.MasterEstimateRoute" Name="MasterEstimateRoute" ShortName="MasterEstimateRoute" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterEstimateSeq}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MasterEstimateSeq" Name="MasterEstimateSeq" ShortName="MasterEstimateSeq" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterEstCopySize}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.MasterEstCopySize" Name="MasterEstCopySize" ShortName="MasterEstCopySize" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterEstNumbAcross}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MasterEstNumbAcross" Name="MasterEstNumbAcross" ShortName="MasterEstNumbAcross" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.WeightUnitCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.WeightUnitCode" Name="WeightUnitCode" ShortName="WeightUnitCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.WeightPer}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.WeightPer" Name="WeightPer" ShortName="WeightPer" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Density}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Density" Name="Density" ShortName="Density" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.SolidsPercent}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.SolidsPercent" Name="SolidsPercent" ShortName="SolidsPercent" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Weight}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Weight" Name="Weight" ShortName="Weight" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Absorption}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Absorption" Name="Absorption" ShortName="Absorption" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MinimumChargeQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.MinimumChargeQty" Name="MinimumChargeQty" ShortName="MinimumChargeQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MinimumChargeUnit}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.MinimumChargeUnit" Name="MinimumChargeUnit" ShortName="MinimumChargeUnit" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.RoundQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.RoundQty" Name="RoundQty" ShortName="RoundQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.HandlingCharge}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.HandlingCharge" Name="HandlingCharge" ShortName="HandlingCharge" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CostCatNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CostCatNum" Name="CostCatNum" ShortName="CostCatNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CostCatSubNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CostCatSubNum" Name="CostCatSubNum" ShortName="CostCatSubNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Formula}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.Formula" Name="Formula" ShortName="Formula" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Thickness}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Thickness" Name="Thickness" ShortName="Thickness" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DemandHorizon}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.DemandHorizon" Name="DemandHorizon" ShortName="DemandHorizon" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MinimumInvQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.MinimumInvQty" Name="MinimumInvQty" ShortName="MinimumInvQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ReOrderQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.ReOrderQty" Name="ReOrderQty" ShortName="ReOrderQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TaxCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="18" LongName="PM_Item1.TaxCode" Name="TaxCode" ShortName="TaxCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.QualityCert}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.QualityCert" Name="QualityCert" ShortName="QualityCert" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ShelfLife}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ShelfLife" Name="ShelfLife" ShortName="ShelfLife" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.LeadTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.LeadTime" Name="LeadTime" ShortName="LeadTime" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CommCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CommCode" Name="CommCode" ShortName="CommCode" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CustItemRef2}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PM_Item1.CustItemRef2" Name="CustItemRef2" ShortName="CustItemRef2" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ColManCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.ColManCode" Name="ColManCode" ShortName="ColManCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MinorProductGroup}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.MinorProductGroup" Name="MinorProductGroup" ShortName="MinorProductGroup" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Parts}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.Parts" Name="Parts" ShortName="Parts" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.NumberTypeCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.NumberTypeCode" Name="NumberTypeCode" ShortName="NumberTypeCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CompositionCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.CompositionCode" Name="CompositionCode" ShortName="CompositionCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PrevCompositionCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.PrevCompositionCode" Name="PrevCompositionCode" ShortName="PrevCompositionCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PreviousItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.PreviousItemCode" Name="PreviousItemCode" ShortName="PreviousItemCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.SuccessorItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.SuccessorItemCode" Name="SuccessorItemCode" ShortName="SuccessorItemCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.DifficultySpeed1}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.DifficultySpeed1" Name="DifficultySpeed1" ShortName="DifficultySpeed1" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DifficultySpeed2}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.DifficultySpeed2" Name="DifficultySpeed2" ShortName="DifficultySpeed2" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DifficultyWaste1}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.DifficultyWaste1" Name="DifficultyWaste1" ShortName="DifficultyWaste1" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DifficultyWaste2}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.DifficultyWaste2" Name="DifficultyWaste2" ShortName="DifficultyWaste2" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ObsolescentDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ObsolescentDate" Name="ObsolescentDate" ShortName="ObsolescentDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.BFFinish}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.BFFinish" Name="BFFinish" ShortName="BFFinish" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.SheetsPer}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.SheetsPer" Name="SheetsPer" ShortName="SheetsPer" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.NumberOnPage}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.NumberOnPage" Name="NumberOnPage" ShortName="NumberOnPage" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PerPack}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.PerPack" Name="PerPack" ShortName="PerPack" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MaxBreaks}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MaxBreaks" Name="MaxBreaks" ShortName="MaxBreaks" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.StandardSizes}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.StandardSizes" Name="StandardSizes" ShortName="StandardSizes" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TPBSupport}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.TPBSupport" Name="TPBSupport" ShortName="TPBSupport" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TPBSurface}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.TPBSurface" Name="TPBSurface" ShortName="TPBSurface" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TPBTaxValue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.TPBTaxValue" Name="TPBTaxValue" ShortName="TPBTaxValue" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FromFreeStock}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.FromFreeStock" Name="FromFreeStock" ShortName="FromFreeStock" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.NonStocked}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.NonStocked" Name="NonStocked" ShortName="NonStocked" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ReceiptWhouseCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.ReceiptWhouseCode" Name="ReceiptWhouseCode" ShortName="ReceiptWhouseCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.SafetyTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.SafetyTime" Name="SafetyTime" ShortName="SafetyTime" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.RollType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.RollType" Name="RollType" ShortName="RollType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Gussetdim}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Gussetdim" Name="Gussetdim" ShortName="Gussetdim" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPMinProdQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.MRPMinProdQty" Name="MRPMinProdQty" ShortName="MRPMinProdQty" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPMaxProdQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.MRPMaxProdQty" Name="MRPMaxProdQty" ShortName="MRPMaxProdQty" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.Adhesive}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.Adhesive" Name="Adhesive" ShortName="Adhesive" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CoatingStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CoatingStatus" Name="CoatingStatus" ShortName="CoatingStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.LinkFile}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="1026" LongName="PM_Item1.LinkFile" Name="LinkFile" ShortName="LinkFile" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DrawingNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="PM_Item1.DrawingNum" Name="DrawingNum" ShortName="DrawingNum" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.SpecialItem}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.SpecialItem" Name="SpecialItem" ShortName="SpecialItem" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DefaultCostcCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.DefaultCostcCode" Name="DefaultCostcCode" ShortName="DefaultCostcCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ISBN}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="54" LongName="PM_Item1.ISBN" Name="ISBN" ShortName="ISBN" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.NameOnShipDoc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.NameOnShipDoc" Name="NameOnShipDoc" ShortName="NameOnShipDoc" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.OuterLabelCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.OuterLabelCode" Name="OuterLabelCode" ShortName="OuterLabelCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TraceLabelCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.TraceLabelCode" Name="TraceLabelCode" ShortName="TraceLabelCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Layers}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.Layers" Name="Layers" ShortName="Layers" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PerLayer}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.PerLayer" Name="PerLayer" ShortName="PerLayer" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TaperA}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.TaperA" Name="TaperA" ShortName="TaperA" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TaperB}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.TaperB" Name="TaperB" ShortName="TaperB" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.TaperC}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.TaperC" Name="TaperC" ShortName="TaperC" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PurchasePriceCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.PurchasePriceCode" Name="PurchasePriceCode" ShortName="PurchasePriceCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.SalesPriceCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.SalesPriceCode" Name="SalesPriceCode" ShortName="SalesPriceCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPDemandPeriod}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MRPDemandPeriod" Name="MRPDemandPeriod" ShortName="MRPDemandPeriod" Type="crFieldValueTypeInt32sField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPItem}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.MRPItem" Name="MRPItem" ShortName="MRPItem" Type="crFieldValueTypeBooleanField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPProcessLevel}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MRPProcessLevel" Name="MRPProcessLevel" ShortName="MRPProcessLevel" Type="crFieldValueTypeInt32sField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.JITPlanQuantity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.JITPlanQuantity" Name="JITPlanQuantity" ShortName="JITPlanQuantity" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.StockedMix}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.StockedMix" Name="StockedMix" ShortName="StockedMix" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.InvRefLabelCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.InvRefLabelCode" Name="InvRefLabelCode" ShortName="InvRefLabelCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MasterEstimateCmpNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MasterEstimateCmpNum" Name="MasterEstimateCmpNum" ShortName="MasterEstimateCmpNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PrintIdenticalTo}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.PrintIdenticalTo" Name="PrintIdenticalTo" ShortName="PrintIdenticalTo" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PrimaryEstimateCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.PrimaryEstimateCode" Name="PrimaryEstimateCode" ShortName="PrimaryEstimateCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.GenericItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PM_Item1.GenericItemCode" Name="GenericItemCode" ShortName="GenericItemCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PONominalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="142" LongName="PM_Item1.PONominalCode" Name="PONominalCode" ShortName="PONominalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.QuarantineDays}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.QuarantineDays" Name="QuarantineDays" ShortName="QuarantineDays" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.InActive}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.InActive" Name="InActive" ShortName="InActive" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PalletRefLabelCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.PalletRefLabelCode" Name="PalletRefLabelCode" ShortName="PalletRefLabelCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PlateCheckSumNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.PlateCheckSumNum" Name="PlateCheckSumNum" ShortName="PlateCheckSumNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Consignment}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.Consignment" Name="Consignment" ShortName="Consignment" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ASNbyOuter}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.ASNbyOuter" Name="ASNbyOuter" ShortName="ASNbyOuter" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ExternalAddressRef}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.ExternalAddressRef" Name="ExternalAddressRef" ShortName="ExternalAddressRef" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FluteCode2}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="6" LongName="PM_Item1.FluteCode2" Name="FluteCode2" ShortName="FluteCode2" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CustItem2Desc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4002" LongName="PM_Item1.CustItem2Desc" Name="CustItem2Desc" ShortName="CustItem2Desc" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FluteCode3}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="6" LongName="PM_Item1.FluteCode3" Name="FluteCode3" ShortName="FluteCode3" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FluteCode4}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="6" LongName="PM_Item1.FluteCode4" Name="FluteCode4" ShortName="FluteCode4" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CorrugationType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CorrugationType" Name="CorrugationType" ShortName="CorrugationType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ECTValue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ECTValue" Name="ECTValue" ShortName="ECTValue" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.BurstValue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.BurstValue" Name="BurstValue" ShortName="BurstValue" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FluteCode1}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="6" LongName="PM_Item1.FluteCode1" Name="FluteCode1" ShortName="FluteCode1" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPReplenishType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MRPReplenishType" Name="MRPReplenishType" ShortName="MRPReplenishType" Type="crFieldValueTypeInt32sField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.OTRValue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.OTRValue" Name="OTRValue" ShortName="OTRValue" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.WVTRValue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.WVTRValue" Name="WVTRValue" ShortName="WVTRValue" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.StdRollLength}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.StdRollLength" Name="StdRollLength" ShortName="StdRollLength" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.AltUnitCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PM_Item1.AltUnitCode" Name="AltUnitCode" ShortName="AltUnitCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPIncrementQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.MRPIncrementQty" Name="MRPIncrementQty" ShortName="MRPIncrementQty" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.MRPMaxInvQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.MRPMaxInvQty" Name="MRPMaxInvQty" ShortName="MRPMaxInvQty" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.WIPInvMultiPlant}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.WIPInvMultiPlant" Name="WIPInvMultiPlant" ShortName="WIPInvMultiPlant" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Jobroundqty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.Jobroundqty" Name="Jobroundqty" ShortName="Jobroundqty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.JMFQueueEntryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="PM_Item1.JMFQueueEntryID" Name="JMFQueueEntryID" ShortName="JMFQueueEntryID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.JDFColourCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PM_Item1.JDFColourCode" Name="JDFColourCode" ShortName="JDFColourCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.LastUpdatedDateTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="26" LongName="PM_Item1.LastUpdatedDateTime" Name="LastUpdatedDateTime" ShortName="LastUpdatedDateTime" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.RadiusPortalItem}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PM_Item1.RadiusPortalItem" Name="RadiusPortalItem" ShortName="RadiusPortalItem" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.MaterialTraceLevel}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.MaterialTraceLevel" Name="MaterialTraceLevel" ShortName="MaterialTraceLevel" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CountLevel}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.CountLevel" Name="CountLevel" ShortName="CountLevel" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.CustItemDesc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4002" LongName="PM_Item1.CustItemDesc" Name="CustItemDesc" ShortName="CustItemDesc" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.createDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.createDate" Name="createDate" ShortName="createDate" Type="crFieldValueTypeDateField" UseCount="1" />
+          <Field Description="" FormulaForm="{PM_Item1.ExternalAppType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ExternalAppType" Name="ExternalAppType" ShortName="ExternalAppType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PurchReceiptOversInUse}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.PurchReceiptOversInUse" Name="PurchReceiptOversInUse" ShortName="PurchReceiptOversInUse" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.PurchReceiptOversPercent}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.PurchReceiptOversPercent" Name="PurchReceiptOversPercent" ShortName="PurchReceiptOversPercent" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.Recycle}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.Recycle" Name="Recycle" ShortName="Recycle" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ClickChargeInd}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ClickChargeInd" Name="ClickChargeInd" ShortName="ClickChargeInd" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.GTIN}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.GTIN" Name="GTIN" ShortName="GTIN" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FieryItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.FieryItemCode" Name="FieryItemCode" ShortName="FieryItemCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.SubLineCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.SubLineCode" Name="SubLineCode" ShortName="SubLineCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ItemStatusCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.ItemStatusCode" Name="ItemStatusCode" ShortName="ItemStatusCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.EndUseCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.EndUseCode" Name="EndUseCode" ShortName="EndUseCode" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FinishingGroupCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PM_Item1.FinishingGroupCode" Name="FinishingGroupCode" ShortName="FinishingGroupCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.LipDim}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.LipDim" Name="LipDim" ShortName="LipDim" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.GlueDim}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.GlueDim" Name="GlueDim" ShortName="GlueDim" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.FoldoverDim}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.FoldoverDim" Name="FoldoverDim" ShortName="FoldoverDim" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.InsertDim}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PM_Item1.InsertDim" Name="InsertDim" ShortName="InsertDim" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.StyleCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="PM_Item1.StyleCode" Name="StyleCode" ShortName="StyleCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.DigitalPressId}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.DigitalPressId" Name="DigitalPressId" ShortName="DigitalPressId" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.AutoReserve}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.AutoReserve" Name="AutoReserve" ShortName="AutoReserve" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PM_Item1.ForceEstimatedWC}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PM_Item1.ForceEstimatedWC" Name="ForceEstimatedWC" ShortName="ForceEstimatedWC" Type="crFieldValueTypeInt32sField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="PV_ItemCustomers1" ClassName="CrystalReports.Table" Name="PV_ItemCustomers">
+        <ConnectionInfo Database_DLL="crdb_odbc.dll" QE_DatabaseName="" QE_DatabaseType="ODBC (RDO)" QE_LogonProperties="" QE_ServerDescription="Vision" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.CompNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_ItemCustomers1.CompNum" Name="CompNum" ShortName="CompNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.ItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PV_ItemCustomers1.ItemCode" Name="ItemCode" ShortName="ItemCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.CustCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_ItemCustomers1.CustCode" Name="CustCode" ShortName="CustCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.CustItemRef}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PV_ItemCustomers1.CustItemRef" Name="CustItemRef" ShortName="CustItemRef" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.CustItemRef2}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PV_ItemCustomers1.CustItemRef2" Name="CustItemRef2" ShortName="CustItemRef2" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.LastUserCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_ItemCustomers1.LastUserCode" Name="LastUserCode" ShortName="LastUserCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.TableRecId}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_ItemCustomers1.TableRecId" Name="TableRecId" ShortName="TableRecId" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.CustItemDesc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4002" LongName="PV_ItemCustomers1.CustItemDesc" Name="CustItemDesc" ShortName="CustItemDesc" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_ItemCustomers1.CustItem2Desc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4002" LongName="PV_ItemCustomers1.CustItem2Desc" Name="CustItem2Desc" ShortName="CustItem2Desc" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula> (  {PV_ItemCustomers1.CustCode} = "70943"  AND  {PM_Item1.Sold}  )  </RecordSelectionFormula>
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions />
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions />
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldHeadingObject Name="Text18" Kind="FieldHeadingObject" Top="379" Left="38280" Width="1080" Height="221" FieldObjectName="LastUserCode1" MaxNumberOfLines="0">
+                <Text>LastUserCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text19" Kind="FieldHeadingObject" Top="379" Left="39600" Width="1080" Height="221" FieldObjectName="LastUpdatedDateTime1" MaxNumberOfLines="0">
+                <Text>LastUpdatedDateTime</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text22" Kind="FieldHeadingObject" Top="379" Left="22800" Width="960" Height="221" FieldObjectName="SuccessorItemCode1" MaxNumberOfLines="0">
+                <Text>SuccessorItemCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text23" Kind="FieldHeadingObject" Top="379" Left="23880" Width="2049" Height="221" FieldObjectName="MRPDemandPeriod1" MaxNumberOfLines="0">
+                <Text>MRPDemandPeriod</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text24" Kind="FieldHeadingObject" Top="379" Left="25800" Width="1894" Height="221" FieldObjectName="MRPIncrementQty1" MaxNumberOfLines="0">
+                <Text>MRPIncrementQty</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text25" Kind="FieldHeadingObject" Top="379" Left="27600" Width="964" Height="221" FieldObjectName="MRPItem1" MaxNumberOfLines="0">
+                <Text>MRPItem</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text26" Kind="FieldHeadingObject" Top="379" Left="28560" Width="1605" Height="221" FieldObjectName="MRPMaxInvQty1" MaxNumberOfLines="0">
+                <Text>MRPMaxInvQty</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text27" Kind="FieldHeadingObject" Top="379" Left="30120" Width="1785" Height="221" FieldObjectName="MRPMaxProdQty1" MaxNumberOfLines="0">
+                <Text>MRPMaxProdQty</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text28" Kind="FieldHeadingObject" Top="379" Left="31800" Width="1719" Height="221" FieldObjectName="MRPMinProdQty1" MaxNumberOfLines="0">
+                <Text>MRPMinProdQty</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text29" Kind="FieldHeadingObject" Top="379" Left="33480" Width="1894" Height="221" FieldObjectName="MRPProcessLevel1" MaxNumberOfLines="0">
+                <Text>MRPProcessLevel</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text30" Kind="FieldHeadingObject" Top="379" Left="35280" Width="2041" Height="221" FieldObjectName="MRPReplenishType1" MaxNumberOfLines="0">
+                <Text>MRPReplenishType</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text31" Kind="FieldHeadingObject" Top="379" Left="37200" Width="1150" Height="221" FieldObjectName="createDate1" MaxNumberOfLines="0">
+                <Text>createDate</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="3720" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="ItemShortDesc1" Kind="FieldObject" Top="1920" Left="0" Width="3600" Height="360" DataSource="{PM_Item1.ItemShortDesc}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="ItemCode1" Kind="FieldObject" Top="240" Left="6000" Width="1680" Height="360" DataSource="{PM_Item1.ItemCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="ItemDesc1" Kind="FieldObject" Top="2520" Left="0" Width="3600" Height="840" DataSource="{PM_Item1.ItemDesc}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="14" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="PreviousItemCode1" Kind="FieldObject" Top="1080" Left="5160" Width="2160" Height="480" DataSource="{PM_Item1.PreviousItemCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="CustItemRef2" Kind="FieldObject" Top="240" Left="1320" Width="1440" Height="360" DataSource="{PV_ItemCustomers1.CustItemRef}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MasterEstimateCode1" Kind="FieldObject" Top="1080" Left="120" Width="2280" Height="480" DataSource="{PM_Item1.MasterEstimateCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="DimA1" Kind="FieldObject" Top="1080" Left="2520" Width="720" Height="480" DataSource="{PM_Item1.DimA}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="4" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToTenThousandth" FormatString="#,##0.0000;-#,##0.0000" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="DimB1" Kind="FieldObject" Top="1080" Left="3240" Width="840" Height="480" DataSource="{PM_Item1.DimB}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="4" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToTenThousandth" FormatString="#,##0.0000;-#,##0.0000" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="LastUserCode1" Kind="FieldObject" Top="0" Left="38280" Width="1080" Height="221" DataSource="{PM_Item1.LastUserCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="LastUpdatedDateTime1" Kind="FieldObject" Top="0" Left="39600" Width="1080" Height="221" DataSource="{PM_Item1.LastUpdatedDateTime}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="SuccessorItemCode1" Kind="FieldObject" Top="0" Left="22800" Width="960" Height="221" DataSource="{PM_Item1.SuccessorItemCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPDemandPeriod1" Kind="FieldObject" Top="0" Left="23880" Width="2049" Height="243" DataSource="{PM_Item1.MRPDemandPeriod}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPIncrementQty1" Kind="FieldObject" Top="0" Left="25800" Width="1894" Height="243" DataSource="{PM_Item1.MRPIncrementQty}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPItem1" Kind="FieldObject" Top="0" Left="27600" Width="964" Height="243" DataSource="{PM_Item1.MRPItem}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPMaxInvQty1" Kind="FieldObject" Top="0" Left="28560" Width="1605" Height="243" DataSource="{PM_Item1.MRPMaxInvQty}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPMaxProdQty1" Kind="FieldObject" Top="0" Left="30120" Width="1785" Height="243" DataSource="{PM_Item1.MRPMaxProdQty}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPMinProdQty1" Kind="FieldObject" Top="0" Left="31800" Width="1719" Height="243" DataSource="{PM_Item1.MRPMinProdQty}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPProcessLevel1" Kind="FieldObject" Top="0" Left="33480" Width="1894" Height="243" DataSource="{PM_Item1.MRPProcessLevel}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="MRPReplenishType1" Kind="FieldObject" Top="0" Left="35280" Width="2041" Height="243" DataSource="{PM_Item1.MRPReplenishType}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="createDate1" Kind="FieldObject" Top="0" Left="37200" Width="1150" Height="243" DataSource="{PM_Item1.createDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldHeadingObject Name="Text1" Kind="FieldHeadingObject" Top="1680" Left="0" Width="3600" Height="221" FieldObjectName="ItemShortDesc1" MaxNumberOfLines="0">
+                <Text>ItemShortDesc</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text3" Kind="FieldHeadingObject" Top="2280" Left="0" Width="3600" Height="221" FieldObjectName="ItemDesc1" MaxNumberOfLines="0">
+                <Text>ItemDesc</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text7" Kind="FieldHeadingObject" Top="720" Left="5160" Width="2160" Height="221" FieldObjectName="PreviousItemCode1" MaxNumberOfLines="0">
+                <Text>PreviousItemCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text2" Kind="FieldHeadingObject" Top="0" Left="6000" Width="1680" Height="221" FieldObjectName="ItemCode1" MaxNumberOfLines="0">
+                <Text>Radius ItemCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text15" Kind="FieldHeadingObject" Top="720" Left="3360" Width="720" Height="240" FieldObjectName="DimB1" MaxNumberOfLines="0">
+                <Text>DimB</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text14" Kind="FieldHeadingObject" Top="720" Left="2520" Width="720" Height="240" FieldObjectName="DimA1" MaxNumberOfLines="0">
+                <Text>DimA</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text13" Kind="FieldHeadingObject" Top="684" Left="120" Width="2280" Height="516" FieldObjectName="MasterEstimateCode1" MaxNumberOfLines="0">
+                <Text>MasterEstimateCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text11" Kind="FieldHeadingObject" Top="0" Left="1320" Width="1440" Height="221" FieldObjectName="CustItemRef2" MaxNumberOfLines="0">
+                <Text>MultiCustItemRef</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldObject Name="ProdGroupCode1" Kind="FieldObject" Top="240" Left="3523" Width="2554" Height="221" DataSource="{PM_Item1.ProdGroupCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldHeadingObject Name="Text4" Kind="FieldHeadingObject" Top="0" Left="3523" Width="2554" Height="221" FieldObjectName="ProdGroupCode1" MaxNumberOfLines="0">
+                <Text>ProdGroupCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <TextObject Name="Text5" Kind="TextObject" Top="3480" Left="0" Width="2040" Height="240" MaxNumberOfLines="0">
+                <Text>LABEL PRINTED ON:
+</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldObject Name="PrintDate1" Kind="FieldObject" Top="3480" Left="2160" Width="994" Height="221" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text12" Kind="TextObject" Top="0" Left="0" Width="1200" Height="480" MaxNumberOfLines="0">
+                <Text>LOBLAWS</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Calibri" GdiCharSet="1" GdiVerticalFont="False" Height="20" IsSystemFont="False" Italic="False" Name="Calibri" OriginalFontName="Calibri" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="225" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

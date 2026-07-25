@@ -68,6 +68,9 @@ class Element:
     chart_value: str = ""      # resolved value column
     condition_formulas: list = field(default_factory=list)  # raw (attr, crystal_text)
     style_expressions: list = field(default_factory=list)   # converted (style_key, openformula)
+    subreport: object = None       # attached child ReportModel (kind="subreport")
+    subreport_links: list = field(default_factory=list)  # (master_column, child_param)
+    subreport_href: str = ""       # bundle path assigned by the writer
     notes: list = field(default_factory=list)
 
 
@@ -75,8 +78,11 @@ def is_todo_element(el) -> bool:
     """True when this element remains manual work after conversion.
     Images whose bytes were migrated into the bundle are converted work,
     not TODOs - only byte-less images (extractor couldn't reach the RAS
-    picture data) still need a hand."""
-    if el.kind in ("subreport", "unknown"):
+    picture data) still need a hand. Same for subreports: one with an
+    attached child model converts into a nested PRD sub-report."""
+    if el.kind == "subreport":
+        return el.subreport is None
+    if el.kind == "unknown":
         return True
     return el.kind == "image" and not el.image_bytes and not el.resource_path
 
@@ -178,6 +184,9 @@ class ReportModel:
     summaries: list = field(default_factory=list)
     groups: list = field(default_factory=list)
     record_sorts: list = field(default_factory=list)  # (bare column, descending) detail ordering
+    table_links: list = field(default_factory=list)   # ((table, col), (table, col)) visual links
+    param_sql_columns: dict = field(default_factory=dict)  # param name -> folded SQL column expr
+    subreports: dict = field(default_factory=dict)    # subreport name -> child ReportModel
     page: PageSetup = field(default_factory=PageSetup)
     issues: list = field(default_factory=list)       # global conversion warnings
 

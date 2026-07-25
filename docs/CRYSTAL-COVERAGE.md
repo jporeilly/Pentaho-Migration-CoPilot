@@ -39,10 +39,11 @@ semantic judgment is required):
 | Crystal feature | Report Designer equivalent | Method |
 | --- | --- | --- |
 | SQL Command objects | Query passed through verbatim; datasource replaced by a named JNDI connection | Deterministic |
-| Linked tables (no SQL in the report) | SELECT generated from the columns the layout uses, with `ORDER BY` for groups/sorts (⚠ verify joins) | Deterministic → review |
+| Linked tables (no SQL in the report) | SELECT generated from the columns the layout uses; the Database Expert's **visual links become `JOIN ... ON`**, with `ORDER BY` for groups/sorts (⚠ verify) | Deterministic → review |
 | Record selection formula | Folded into the SQL `WHERE` (alias-aware for `{Command.X}` refs) — converted prompts filter live | Deterministic |
-| Parameters (prompts) | PRD parameters; static pick-lists → list-parameters; multi-value → `IN (${p})` | Deterministic |
-| Summary fields (Sum, Count, Avg, Max, Min, DistinctCount) | Item*/CountDistinct report functions, group-scoped | Deterministic |
+| Parameters (prompts) | PRD parameters; static pick-lists → list-parameters; multi-value → `IN (${p})`; a folded prompt becomes a **query-backed dropdown** (`SELECT DISTINCT` on the live database) | Deterministic |
+| Summary fields (Sum, Count, Avg, Max, Min, DistinctCount) | Item*/CountDistinct report functions, group-scoped (count functions correctly fieldless) | Deterministic |
+| **Subreports** (linked & unlinked) | **Nested PRD sub-report bundles**: the child converts through the full pipeline (own query, groups, formulas, formatting); Crystal `Pm-<field>` links become `input-parameter` mappings and the child's record selection folds to a parameterized `WHERE` | Deterministic → review |
 
 ## Formulas
 
@@ -61,8 +62,10 @@ semantic judgment is required):
 
 | Crystal feature | What you get |
 | --- | --- |
-| Subreports | Red TODO placeholder at the exact position + conversion-report entry |
+| Subreports **in page bands** | TODO placeholder + note — the engine hard-forbids sub-reports in page headers/footers (verified) |
+| Subreports with no definition in the dump | TODO placeholder (re-extract with the fork) |
 | Cross-tabs | TODO placeholder (rebuild as a PRD crosstab) |
+| RunningTotalField objects (`{#name}` with reset conditions) | Resolved via SummaryFields when present; the extractor emits empty definitions, so bespoke reset conditions need the fork extended |
 | Arrays, loops, multi-variable formula state | Original text preserved, `manual` status, LLM advice |
 | Group Sort Expert / Top N (groups ordered by a summary) | Review note — order in the query or rebuild with PRD group sorting |
 | StdDev / Median / other summaries with no PRD function | Review note + TODO placeholder for referencing elements |
@@ -84,6 +87,30 @@ Every conversion can be verified mechanically:
 - **Batch triage** (`report-triage`): READY / REVIEW / BLOCKED verdict per
   report across a whole corpus.
 
-Live demo set: `samples/cr_demo/` — seven CSCU reports of increasing
+## Known boundaries (found by the Stress Lab, verified against the engine)
+
+`samples/cr_demo/08_stress_lab.xml` deliberately stacks complexity to map
+where conversion stops being mechanical:
+
+1. **Sub-reports in page bands**: the engine throws *"SubReports cannot be
+   started for page headers"* at render time — the converter guards this
+   and emits an honest TODO instead of a broken bundle.
+2. **Count summaries**: PRD's count functions have **no `field` property**
+   (they count rows) — the writer emits them fieldless; the engine rejects
+   the bundle otherwise.
+3. **Mandatory prompts without defaults** block headless rendering (parity,
+   PDF preview with data). Interactive PRD prompts fine; give demo reports
+   defaults.
+4. **Groups on formulas** convert and render, but the query cannot
+   `ORDER BY` the formula — groups re-emit on every value change unless the
+   query is sorted by the formula's SQL equivalent.
+5. **Group-scoped summaries referenced outside their group** show the last
+   group's value (Crystal semantics trap, not a converter defect) — use a
+   grand-total summary in report footers.
+6. Multi-link subreports (two `Pm-` fields) convert and filter correctly —
+   verified live.
+
+Live demo set: `samples/cr_demo/` — eight CSCU reports of increasing
 complexity, every one converting AND rendering against the live CSCU
-database.
+database. Real-world reports classified by feature for demo-picking:
+`samples/crystal/by-feature/` (`pentaho-migrate report-classify`).

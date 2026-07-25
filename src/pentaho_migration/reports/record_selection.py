@@ -83,6 +83,9 @@ def try_fold_record_selection(model) -> bool:
                 clauses.append(f"{column} IN (${{{name}}})")
             else:
                 clauses.append(f"{column} {op} ${{{name}}}")
+            # remember the column each prompt filters - the writer builds a
+            # query-backed pick-list (SELECT DISTINCT) from it
+            model.param_sql_columns[name] = column
         else:
             if rhs.startswith('"'):
                 rhs = "'" + rhs[1:-1].replace("'", "''") + "'"

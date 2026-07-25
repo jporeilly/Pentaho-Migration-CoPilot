@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.21.1** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
+Version **1.22.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1** — Informatica & Crystal Reports complete, Talend in progress ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -35,7 +35,10 @@ manual: running-total variables become `ItemSumFunction` / `ItemCountFunction`,
 whole-formula aggregates (`Sum`, `Count`, `Maximum`, `Minimum`) become
 `Total*` functions, and `Select Case` becomes nested `IF()` — generated,
 wired to their referencing elements, and flagged for review with the
-PRD-side artifact always shown, so there is something concrete to review. Simple record selections fold into the SQL `WHERE`
+PRD-side artifact always shown, so there is something concrete to review.
+**Subreports convert into nested PRD sub-report bundles**: the child runs
+through the full pipeline and Crystal's `Pm-<field>` links become
+parameter mappings, so a linked subreport filters per parent row — live. Simple record selections fold into the SQL `WHERE`
 (alias-aware for Command-based reports), so converted parameter prompts filter
 live data. The Inspect page carries the **schema-aware SQL agent**: the report
 SQL is `EXPLAIN`-validated against the live JNDI target automatically, and a
@@ -183,6 +186,7 @@ pentaho-migrate report-env                  # preflight: PRD, Java, SAP Crystal 
 pentaho-migrate report-sql <dump> --jndi <ds> # validate the report SQL against the live JNDI target (EXPLAIN)
 pentaho-migrate report-qa <dump> [--render] # layout QA agent: geometry lint + optional engine render verification
 pentaho-migrate report-parity <prpt|dump> <crystal-export.pdf|csv> # measured output parity vs the live database
+pentaho-migrate report-classify [dir]       # classify a corpus by feature into by-feature/ folders (demo picking)
 pentaho-migrate report-triage <dir> --jndi <ds> # batch triage agent: READY/REVIEW/BLOCKED verdict per report
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
@@ -225,9 +229,14 @@ CSCU credit-union reports of increasing complexity that convert *and render live
 against the CSCU Postgres database — working parameter prompts, a bar chart, a
 running balance rebuilt as a PRD report function, live conditional formatting
 (delinquent balances render red; paid-off rows are suppressed by a visibility
-expression), and descending group/record sorts. The full Crystal→PRD feature
-map — what converts, into what, deterministic vs ✨ LLM — is in
-[docs/CRYSTAL-COVERAGE.md](docs/CRYSTAL-COVERAGE.md).
+expression), descending group/record sorts, a **live-filtering linked
+subreport**, and a **Stress Lab** rung that maps the converter's boundaries
+against the real engine. The corpus is also **classified by feature** into
+`samples/crystal/by-feature/` (`report-classify`) — pick real-world demo
+reports by what they demonstrate (22 with subreports, 35 with conditional
+formatting, 12 with cross-tabs, ...). The full Crystal→PRD feature map —
+what converts, into what, deterministic vs ✨ LLM, and the known
+boundaries — is in [docs/CRYSTAL-COVERAGE.md](docs/CRYSTAL-COVERAGE.md).
 
 ## Tests & CI
 

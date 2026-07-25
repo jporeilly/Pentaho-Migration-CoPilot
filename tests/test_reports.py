@@ -213,6 +213,23 @@ def test_fold_keeps_real_table_qualifiers_verbatim():
     assert "WHERE BRANCHES.BR_NAME = ${Branch}" in model.sql
 
 
+# ------------------------------------------------------------- subreports
+
+def test_real_corpus_subreports_parse_and_join():
+    """The Northwind employee list carries two nested subreport definitions;
+    both parse into child models, and the child's visual table links become
+    real JOIN ... ON clauses in the generated SQL."""
+    corpus = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+    model = load_report_model(corpus / "Jakub-Syrek_EmployeeList_2.xml")
+    assert set(model.subreports) == {"efficiency", "sqlquerry"}
+    attached = [el for s in model.sections for el in s.elements
+                if el.kind == "subreport" and el.subreport is not None]
+    assert len(attached) == 2
+    child = model.subreports["efficiency"]
+    assert child.sql_generated
+    assert "JOIN Orders ON Employees.EmployeeID = Orders.EmployeeID" in child.sql
+
+
 # ---------------------------------------------------------------- routing
 
 def test_detect_parser_rejects_crystal_dump_with_pointer():

@@ -1,0 +1,687 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\AndyVarnoRLG_28_JobSteps_Active_Jobs.rpt" HasSavedData="True">
+  <Embedinfo />
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="11401" PageContentWidth="23640" PaperOrientation="Portrait" PaperSize="256" PaperSource="FormSource" PrinterDuplex="Simplex" PrinterName="">
+    <PageMargins bottomMargin="360" leftMargin="360" rightMargin="480" topMargin="480" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks>
+      <TableLink JoinType="LeftOuter">
+        <SourceFields>
+          <Field FormulaName="{PV_Job1.CompNum}" Kind="DatabaseField" Name="CompNum" NumberOfBytes="4" ValueType="Int32sField" />
+          <Field FormulaName="{PV_Job1.PlantCode}" Kind="DatabaseField" Name="PlantCode" NumberOfBytes="34" ValueType="StringField" />
+          <Field FormulaName="{PV_Job1.JobCode}" Kind="DatabaseField" Name="JobCode" NumberOfBytes="42" ValueType="StringField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{PV_JobStep1.CompNum}" Kind="DatabaseField" Name="CompNum" NumberOfBytes="4" ValueType="Int32sField" />
+          <Field FormulaName="{PV_JobStep1.PlantCode}" Kind="DatabaseField" Name="PlantCode" NumberOfBytes="34" ValueType="StringField" />
+          <Field FormulaName="{PV_JobStep1.JobCode}" Kind="DatabaseField" Name="JobCode" NumberOfBytes="42" ValueType="StringField" />
+        </DestinationFields>
+      </TableLink>
+    </TableLinks>
+    <Tables>
+      <Table Alias="PV_Job1" ClassName="CrystalReports.Table" Name="PV_Job">
+        <ConnectionInfo Database_DLL="crdb_odbc.dll" QE_DatabaseName="" QE_DatabaseType="ODBC (RDO)" QE_LogonProperties="" QE_ServerDescription="Vision" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{PV_Job1.PlantCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_Job1.PlantCode" Name="PlantCode" ShortName="PlantCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.JobCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PV_Job1.JobCode" Name="JobCode" ShortName="JobCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.JobName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="162" LongName="PV_Job1.JobName" Name="JobName" ShortName="JobName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.TableRecId}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.TableRecId" Name="TableRecId" ShortName="TableRecId" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.LastUserCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_Job1.LastUserCode" Name="LastUserCode" ShortName="LastUserCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.JobStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.JobStatus" Name="JobStatus" ShortName="JobStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.StatusCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="PV_Job1.StatusCode" Name="StatusCode" ShortName="StatusCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.CompNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.CompNum" Name="CompNum" ShortName="CompNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.EstTotalCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.EstTotalCost" Name="EstTotalCost" ShortName="EstTotalCost" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ActTotalCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.ActTotalCost" Name="ActTotalCost" ShortName="ActTotalCost" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.EstTotalRev}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.EstTotalRev" Name="EstTotalRev" ShortName="EstTotalRev" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.ActTotalRev}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.ActTotalRev" Name="ActTotalRev" ShortName="ActTotalRev" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.est-k-seq}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.est-k-seq" Name="est-k-seq" ShortName="est-k-seq" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.EstCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PV_Job1.EstCode" Name="EstCode" ShortName="EstCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PlannedAvailDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.PlannedAvailDate" Name="PlannedAvailDate" ShortName="PlannedAvailDate" Type="crFieldValueTypeDateField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.ProductionStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ProductionStatus" Name="ProductionStatus" ShortName="ProductionStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ToolChange}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.ToolChange" Name="ToolChange" ShortName="ToolChange" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.CylindersAvail}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.CylindersAvail" Name="CylindersAvail" ShortName="CylindersAvail" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.EmbossCutAvail}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.EmbossCutAvail" Name="EmbossCutAvail" ShortName="EmbossCutAvail" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.EmbossCutDue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.EmbossCutDue" Name="EmbossCutDue" ShortName="EmbossCutDue" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.CylindersDue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.CylindersDue" Name="CylindersDue" ShortName="CylindersDue" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PlannedStartDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.PlannedStartDate" Name="PlannedStartDate" ShortName="PlannedStartDate" Type="crFieldValueTypeDateField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.ProdGroupCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="PV_Job1.ProdGroupCode" Name="ProdGroupCode" ShortName="ProdGroupCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.CustCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_Job1.CustCode" Name="CustCode" ShortName="CustCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.PSAextracted}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.PSAextracted" Name="PSAextracted" ShortName="PSAextracted" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.LastProdRefNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.LastProdRefNum" Name="LastProdRefNum" ShortName="LastProdRefNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.RepJobCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PV_Job1.RepJobCode" Name="RepJobCode" ShortName="RepJobCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.MRPRunNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.MRPRunNumber" Name="MRPRunNumber" ShortName="MRPRunNumber" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.JobType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.JobType" Name="JobType" ShortName="JobType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ProdCompDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ProdCompDate" Name="ProdCompDate" ShortName="ProdCompDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ProdComplete}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.ProdComplete" Name="ProdComplete" ShortName="ProdComplete" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PreviousJobCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PV_Job1.PreviousJobCode" Name="PreviousJobCode" ShortName="PreviousJobCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.CompletedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.CompletedDate" Name="CompletedDate" ShortName="CompletedDate" Type="crFieldValueTypeDateField" UseCount="2" />
+          <Field Description="" FormulaForm="{PV_Job1.MinorProductGroup}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_Job1.MinorProductGroup" Name="MinorProductGroup" ShortName="MinorProductGroup" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PrePress}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.PrePress" Name="PrePress" ShortName="PrePress" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.SOHandlingCharges}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.SOHandlingCharges" Name="SOHandlingCharges" ShortName="SOHandlingCharges" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PromisedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.PromisedDate" Name="PromisedDate" ShortName="PromisedDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PlannedFinishDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.PlannedFinishDate" Name="PlannedFinishDate" ShortName="PlannedFinishDate" Type="crFieldValueTypeDateField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.ReqHaveReadyDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ReqHaveReadyDate" Name="ReqHaveReadyDate" ShortName="ReqHaveReadyDate" Type="crFieldValueTypeDateField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.ReconfirmStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ReconfirmStatus" Name="ReconfirmStatus" ShortName="ReconfirmStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ToolIssue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ToolIssue" Name="ToolIssue" ShortName="ToolIssue" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.RevenueAppPerc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.RevenueAppPerc" Name="RevenueAppPerc" ShortName="RevenueAppPerc" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ActMaterialCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.ActMaterialCost" Name="ActMaterialCost" ShortName="ActMaterialCost" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ActLabourCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.ActLabourCost" Name="ActLabourCost" ShortName="ActLabourCost" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_Job1.ActOtherCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.ActOtherCost" Name="ActOtherCost" ShortName="ActOtherCost" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.RiskStock}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.RiskStock" Name="RiskStock" ShortName="RiskStock" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ActOutworkCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_Job1.ActOutworkCost" Name="ActOutworkCost" ShortName="ActOutworkCost" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.DeliveredQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.DeliveredQty" Name="DeliveredQty" ShortName="DeliveredQty" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.JobText}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4002" LongName="PV_Job1.JobText" Name="JobText" ShortName="JobText" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.JobCreateDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.JobCreateDate" Name="JobCreateDate" ShortName="JobCreateDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.TrialJob}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.TrialJob" Name="TrialJob" ShortName="TrialJob" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.MRPWhouseCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_Job1.MRPWhouseCode" Name="MRPWhouseCode" ShortName="MRPWhouseCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.MRPJobType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.MRPJobType" Name="MRPJobType" ShortName="MRPJobType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.WhouseCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_Job1.WhouseCode" Name="WhouseCode" ShortName="WhouseCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.MRPOverride}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.MRPOverride" Name="MRPOverride" ShortName="MRPOverride" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.FieryXFJobStat}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.FieryXFJobStat" Name="FieryXFJobStat" ShortName="FieryXFJobStat" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.LastUpdatedDateTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="26" LongName="PV_Job1.LastUpdatedDateTime" Name="LastUpdatedDateTime" ShortName="LastUpdatedDateTime" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PFExported}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.PFExported" Name="PFExported" ShortName="PFExported" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ProdStartStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ProdStartStatus" Name="ProdStartStatus" ShortName="ProdStartStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.MaterialTraceLevel}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.MaterialTraceLevel" Name="MaterialTraceLevel" ShortName="MaterialTraceLevel" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.MatTraceLevelSet}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.MatTraceLevelSet" Name="MatTraceLevelSet" ShortName="MatTraceLevelSet" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.PFExportMode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.PFExportMode" Name="PFExportMode" ShortName="PFExportMode" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ClosedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.ClosedDate" Name="ClosedDate" ShortName="ClosedDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.GLPostDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.GLPostDate" Name="GLPostDate" ShortName="GLPostDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.iWorkFlowJobCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="130" LongName="PV_Job1.iWorkFlowJobCode" Name="iWorkFlowJobCode" ShortName="iWorkFlowJobCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.UpdateID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.UpdateID" Name="UpdateID" ShortName="UpdateID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.iWorkflowStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_Job1.iWorkflowStatus" Name="iWorkflowStatus" ShortName="iWorkflowStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.iworkflowwiurl}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="1602" LongName="PV_Job1.iworkflowwiurl" Name="iworkflowwiurl" ShortName="iworkflowwiurl" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.CustomerPO}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PV_Job1.CustomerPO" Name="CustomerPO" ShortName="CustomerPO" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.ShipExact}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="PV_Job1.ShipExact" Name="ShipExact" ShortName="ShipExact" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.EndUserPO}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PV_Job1.EndUserPO" Name="EndUserPO" ShortName="EndUserPO" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_Job1.QueueEntryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="402" LongName="PV_Job1.QueueEntryID" Name="QueueEntryID" ShortName="QueueEntryID" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="PV_JobStep1" ClassName="CrystalReports.Table" Name="PV_JobStep">
+        <ConnectionInfo Database_DLL="crdb_odbc.dll" QE_DatabaseName="" QE_DatabaseType="ODBC (RDO)" QE_LogonProperties="" QE_ServerDescription="Vision" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{PV_JobStep1.CompNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.CompNum" Name="CompNum" ShortName="CompNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PlantCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_JobStep1.PlantCode" Name="PlantCode" ShortName="PlantCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.JobCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="PV_JobStep1.JobCode" Name="JobCode" ShortName="JobCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.StepNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.StepNum" Name="StepNum" ShortName="StepNum" Type="crFieldValueTypeInt32sField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_JobStep1.StepType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.StepType" Name="StepType" ShortName="StepType" Type="crFieldValueTypeInt32sField" UseCount="2" />
+          <Field Description="" FormulaForm="{PV_JobStep1.TableRecId}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.TableRecId" Name="TableRecId" ShortName="TableRecId" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.LastUserCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_JobStep1.LastUserCode" Name="LastUserCode" ShortName="LastUserCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.StepDescrip}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PV_JobStep1.StepDescrip" Name="StepDescrip" ShortName="StepDescrip" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.WorkcCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_JobStep1.WorkcCode" Name="WorkcCode" ShortName="WorkcCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ItemCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="PV_JobStep1.ItemCode" Name="ItemCode" ShortName="ItemCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.DimA}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.DimA" Name="DimA" ShortName="DimA" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.DimB}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.DimB" Name="DimB" ShortName="DimB" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.est-cmp-no}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.est-cmp-no" Name="est-cmp-no" ShortName="est-cmp-no" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.est-route-seq}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.est-route-seq" Name="est-route-seq" ShortName="est-route-seq" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.est-route-sub-seq}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.est-route-sub-seq" Name="est-route-sub-seq" ShortName="est-route-sub-seq" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.UnitCost}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.UnitCost" Name="UnitCost" ShortName="UnitCost" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.AccUCP}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.AccUCP" Name="AccUCP" ShortName="AccUCP" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.StepStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.StepStatus" Name="StepStatus" ShortName="StepStatus" Type="crFieldValueTypeInt32sField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_JobStep1.DimC}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.DimC" Name="DimC" ShortName="DimC" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.CmpType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.CmpType" Name="CmpType" ShortName="CmpType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.HCStepNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.HCStepNum" Name="HCStepNum" ShortName="HCStepNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.EstCompDesc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="PV_JobStep1.EstCompDesc" Name="EstCompDesc" ShortName="EstCompDesc" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PlanStartDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.PlanStartDate" Name="PlanStartDate" ShortName="PlanStartDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PlanStartTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.PlanStartTime" Name="PlanStartTime" ShortName="PlanStartTime" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.WorkcTypeCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_JobStep1.WorkcTypeCode" Name="WorkcTypeCode" ShortName="WorkcTypeCode" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{PV_JobStep1.NumberUp}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.NumberUp" Name="NumberUp" ShortName="NumberUp" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.CutOff}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.CutOff" Name="CutOff" ShortName="CutOff" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.InputQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.InputQty" Name="InputQty" ShortName="InputQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.LabStepNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.LabStepNum" Name="LabStepNum" ShortName="LabStepNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.VRType}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.VRType" Name="VRType" ShortName="VRType" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.AutoActual}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.AutoActual" Name="AutoActual" ShortName="AutoActual" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.JobLineNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.JobLineNum" Name="JobLineNum" ShortName="JobLineNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ScrapQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.ScrapQty" Name="ScrapQty" ShortName="ScrapQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.OutputQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.OutputQty" Name="OutputQty" ShortName="OutputQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ProdUnit}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.ProdUnit" Name="ProdUnit" ShortName="ProdUnit" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.NumPrintChanges}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.NumPrintChanges" Name="NumPrintChanges" ShortName="NumPrintChanges" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ItemQtyRatio}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.ItemQtyRatio" Name="ItemQtyRatio" ShortName="ItemQtyRatio" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.JobCmpNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.JobCmpNum" Name="JobCmpNum" ShortName="JobCmpNum" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.LabourSecs}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.LabourSecs" Name="LabourSecs" ShortName="LabourSecs" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.LabTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.LabTime" Name="LabTime" ShortName="LabTime" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ToolsAllocated}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.ToolsAllocated" Name="ToolsAllocated" ShortName="ToolsAllocated" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PlanWorkcCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_JobStep1.PlanWorkcCode" Name="PlanWorkcCode" ShortName="PlanWorkcCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.OutsourceStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.OutsourceStatus" Name="OutsourceStatus" ShortName="OutsourceStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ToolIssue}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.ToolIssue" Name="ToolIssue" ShortName="ToolIssue" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ProdGSM}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.ProdGSM" Name="ProdGSM" ShortName="ProdGSM" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.AIGoodCopy}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.AIGoodCopy" Name="AIGoodCopy" ShortName="AIGoodCopy" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.TrfPlantCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="PV_JobStep1.TrfPlantCode" Name="TrfPlantCode" ShortName="TrfPlantCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ExcludedQty}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.ExcludedQty" Name="ExcludedQty" ShortName="ExcludedQty" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PSAPlannedMR}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.PSAPlannedMR" Name="PSAPlannedMR" ShortName="PSAPlannedMR" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.RollLength}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.RollLength" Name="RollLength" ShortName="RollLength" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ResinAccUCP}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.ResinAccUCP" Name="ResinAccUCP" ShortName="ResinAccUCP" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PFTaskCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="PV_JobStep1.PFTaskCode" Name="PFTaskCode" ShortName="PFTaskCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PlanEndDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.PlanEndDate" Name="PlanEndDate" ShortName="PlanEndDate" Type="crFieldValueTypeDateField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.PlanEndTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.PlanEndTime" Name="PlanEndTime" ShortName="PlanEndTime" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.LastUpdatedDateTime}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="26" LongName="PV_JobStep1.LastUpdatedDateTime" Name="LastUpdatedDateTime" ShortName="LastUpdatedDateTime" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.LikePieceMultiple}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.LikePieceMultiple" Name="LikePieceMultiple" ShortName="LikePieceMultiple" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.DCUTrimWidth}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.DCUTrimWidth" Name="DCUTrimWidth" ShortName="DCUTrimWidth" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ProdStartStatus}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="PV_JobStep1.ProdStartStatus" Name="ProdStartStatus" ShortName="ProdStartStatus" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{PV_JobStep1.ConsumptionRatio}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="PV_JobStep1.ConsumptionRatio" Name="ConsumptionRatio" ShortName="ConsumptionRatio" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula> (  {PV_Job1.PlantCode} = "28"  AND  {PV_JobStep1.StepType} = 3  )  </RecordSelectionFormula>
+    <Groups />
+    <SortFields>
+      <SortField Field="{PV_Job1.CompletedDate}" SortDirection="AscendingOrder" SortType="RecordSortField" />
+      <SortField Field="{PV_Job1.ActLabourCost}" SortDirection="AscendingOrder" SortType="RecordSortField" />
+    </SortFields>
+    <FormulaFieldDefinitions />
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions />
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldHeadingObject Name="Text3" Kind="FieldHeadingObject" Top="379" Left="120" Width="1142" Height="221" FieldObjectName="ActTotalCost1" MaxNumberOfLines="0">
+                <Text>ActTotalCost</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text4" Kind="FieldHeadingObject" Top="379" Left="1440" Width="1085" Height="221" FieldObjectName="ActTotalRev1" MaxNumberOfLines="0">
+                <Text>ActTotalRev</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text5" Kind="FieldHeadingObject" Top="379" Left="2698" Width="1142" Height="221" FieldObjectName="JobCode1" MaxNumberOfLines="0">
+                <Text>JobCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text6" Kind="FieldHeadingObject" Top="379" Left="4080" Width="1385" Height="221" FieldObjectName="CompletedDate1" MaxNumberOfLines="0">
+                <Text>CompletedDate</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text7" Kind="FieldHeadingObject" Top="379" Left="6005" Width="1085" Height="221" FieldObjectName="EstTotalRev1" MaxNumberOfLines="0">
+                <Text>EstTotalRev</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text8" Kind="FieldHeadingObject" Top="379" Left="7680" Width="1817" Height="221" FieldObjectName="ReqHaveReadyDate1" MaxNumberOfLines="0">
+                <Text>ReqHaveReadyDate</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text9" Kind="FieldHeadingObject" Top="379" Left="9960" Width="2150" Height="221" FieldObjectName="CustCode1" MaxNumberOfLines="0">
+                <Text>CustCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text10" Kind="FieldHeadingObject" Top="379" Left="11160" Width="1567" Height="221" FieldObjectName="PlannedStartDate1" MaxNumberOfLines="0">
+                <Text>PlannedStartDate</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text11" Kind="FieldHeadingObject" Top="379" Left="12960" Width="1678" Height="221" FieldObjectName="PlannedFinishDate1" MaxNumberOfLines="0">
+                <Text>PlannedFinishDate</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text12" Kind="FieldHeadingObject" Top="379" Left="14880" Width="1574" Height="221" FieldObjectName="PlannedAvailDate1" MaxNumberOfLines="0">
+                <Text>PlannedAvailDate</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text13" Kind="FieldHeadingObject" Top="379" Left="16710" Width="950" Height="221" FieldObjectName="StepType1" MaxNumberOfLines="0">
+                <Text>StepType</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text14" Kind="FieldHeadingObject" Top="379" Left="17895" Width="972" Height="221" FieldObjectName="StepStatus1" MaxNumberOfLines="0">
+                <Text>StepStatus</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text15" Kind="FieldHeadingObject" Top="379" Left="19080" Width="950" Height="221" FieldObjectName="StepNum1" MaxNumberOfLines="0">
+                <Text>StepNum</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text16" Kind="FieldHeadingObject" Top="379" Left="20175" Width="2150" Height="221" FieldObjectName="WorkcTypeCode1" MaxNumberOfLines="0">
+                <Text>WorkcTypeCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text17" Kind="FieldHeadingObject" Top="379" Left="21840" Width="2554" Height="221" FieldObjectName="StatusCode1" MaxNumberOfLines="0">
+                <Text>StatusCode</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="221" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="ActTotalCost1" Kind="FieldObject" Top="0" Left="120" Width="1142" Height="221" DataSource="{PV_Job1.ActTotalCost}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="ActTotalRev1" Kind="FieldObject" Top="0" Left="1440" Width="1085" Height="221" DataSource="{PV_Job1.ActTotalRev}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="JobCode1" Kind="FieldObject" Top="0" Left="2698" Width="1142" Height="221" DataSource="{PV_Job1.JobCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="CompletedDate1" Kind="FieldObject" Top="0" Left="4080" Width="1385" Height="221" DataSource="{PV_Job1.CompletedDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="EstTotalRev1" Kind="FieldObject" Top="0" Left="6005" Width="1085" Height="221" DataSource="{PV_Job1.EstTotalRev}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="ReqHaveReadyDate1" Kind="FieldObject" Top="0" Left="7680" Width="1817" Height="221" DataSource="{PV_Job1.ReqHaveReadyDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="CustCode1" Kind="FieldObject" Top="0" Left="9960" Width="2150" Height="221" DataSource="{PV_Job1.CustCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="PlannedStartDate1" Kind="FieldObject" Top="0" Left="11160" Width="1567" Height="221" DataSource="{PV_Job1.PlannedStartDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="PlannedFinishDate1" Kind="FieldObject" Top="0" Left="12960" Width="1678" Height="221" DataSource="{PV_Job1.PlannedFinishDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="PlannedAvailDate1" Kind="FieldObject" Top="0" Left="14880" Width="1574" Height="221" DataSource="{PV_Job1.PlannedAvailDate}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="StepType1" Kind="FieldObject" Top="0" Left="16710" Width="950" Height="221" DataSource="{PV_JobStep1.StepType}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="StepStatus1" Kind="FieldObject" Top="0" Left="17895" Width="972" Height="221" DataSource="{PV_JobStep1.StepStatus}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="StepNum1" Kind="FieldObject" Top="0" Left="19080" Width="950" Height="221" DataSource="{PV_JobStep1.StepNum}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="WorkcTypeCode1" Kind="FieldObject" Top="0" Left="20175" Width="2150" Height="221" DataSource="{PV_JobStep1.WorkcTypeCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="StatusCode1" Kind="FieldObject" Top="0" Left="21840" Width="2554" Height="221" DataSource="{PV_Job1.StatusCode}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

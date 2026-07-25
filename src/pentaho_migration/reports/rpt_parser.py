@@ -218,7 +218,18 @@ def _parse_object(obj):
 
 def parse_rpttoxml(path):
     tree = ET.parse(path)
-    root = tree.getroot()
+    return _parse_report(tree.getroot())
+
+
+def _parse_report(root):
+    """Parse one <Report> element (top-level or nested subreport definition)
+    into a ReportModel. Nested <SubReports> are detached first so the scoped
+    iter() calls never leak child tables/formulas into the parent, then each
+    child <Report> is parsed recursively and attached to its placeholder."""
+    subs = root.find("SubReports")
+    if subs is not None:
+        root.remove(subs)
+
     model = ReportModel()
     model.name = _attr(root, "Name", default="") or _attr(root, "FileName", default="Converted Report")
     model.name = re.sub(r"\.rpt$", "", model.name.replace("\\", "/").split("/")[-1], flags=re.I)
@@ -228,7 +239,67 @@ def parse_rpttoxml(path):
     _parse_print_options(root, model)
     _parse_areas(root, model)
     _resolve_references(model)
+
+    if subs is not None:
+        for rep in subs.findall("Report"):
+            child = _parse_report(rep)
+            model.subreports[_subreport_key(child.name)] = child
+        _attach_subreports(model)
     return model
+
+
+def _subreport_key(name):
+    return re.sub(r"\.rpt$", "", (name or "").strip(), flags=re.I).lower()
+
+
+def _attach_subreports(model):
+    """Wire each SubreportObject placeholder to its parsed child model and
+    derive the parent->child links from Crystal's Pm-<field> parameters
+    (renamed to PRD-safe identifiers, rewritten through the child's record
+    selection and formulas)."""
+    for section in model.sections:
+        for el in section.elements:
+            if el.kind != "subreport":
+                continue
+            if section.area_kind in ("PageHeader", "PageFooter"):
+                # engine boundary (verified): "SubReports cannot be started
+                # for page headers" - a converted one would render-fail
+                el.notes.append(
+                    f"subreport '{el.text}' sits in a Crystal {section.area_kind} - "
+                    "PRD forbids sub-reports in page bands; emitted as a TODO "
+                    "placeholder (move it to a report or group band instead)")
+                continue
+            child = model.subreports.get(_subreport_key(el.text))
+            if child is None:
+                el.notes.append(
+                    f"subreport '{el.text}' has no definition in the dump - "
+                    "emitted as a TODO placeholder")
+                continue
+            el.subreport = child
+            for prm in child.parameters:
+                if not prm.name.startswith("Pm-"):
+                    continue
+                master_raw = prm.name[3:]
+                if master_raw.startswith("#"):
+                    el.notes.append(
+                        f"subreport link on summary {{?{prm.name}}} not carried "
+                        "- link on a plain field or formula instead")
+                    continue
+                master = (master_raw[1:] if master_raw.startswith("@")
+                          else master_raw.split(".")[-1])
+                alias = re.sub(r"\W+", "_", prm.name)
+                old = prm.name
+                prm.name = alias
+                token, replacement = "{?" + old + "}", "{?" + alias + "}"
+                child.record_selection = child.record_selection.replace(token, replacement)
+                for f in child.formulas.values():
+                    f.text = f.text.replace(token, replacement)
+                el.subreport_links.append((master, alias))
+            el.notes.append(
+                f"subreport '{child.name}' converted as a nested PRD sub-report"
+                + (f" ({len(el.subreport_links)} linked parameter(s))"
+                   if el.subreport_links else " (unlinked - shows all rows)")
+                + " - verify layout and data")
 
 
 def _parse_database(root, model):
@@ -246,6 +317,19 @@ def _parse_database(root, model):
         cmd = table.find("Command")
         if cmd is not None and (cmd.text or "").strip():
             model.sql = cmd.text.strip()
+
+    # visual table links (Database Expert joins) - feed generated SQL
+    for link in root.iter("TableLink"):
+        src = link.find("SourceFields/Field")
+        dst = link.find("DestinationFields/Field")
+        if src is None or dst is None:
+            continue
+        s = _attr(src, "FormulaName", default="").strip("{}")
+        d = _attr(dst, "FormulaName", default="").strip("{}")
+        if "." in s and "." in d:
+            st, sc = s.rsplit(".", 1)
+            dt, dc = d.rsplit(".", 1)
+            model.table_links.append(((st, sc), (dt, dc)))
 
 
 def _parse_data_definition(root, model):
@@ -538,8 +622,34 @@ def generate_sql(model):
                     used.insert(0, q)
     if not used:
         used = ["*"]
-    tables = ", ".join(model.tables) if model.tables else "TABLE"
-    sql = "SELECT\n  " + ",\n  ".join(used) + f"\nFROM {tables}"
+
+    # FROM clause: honor the Database Expert's visual links as JOIN ... ON
+    table_names = list(model.tables) or ["TABLE"]
+    if model.table_links and len(table_names) > 1:
+        placed = [table_names[0]]
+        joins, remaining_links = [], list(model.table_links)
+        progress = True
+        while progress:
+            progress = False
+            for link in list(remaining_links):
+                (st, sc), (dt, dc) = link
+                if st in placed and dt not in placed and dt in table_names:
+                    joins.append(f"JOIN {dt} ON {st}.{sc} = {dt}.{dc}")
+                    placed.append(dt)
+                elif dt in placed and st not in placed and st in table_names:
+                    joins.append(f"JOIN {st} ON {dt}.{dc} = {st}.{sc}")
+                    placed.append(st)
+                else:
+                    continue
+                remaining_links.remove(link)
+                progress = True
+        leftovers = [t for t in table_names if t not in placed]
+        from_clause = placed[0] + ("\n" + "\n".join(joins) if joins else "")
+        if leftovers:
+            from_clause = ", ".join([from_clause] + leftovers)
+    else:
+        from_clause = ", ".join(table_names)
+    sql = "SELECT\n  " + ",\n  ".join(used) + f"\nFROM {from_clause}"
 
     # PRD relational groups need pre-sorted data: order by the group columns
     # (honoring group direction), then the report's record sorts

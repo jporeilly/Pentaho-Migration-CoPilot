@@ -136,6 +136,18 @@ def render_element(el, tp="", sp="style:"):
     if el.kind == "chart":
         return _render_chart(el, tp, sp)
     if el.kind == "subreport":
+        if el.subreport_href:
+            # a converted nested sub-report: banded, linked to the parent row
+            # via input-parameter mappings (master column -> child parameter)
+            links = "".join(
+                f"<input-parameter master-fieldname={quoteattr(m)} "
+                f"detail-fieldname={quoteattr(d)}/>"
+                for m, d in el.subreport_links)
+            return (f'<{tp}sub-report href="{el.subreport_href}">'
+                    f"<{sp}element-style>"
+                    f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
+                    f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
+                    f"</{sp}element-style>{links}</{tp}sub-report>")
         return render_element(_todo_label(el, f"[TODO subreport: {el.text} - convert separately]"), tp, sp)
     if el.kind == "image":
         if el.image_bytes and el.resource_path:

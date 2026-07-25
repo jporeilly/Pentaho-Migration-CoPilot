@@ -1,0 +1,523 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="C:\Projects\Pentaho-Migration\samples\crystal-rpt\Jakub-Syrek_CrystalReport3.rpt" HasSavedData="False">
+  <Embedinfo />
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="False" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="15504" PageContentWidth="11904" PaperOrientation="Portrait" PaperSize="DefaultPaperSize" PaperSource="FormSource" PrinterDuplex="Default" PrinterName="">
+    <PageMargins bottomMargin="168" leftMargin="168" rightMargin="168" topMargin="168" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Order_Details.OrderID}" Kind="DatabaseField" Name="OrderID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Orders.OrderID}" Kind="DatabaseField" Name="OrderID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Order_Details.ProductID}" Kind="DatabaseField" Name="ProductID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Products.ProductID}" Kind="DatabaseField" Name="ProductID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Products.CategoryID}" Kind="DatabaseField" Name="CategoryID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Categories.CategoryID}" Kind="DatabaseField" Name="CategoryID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Products.SupplierID}" Kind="DatabaseField" Name="SupplierID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Suppliers.SupplierID}" Kind="DatabaseField" Name="SupplierID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Orders.CustomerID}" Kind="DatabaseField" Name="CustomerID" NumberOfBytes="12" ValueType="StringField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Customers.CustomerID}" Kind="DatabaseField" Name="CustomerID" NumberOfBytes="12" ValueType="StringField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Orders.EmployeeID}" Kind="DatabaseField" Name="EmployeeID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Employees.EmployeeID}" Kind="DatabaseField" Name="EmployeeID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Orders.ShipVia}" Kind="DatabaseField" Name="ShipVia" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Shippers.ShipperID}" Kind="DatabaseField" Name="ShipperID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{EmployeeTerritories.EmployeeID}" Kind="DatabaseField" Name="EmployeeID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Employees.EmployeeID}" Kind="DatabaseField" Name="EmployeeID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{EmployeeTerritories.TerritoryID}" Kind="DatabaseField" Name="TerritoryID" NumberOfBytes="42" ValueType="StringField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Territories.TerritoryID}" Kind="DatabaseField" Name="TerritoryID" NumberOfBytes="42" ValueType="StringField" />
+        </DestinationFields>
+      </TableLink>
+      <TableLink JoinType="Equal">
+        <SourceFields>
+          <Field FormulaName="{Territories.RegionID}" Kind="DatabaseField" Name="RegionID" NumberOfBytes="4" ValueType="Int32sField" />
+        </SourceFields>
+        <DestinationFields>
+          <Field FormulaName="{Region.RegionID}" Kind="DatabaseField" Name="RegionID" NumberOfBytes="4" ValueType="Int32sField" />
+        </DestinationFields>
+      </TableLink>
+    </TableLinks>
+    <Tables>
+      <Table Alias="Alphabetical_list_of_products" ClassName="CrystalReports.Table" Name="Alphabetical list of products">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Alphabetical_list_of_products.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Alphabetical_list_of_products.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.SupplierID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Alphabetical_list_of_products.SupplierID" Name="SupplierID" ShortName="SupplierID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.CategoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Alphabetical_list_of_products.CategoryID" Name="CategoryID" ShortName="CategoryID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.QuantityPerUnit}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Alphabetical_list_of_products.QuantityPerUnit" Name="QuantityPerUnit" ShortName="QuantityPerUnit" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Alphabetical_list_of_products.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.UnitsInStock}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Alphabetical_list_of_products.UnitsInStock" Name="UnitsInStock" ShortName="UnitsInStock" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.UnitsOnOrder}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Alphabetical_list_of_products.UnitsOnOrder" Name="UnitsOnOrder" ShortName="UnitsOnOrder" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.ReorderLevel}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Alphabetical_list_of_products.ReorderLevel" Name="ReorderLevel" ShortName="ReorderLevel" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.Discontinued}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Alphabetical_list_of_products.Discontinued" Name="Discontinued" ShortName="Discontinued" Type="crFieldValueTypeBooleanField" UseCount="0" />
+          <Field Description="" FormulaForm="{Alphabetical_list_of_products.CategoryName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Alphabetical_list_of_products.CategoryName" Name="CategoryName" ShortName="CategoryName" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Categories" ClassName="CrystalReports.Table" Name="Categories">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Categories.CategoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Categories.CategoryID" Name="CategoryID" ShortName="CategoryID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Categories.CategoryName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Categories.CategoryName" Name="CategoryName" ShortName="CategoryName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Categories.Description}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="131070" LongName="Categories.Description" Name="Description" ShortName="Description" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Categories.Picture}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="-1" LongName="Categories.Picture" Name="Picture" ShortName="Picture" Type="crFieldValueTypeBlobField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Category_Sales_for_1997" ClassName="CrystalReports.Table" Name="Category Sales for 1997">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Category_Sales_for_1997.CategoryName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Category_Sales_for_1997.CategoryName" Name="CategoryName" ShortName="CategoryName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Category_Sales_for_1997.CategorySales}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Category_Sales_for_1997.CategorySales" Name="CategorySales" ShortName="CategorySales" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Current_Product_List" ClassName="CrystalReports.Table" Name="Current Product List">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Current_Product_List.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Current_Product_List.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Current_Product_List.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Current_Product_List.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Customer_and_Suppliers_by_City" ClassName="CrystalReports.Table" Name="Customer and Suppliers by City">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Customer_and_Suppliers_by_City.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Customer_and_Suppliers_by_City.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customer_and_Suppliers_by_City.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Customer_and_Suppliers_by_City.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customer_and_Suppliers_by_City.ContactName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="Customer_and_Suppliers_by_City.ContactName" Name="ContactName" ShortName="ContactName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customer_and_Suppliers_by_City.Relationship}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="20" LongName="Customer_and_Suppliers_by_City.Relationship" Name="Relationship" ShortName="Relationship" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Customers" ClassName="CrystalReports.Table" Name="Customers">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Customers.CustomerID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="12" LongName="Customers.CustomerID" Name="CustomerID" ShortName="CustomerID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Customers.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.ContactName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="Customers.ContactName" Name="ContactName" ShortName="ContactName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.ContactTitle}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="Customers.ContactTitle" Name="ContactTitle" ShortName="ContactTitle" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.Address}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Customers.Address" Name="Address" ShortName="Address" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Customers.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.Region}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Customers.Region" Name="Region" ShortName="Region" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.PostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Customers.PostalCode" Name="PostalCode" ShortName="PostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.Country}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Customers.Country" Name="Country" ShortName="Country" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.Phone}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="50" LongName="Customers.Phone" Name="Phone" ShortName="Phone" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Customers.Fax}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="50" LongName="Customers.Fax" Name="Fax" ShortName="Fax" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Employees" ClassName="CrystalReports.Table" Name="Employees">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Employees.EmployeeID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Employees.EmployeeID" Name="EmployeeID" ShortName="EmployeeID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.LastName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Employees.LastName" Name="LastName" ShortName="LastName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.FirstName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Employees.FirstName" Name="FirstName" ShortName="FirstName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Title}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="Employees.Title" Name="Title" ShortName="Title" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.TitleOfCourtesy}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="52" LongName="Employees.TitleOfCourtesy" Name="TitleOfCourtesy" ShortName="TitleOfCourtesy" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.BirthDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Employees.BirthDate" Name="BirthDate" ShortName="BirthDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.HireDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Employees.HireDate" Name="HireDate" ShortName="HireDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Address}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Employees.Address" Name="Address" ShortName="Address" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Employees.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Region}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Employees.Region" Name="Region" ShortName="Region" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.PostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Employees.PostalCode" Name="PostalCode" ShortName="PostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Country}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Employees.Country" Name="Country" ShortName="Country" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.HomePhone}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="50" LongName="Employees.HomePhone" Name="HomePhone" ShortName="HomePhone" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Extension}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="10" LongName="Employees.Extension" Name="Extension" ShortName="Extension" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Photo}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="-1" LongName="Employees.Photo" Name="Photo" ShortName="Photo" Type="crFieldValueTypeBlobField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Notes}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="131070" LongName="Employees.Notes" Name="Notes" ShortName="Notes" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.ReportsTo}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Employees.ReportsTo" Name="ReportsTo" ShortName="ReportsTo" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.PhotoPath}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="Employees.PhotoPath" Name="PhotoPath" ShortName="PhotoPath" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Employees.Salary}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Employees.Salary" Name="Salary" ShortName="Salary" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="EmployeeTerritories" ClassName="CrystalReports.Table" Name="EmployeeTerritories">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{EmployeeTerritories.EmployeeID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="EmployeeTerritories.EmployeeID" Name="EmployeeID" ShortName="EmployeeID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{EmployeeTerritories.TerritoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="EmployeeTerritories.TerritoryID" Name="TerritoryID" ShortName="TerritoryID" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Invoices" ClassName="CrystalReports.Table" Name="Invoices">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Invoices.ShipName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Invoices.ShipName" Name="ShipName" ShortName="ShipName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShipAddress}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Invoices.ShipAddress" Name="ShipAddress" ShortName="ShipAddress" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShipCity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Invoices.ShipCity" Name="ShipCity" ShortName="ShipCity" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShipRegion}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Invoices.ShipRegion" Name="ShipRegion" ShortName="ShipRegion" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShipPostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Invoices.ShipPostalCode" Name="ShipPostalCode" ShortName="ShipPostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShipCountry}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Invoices.ShipCountry" Name="ShipCountry" ShortName="ShipCountry" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.CustomerID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="12" LongName="Invoices.CustomerID" Name="CustomerID" ShortName="CustomerID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.CustomerName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Invoices.CustomerName" Name="CustomerName" ShortName="CustomerName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Address}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Invoices.Address" Name="Address" ShortName="Address" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Invoices.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Region}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Invoices.Region" Name="Region" ShortName="Region" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.PostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Invoices.PostalCode" Name="PostalCode" ShortName="PostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Country}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Invoices.Country" Name="Country" ShortName="Country" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Salesperson}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="64" LongName="Invoices.Salesperson" Name="Salesperson" ShortName="Salesperson" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Invoices.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.OrderDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.OrderDate" Name="OrderDate" ShortName="OrderDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.RequiredDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.RequiredDate" Name="RequiredDate" ShortName="RequiredDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShippedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.ShippedDate" Name="ShippedDate" ShortName="ShippedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ShipperName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Invoices.ShipperName" Name="ShipperName" ShortName="ShipperName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Invoices.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Invoices.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Quantity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Invoices.Quantity" Name="Quantity" ShortName="Quantity" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Discount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.Discount" Name="Discount" ShortName="Discount" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.ExtendedPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.ExtendedPrice" Name="ExtendedPrice" ShortName="ExtendedPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Invoices.Freight}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Invoices.Freight" Name="Freight" ShortName="Freight" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Order_Details" ClassName="CrystalReports.Table" Name="Order Details">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Order_Details.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Order_Details.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Order_Details.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Order_Details.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details.Quantity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Order_Details.Quantity" Name="Quantity" ShortName="Quantity" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details.Discount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Order_Details.Discount" Name="Discount" ShortName="Discount" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Order_Details_Extended" ClassName="CrystalReports.Table" Name="Order Details Extended">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Order_Details_Extended.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Order_Details_Extended.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details_Extended.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Order_Details_Extended.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details_Extended.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Order_Details_Extended.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details_Extended.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Order_Details_Extended.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details_Extended.Quantity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Order_Details_Extended.Quantity" Name="Quantity" ShortName="Quantity" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details_Extended.Discount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Order_Details_Extended.Discount" Name="Discount" ShortName="Discount" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Details_Extended.ExtendedPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Order_Details_Extended.ExtendedPrice" Name="ExtendedPrice" ShortName="ExtendedPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Order_Subtotals" ClassName="CrystalReports.Table" Name="Order Subtotals">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Order_Subtotals.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Order_Subtotals.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Order_Subtotals.Subtotal}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Order_Subtotals.Subtotal" Name="Subtotal" ShortName="Subtotal" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Orders" ClassName="CrystalReports.Table" Name="Orders">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Orders.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Orders.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.CustomerID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="12" LongName="Orders.CustomerID" Name="CustomerID" ShortName="CustomerID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.EmployeeID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Orders.EmployeeID" Name="EmployeeID" ShortName="EmployeeID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.OrderDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders.OrderDate" Name="OrderDate" ShortName="OrderDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.RequiredDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders.RequiredDate" Name="RequiredDate" ShortName="RequiredDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShippedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders.ShippedDate" Name="ShippedDate" ShortName="ShippedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipVia}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Orders.ShipVia" Name="ShipVia" ShortName="ShipVia" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.Freight}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders.Freight" Name="Freight" ShortName="Freight" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Orders.ShipName" Name="ShipName" ShortName="ShipName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipAddress}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Orders.ShipAddress" Name="ShipAddress" ShortName="ShipAddress" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipCity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders.ShipCity" Name="ShipCity" ShortName="ShipCity" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipRegion}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders.ShipRegion" Name="ShipRegion" ShortName="ShipRegion" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipPostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Orders.ShipPostalCode" Name="ShipPostalCode" ShortName="ShipPostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders.ShipCountry}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders.ShipCountry" Name="ShipCountry" ShortName="ShipCountry" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Orders_Qry" ClassName="CrystalReports.Table" Name="Orders Qry">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Orders_Qry.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Orders_Qry.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.CustomerID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="12" LongName="Orders_Qry.CustomerID" Name="CustomerID" ShortName="CustomerID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.EmployeeID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Orders_Qry.EmployeeID" Name="EmployeeID" ShortName="EmployeeID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.OrderDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders_Qry.OrderDate" Name="OrderDate" ShortName="OrderDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.RequiredDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders_Qry.RequiredDate" Name="RequiredDate" ShortName="RequiredDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShippedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders_Qry.ShippedDate" Name="ShippedDate" ShortName="ShippedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipVia}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Orders_Qry.ShipVia" Name="ShipVia" ShortName="ShipVia" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.Freight}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Orders_Qry.Freight" Name="Freight" ShortName="Freight" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Orders_Qry.ShipName" Name="ShipName" ShortName="ShipName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipAddress}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Orders_Qry.ShipAddress" Name="ShipAddress" ShortName="ShipAddress" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipCity}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders_Qry.ShipCity" Name="ShipCity" ShortName="ShipCity" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipRegion}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders_Qry.ShipRegion" Name="ShipRegion" ShortName="ShipRegion" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipPostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Orders_Qry.ShipPostalCode" Name="ShipPostalCode" ShortName="ShipPostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.ShipCountry}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders_Qry.ShipCountry" Name="ShipCountry" ShortName="ShipCountry" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Orders_Qry.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.Address}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Orders_Qry.Address" Name="Address" ShortName="Address" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders_Qry.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.Region}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders_Qry.Region" Name="Region" ShortName="Region" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.PostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Orders_Qry.PostalCode" Name="PostalCode" ShortName="PostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Orders_Qry.Country}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Orders_Qry.Country" Name="Country" ShortName="Country" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Product_Sales_for_1997" ClassName="CrystalReports.Table" Name="Product Sales for 1997">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Product_Sales_for_1997.CategoryName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Product_Sales_for_1997.CategoryName" Name="CategoryName" ShortName="CategoryName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Product_Sales_for_1997.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Product_Sales_for_1997.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Product_Sales_for_1997.ProductSales}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Product_Sales_for_1997.ProductSales" Name="ProductSales" ShortName="ProductSales" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Products" ClassName="CrystalReports.Table" Name="Products">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Products.ProductID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Products.ProductID" Name="ProductID" ShortName="ProductID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Products.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.SupplierID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Products.SupplierID" Name="SupplierID" ShortName="SupplierID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.CategoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Products.CategoryID" Name="CategoryID" ShortName="CategoryID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.QuantityPerUnit}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Products.QuantityPerUnit" Name="QuantityPerUnit" ShortName="QuantityPerUnit" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Products.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.UnitsInStock}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Products.UnitsInStock" Name="UnitsInStock" ShortName="UnitsInStock" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.UnitsOnOrder}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Products.UnitsOnOrder" Name="UnitsOnOrder" ShortName="UnitsOnOrder" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.ReorderLevel}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Products.ReorderLevel" Name="ReorderLevel" ShortName="ReorderLevel" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products.Discontinued}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Products.Discontinued" Name="Discontinued" ShortName="Discontinued" Type="crFieldValueTypeBooleanField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Products_Above_Average_Price" ClassName="CrystalReports.Table" Name="Products Above Average Price">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Products_Above_Average_Price.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Products_Above_Average_Price.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products_Above_Average_Price.UnitPrice}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Products_Above_Average_Price.UnitPrice" Name="UnitPrice" ShortName="UnitPrice" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Products_by_Category" ClassName="CrystalReports.Table" Name="Products by Category">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Products_by_Category.CategoryName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Products_by_Category.CategoryName" Name="CategoryName" ShortName="CategoryName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products_by_Category.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Products_by_Category.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products_by_Category.QuantityPerUnit}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Products_by_Category.QuantityPerUnit" Name="QuantityPerUnit" ShortName="QuantityPerUnit" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products_by_Category.UnitsInStock}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Products_by_Category.UnitsInStock" Name="UnitsInStock" ShortName="UnitsInStock" Type="crFieldValueTypeInt16sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Products_by_Category.Discontinued}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="Products_by_Category.Discontinued" Name="Discontinued" ShortName="Discontinued" Type="crFieldValueTypeBooleanField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Quarterly_Orders" ClassName="CrystalReports.Table" Name="Quarterly Orders">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Quarterly_Orders.CustomerID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="12" LongName="Quarterly_Orders.CustomerID" Name="CustomerID" ShortName="CustomerID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Quarterly_Orders.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Quarterly_Orders.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Quarterly_Orders.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Quarterly_Orders.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Quarterly_Orders.Country}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Quarterly_Orders.Country" Name="Country" ShortName="Country" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Region" ClassName="CrystalReports.Table" Name="Region">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Region.RegionID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Region.RegionID" Name="RegionID" ShortName="RegionID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Region.RegionDescription}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="Region.RegionDescription" Name="RegionDescription" ShortName="RegionDescription" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Sales_by_Category" ClassName="CrystalReports.Table" Name="Sales by Category">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Sales_by_Category.CategoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Sales_by_Category.CategoryID" Name="CategoryID" ShortName="CategoryID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Sales_by_Category.CategoryName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Sales_by_Category.CategoryName" Name="CategoryName" ShortName="CategoryName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Sales_by_Category.ProductName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Sales_by_Category.ProductName" Name="ProductName" ShortName="ProductName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Sales_by_Category.ProductSales}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Sales_by_Category.ProductSales" Name="ProductSales" ShortName="ProductSales" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Sales_Totals_by_Amount" ClassName="CrystalReports.Table" Name="Sales Totals by Amount">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Sales_Totals_by_Amount.SaleAmount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Sales_Totals_by_Amount.SaleAmount" Name="SaleAmount" ShortName="SaleAmount" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{Sales_Totals_by_Amount.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Sales_Totals_by_Amount.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Sales_Totals_by_Amount.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Sales_Totals_by_Amount.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Sales_Totals_by_Amount.ShippedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Sales_Totals_by_Amount.ShippedDate" Name="ShippedDate" ShortName="ShippedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Shippers" ClassName="CrystalReports.Table" Name="Shippers">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Shippers.ShipperID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Shippers.ShipperID" Name="ShipperID" ShortName="ShipperID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Shippers.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Shippers.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Shippers.Phone}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="50" LongName="Shippers.Phone" Name="Phone" ShortName="Phone" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Summary_of_Sales_by_Quarter" ClassName="CrystalReports.Table" Name="Summary of Sales by Quarter">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Summary_of_Sales_by_Quarter.ShippedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Summary_of_Sales_by_Quarter.ShippedDate" Name="ShippedDate" ShortName="ShippedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Summary_of_Sales_by_Quarter.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Summary_of_Sales_by_Quarter.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Summary_of_Sales_by_Quarter.Subtotal}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Summary_of_Sales_by_Quarter.Subtotal" Name="Subtotal" ShortName="Subtotal" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Summary_of_Sales_by_Year" ClassName="CrystalReports.Table" Name="Summary of Sales by Year">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Summary_of_Sales_by_Year.ShippedDate}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Summary_of_Sales_by_Year.ShippedDate" Name="ShippedDate" ShortName="ShippedDate" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Summary_of_Sales_by_Year.OrderID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Summary_of_Sales_by_Year.OrderID" Name="OrderID" ShortName="OrderID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Summary_of_Sales_by_Year.Subtotal}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Summary_of_Sales_by_Year.Subtotal" Name="Subtotal" ShortName="Subtotal" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Suppliers" ClassName="CrystalReports.Table" Name="Suppliers">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Suppliers.SupplierID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Suppliers.SupplierID" Name="SupplierID" ShortName="SupplierID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.CompanyName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="82" LongName="Suppliers.CompanyName" Name="CompanyName" ShortName="CompanyName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.ContactName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="Suppliers.ContactName" Name="ContactName" ShortName="ContactName" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.ContactTitle}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="62" LongName="Suppliers.ContactTitle" Name="ContactTitle" ShortName="ContactTitle" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.Address}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="122" LongName="Suppliers.Address" Name="Address" ShortName="Address" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Suppliers.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.Region}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Suppliers.Region" Name="Region" ShortName="Region" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.PostalCode}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="22" LongName="Suppliers.PostalCode" Name="PostalCode" ShortName="PostalCode" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.Country}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Suppliers.Country" Name="Country" ShortName="Country" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.Phone}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="50" LongName="Suppliers.Phone" Name="Phone" ShortName="Phone" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.Fax}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="50" LongName="Suppliers.Fax" Name="Fax" ShortName="Fax" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Suppliers.HomePage}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="131070" LongName="Suppliers.HomePage" Name="HomePage" ShortName="HomePage" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="Territories" ClassName="CrystalReports.Table" Name="Territories">
+        <ConnectionInfo Database_DLL="crdb_adoplus.dll" QE_DatabaseName="" QE_DatabaseType="ADO.NET (XML)" QE_LogonProperties="" QE_ServerDescription="NorthwindDataSet" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{Territories.TerritoryID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Territories.TerritoryID" Name="TerritoryID" ShortName="TerritoryID" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Territories.TerritoryDescription}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="Territories.TerritoryDescription" Name="TerritoryDescription" ShortName="TerritoryDescription" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Territories.RegionID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Territories.RegionID" Name="RegionID" ShortName="RegionID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula />
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions />
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions />
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="Area1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="842" Kind="ReportHeader" Name="Section1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <CrossTabObject Name="CrossTab1" Kind="CrossTabObject" Top="0" Left="0" Width="3318" Height="842">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </CrossTabObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="Area2">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="221" Kind="PageHeader" Name="Section2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="PrintDate1" Kind="FieldObject" Top="0" Left="0" Width="994" Height="221" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="LongYear" FormatString="MM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="Area3">
+        <AreaFormat EnableHideForDrillDown="True" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="220" Kind="Detail" Name="Section3">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="Area4">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="220" Kind="ReportFooter" Name="Section4">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="Area5">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageFooter" Name="Section5">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

@@ -562,6 +562,33 @@ def report_parity(
         raise typer.Exit(code=1)
 
 
+@app.command("report-classify")
+def report_classify(
+    src: Path = typer.Argument(Path("samples/crystal/real")),
+    dest: Path = typer.Option(
+        Path("samples/crystal/by-feature"), "--out", "-o",
+        help="Destination for the by-feature folder tree"),
+) -> None:
+    """Classify a Crystal corpus by migration feature: each report is copied
+    into a folder per feature it demonstrates (sub-reports/, charts/, ...)
+    plus a generated README index - pick real-world demo reports by feature."""
+    from pentaho_migration.reports.classify import classify_corpus
+
+    def progress(done: int, total: int) -> None:
+        if done % 25 == 0 or done == total:
+            typer.echo(f"  scanned {done}/{total}", err=True)
+
+    results = classify_corpus(src, dest, progress=progress)
+    counts: dict[str, int] = {}
+    for feats in results.values():
+        for f in feats:
+            counts[f] = counts.get(f, 0) + 1
+    typer.echo(f"{len(results)} reports classified into {dest}")
+    for feature, n in sorted(counts.items(), key=lambda kv: -kv[1]):
+        typer.echo(f"  {feature:24} {n}")
+    typer.echo(f"index: {dest / 'README.md'}")
+
+
 @app.command("report-gaps")
 def report_gaps(
     directory: Path = typer.Argument(Path("samples/crystal/real")),

@@ -73,6 +73,7 @@ FUNC_MAP = {
     "minute":      ("MINUTE", None, None),
     "second":      ("SECOND", None, None),
     "date":        ("DATE", None, None),
+    "dateserial":  ("DATE", None, None),
     "cdate":       ("DATEVALUE", "CDate mapped to DATEVALUE; verify input format", None),
     "datevalue":   ("DATEVALUE", None, None),
     "weekday":     ("WEEKDAY", "Verify weekday numbering convention", None),
@@ -333,6 +334,8 @@ class _Parser:
             return self._switch(args)
         if low == "datediff":
             return self._datediff(args)
+        if low == "dateadd":
+            return self._dateadd(args)
         if low not in FUNC_MAP:
             raise TranslationError(f"no OpenFormula mapping for function {original}()")
         target, note, arg_fn = FUNC_MAP[low]
@@ -371,6 +374,19 @@ class _Parser:
         self.notes.append("DateDiff mapped to DATEDIF - verify boundary "
                           "semantics (Crystal counts interval crossings)")
         return f"DATEDIF({args[1]};{args[2]};{unit})"
+
+    def _dateadd(self, args):
+        """Crystal DateAdd("d", n, date) -> date + n (OpenFormula date serial
+        arithmetic). Only day intervals map exactly; months/years vary in
+        length and stay manual."""
+        if len(args) != 3:
+            raise TranslationError("DateAdd() with other than 3 arguments")
+        if args[0].strip().lower() != '"d"':
+            raise TranslationError(
+                f"DateAdd interval {args[0]} has no exact OpenFormula "
+                "equivalent (only \"d\" maps to date arithmetic)")
+        self.notes.append("DateAdd(\"d\", ...) mapped to date + days arithmetic")
+        return f"({args[2]} + {args[1]})"
 
     def _expect_op(self, symbol):
         kind, val = self.next()
