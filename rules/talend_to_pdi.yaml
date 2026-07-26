@@ -4,13 +4,14 @@
 # Governance: bump _meta.version and record provenance on every change.
 
 _meta:
-  version: 3
+  version: 4
   updated: "2026-07-25"
   provenance:
     - "v1 (2026-07-17): initial component set from Talend Open Studio docs and PDI step inventory; to be validated against the real .item corpus."
     - "v2 (2026-07-17): +18 components from gap analysis on the real corpus (40 jobs, 763 steps): hash staging, per-row SQL, connection/commit management, catchers, REST/JSON/XML extraction, tJavaFlex, tSetGlobalVar, tFlowToIterate."
     - "v2b (2026-07-17): +9 from the harvest frequency table incl. Talend 8 TCK components without the t prefix (JDBCOutput)."
     - "v3 (2026-07-25): +12 long-tail closers from the 42 remaining manual corpus steps (Excel output, property files, HSQLDb, Vertica/rollback connection mgmt, AMC logging, tMemorizeRows->AnalyticQuery, tSOAP->WebServiceLookup, tLibraryLoad); ESB/service-host components stay honestly manual."
+    - "v4 (2026-07-25): corpus grown 40->150 real jobs; +85 components from the new tail. Database families (Teradata/Greenplum/HSQLDb/MSSql/Mysql connection+commit+rollback, Snowflake, BigQuery, tSqlRow, tMongoDBOutput); big data WITHOUT bespoke steps - Hive over JDBC, HDFS over VFS (hdfs:// URLs on ordinary file steps); object storage over PDI VFS connections (S3/Azure, s3://|pvfs://); files/fields/utilities (tExtractDelimitedFields, tAddCRCRow, tSynonymSearch, tSleep, tFileDelete, JSON writers); and DOCUMENTED-MANUAL entries (pdi_type: null + reason) for Talend ESB Mediation Route components (Apache Camel) and service endpoints - Pentaho has no Camel/ESB engine, so the review list now explains WHY instead of printing a bare no-rule message."
 
 # ---- database I/O (family rule: any t<Db>Input behaves the same) ----
 "tOracleInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review dialect against the sandbox database." }
@@ -146,3 +147,155 @@ _meta:
 #  tDataStewardshipTaskOutput / iNetCDF* stay unmapped: PDI is not a service
 #  host and has no Talend-cloud/NetCDF integrations - the impact knowledge
 #  base carries the rebuild guidance.)
+
+# ---- v4: database families from the 150-job corpus ----
+# (family rule: every t<Db>Input/Output/Row/Connection/Close/Commit/Rollback
+#  behaves like the Oracle/Postgres set already mapped above)
+"tTeradataInput": { pdi_type: TableInput, confidence: auto, notes: "Query copied verbatim; review Teradata-specific SQL against the target dialect." }
+"tTeradataOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tTeradataRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row SQL - verify statement and commit behavior." }
+"tTeradataConnection": { pdi_type: Dummy, confidence: auto, notes: "PDI manages connections per step - define a Teradata connection in the .ktr instead." }
+"tTeradataClose": { pdi_type: Dummy, confidence: auto, notes: "PDI closes connections automatically." }
+"tTeradataCommit": { pdi_type: Dummy, confidence: review, notes: "Use the transformation's 'Make the transformation database transactional' option instead of an explicit commit." }
+"tTeradataRollback": { pdi_type: Dummy, confidence: review, notes: "PDI transaction semantics differ - use the transactional transformation option instead of explicit rollback." }
+
+"tGreenplumInput": { pdi_type: TableInput, confidence: auto, notes: "Greenplum speaks PostgreSQL - use a PostgreSQL connection; query copied verbatim." }
+"tGreenplumOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tGreenplumRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row SQL - verify statement and commit behavior." }
+"tGreenplumRowGE": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row SQL (GE variant) - verify statement and commit behavior." }
+"tGreenplumConnection": { pdi_type: Dummy, confidence: auto, notes: "PDI manages connections per step - define a PostgreSQL/Greenplum connection in the .ktr instead." }
+"tGreenplumClose": { pdi_type: Dummy, confidence: auto, notes: "PDI closes connections automatically." }
+"tGEGreenplumGPLoad": { pdi_type: TableOutput, confidence: review, notes: "gpload bulk loader - PDI's Greenplum bulk loader (or Table output with batch inserts) is the equivalent; verify load semantics." }
+
+"tHSQLDbOutput": { pdi_type: TableOutput, confidence: auto, notes: "Review insert/update action and batch settings." }
+"tMysqlClose": { pdi_type: Dummy, confidence: auto, notes: "PDI closes connections automatically." }
+"tMysqlCommit": { pdi_type: Dummy, confidence: review, notes: "Use the transactional transformation option instead of an explicit commit." }
+"tMSSqlConnection": { pdi_type: Dummy, confidence: auto, notes: "PDI manages connections per step - define an MS SQL Server connection in the .ktr instead." }
+"tMSSqlClose": { pdi_type: Dummy, confidence: auto, notes: "PDI closes connections automatically." }
+"tMSSqlCommit": { pdi_type: Dummy, confidence: review, notes: "Use the transactional transformation option instead of an explicit commit." }
+"tSqlRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row SQL - verify statement and commit behavior." }
+"tMongoDBOutput": { pdi_type: MongoDbOutput, confidence: review, notes: "Recreate the collection/write concern configuration (mirrors the tMongoDBInput mapping)." }
+
+# ---- v4: big data (Hive over JDBC, HDFS over VFS - no bespoke steps needed) ----
+"tHiveInput": { pdi_type: TableInput, confidence: review, notes: "Hive is a JDBC source in PDI - create a Hive connection (Big Data plugin) and keep the HiveQL; verify dialect." }
+"tHiveRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row HiveQL over a PDI Hive JDBC connection - verify statement semantics." }
+"tHiveConnection": { pdi_type: Dummy, confidence: auto, notes: "PDI manages connections per step - define a Hive connection (Big Data plugin) in the .ktr instead." }
+"tHiveConfiguration": { pdi_type: Dummy, confidence: auto, notes: "Cluster configuration lives in PDI's named Hadoop cluster, not in a step." }
+"tHDFSInput": { pdi_type: TextFileInput, confidence: review, notes: "PDI reads HDFS through VFS - point the file name at an hdfs:// URL (named Hadoop cluster); verify separator/encoding." }
+"tHDFSOutput": { pdi_type: TextFileOutput, confidence: review, notes: "PDI writes HDFS through VFS - point the file name at an hdfs:// URL (named Hadoop cluster)." }
+"tHDFSConnection": { pdi_type: Dummy, confidence: auto, notes: "Connection details live in PDI's named Hadoop cluster; the hdfs:// VFS URL carries them." }
+"tHDFSConfiguration": { pdi_type: Dummy, confidence: auto, notes: "Cluster configuration lives in PDI's named Hadoop cluster, not in a step." }
+"tHDFSCopy": { pdi_type: ProcessFiles, confidence: review, notes: "Copy/move over VFS - hdfs:// source and target paths." }
+
+# ---- v4: files, fields and utilities ----
+"tFileInputFullRow": { pdi_type: TextFileInput, confidence: auto, notes: "Whole line per row - configure a single field with no separator." }
+"tFileProperties": { pdi_type: GetFileNames, confidence: review, notes: "File metadata (size, dates) comes from Get File Names." }
+"tFileDelete": { pdi_type: ProcessFiles, confidence: review, notes: "Set Process Files to 'delete'; a Delete files job entry is the alternative in a .kjb." }
+"tFileOutputJSON": { pdi_type: JsonOutput, confidence: review, notes: "Recreate the JSON structure/nesting in JSON output." }
+"tWriteJSONField": { pdi_type: JsonOutput, confidence: review, notes: "Builds a JSON document from fields - recreate the structure in JSON output." }
+"tExtractDelimitedFields": { pdi_type: FieldSplitter, confidence: review, notes: "Split one delimited column into fields - verify the field list and types." }
+"tAddCRCRow": { pdi_type: CheckSum, confidence: review, notes: "Row checksum - pick the matching algorithm in Add a checksum." }
+"tSynonymSearch": { pdi_type: FuzzyMatch, confidence: review, notes: "Synonym/reference matching - Fuzzy match is the closest PDI step; recreate the index and algorithm." }
+"tSleep": { pdi_type: Delay, confidence: review, notes: "Delay row - verify the timeout units." }
+"tJobFailure": { pdi_type: Abort, confidence: auto, notes: "Fails the transformation like Talend's job failure." }
+"tChronometerStart": { pdi_type: Dummy, confidence: auto, notes: "Timing instrumentation - PDI records per-step durations in its own step metrics/logging." }
+"tChronometerStop": { pdi_type: Dummy, confidence: auto, notes: "Timing instrumentation - PDI records per-step durations in its own step metrics/logging." }
+"tParallelize": { pdi_type: Dummy, confidence: review, notes: "PDI parallelism is configured per step (Change number of copies), not as a flow component." }
+
+# ---- v4: object storage over VFS (PDI VFS connections: s3://, azure, gs://,
+#      or the portable pvfs:// alias) - no bespoke steps needed ----
+"tS3Connection": { pdi_type: Dummy, confidence: auto, notes: "Define a PDI VFS connection (S3) instead - the s3://|pvfs:// URL carries credentials and bucket." }
+"tS3Put": { pdi_type: ProcessFiles, confidence: review, notes: "Upload over VFS - target an s3://|pvfs:// path; a file-writing step can also write straight to the URL." }
+"tS3Get": { pdi_type: ProcessFiles, confidence: review, notes: "Download over VFS - source an s3://|pvfs:// path; a file-reading step can also read straight from the URL." }
+"tS3List": { pdi_type: GetFileNames, confidence: review, notes: "List objects over VFS - point Get File Names at the s3://|pvfs:// prefix." }
+"tS3Delete": { pdi_type: ProcessFiles, confidence: review, notes: "Set Process Files to 'delete' against the s3://|pvfs:// path." }
+"tAzureStorageGet": { pdi_type: ProcessFiles, confidence: review, notes: "Download over a PDI VFS connection (Azure Blob/Data Lake)." }
+"tAzureStoragePut": { pdi_type: ProcessFiles, confidence: review, notes: "Upload over a PDI VFS connection (Azure Blob/Data Lake)." }
+"tAzureStorageList": { pdi_type: GetFileNames, confidence: review, notes: "List blobs through a PDI VFS connection." }
+"tFileFetch": { pdi_type: HTTP, confidence: review, notes: "Fetch a remote file - HTTP client for http(s), or read the URL directly through VFS." }
+
+# ---- v4: cloud warehouses (JDBC in PDI, same family contract) ----
+"tSnowflakeInput": { pdi_type: TableInput, confidence: review, notes: "Snowflake is a JDBC source in PDI - create a Snowflake connection; verify dialect." }
+"tSnowflakeOutput": { pdi_type: TableOutput, confidence: review, notes: "Review insert/update action and batch settings; bulk loads stage through VFS." }
+"tSnowflakeConnection": { pdi_type: Dummy, confidence: auto, notes: "PDI manages connections per step - define a Snowflake connection in the .ktr instead." }
+"tBigQueryInput": { pdi_type: TableInput, confidence: review, notes: "BigQuery via its JDBC driver - verify Standard SQL dialect." }
+"tBigQuerySQLRow": { pdi_type: ExecSQLRow, confidence: review, notes: "Per-row BigQuery SQL - verify statement semantics and quota cost." }
+
+# ---- v4: Talend ESB Mediation Routes (Apache Camel) -------------------------
+# NOT data-integration jobs: these are message routes. Pentaho has no Camel/ESB
+# equivalent - PDI is not a message-routing engine or a service host. Mapped to
+# null (stays MANUAL) but WITH the reason, so the review list explains itself
+# instead of printing a bare "no mapping rule". The route layer is rebuilt on a
+# real integration platform; PDI is then called from it (Carte REST endpoint).
+"cMessagingEndpoint": { pdi_type: null, confidence: manual, notes: "Camel route endpoint - PDI has no Camel/ESB equivalent; rebuild the route on an integration platform and call PDI via Carte." }
+"cFile": { pdi_type: null, confidence: manual, notes: "Camel file endpoint - PDI has no Camel/ESB equivalent; a scheduled PDI job with VFS paths covers the file-polling case." }
+"cJMS": { pdi_type: null, confidence: manual, notes: "Camel JMS endpoint - PDI has no Camel/ESB equivalent; keep messaging in the integration layer." }
+"cMQConnectionFactory": { pdi_type: null, confidence: manual, notes: "Camel JMS connection factory - no PDI equivalent (routing layer)." }
+"cCXF": { pdi_type: null, confidence: manual, notes: "Camel CXF web-service endpoint - PDI is not a service host." }
+"cREST": { pdi_type: null, confidence: manual, notes: "Camel REST endpoint - PDI is not a service host; expose the service in the integration layer." }
+"cRest": { pdi_type: null, confidence: manual, notes: "Camel REST endpoint - PDI is not a service host; expose the service in the integration layer." }
+"cSetHeader": { pdi_type: null, confidence: manual, notes: "Camel message header manipulation - routing-layer concept, no PDI equivalent." }
+"cSetBody": { pdi_type: null, confidence: manual, notes: "Camel message body manipulation - routing-layer concept, no PDI equivalent." }
+"cLog": { pdi_type: null, confidence: manual, notes: "Camel route logging - routing-layer concept; PDI logs via its own step/job logging." }
+"cDirect": { pdi_type: null, confidence: manual, notes: "Camel in-memory route link - routing-layer concept, no PDI equivalent." }
+"cJavaDSLProcessor": { pdi_type: null, confidence: manual, notes: "Camel Java DSL processor - routing-layer code, no PDI equivalent." }
+"cProcessor": { pdi_type: null, confidence: manual, notes: "Camel processor - routing-layer code, no PDI equivalent." }
+"cBeanRegister": { pdi_type: null, confidence: manual, notes: "Camel bean registry entry - routing-layer concept, no PDI equivalent." }
+"cBean": { pdi_type: null, confidence: manual, notes: "Camel bean invocation - routing-layer code, no PDI equivalent." }
+"cRouteInput": { pdi_type: null, confidence: manual, notes: "Route entry point - no PDI equivalent (routing layer)." }
+"cConfig": { pdi_type: null, confidence: manual, notes: "Camel route configuration - no PDI equivalent (routing layer)." }
+
+# ---- v4: service endpoints and vendor cloud services (honest boundary) ------
+"tESBConsumer": { pdi_type: null, confidence: manual, notes: "Calls a SOAP/REST service as an ESB consumer - for a plain call use Web services lookup or REST client; a full ESB consumer has no PDI equivalent." }
+"tESBProviderRequest": { pdi_type: null, confidence: manual, notes: "Service ENDPOINT (PDI is not a service host) - expose the service elsewhere and call PDI via Carte." }
+"tESBProviderResponse": { pdi_type: null, confidence: manual, notes: "Service ENDPOINT (PDI is not a service host) - expose the service elsewhere and call PDI via Carte." }
+"tRESTRequest": { pdi_type: null, confidence: manual, notes: "Inbound REST endpoint (PDI is not a service host) - expose the service elsewhere and call PDI via Carte." }
+"tRESTResponse": { pdi_type: null, confidence: manual, notes: "Inbound REST response (PDI is not a service host) - expose the service elsewhere and call PDI via Carte." }
+"tDataprepRun": { pdi_type: null, confidence: manual, notes: "Runs a Talend Cloud Data Preparation recipe - no PDI equivalent; rebuild the preparation as PDI steps." }
+"tDataStewardshipTaskOutput": { pdi_type: null, confidence: manual, notes: "Talend Data Stewardship campaign - no PDI equivalent; Pentaho's data-quality tooling is a separate design." }
+"tDqReportRun": { pdi_type: null, confidence: manual, notes: "Talend Data Quality report - no PDI equivalent; rebuild profiling separately." }
+"tHMap": { pdi_type: null, confidence: manual, notes: "Talend Data Mapper transformation - a proprietary mapping artifact; rebuild the mapping as PDI steps." }
+"tMsgBox": { pdi_type: null, confidence: manual, notes: "Interactive dialog box - unattended PDI has no equivalent (and shouldn't); drop it or log instead." }
+
+# ---- v4b: remaining Camel route components (same boundary as above) ---------
+"cTimer": { pdi_type: null, confidence: manual, notes: "Camel timer/scheduler endpoint - schedule the PDI job instead (Carte, cron, or an orchestration tool)." }
+"cSetProperty": { pdi_type: null, confidence: manual, notes: "Camel exchange property - routing-layer concept, no PDI equivalent." }
+"cContentEnricher": { pdi_type: null, confidence: manual, notes: "Camel content enricher - the data-enrichment case is a PDI lookup step, but the routing construct has no equivalent." }
+"cMap": { pdi_type: null, confidence: manual, notes: "Talend ESB route mapper - rebuild the payload mapping in the integration layer (a data-only mapping becomes PDI steps)." }
+"cMessageFilter": { pdi_type: null, confidence: manual, notes: "Camel message filter - routing-layer concept (the data-row case is PDI's Filter rows)." }
+"cExchangePattern": { pdi_type: null, confidence: manual, notes: "Camel exchange pattern (InOnly/InOut) - routing-layer concept, no PDI equivalent." }
+"cConvertBodyTo": { pdi_type: null, confidence: manual, notes: "Camel body type conversion - routing-layer concept, no PDI equivalent." }
+"cSplitter": { pdi_type: null, confidence: manual, notes: "Camel splitter - routing-layer concept (the row-splitting case is PDI's Split field to rows)." }
+"cAggregate": { pdi_type: null, confidence: manual, notes: "Camel aggregator - routing-layer concept (the row-aggregation case is PDI's Group by)." }
+"cIdempotentConsumer": { pdi_type: null, confidence: manual, notes: "Camel idempotent consumer - routing-layer deduplication, no PDI equivalent." }
+"cErrorHandler": { pdi_type: null, confidence: manual, notes: "Camel error handler - routing-layer concept; PDI uses step error handling and job hops." }
+"cOnException": { pdi_type: null, confidence: manual, notes: "Camel exception route - routing-layer concept; PDI uses step error handling and job hops." }
+
+# ---- v4b: messaging, CDC and remaining long tail ----------------------------
+"tKafkaInput": { pdi_type: null, confidence: manual, notes: "Kafka consumer - PDI ships Kafka steps with the streaming plugin; install it and rebuild the consumer (streaming semantics differ from a batch step)." }
+"tKafkaOutput": { pdi_type: null, confidence: manual, notes: "Kafka producer - PDI ships Kafka steps with the streaming plugin; install it and rebuild the producer." }
+"tMomInput": { pdi_type: null, confidence: manual, notes: "JMS/MOM consumer - messaging belongs in the integration layer; PDI's JMS support is plugin-dependent." }
+"tMomOutput": { pdi_type: null, confidence: manual, notes: "JMS/MOM producer - messaging belongs in the integration layer; PDI's JMS support is plugin-dependent." }
+"tREST": { pdi_type: null, confidence: manual, notes: "REST client call - PDI's REST client step covers this; verify the exact step id in your install before wiring it (not verifiable from the export alone)." }
+"tXMLRPCInput": { pdi_type: null, confidence: manual, notes: "XML-RPC client - no direct PDI step; call the service with the HTTP/REST client and parse the response." }
+"tAS400CDC": { pdi_type: null, confidence: manual, notes: "AS/400 change data capture - PDI has no CDC subscriber; source the change table directly or use a CDC product." }
+"tIntervalMatch": { pdi_type: null, confidence: manual, notes: "Range/interval join - rebuild with a database range join or a Merge join plus a range filter." }
+"tPatternCheck": { pdi_type: null, confidence: manual, notes: "Data-quality pattern check - rebuild as a regex evaluation (Modified Java Script Value / Filter rows)." }
+"tFileOutputDelimitedGE": { pdi_type: TextFileOutput, confidence: review, notes: "GE variant of the delimited writer - verify separator, header and encoding." }
+"tExtractPositionalFields": { pdi_type: null, confidence: manual, notes: "Fixed-width field extraction - use Text file input's fixed-width layout, or a scripted substring split." }
+
+# ---- v4c: final tail ---------------------------------------------------------
+"tSystem": { pdi_type: ExecProcess, confidence: review, notes: "Runs an external command - PDI's 'Execute a process' step (or a Shell job entry in a .kjb); verify the exact step id in your install." }
+"tAssert": { pdi_type: null, confidence: manual, notes: "Test assertion - PDI has no assert step; express the check as a Filter rows + Abort, or move it to the test harness." }
+"tAssertCatcher": { pdi_type: null, confidence: manual, notes: "Collects assertion results - see tAssert; PDI reports failures through step errors and the log." }
+"tFileInputParquet": { pdi_type: null, confidence: manual, notes: "Parquet reader - PDI reads Parquet with the Big Data plugin (over VFS paths); install it and rebuild the reader." }
+"tFileOutputParquet": { pdi_type: null, confidence: manual, notes: "Parquet writer - PDI writes Parquet with the Big Data plugin (over VFS paths); install it and rebuild the writer." }
+"tMapRStreamsCreateStream": { pdi_type: null, confidence: manual, notes: "MapR Streams admin operation - infrastructure provisioning, not a data step; no PDI equivalent." }
+"tDropboxConnection": { pdi_type: null, confidence: manual, notes: "Dropbox is not a standard PDI VFS provider - stage the files to a supported store (S3/Azure/SFTP) or script the transfer." }
+"tDropboxGet": { pdi_type: null, confidence: manual, notes: "Dropbox is not a standard PDI VFS provider - stage the files to a supported store (S3/Azure/SFTP) or script the transfer." }
+"tDropboxPut": { pdi_type: null, confidence: manual, notes: "Dropbox is not a standard PDI VFS provider - stage the files to a supported store (S3/Azure/SFTP) or script the transfer." }
+"tMilvusConnection": { pdi_type: null, confidence: manual, notes: "Milvus vector database - no PDI step; call its API from a scripted step or load through a supported interface." }
+"MilvusInput": { pdi_type: null, confidence: manual, notes: "Milvus vector database - no PDI step; call its API from a scripted step or load through a supported interface." }
+"MilvusOutput": { pdi_type: null, confidence: manual, notes: "Milvus vector database - no PDI step; call its API from a scripted step or load through a supported interface." }
+"cRecipientList": { pdi_type: null, confidence: manual, notes: "Camel dynamic recipient list - routing-layer concept, no PDI equivalent." }
+"cSOAP": { pdi_type: null, confidence: manual, notes: "Camel SOAP endpoint - PDI is not a service host; a SOAP CALL is Web services lookup." }

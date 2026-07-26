@@ -1,10 +1,10 @@
 # Pentaho Migration Copilot
 
 **AI-assisted migration of legacy data platforms into Pentaho — ETL and BI reports:**
-**Informatica PowerCenter and Talend → native PDI pipelines (SSIS and DataStage next);**
+**Informatica PowerCenter and Talend → native PDI pipelines (IBM DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.32.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
+Version **1.33.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -93,8 +93,8 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 
 | Layer | Where | Status |
 | --- | --- | --- |
-| Parsers (Parse) | `src/pentaho_migration/parser/` | PowerCenter XML and Talend .item → one normalized Pydantic IR; content-sniffing auto-detection; source analysis with version detection. Zero failures across both real corpora (90 files) |
-| Rules mappers (Map) | `src/pentaho_migration/mapper/` + `rules/*.yaml` | Per-source rules libraries with governance metadata (PowerCenter v3: 18 types; Talend v2: 60+ components); unknown types → explicit manual handoff |
+| Parsers (Parse) | `src/pentaho_migration/parser/` | PowerCenter XML and Talend .item → one normalized Pydantic IR; content-sniffing auto-detection; source analysis with version detection. Zero failures across both real corpora (200 files: 50 PowerCenter, 150 Talend) |
+| Rules mappers (Map) | `src/pentaho_migration/mapper/` + `rules/*.yaml` | Per-source rules libraries with governance metadata (PowerCenter v3: 18 types; Talend v4: 190+ components — including documented-manual entries that carry the reason); unknown types → explicit manual handoff |
 | LLM (Map) | `src/pentaho_migration/llm/` | Expression translation (Informatica + Java prompts, schema-forced JSON, always flagged `review`), per-step solution suggestions, hardware detection with multi-GPU model recommendation; provider dispatch shared app-wide — Ollama (local), Anthropic, OpenAI, Google Gemini, Azure OpenAI |
 | Generators (Generate) | `src/pentaho_migration/generator/` | .ktr with real config for 9 step types (incl. Merge Join keys, Stream Lookup with injected lookup source); .kjb jobs from PowerCenter workflows |
 | Validator (Validate) | `src/pentaho_migration/validator/` | Migration report, gap analysis, pre-migration assessment, impact knowledge base (both sources), confidence score, effort & cost estimate (Copilot vs manual rebuild), CSV diff harness (measured parity) |
@@ -262,11 +262,19 @@ Current coverage measured on that corpus with `pentaho-migrate gaps`: **54% auto
 45% review (dominated by untranslated expressions — 4,321 of them), and a handful
 of manual steps (Custom Transformation, Transaction Control).
 
-`samples/talend/` holds **40 genuine Talend jobs spanning versions 5.1 → 8.0.1** —
-production data warehouses, Red Hat's oVirt DWH, health-informatics ETL, Salesforce
-REST syncs — 763 steps across 104 distinct components, all parsing with zero errors.
-Rules v2 (extended from this corpus's gap analysis) cut manual steps from 207 to 42;
-avg confidence 62/100.
+`samples/talend/` holds **150 genuine Talend jobs** harvested from public GitHub
+repositories (provenance, licences and hashes in `samples/talend/MANIFEST.md`;
+regenerate or extend with `scripts/harvest_talend.py`) — production data warehouses,
+Red Hat's oVirt DWH, health-informatics ETL, Salesforce REST syncs, ESB mediation
+routes — **1,668 steps across 220+ distinct components, all parsing with zero
+errors**. Rules v4, extended from this corpus's gap analysis, cut manual steps from
+293 to 167 (avg confidence 68/100), and **every remaining unmapped component now
+carries its reason** rather than a bare "no rule": Camel/ESB routing components and
+service endpoints are documented as an honest boundary (Pentaho has no Camel/ESB
+engine), and in-house custom components and joblets are named as such. Big-data and
+object-store components map through PDI's own mechanisms rather than invented steps —
+Hive over JDBC, HDFS over VFS (`hdfs://` on ordinary file steps), S3/Azure through
+VFS connections.
 
 `samples/crystal-rpt/` holds **150 genuine Crystal Reports `.rpt` binaries**
 harvested from public GitHub repositories, with fork-extracted, credential-scrubbed
@@ -363,7 +371,6 @@ Completed sources — Informatica PowerCenter and SAP Crystal Reports:
 
 **Phase 2 — multi-source, next:**
 
-- [ ] SSIS (.dtsx)
 - [ ] IBM DataStage (.dsx)
 
 ## Project documents

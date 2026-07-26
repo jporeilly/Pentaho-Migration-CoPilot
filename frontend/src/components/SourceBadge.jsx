@@ -5,7 +5,6 @@ import { useState } from 'react'
 // tool), it is shown; otherwise a neutral lettermark fallback renders.
 export const TOOLS = {
   powercenter: { short: 'INFA', label: 'Informatica PowerCenter', color: '#eb6834' },
-  ssis: { short: 'SSIS', label: 'SQL Server Integration Services', color: '#3987e5' },
   talend: { short: 'TLND', label: 'Talend', color: '#1baf7a' },
   datastage: { short: 'DS', label: 'IBM DataStage', color: '#9085e9' },
   crystal: { short: 'CR', label: 'SAP Crystal Reports', color: '#f0ab00' },

@@ -20,6 +20,23 @@ RULES_BY_TOOL = {
 }
 
 
+def _no_rule_note(source_type: str) -> str:
+    """The honest handoff message for a step with no rule. Custom and joblet
+    components can never be enumerated in a rules library (every estate has
+    its own), so name that category explicitly instead of implying the
+    library is simply incomplete — the rebuild advice differs completely."""
+    conventional = (len(source_type) > 1
+                    and source_type[0] in "tc"
+                    and source_type[1].isupper())
+    if not conventional or source_type.lower().startswith("joblet"):
+        return (f"'{source_type}' does not follow the Talend component naming "
+                "convention — it is most likely a CUSTOM component or a joblet "
+                "built in-house. No rules library can cover these: open it in "
+                "Studio to see what it does, then rebuild that behaviour with "
+                "PDI steps (a joblet usually becomes a mapping/sub-transformation).")
+    return f"No mapping rule for '{source_type}' — manual conversion required."
+
+
 class RulesMapper:
     def __init__(self, rules_path: str | Path = DEFAULT_RULES):
         with open(rules_path, encoding="utf-8") as f:
@@ -44,9 +61,7 @@ class RulesMapper:
             rule = self.rules.get(step.source_type)
             if rule is None:
                 step.confidence = Confidence.MANUAL
-                step.notes.append(
-                    f"No mapping rule for '{step.source_type}' — manual conversion required."
-                )
+                step.notes.append(_no_rule_note(step.source_type))
                 continue
             step.pdi_type = rule["pdi_type"]
             step.confidence = Confidence(rule.get("confidence", "review"))

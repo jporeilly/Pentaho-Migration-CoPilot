@@ -7,6 +7,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.33.0] — 2026-07-25
+
+### Added
+
+- **Talend rules v4 — 190+ components**, extended from the gap analysis of
+  the now 150-job corpus. Database families completed
+  (Teradata/Greenplum/HSQLDb/MSSql/Mysql connection-commit-rollback,
+  Snowflake, BigQuery, tSqlRow, tMongoDBOutput); **big data and object
+  storage map through PDI's own mechanisms rather than invented steps** —
+  Hive over JDBC, HDFS over VFS (`hdfs://` URLs on ordinary file steps),
+  S3/Azure through VFS connections; plus files/fields/utilities
+  (tExtractDelimitedFields, tAddCRCRow, tSynonymSearch, tSleep,
+  tFileDelete, JSON writers). Corpus effect: **manual steps 293 → 167**,
+  avg confidence 65 → 68.
+- **Every unmapped component now carries its reason.** New
+  documented-manual rule form (`pdi_type: null` + the why) covers Talend
+  ESB Mediation Route components (Apache Camel) and service endpoints —
+  Pentaho has no Camel/ESB engine, so the review list says so and points
+  at the real path (rebuild the route on an integration platform, call
+  PDI via Carte). In-house **custom components and joblets are detected
+  by naming convention** and named as such, since no rules library can
+  enumerate them. A regression test asserts no corpus step is ever left
+  unexplained.
+- **ESB route detection in the source analysis**: a job carrying Camel
+  components is flagged SERIOUS *before* conversion as a different
+  artifact kind, instead of trickling through as unmapped-step noise.
+
+### Changed
+
+- **SSIS removed from the roadmap** (not required). Phase 2 is now IBM
+  DataStage only.
+- Talend corpus documentation refreshed: 150 jobs, 1,668 steps, 220+
+  distinct components, provenance in `samples/talend/MANIFEST.md`.
+
 ## [1.32.0] — 2026-07-25
 
 ### Added

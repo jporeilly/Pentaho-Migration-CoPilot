@@ -30,6 +30,7 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
                      "a PDI Job (.kjb) is generated with the calling structure wired to the "
                      "called jobs' .ktr files; convert each called job so the references resolve.",
             ))
+
         else:
             warn(SourceWarning(
                 level=WarningLevel.WARNING,
@@ -37,6 +38,30 @@ def assess_source(source: SourceInfo, pipelines: list[Pipeline]) -> SourceInfo:
                      "Workflows convert to .kjb skeletons; session-level settings (commit intervals, "
                      "error handling, overrides) are NOT carried over — review every job entry.",
             ))
+
+    # Talend ESB Mediation Routes are a DIFFERENT artifact kind: Apache Camel
+    # message routes, not data pipelines. Pentaho has no Camel/ESB engine, so
+    # say so up front instead of letting the route components trickle through
+    # as unmapped-step noise.
+    route_components = sorted({
+        step.source_type
+        for p in pipelines for step in p.steps
+        if len(step.source_type) > 1
+        and step.source_type[0] == "c" and step.source_type[1].isupper()
+    })
+    if route_components:
+        warn(SourceWarning(
+            level=WarningLevel.SERIOUS,
+            text=f"This is a Talend ESB Mediation Route (Apache Camel), not a data-integration "
+                 f"job — {len(route_components)} routing component(s) detected "
+                 f"({', '.join(route_components[:5])}"
+                 f"{', …' if len(route_components) > 5 else ''}). Pentaho has no Camel/ESB "
+                 "engine: message routing, service endpoints and mediation have no PDI "
+                 "equivalent. Rebuild the route on an integration platform and call PDI "
+                 "from it (a Carte REST endpoint runs the transformation) — only the "
+                 "data-processing components inside the route convert.",
+        ))
+
     if source.mapplets:
         warn(SourceWarning(
             level=WarningLevel.INFO,

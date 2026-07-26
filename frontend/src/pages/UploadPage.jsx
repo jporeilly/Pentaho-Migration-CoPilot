@@ -26,8 +26,8 @@ const REPORTS = [
 
 const PHASES = [
   { name: 'Phase 0 — Internal tool', text: 'Informatica PowerCenter end-to-end, used by Pentaho’s own services team. Complete.' },
-  { name: 'Phase 1 — Assisted product', text: 'Informatica PowerCenter and SAP Crystal Reports complete (real-corpus validated); Talend in progress. Confidence scoring and mandatory human review throughout. You are here.', current: true },
-  { name: 'Phase 2 — Multi-source', text: 'Complete Talend; then SSIS and DataStage.' },
+  { name: 'Phase 1 — Assisted product', text: 'Informatica PowerCenter, SAP Crystal Reports and Talend complete (real-corpus validated). Confidence scoring and mandatory human review throughout. You are here.', current: true },
+  { name: 'Phase 2 — Multi-source', text: 'Informatica, Crystal Reports and Talend complete; DataStage next.' },
 ]
 
 export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, error, loading, source, onShowPractices, family }) {

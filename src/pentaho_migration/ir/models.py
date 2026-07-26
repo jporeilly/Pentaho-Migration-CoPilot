@@ -1,6 +1,6 @@
 """Normalized intermediate representation (IR) for legacy ETL pipelines.
 
-Every source tool (Informatica, SSIS, Talend, DataStage) parses into this
+Every source tool (Informatica, Talend, DataStage) parses into this
 representation; the mapper and generator only ever see the IR, never the
 source format.
 """
@@ -12,7 +12,6 @@ from pydantic import BaseModel, Field
 
 class SourceTool(str, Enum):
     POWERCENTER = "powercenter"
-    SSIS = "ssis"
     TALEND = "talend"
     DATASTAGE = "datastage"
     CRYSTAL = "crystal"  # reports family — converted by pentaho_migration.reports, not this IR
