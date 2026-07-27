@@ -103,6 +103,13 @@ def _style_expr_block(el):
 def render_element(el, tp="", sp="style:"):
     """Render one Element. tp/sp are tag prefixes for layout.xml vs styles.xml."""
     if el.kind == "label":
+        if el.text_template:
+            # Crystal text object with fields embedded in its prose. PRD's
+            # message element interpolates $(column) at render time, which is
+            # the same thing Crystal does with {Table.Column}.
+            return (f'<{tp}message core:element-type="message">{_style_block(el, sp)}'
+                    f"{_style_expr_block(el)}"
+                    f"<core:value>{escape(el.text_template)}</core:value></{tp}message>")
         return (f'<{tp}label core:element-type="label">{_style_block(el, sp)}'
                 f"{_style_expr_block(el)}"
                 f"<core:value>{escape(el.text)}</core:value></{tp}label>")

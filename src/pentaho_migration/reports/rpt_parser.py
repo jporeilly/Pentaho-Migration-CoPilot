@@ -158,7 +158,15 @@ def _parse_object(obj):
     if tag == "TextObject":
         el.kind = "label"
         el.text = _text_of(obj, "Text")
-    elif tag in ("FieldObject", "FieldHeadingObject", "SpecialVarFieldObject",
+    elif tag == "FieldHeadingObject":
+        # Crystal's automatic column heading for a field. It has no DataSource
+        # of its own - the caption is its <Text> child, and FieldObjectName
+        # only says which field it sits above. Treating it as a field left an
+        # unbound element and a spurious "unresolved reference" on every
+        # standard-layout report.
+        el.kind = "label"
+        el.text = _text_of(obj, "Text") or _attr(obj, "FieldObjectName", default="")
+    elif tag in ("FieldObject", "SpecialVarFieldObject",
                  "DatabaseFieldObject", "FormulaFieldObject", "ParameterFieldObject"):
         el.kind = "field"
         el.field_ref = _attr(obj, "DataSource", "DataSourceName", "FieldSource",
@@ -817,11 +825,93 @@ def _resolve_format(el):
         el.format_string = el.format_date
 
 
+_EMBEDDED = re.compile(r"\{[^{}]+\}")
+
+# "Sum ({@Late Invoices}, {CUSTOMER.COUNTRY})" - Crystal spells a summary out
+# in full wherever it is referenced, including inside a text object's prose.
+_SUMMARY_CALL = re.compile(
+    r"\b[A-Za-z][A-Za-z0-9]*\s*\(\s*\{[^{}]+\}\s*(?:,\s*\{[^{}]+\}\s*)*\)")
+
+
+def _resolve_embedded_text(el, model, summary_by_name):
+    """Crystal text objects can carry field references INSIDE their prose:
+    "The total amount due is {@statement amount} and is payable...". Emitted as
+    a plain label, that prints the braces at the customer. PRD has the right
+    element for this - a message field with $(column) placeholders - so build
+    the template here and let the renderer choose the element type.
+
+    A marker that cannot be resolved is left exactly as it was, and the element
+    keeps a note: printing '{@thing}' is bad, but silently dropping the phrase
+    the letter is built around is worse."""
+    text = el.text or ""
+    if "{" not in text:
+        return
+    unresolved = []
+
+    def substitute(match):
+        raw = match.group(0)
+        # A summary is spelled by its display name: "Sum ({@x}, {Cust.Name})".
+        # Those markers are consumed by the outer expression, not on their own.
+        kind, name = parse_field_ref(raw)
+        if kind == "db":
+            return f"$({name})"
+        if kind == "formula":
+            # The same reference a standalone formula field uses: the writer
+            # emits a PRD expression named after the formula. prd_target() is
+            # a description for humans, not something $() can resolve.
+            if name in model.formulas:
+                return f"$({name})"
+        if kind == "parameter":
+            return f"$({name})"
+        if kind == "summary":
+            summary = summary_by_name.get(name)
+            if summary is not None:
+                return f"$({summary.expression_name})"
+        unresolved.append(raw)
+        return raw
+
+    # A summary is spelled out in full - "Sum ({@Late Invoices}, {CUST.NAME})" -
+    # so it must be handled BEFORE its inner markers are, or the phrase no
+    # longer matches anything. Crystal also allows an INLINE summary here that
+    # has no definition anywhere; that one cannot be bound to a PRD function,
+    # and half-resolving it to "Sum ($(a), $(b))" would print a number that is
+    # not the total. Those are frozen as written and flagged instead.
+    frozen = {}
+
+    def summary_call(match):
+        phrase = match.group(0)
+        summary = summary_by_name.get(phrase) or summary_by_name.get(" ".join(phrase.split()))
+        if summary is not None:
+            return f"$({summary.expression_name})"
+        token = f"\x00{len(frozen)}\x00"
+        frozen[token] = phrase
+        unresolved.append(phrase)
+        return token
+
+    template = _SUMMARY_CALL.sub(summary_call, text)
+    template = _EMBEDDED.sub(substitute, template)
+    for token, phrase in frozen.items():
+        template = template.replace(token, phrase)
+    if unresolved:
+        # Note it even when nothing else in the text resolved - especially
+        # then, because the element stays a plain label and prints the Crystal
+        # source at the customer. That has to show up in the backlog.
+        el.notes.append(
+            "text object embeds reference(s) with no PRD equivalent - "
+            f"{', '.join(sorted(set(unresolved))[:3])} - left as written so the "
+            "gap is visible; add the aggregate or binding by hand in PRD")
+    if template != text:
+        el.text_template = template
+
+
 def _resolve_references(model):
     """Resolve element field refs to PRD column/expression names."""
     summary_by_name = {s.name: s for s in model.summaries}
     for section in model.sections:
         for el in section.elements:
+            if el.kind == "label":
+                _resolve_embedded_text(el, model, summary_by_name)
+                continue
             if el.kind == "chart":
                 el.chart_category = _chart_column(el.chart_category, model)
                 el.chart_value = _chart_column(el.chart_value, model)

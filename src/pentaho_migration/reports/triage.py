@@ -29,6 +29,7 @@ from pentaho_migration.llm.settings import LLMSettings, load_settings
 from pentaho_migration.reports import load_report_model
 from pentaho_migration.reports.effort import build_report_effort
 from pentaho_migration.reports.layout_qa import lint_layout
+from pentaho_migration.reports.todo_kinds import MANUAL, split_todos
 from pentaho_migration.reports.schema_agent import validate_sql
 
 
@@ -44,6 +45,7 @@ class TriageResult:
     rewrites: int = 0
     todos: int = 0
     todo_kinds: dict = field(default_factory=dict)  # category -> count (cross-tab/subreport/image/...)
+    unconverted: int = 0           # Crystal behaviours with no PRD equivalent
     layout_errors: int = 0
     layout_warnings: int = 0
     sql_status: str = "unchecked"  # valid | invalid | unchecked
@@ -127,9 +129,23 @@ def triage_one(dump: Path, jndi: str = "", check_sql: bool = True) -> TriageResu
     if result.todos:
         result.reasons.append(f"{result.todos} TODO placeholder(s) (subreport/image/cross-tab)")
 
+    # Notes the pipeline raised because a Crystal behaviour has no PRD
+    # equivalent. These used to be invisible to the verdict, so a report whose
+    # conditional suppression, group sort or percent-of-total had been dropped
+    # still came out READY - the one word a consultant trusts to mean
+    # convert-and-go.
+    notes = [n for s in model.sections for el in s.elements for n in el.notes]
+    notes.extend(model.issues)
+    unconverted = split_todos(notes)[MANUAL]
+    result.unconverted = len(unconverted)
+    for note in unconverted[:6]:
+        result.reasons.append(note)
+    if len(unconverted) > 6:
+        result.reasons.append(f"... and {len(unconverted) - 6} more not carried")
+
     if result.sql_status == "invalid":
         result.verdict = "BLOCKED"
-    elif (result.manual or result.todos or result.rewrites
+    elif (result.manual or result.todos or result.rewrites or result.unconverted
           or result.layout_errors or result.layout_warnings):
         result.verdict = "REVIEW"
     else:

@@ -30,6 +30,17 @@ _RULES = (
     (APPLIED, re.compile(r"\blayout auto-fit:", re.I)),
     (APPLIED, re.compile(r"\bnudged apart\b|\bgrown to fit\b|\bscaled by\b", re.I)),
     (APPLIED, re.compile(r"\brecovered\b.*\brpt-rs\b", re.I)),
+    # "conditional EnableSuppress converted to a 'visible' style expression -
+    # verify against Crystal", "cross-tab converted to a nested PRD crosstab
+    # sub-report", "subreport 'x' converted as a nested PRD sub-report". The
+    # pipeline did the work; the sentence is telling you what it chose.
+    (APPLIED, re.compile(r"\bconverted (?:to|as|into)\b", re.I)),
+    (APPLIED, re.compile(r"\bresolved to column\b", re.I)),
+    # "summary 'StdDev of APR' has no PRD report function - computed as a
+    # windowed SQL column (STDDEV_SAMP ... OVER ...)". The workaround shipped;
+    # the sentence names it. Without this the note reads as a rebuild.
+    (APPLIED, re.compile(r"\bcomputed as a\b|\brewritten as a\b|\bemitted as a "
+                         r"PRD\b|\bgenerated in the bundle\b", re.I)),
     (INFO, re.compile(r"\bimage carved from the \.rpt", re.I)),
     (INFO, re.compile(r"\bchart migrated as a PRD legacy chart", re.I)),
     (MANUAL, re.compile(r"\bnot carried\b|\brebuild by hand\b|\bby hand\b"

@@ -163,27 +163,69 @@ def _aspect_distance(box_aspect, image):
     return abs(log(box_aspect / image.aspect))
 
 
-def match_images(picture_boxes, images):
-    """picture_boxes: [(key, width, height)] layout boxes (any unit — only the
-    ratio is used). Returns {key: CarvedImage}.
+# Crystal places a picture at its natural size unless someone resizes it, and
+# rasters are authored at 96 DPI, so box_points == pixels * 72/96. When a box
+# lands within this many points of an image's natural size it is that image —
+# a far stronger signal than the aspect ratio, which cannot tell a 2.14 logo
+# from a 2.33 box.
+PT_PER_PX = 72.0 / 96.0
+NATURAL_SIZE_TOLERANCE_PT = 3.0
 
-    Confident pairs first: every (box, image) combination is scored and the
-    best ones claim each other, so a distinct image is never spent twice while
-    another image is still unused — three logos in a report come out as three
-    logos, not the best-matching one repeated. Only once the images run out may
-    the remainder reuse one, which is the honest reading of a report that
-    repeats a logo per band. A single box with a single candidate matches
-    unconditionally (the box may crop the raster, breaking the ratio)."""
+
+def _natural_size_distance(box_w_pt, box_h_pt, image):
+    """Width is the axis to trust. A Crystal picture box routinely CROPS its
+    raster vertically — a tall watermark shown as a band — but a box placed at
+    natural size keeps the raster's full width. So match on width, and reject
+    when the box is taller than the raster, which means it was stretched rather
+    than placed."""
+    natural_w = image.width * PT_PER_PX
+    natural_h = image.height * PT_PER_PX
+    if box_h_pt > natural_h + NATURAL_SIZE_TOLERANCE_PT:
+        return float("inf")
+    return abs(box_w_pt - natural_w)
+
+
+def match_images(picture_boxes, images, boxes_in_points=False):
+    """picture_boxes: [(key, width, height)] layout boxes. Returns
+    {key: CarvedImage}.
+
+    With `boxes_in_points` the natural-size test runs first: any box sitting
+    within a few points of an image's own dimensions is that image, full stop.
+    Whatever is left falls back to aspect ratio.
+
+    Either way, confident pairs claim each other first, so a distinct image is
+    never spent twice while another image is still unused — three logos in a
+    report come out as three logos, not the best-matching one repeated. Only
+    once the images run out may the remainder reuse one, which is the honest
+    reading of a report that repeats a logo per band. A single box with a
+    single candidate matches unconditionally (the box may crop the raster,
+    breaking the ratio)."""
     if not images:
         return {}
     if len(picture_boxes) == 1 and len(images) == 1:
         return {picture_boxes[0][0]: images[0]}
 
+    claimed_boxes, claimed_images, matched = set(), set(), {}
+    if boxes_in_points:
+        exact = sorted(
+            (_natural_size_distance(w, h, img), bi, ii)
+            for bi, (_key, w, h) in enumerate(picture_boxes)
+            for ii, img in enumerate(images))
+        for distance, bi, ii in exact:
+            if distance > NATURAL_SIZE_TOLERANCE_PT:
+                break
+            if bi in claimed_boxes or ii in claimed_images:
+                continue
+            matched[picture_boxes[bi][0]] = images[ii]
+            claimed_boxes.add(bi)
+            claimed_images.add(ii)
+
     scored = sorted(
         (_aspect_distance((w / h) if h else 0.0, img), bi, ii)
         for bi, (_key, w, h) in enumerate(picture_boxes)
-        for ii, img in enumerate(images))
-    matched, taken_boxes, taken_images = {}, set(), set()
+        for ii, img in enumerate(images)
+        if bi not in claimed_boxes and ii not in claimed_images)
+    taken_boxes, taken_images = set(claimed_boxes), set(claimed_images)
     for distance, bi, ii in scored:
         if distance > MAX_ASPECT_DISTANCE:
             break
@@ -213,15 +255,16 @@ def enrich_dump(dump_path, rpt_path, out_path=None):
         el for el in tree.getroot().iter("PictureObject")
         if el.find("ImageData") is None
     ]
+    # RptToXml writes geometry in twips; points let the natural-size test work
     boxes = []
     for idx, el in enumerate(pictures):
         try:
-            w = float(el.get("Width", "0"))
-            h = float(el.get("Height", "0"))
+            w = float(el.get("Width", "0")) / 20.0
+            h = float(el.get("Height", "0")) / 20.0
         except ValueError:
             w = h = 0.0
         boxes.append((idx, w, h))
-    assignments = match_images(boxes, images)
+    assignments = match_images(boxes, images, boxes_in_points=True)
     for idx, image in assignments.items():
         data_el = ET.SubElement(pictures[idx], "ImageData")
         data_el.set("Carved", "true")  # parser adds a verify note downstream

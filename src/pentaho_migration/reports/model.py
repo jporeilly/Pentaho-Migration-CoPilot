@@ -56,6 +56,8 @@ class Element:
     width: float = 100.0
     height: float = 14.0
     text: str = ""            # label text
+    text_template: str = ""   # PRD message template when the text embeds
+                              # field references: "Total due is $(AMOUNT)"
     field_ref: str = ""       # raw Crystal DataSource, e.g. {Orders.AMOUNT}, {@FullName}, {?Branch}
     column: str = ""          # resolved PRD column/expression name
     value_type: str = ""      # Crystal ValueType of the underlying field, if known
