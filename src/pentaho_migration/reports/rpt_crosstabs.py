@@ -141,7 +141,7 @@ def describe_availability() -> str:
     """One line for the CLI/preflight: is cross-tab recovery possible here?"""
     exe = find_rpt_rs()
     if exe is None:
-        return ("rpt-rs not found — cross-tab definitions cannot be recovered "
+        return ("rpt-rs not found - cross-tab definitions cannot be recovered "
                 "automatically (add tools/rpt-rs/rpt[.exe] or set RPT_RS_PATH). "
                 "Hand-add <CrossTabDefinition> instead.")
-    return f"rpt-rs found at {exe} — cross-tab definitions can be recovered from .rpt binaries."
+    return f"rpt-rs found at {exe} - cross-tab definitions can be recovered from .rpt binaries."

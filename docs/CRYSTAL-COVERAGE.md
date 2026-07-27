@@ -94,6 +94,10 @@ Every conversion can be verified mechanically:
   diffed against the customer's Crystal export — PASS / NEAR / FAIL.
 - **Batch triage** (`report-triage`): READY / REVIEW / BLOCKED verdict per
   report across a whole corpus.
+- **Cross-tab recovery walkthrough** (`python scripts/demo_crosstab_recovery.py`):
+  runs a real corpus report from "the SDK cannot see this grid, so it is a TODO"
+  through recovery to a live PRD crosstab, printing the recovered rows, columns
+  and measures at each step.
 
 ## Known boundaries (found by the Stress Lab, verified against the engine)
 

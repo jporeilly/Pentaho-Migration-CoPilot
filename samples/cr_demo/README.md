@@ -22,6 +22,19 @@ Regenerate with `python samples/cr_demo/build_ladder.py`.
 | 8 | Stress Lab **- Boundaries** | 3 nested groups (one on a formula), **two-field-linked subreport**, complex child (own group + summary + cond. format), page-band subreport (engine-forbidden → TODO), query-backed pick-list, full formula zoo | maps the boundaries — see [docs/CRYSTAL-COVERAGE.md](../../docs/CRYSTAL-COVERAGE.md) |
 | 9 | Branch Activity Matrix **- Cross-tab** | `<CrossTabDefinition>` block → **live PRD crosstab** (branches × txn types, summed) hosted in a nested sub-report | all auto (review the pivot) |
 
+**Cross-tab recovery is demoed elsewhere.** These dumps are *authored* by
+`build_ladder.py`, so there is no `.rpt` binary for `report-crosstabs` to read:
+rung 9 carries a hand-written `<CrossTabDefinition>` (the converted path) and
+rung 6 deliberately carries none (the manual path). To see a grid recovered
+from a real binary, run:
+
+```
+python scripts/demo_crosstab_recovery.py
+```
+
+which walks `samples/crystal-rpt/ajryan_B1Budget_M.rpt` from "cross-tab is a
+TODO" to a live PRD crosstab.
+
 The flagship UI sample **Branch Transaction Summary - Prompt**
 (`../crystal/branch_transactions.xml`) demonstrates the working parameter
 prompt: the record selection folds into the SQL WHERE, so changing the Branch

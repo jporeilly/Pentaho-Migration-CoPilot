@@ -96,9 +96,52 @@ Then the corpus/engagement workflow is:
 pentaho-migrate report-env                       # preflight: all four checks green?
 .\scripts\extract-rpt.ps1 -InDir C:\customer\rpts -OutDir C:\customer\xml
 pentaho-migrate report-scrub C:\customer\xml     # blank credentials RptToXml copies from .rpt files
+pentaho-migrate report-crosstabs C:\customer\xml --rpt-dir C:\customer\rpts   # recover cross-tab grids
 pentaho-migrate report-gaps  C:\customer\xml     # parse coverage, formula rates, portfolio effort
 pentaho-migrate report C:\customer\xml\Foo.xml --jndi MyDS -t --validate
 ```
+
+### Optional: cross-tab recovery (rpt-rs)
+
+`report-crosstabs` recovers cross-tab grids the SAP SDK cannot export, by
+reading the `.rpt` binary with [rpt-rs](https://github.com/MrSrsen/rpt-rs)
+(MPL-2.0, no SAP runtime needed). It is **optional** — without it, cross-tabs
+keep their hand-add TODO and nothing else changes.
+
+Put the binary at `tools/rpt-rs/rpt.exe` (or set `RPT_RS_PATH`). Note that
+release v0.2.0 decodes nothing on Windows; the one-line fix is
+[upstream PR #1](https://github.com/MrSrsen/rpt-rs/pull/1), so until it is
+merged build from a clone with that patch applied:
+
+```powershell
+cargo build --release --bin rpt      # in the rpt-rs clone
+copy target\release\rpt.exe <repo>\tools\rpt-rs\
+```
+
+Check it with `python scripts/demo_crosstab_recovery.py`, which walks the
+before/after on a real corpus report.
+
+### Optional: viewing the ORIGINAL .rpt (designer / viewer)
+
+Nothing in the conversion pipeline needs this — it is only for showing a
+customer their original report beside the converted `.prpt`.
+
+- **The runtime alone is enough to *view*.** The runtime MSIs put
+  `CrystalDecisions.Windows.Forms` (the `CrystalReportViewer` control) in the
+  GAC, so a small WinForms host can preview a report without any developer
+  install. Reports without saved data still need their database.
+- **To *edit* reports inside Visual Studio** you need "SAP Crystal Reports,
+  developer version for Microsoft Visual Studio" — the full `CRforVS_13_0_xx.exe`
+  installer, **not** the runtime MSI. It adds the report designer and project
+  templates to VS.
+- **Check VS support before installing.** CR for VS trails Visual Studio
+  releases (SP35 added VS 2022); a brand-new VS may not be supported yet, and
+  the installer targets the VS versions it knows about. Confirm your VS version
+  is on SAP's supported list for the SP you download — otherwise install the
+  standalone **SAP Crystal Reports 2020** designer (30-day trial) instead, which
+  does not depend on VS at all.
+- **No-SAP option:** the patched `rpt-rs` above also renders `.rpt` to
+  PNG/PDF/HTML on any platform (`rpt-render <file>.rpt -f png -o out.png`).
 
 ## Optional: Docker
 

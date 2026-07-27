@@ -281,9 +281,12 @@ VFS connections.
 harvested from public GitHub repositories, with fork-extracted, credential-scrubbed
 dumps in `samples/crystal/real/`. All 150 parse with zero errors; of their 726
 formulas, **80% translate deterministically** (auto + review, including idiom
-rewrites) before any LLM assist. Embedded logos survive too: `report-images`
-carves the raster bytes out of the .rpt binary (the free SAP SDK cannot read
-them) — **83 images recovered across all 44 image-bearing corpus reports**. `samples/cr_demo/` is the demo set: nine authored
+rewrites) before any LLM assist. Two things the free SAP SDK refuses to export
+are recovered straight from the `.rpt` binary: **embedded logos**
+(`report-images` — 83 recovered across all 44 image-bearing reports) and
+**cross-tab grids** (`report-crosstabs` — 12 recovered across 10 reports, all
+converting to live PRD crosstabs). `python scripts/demo_crosstab_recovery.py`
+walks that recovery end to end on a real report. `samples/cr_demo/` is the demo set: nine authored
 CSCU credit-union reports of increasing complexity (A4 portrait) that convert
 *and render live* against the CSCU Postgres database — working parameter
 prompts, a bar chart, a running balance rebuilt as a PRD report function, live
