@@ -126,10 +126,19 @@ before/after on a real corpus report.
 Nothing in the conversion pipeline needs this — it is only for showing a
 customer their original report beside the converted `.prpt`.
 
-- **The runtime alone is enough to *view*.** The runtime MSIs put
-  `CrystalDecisions.Windows.Forms` (the `CrystalReportViewer` control) in the
-  GAC, so a small WinForms host can preview a report without any developer
-  install. Reports without saved data still need their database.
+- **The runtime alone is enough to *view*** — and this repo ships the host:
+
+  ```powershell
+  .\tools\RptViewer\build.ps1                                  # build once
+  .\tools\RptViewer\RptViewer.exe report.rpt                   # view
+  .\tools\RptViewer\RptViewer.exe report.rpt --export out.pdf  # headless PDF
+  ```
+
+  It wraps the `CrystalReportViewer` control the runtime MSI puts in the GAC —
+  no designer, no developer install, no Crystal licence. A report saved WITH
+  data renders in full; one saved without data shows layout only until you pass
+  `--server/--db/--user/--password`. See
+  [tools/RptViewer/README.md](../tools/RptViewer/README.md).
 - **To *edit* reports inside Visual Studio** you need "SAP Crystal Reports,
   developer version for Microsoft Visual Studio" — the full `CRforVS_13_0_xx.exe`
   installer, **not** the runtime MSI. It adds the report designer and project
