@@ -21,13 +21,13 @@ pentaho-migrate report <report>.xml --validate   # the CONVERTED .prpt
 | `record-selection/` | record selection formulas (SQL WHERE folding) | 28 | 23 |
 | `groups/` | grouped reports | 35 | 26 |
 | `nested-groups/` | two or more nested groups | 21 | 16 |
-| `summaries/` | summary fields (report functions) | 18 | 12 |
+| `summaries/` | summary fields (report functions) | 23 | 16 |
 | `running-totals/` | running-total idiom rewritten as report functions | 6 | 4 |
 | `select-case/` | Select Case formulas (nested IF conversion) | 1 | 0 |
 | `conditional-formatting/` | conditional format/suppress formulas (style expressions) | 35 | 26 |
 | `sort-directions/` | explicit record/group sort fields | 19 | 13 |
 | `images/` | picture objects | 44 | 30 |
-| `manual-formulas/` | formulas needing the LLM or a human | 37 | 28 |
+| `manual-formulas/` | formulas needing the LLM or a human | 36 | 27 |
 | `linked-tables/` | no SQL command - the query is generated from the layout | 118 | 94 |
 | `sql-commands/` | verbatim SQL command objects | 32 | 17 |
 
@@ -57,11 +57,11 @@ pentaho-migrate report <report>.xml --validate   # the CONVERTED .prpt
 - `LarsBusk_CalibrationControlexp.xml` * — groups, images, manual-formulas, parameters, sql-commands, subreports
 - `LarsBusk_GeneralIrma.xml` — images, manual-formulas, sql-commands
 - `LarsBusk_InstrumentCheckSample.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, sql-commands
-- `LarsBusk_InstrumentCheckSample1Week.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, running-totals, sort-directions, sql-commands, subreports
-- `LarsBusk_InstrumentCheckSample2Weeks.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, running-totals, sort-directions, sql-commands, subreports
-- `LarsBusk_InstrumentCheckSample3Weeks.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, running-totals, sort-directions, sql-commands, subreports
+- `LarsBusk_InstrumentCheckSample1Week.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, running-totals, sort-directions, sql-commands, subreports, summaries
+- `LarsBusk_InstrumentCheckSample2Weeks.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, running-totals, sort-directions, sql-commands, subreports, summaries
+- `LarsBusk_InstrumentCheckSample3Weeks.xml` * — charts, conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, running-totals, sort-directions, sql-commands, subreports, summaries
 - `LarsBusk_ListOfAllInstruments.xml` — groups, parameters, sort-directions, sql-commands
-- `LarsBusk_PredictionModelControl.xml` — conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, sql-commands, subreports
+- `LarsBusk_PredictionModelControl.xml` — conditional-formatting, groups, images, manual-formulas, nested-groups, parameters, sql-commands, subreports, summaries
 - `M4sT3rJ3sUs_CrystalReport1.xml` * — images, linked-tables
 - `M4sT3rJ3sUs_CrystalReport3.xml` — conditional-formatting, groups, images, linked-tables, manual-formulas, nested-groups
 - `Red0699_CrystalReport1.xml` * — linked-tables
@@ -171,7 +171,7 @@ pentaho-migrate report <report>.xml --validate   # the CONVERTED .prpt
 - `workcontrolgit_ConsolidatedIncomeStatement.xml` * — crosstabs, images, linked-tables, parameters, record-selection
 - `workcontrolgit_IncomeStatement.xml` * — crosstabs, images, linked-tables, parameters, record-selection
 - `workcontrolgit_MonthlyVarianceCrossTab.xml` — crosstabs, images, linked-tables, parameters, record-selection
-- `workcontrolgit_OrderProcessingEfficiencyDashboard.xml` * — charts, conditional-formatting, groups, images, linked-tables, manual-formulas, multi-value-params, nested-groups, parameters, record-selection, sort-directions
+- `workcontrolgit_OrderProcessingEfficiencyDashboard.xml` * — charts, conditional-formatting, groups, images, linked-tables, manual-formulas, multi-value-params, nested-groups, parameters, record-selection, sort-directions, summaries
 - `workcontrolgit_RollingQuarterIncomeStatement.xml` — crosstabs, images, linked-tables, manual-formulas, parameters, record-selection
 - `workcontrolgit_SortedVarianceAnalysisReport.xml` — crosstabs, images, linked-tables, parameters, record-selection
 - `workcontrolgit_WorldSalesReport.xml` * — charts, conditional-formatting, groups, images, linked-tables, manual-formulas, nested-groups, record-selection, sort-directions, summaries
@@ -182,6 +182,6 @@ pentaho-migrate report <report>.xml --validate   # the CONVERTED .prpt
 - `worrallbrian_MostRecentStructuringOfCanadianCities.xml` * — charts, conditional-formatting, groups, linked-tables, manual-formulas, sort-directions, summaries
 - `worrallbrian_PinkPaletteSampler.xml` * — conditional-formatting, linked-tables, record-selection
 - `worrallbrian_SportsTeams.xml` * — conditional-formatting, linked-tables
-- `worrallbrian_SportsTeams_TorontoOnly.xml` * — conditional-formatting, linked-tables, manual-formulas, record-selection
+- `worrallbrian_SportsTeams_TorontoOnly.xml` * — conditional-formatting, linked-tables, record-selection
 
 `*` = carries saved data; renders in the Crystal viewer without its source database.
