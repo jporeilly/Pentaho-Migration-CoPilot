@@ -17,10 +17,11 @@ export default function DropZone({ onFile }) {
       >
         <input
           type="file"
-          accept=".xml,.item"
+          accept=".xml,.item,.rpt"
           onChange={(e) => e.target.files.length && onFile(e.target.files[0])}
         />
-        Drop a PowerCenter .xml, Talend .item, or Crystal Reports RptToXml dump here, or{' '}
+        Drop a PowerCenter .xml, Talend .item, or Crystal Reports file here
+        (the <b>.rpt itself</b>, or an RptToXml dump), or{' '}
         <strong>browse</strong> — the format is auto-detected
       </label>
     </div>

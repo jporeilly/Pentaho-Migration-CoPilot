@@ -221,9 +221,34 @@ def _summarize(model, source_name: str) -> ReportSummary:
     )
 
 
-def _load_upload(data: bytes, filename: str, jndi: str):
+def _check_upload_size(data: bytes) -> None:
     if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="upload exceeds the 50MB limit")
+
+
+def _load_rpt_upload(data: bytes, filename: str, jndi: str):
+    """A customer's file is the .rpt itself - run the same extraction chain
+    the corpus scripts use (RptToXml + credential scrub + cross-tab
+    recovery), then parse the dump exactly as if it had been uploaded."""
+    from pentaho_migration.reports.rpt_extract import extract_rpt
+
+    with tempfile.TemporaryDirectory() as workdir:
+        rpt = Path(workdir) / (Path(filename).stem + ".rpt")
+        rpt.write_bytes(data)
+        try:
+            dump = extract_rpt(rpt, rpt.with_suffix(".xml"))
+        except RuntimeError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        try:
+            return load_report_model(dump, jndi or None)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=422,
+                detail=f"extracted, but could not parse the dump: {exc}")
+
+
+def _load_dump_upload(data: bytes, jndi: str):
+    """An RptToXml dump uploaded directly."""
     with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as tf:
         tf.write(data)
         tmp = Path(tf.name)
@@ -234,6 +259,17 @@ def _load_upload(data: bytes, filename: str, jndi: str):
                             detail=f"could not parse RptToXml file: {exc}")
     finally:
         tmp.unlink(missing_ok=True)
+
+
+def _load_upload(data: bytes, filename: str, jndi: str):
+    """Size gate, then route by CONTENT: an OLE header means the .rpt binary,
+    anything else is treated as a dump. Never by file extension."""
+    from pentaho_migration.reports.rpt_extract import looks_like_rpt
+
+    _check_upload_size(data)
+    if looks_like_rpt(data[:8]):
+        return _load_rpt_upload(data, filename, jndi)
+    return _load_dump_upload(data, jndi)
 
 
 @router.post("/preview", dependencies=[Depends(require_api_key)])

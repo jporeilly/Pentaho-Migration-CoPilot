@@ -9,6 +9,18 @@ deliberately — not one per work session.
 
 ## [1.36.1] — 2026-07-27
 
+### Added
+
+- **Drag & drop the `.rpt` itself.** The Crystal flow started from an
+  RptToXml dump, but a customer's file is the binary — asking them to run a
+  command-line extractor first is a step that loses people. Uploads are now
+  routed by CONTENT (the OLE compound-file magic, never the extension): an
+  `.rpt` is extracted server-side with the same chain the corpus scripts use
+  (RptToXml fork → credential scrub → cross-tab recovery) and then continues
+  through the normal pipeline. Works on convert, inspect and PDF preview
+  alike. Needs the extraction environment (`pentaho-migrate report-env`);
+  without it the upload fails with one actionable sentence.
+
 ### Fixed
 
 - **Crystal's PageHeader now renders — it maps to PRD's physical page-header

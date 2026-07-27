@@ -40,6 +40,9 @@ export default function App() {
   const result = results[selected]
 
   async function convert(file) {
+    // an .rpt is a binary the ETL endpoint can never parse - route it
+    // straight to the reports pipeline, which extracts it server-side
+    if (/\.rpt$/i.test(file.name)) return convertReport(file)
     setError(null)
     setLoading(true)
     try {

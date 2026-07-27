@@ -12,8 +12,8 @@ const ETL_STEPS = [
 ]
 
 export const REPORT_STEPS = [
-  { label: 'Upload', hint: 'RptToXml dump',
-    tip: 'Drop a Crystal Reports RptToXml .xml dump (extracted from the .rpt with the free SAP .NET runtime).' },
+  { label: 'Upload', hint: '.rpt or dump',
+    tip: 'Drop the Crystal .rpt itself (extracted server-side with the free SAP .NET runtime) or an RptToXml .xml dump.' },
   { label: 'Inspect', hint: 'deterministic',
     tip: 'Real XML parsing — no AI. Report structure, bands, data source SQL, parameters, and summaries.' },
   { label: 'Formulas', hint: 'rules + AI',
