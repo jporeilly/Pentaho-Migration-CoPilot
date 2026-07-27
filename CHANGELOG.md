@@ -9,7 +9,38 @@ deliberately — not one per work session.
 
 ## [1.35.0] — 2026-07-27
 
+### Added
+
+- **Conversion notes are sorted into what a consultant must actually do.**
+  Every note landed in one "Other manual work" list, so repairs the layout
+  agent had already applied ("7 text boxes grown to fit their font — verify")
+  read as outstanding work and buried the few entries that genuinely need a
+  decision. Notes are now classified — **manual** (a Crystal behaviour with no
+  PRD equivalent), **applied** (done, worth a glance) and **info**
+  (provenance) — with the latter two folded away. Statement of Account drops
+  from 16 alarming bullets to 4 real ones. Classification is deterministic:
+  an estimate should not move because a model felt differently today.
+- The layout wireframe opens **scaled to fit** for reports taller than the
+  viewport, with an "Actual detail" toggle. A single 440pt chart band used to
+  draw thousands of pixels tall, so the reviewer scrolled past acres of one
+  rectangle and never saw the shape of the report.
+
 ### Fixed
+
+- **Summary fields could collapse onto one report function.** RptToXml writes
+  the .NET *type* name (`CrystalDecisions...DatabaseFieldDefinition`) when it
+  cannot resolve the object, so every summary in such a report read as the
+  same field grouped the same way — six distinct PRD functions became one
+  name, and the layout elements all referenced whichever survived. The field
+  and group are now recovered from the summary's own name, and the generated
+  name distinguishes `PercentOfSum` from `Sum` (Crystal stores both as "Sum").
+  A percent-of-total summary is now flagged rather than silently totalling.
+- **Crystal's `GroupName` special field is carried across** instead of being
+  reported as an unresolved reference. It prints the value the report is
+  currently grouped by, which in PRD is simply that column in the group
+  header. Only bound when the report really does group by that column.
+- An element whose field reference is empty in the dump now says so, rather
+  than reporting `Unresolved field reference: ''`.
 
 - **Embedded pictures were being torn by the compound-file layout.** An `.rpt`
   is an OLE compound file: a stream's bytes are chained through 512-byte

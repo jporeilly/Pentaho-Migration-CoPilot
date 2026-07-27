@@ -3,9 +3,11 @@
 **1.35.0** — 2026-07-27
 
 **The Crystal demo now runs end to end.** "Try Crystal Reports" loads a real
-harvested report that ships its own `.rpt` and 2,191 saved rows, so the
+harvested report that ships its own `.rpt` and its own saved rows, so the
 original opens in the Crystal viewer, converts, and lands in Report Designer
-without a database anywhere in the chain. `samples/crystal/` was tidied into
+without a database anywhere in the chain. It is picked for converting clean -
+zero manual work. Conversion notes are sorted now too, so repairs the layout
+agent already applied stop reading as outstanding work. `samples/crystal/` was tidied into
 `corpus/` (all 150 reports as `.rpt` + `.xml` pairs), `demo/` and the
 generated `by-feature/` index, which marks the **111 of 150** reports that
 carry saved data.

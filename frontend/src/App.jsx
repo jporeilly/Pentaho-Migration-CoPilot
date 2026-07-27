@@ -116,8 +116,8 @@ export default function App() {
     const blob = await res.blob()
     // A real harvested report, not an authored dump - its .rpt ships beside it
     // so the same report can be opened in the Crystal viewer first.
-    convertReport(new File([blob], 'workcontrolgit_WorldSalesReport.xml', { type: 'text/xml' }),
-                  'SampleData')
+    convertReport(new File([blob], 'souvikduttachoudhury_Statement_of_Account.xml', { type: 'text/xml' }),
+                  'Xtreme')
   }
 
   async function openFromProject(row) {

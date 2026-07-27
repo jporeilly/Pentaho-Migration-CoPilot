@@ -156,9 +156,38 @@ export default function ReportsFormulasPage({ summary, file, onUpdate }) {
       {summary.todos.length > 0 && (
         <div className="card">
           <header><h2>Other manual work</h2></header>
-          <ul className="notes">
-            {summary.todos.map((t, i) => <li key={i}>{t}</li>)}
-          </ul>
+          {(summary.todos_manual ?? summary.todos).length > 0 ? (
+            <ul className="notes">
+              {(summary.todos_manual ?? summary.todos).map((t, i) => <li key={i}>{t}</li>)}
+            </ul>
+          ) : (
+            <p className="muted">
+              Nothing left to decide — everything below was handled for you.
+            </p>
+          )}
+
+          {summary.todos_applied?.length > 0 && (
+            <details className="todo-group">
+              <summary>
+                ✓ {summary.todos_applied.length} fixed automatically
+                <span className="muted"> — worth a glance, no action needed</span>
+              </summary>
+              <ul className="notes">
+                {summary.todos_applied.map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
+            </details>
+          )}
+          {summary.todos_info?.length > 0 && (
+            <details className="todo-group">
+              <summary>
+                {summary.todos_info.length} notes
+                <span className="muted"> — how something was recovered</span>
+              </summary>
+              <ul className="notes">
+                {summary.todos_info.map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
+            </details>
+          )}
         </div>
       )}
     </>

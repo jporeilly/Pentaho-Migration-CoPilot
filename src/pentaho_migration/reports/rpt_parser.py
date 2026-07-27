@@ -446,24 +446,92 @@ def _parse_data_definition(root, model):
             default_values=default_values,
         ))
 
+    _parse_summaries(dd, model)
+    _parse_running_totals(dd, model)
+
+
+# RptToXml writes an object's .NET TYPE name when it cannot resolve the object
+# itself - "CrystalDecisions.CrystalReports.Engine.DatabaseFieldDefinition"
+# where a field name belongs.
+_DOTNET_TYPE = re.compile(r"^CrystalDecisions(\.\w+)+$")
+
+
+_GROUP_NAME = re.compile(r"^\s*GroupName\s*\(\s*\{?([^{}(),]+)\}?", re.I)
+
+
+def _group_name_field(field_ref, model):
+    """The column behind a Crystal GroupName special field, if that is what
+    this reference is. "GroupName ({Customer.Country})" prints the current
+    Country value, which in PRD is simply that column in the group header.
+    Returns "" when the reference is not a GroupName, or names a column the
+    report does not actually group by (in which case it stays a TODO rather
+    than being silently bound to something else)."""
+    match = _GROUP_NAME.match((field_ref or "").strip("{}#"))
+    if not match:
+        return ""
+    # parse_field_ref needs the braces to recognise a database field
+    _, column = parse_field_ref("{" + match.group(1).strip() + "}")
+    for group in model.groups:
+        if group.column.lower() == column.lower():
+            return group.column
+    return ""
+
+
+def _summary_label(name):
+    """The operation as the report itself names it: "PercentOfSum" out of
+    "PercentOfSum ({Customer.Last_Years_Sales}, {Customer.City})"."""
+    match = re.match(r"\s*([A-Za-z][A-Za-z0-9]*)\s*\(", name or "")
+    return match.group(1) if match else ""
+
+
+def _recover_summary_refs(name, fref, gref):
+    """Recover the summarized field and its group when RptToXml stringified the
+    .NET objects instead. Every summary in such a report otherwise reads as the
+    same field grouped the same way, which collapses six distinct report
+    functions into one name - and layout elements then all reference whichever
+    survived. The summary's name still spells out the real arguments."""
+    if not (_DOTNET_TYPE.match(fref or "") or _DOTNET_TYPE.match(gref or "")):
+        return fref, gref
+    args = re.findall(r"\{([^{}]+)\}", name or "")
+    if not args:
+        return fref, gref
+    if _DOTNET_TYPE.match(fref or ""):
+        fref = args[0]
+    if _DOTNET_TYPE.match(gref or "") and len(args) > 1:
+        gref = args[1]      # PercentOfSum(field, group, outerGroup) - own group first
+    return fref, gref
+
+
+def _parse_summaries(dd, model):
     for s in dd.iter("SummaryFieldDefinition"):
         op = _attr(s, "Operation", "SummaryOperation", default="Sum")
         fref = _attr(s, "SummarizedField", "Field", "DataSource", default="")
         gref = _attr(s, "Group", "GroupConditionField", default="")
+        name = _attr(s, "Name", default="")
+        fref, gref = _recover_summary_refs(name, fref, gref)
         _, column = parse_field_ref(fref)
         _, gcolumn = parse_field_ref(gref) if gref else ("", "")
-        name = _attr(s, "Name", default="") or f"{op} of {column}"
-        expr_name = re.sub(r"\W+", "_", f"{op}_{column}" + (f"_{gcolumn}" if gcolumn else ""))
+        name = name or f"{op} of {column}"
+        # Crystal reports the storage operation ("Sum") for the whole family,
+        # so PercentOfSum and Sum over the same field/group would generate one
+        # name and silently overwrite each other. The summary's own name spells
+        # out which one it is.
+        label = _summary_label(name) or op
+        expr_name = re.sub(r"\W+", "_", f"{label}_{column}" + (f"_{gcolumn}" if gcolumn else ""))
         model.summaries.append(Summary(
             name=name.strip("{}#"), operation=op, field_ref=fref,
             group_field=gcolumn, expression_name=expr_name))
+        if label.lower().startswith(("percentof", "percentage")):
+            model.issues.append(
+                f"summary '{name.strip('{}#')}' is a percent-of-total, but "
+                f"Crystal stores its operation as {op!r} - PRD would total the "
+                "field instead of expressing it as a share. Add the percentage "
+                "calculation by hand (or compute it in SQL)")
         if op not in SUMMARY_CLASS_MAP and op not in WINDOW_AGG_MAP:
             model.issues.append(
                 f"summary '{name.strip('{}#')}' uses operation {op!r}, which has "
                 "no PRD report-function mapping - rebuild by hand (custom "
                 "function or a pre-computed SQL column)")
-
-    _parse_running_totals(dd, model)
 
 
 def _parse_running_totals(dd, model):
@@ -805,6 +873,16 @@ def _resolve_references(model):
                 elif summ:
                     el.column = summ.expression_name
                     el.value_type = "NumberField"
+                elif (group_column := _group_name_field(el.field_ref, model)):
+                    # Crystal's GroupName special field prints the value the
+                    # report is currently grouped by. In PRD that is just the
+                    # group's own field in the group header - no TODO needed.
+                    el.column = group_column
+                    el.value_type = "StringField"
+                elif not el.field_ref.strip("{}#"):
+                    el.notes.append(
+                        "field reference is empty in the dump - the element "
+                        "prints nothing; delete it or bind it in PRD")
                 else:
                     el.notes.append(f"Unresolved field reference: {el.field_ref!r}")
             _resolve_format(el)

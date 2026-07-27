@@ -27,6 +27,13 @@ const KIND_COLORS = {
 const SCALE_Y = 2.2
 const BAND_GAP = 4
 
+// A chart band can be 440pt on its own. At the schematic stretch a report like
+// that draws four thousand pixels tall, so the reviewer scrolls past acres of
+// one rectangle and never sees the shape of the report. Long reports therefore
+// open scaled to fit, with the stretch one click away.
+const VIEWPORT_H = 620
+const MIN_SCALE_Y = 0.35
+
 // When a report has converted subreports, tab between the main report and
 // each subreport's own bands (a subreport is a nested banded report).
 export function TabbedLayoutPreview({ sections, subreports = [] }) {
@@ -62,18 +69,35 @@ export default function LayoutPreview({ sections }) {
   const width = Math.max(560,
     ...visible.flatMap((s) => s.items.map((el) => el.x + el.width))) + 10
   const LABEL_W = 92
+
+  const totalPt = visible.reduce((sum, s) => sum + Math.max(s.height, 14), 0)
+    + BAND_GAP * visible.length
+  const fitScale = Math.max(MIN_SCALE_Y, VIEWPORT_H / Math.max(totalPt, 1))
+  const overflows = totalPt * SCALE_Y > VIEWPORT_H
+  const [fit, setFit] = useState(true)
+  const scaleY = fit && overflows ? Math.min(SCALE_Y, fitScale) : SCALE_Y
+
   let y = 0
   const bands = visible.map((s) => {
-    const h = Math.max(s.height, 14) * SCALE_Y
+    const h = Math.max(s.height, 14) * scaleY
     const band = { ...s, y, h }
     y += h + BAND_GAP
     return band
   })
 
   return (
-    <div className="wireframe">
+    <div className={`wireframe${fit && overflows ? ' wf-fit' : ''}`}>
+      {overflows && (
+        <div className="wf-zoom">
+          <button className={fit ? 'active' : ''} onClick={() => setFit(true)}>Fit report</button>
+          <button className={fit ? '' : 'active'} onClick={() => setFit(false)}>Actual detail</button>
+          <span className="muted">
+            {Math.round(totalPt)}pt of bands — {fit ? 'scaled to fit' : 'scroll to read'}
+          </span>
+        </div>
+      )}
       <svg viewBox={`0 0 ${width + LABEL_W} ${y + 4}`} width={width + LABEL_W}
-        style={{ minHeight: Math.min(y + 4, 640) }}>
+        style={{ minHeight: Math.min(y + 4, VIEWPORT_H) }}>
         {bands.map((band, i) => (
           <g key={i} transform={`translate(0 ${band.y})`}>
             <rect x={LABEL_W} y="0" width={width} height={band.h}
@@ -84,8 +108,8 @@ export default function LayoutPreview({ sections }) {
             </text>
             {band.items.map((el, j) => {
               const color = KIND_COLORS[el.kind] || 'var(--text-muted)'
-              const ey = el.y * SCALE_Y
-              const eh = Math.max(el.height * SCALE_Y, 8)
+              const ey = el.y * scaleY
+              const eh = Math.max(el.height * scaleY, fit ? 4 : 8)
               if (el.kind === 'line') {
                 return <line key={j} x1={LABEL_W + el.x} y1={ey + 1} x2={LABEL_W + el.x + el.width} y2={ey + 1}
                   stroke={color} strokeWidth="1" />

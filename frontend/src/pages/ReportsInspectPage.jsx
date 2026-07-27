@@ -225,7 +225,7 @@ ${original.original}`}
             function (StdDev, Median…) are flagged as manual work.
           </Explain>
           {summary.summaries.length ? (
-            <table>
+            <table className="summary-table">
               <thead><tr><th>Crystal summary</th><th>PRD function</th><th>Group</th></tr></thead>
               <tbody>
                 {summary.summaries.map((s) => (

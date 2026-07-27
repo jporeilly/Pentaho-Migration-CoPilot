@@ -686,8 +686,25 @@ th.num { text-align: right; }
 }
 .wf-tabs button.active { background: var(--text-primary); color: var(--page); }
 .wf-sub-note { margin-top: .5rem; font-size: .82rem; }
-.wireframe { overflow-x: auto; }
+/* "Actual detail" keeps the schematic stretch, so the preview scrolls inside
+   its own card rather than pushing the rest of the page down a screen. */
+.wireframe { overflow: auto; max-height: 660px; }
+.wireframe.wf-fit { overflow-x: auto; overflow-y: hidden; max-height: none; }
 .wireframe svg { display: block; max-width: 100%; }
+
+.wf-zoom { display: flex; align-items: center; gap: .4rem; margin-bottom: .6rem; }
+.wf-zoom button {
+  background: var(--surface-2); color: var(--text-secondary);
+  border: none; border-radius: 6px; padding: .25rem .6rem;
+  font-size: .76rem; cursor: pointer;
+}
+.wf-zoom button.active { background: var(--accent); color: #fff; }
+.wf-zoom .muted { font-size: .76rem; margin-left: .3rem; }
+
+/* Generated PRD function names are long by nature (operation + field + group).
+   Let them wrap instead of stretching the table past the card. */
+.summary-table code { word-break: break-all; font-size: .74rem; }
+.summary-table td:nth-child(2) { max-width: 22rem; }
 .wf-legend { display: flex; gap: 1rem; flex-wrap: wrap; color: var(--text-muted); font-size: .78rem; margin-top: .5rem; }
 .wf-legend span { display: inline-flex; align-items: center; gap: .35rem; }
 .wf-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
@@ -738,3 +755,12 @@ span.triage-chip { cursor: default; }
 .sample-row { display: flex; gap: .5rem; flex-wrap: wrap; }
 .inline-btn { padding: .1rem .5rem; font-size: .8rem; }
 .subhead-row { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+
+/* Applied fixes and provenance notes fold away, so "manual work" means work. */
+.todo-group { margin-top: .8rem; }
+.todo-group > summary {
+  cursor: pointer; font-size: .82rem; color: var(--text-secondary);
+  padding: .35rem 0; list-style: none;
+}
+.todo-group > summary::before { content: '▸ '; color: var(--text-muted); }
+.todo-group[open] > summary::before { content: '▾ '; }

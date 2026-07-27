@@ -21,6 +21,7 @@ from pentaho_migration.api.security import require_api_key
 from pentaho_migration.llm import ExpressionTranslator, TranslationError
 from pentaho_migration.reports import build_conversion_report, load_report_model, write_prpt
 from pentaho_migration.reports.effort import build_report_effort
+from pentaho_migration.reports.todo_kinds import APPLIED, INFO, MANUAL, split_todos
 from pentaho_migration.reports.llm_assist import translate_manual_formulas
 from pentaho_migration.reports.schema_agent import (
     SqlAssistant, probe_schema, schema_context, validate_sql)
@@ -29,12 +30,19 @@ from pentaho_migration.validator.effort import EffortEstimate
 logger = logging.getLogger("pentaho_migration.api.reports")
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-# The "Try Crystal Reports" scenario. A REAL customer-style report (Xtreme
-# World Sales Report, harvested from GitHub) rather than an authored dump, so
-# the demo runs end to end: open the original .rpt in the Crystal viewer - it
-# carries 2,191 saved rows, so it renders with no database - then convert it
-# and open the .prpt in Report Designer.
-SAMPLE_NAME = "workcontrolgit_WorldSalesReport.xml"
+# The "Try Crystal Reports" scenario. A REAL harvested report, not an authored
+# dump, so the demo runs end to end: open the original .rpt in the Crystal
+# viewer - it carries its own saved rows, so it renders with no database -
+# then convert it and open the .prpt in Report Designer.
+#
+# Chosen for being substantial AND landing clean: a real account statement -
+# letterhead, watermark, scanned signature, two nested groups, running totals,
+# 74 pages of saved rows - that converts with three honest TODOs, all of them
+# the same thing (Crystal suppresses sections conditionally; PRD merges
+# sections into one band). Feature density alone was the wrong instinct: the
+# densest report in the corpus is a drill-down report, and drill-down has no
+# PRD equivalent, so it arrives with a page of TODOs. True, and a bad opening.
+SAMPLE_NAME = "souvikduttachoudhury_Statement_of_Account.xml"
 SAMPLE_FILE = REPO_ROOT / "samples" / "crystal" / "demo" / SAMPLE_NAME
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 
@@ -123,7 +131,10 @@ class ReportSummary(BaseModel):
     sections: list[ReportSection]
     subreports: list[ReportSubLayout] = []
     formulas: list[ReportFormula]
-    todos: list[str]
+    todos: list[str]           # everything, unchanged - existing callers
+    todos_manual: list[str] = []   # the real backlog: a human must decide
+    todos_applied: list[str] = []  # the pipeline already did it - verify
+    todos_info: list[str] = []     # provenance, no action
     counts: ReportCounts
     effort: EffortEstimate | None = None
 
@@ -168,6 +179,7 @@ def _summarize(model, source_name: str) -> ReportSummary:
                 todos.append(f"{s.area_kind}: {el.kind} '{el.text or el.name}'")
             todos.extend(el.notes)
     todos.extend(model.issues)
+    split = split_todos(todos)
     return ReportSummary(
         source=source_name,
         name=model.name,
@@ -192,6 +204,9 @@ def _summarize(model, source_name: str) -> ReportSummary:
                                 original=f.text, notes=f.notes)
                   for f in model.formulas.values()],
         todos=todos,
+        todos_manual=split[MANUAL],
+        todos_applied=split[APPLIED],
+        todos_info=split[INFO],
         effort=build_report_effort(model),
         counts=ReportCounts(
             sections=len(model.sections),

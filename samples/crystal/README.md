@@ -22,19 +22,20 @@ The `by-feature/README.md` marks them with `*`.
 
 ## The demo path
 
-`demo/workcontrolgit_WorldSalesReport.*` — the Xtreme World Sales Report,
-harvested from GitHub. It was picked because it is both **viewer-ready**
-(2,191 saved rows) and **feature-dense**: three nested groups, two charts,
-images, summaries, conditional formatting and a record-selection formula.
-Page one alone puts a live pie chart, a summary table and branded headers on
-screen, which is what makes the before/after land.
+`demo/souvikduttachoudhury_Statement_of_Account.*` — a customer account
+statement: letterhead, watermark, a scanned signature, two nested groups, a
+running total, 74 pages of saved rows.
 
-Two curated alternates sit beside it for when the conversation goes elsewhere:
+It was chosen for being **substantial and still landing clean** — 43 elements,
+zero manual formulas, and three honest TODOs, all of them the same thing
+(Crystal suppresses sections conditionally; PRD merges sections into one band).
 
-| Report | Reach for it when |
+Two extremes were tried and rejected, which is worth knowing before you swap it:
+
+| Report | Why not |
 | --- | --- |
-| `souvikduttachoudhury_Statement_of_Account` | The talk is about **images and fidelity** — logo, watermark and a scanned signature, all carved out of the `.rpt` and embedded in the `.prpt`. 74 pages, and **no manual formulas at all**. |
-| `ljokhan_AdventureWorks-TotalSalesByYear` | Someone says the corpus looks dated. Saved **2026-05-20**, AdventureWorks, one clean chart. |
+| `ljokhan_AdventureWorks-TotalSalesByYear` | Converts perfectly — **zero** manual work, saved 2026-05-20 — but it is two elements and a chart. Nothing to be impressed by. Keep it for "show me something recent". |
+| `workcontrolgit_WorldSalesReport` | The richest report in the corpus: live pie chart, three nested groups, 2,191 rows. It is also a **drill-down** report, and drill-down has no PRD equivalent, so it lands with sixteen real TODOs. A good honesty demo, a bad opening one. |
 
 The rest of the corpus is one command away — `by-feature/` groups all 150 by
 what they demonstrate, so "show me one with sub-reports" is a folder, not a
