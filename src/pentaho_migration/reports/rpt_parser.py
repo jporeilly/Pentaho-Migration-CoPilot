@@ -881,6 +881,10 @@ def _resolve_embedded_text(el, model, summary_by_name):
     def summary_call(match):
         phrase = match.group(0)
         summary = summary_by_name.get(phrase) or summary_by_name.get(" ".join(phrase.split()))
+        if summary is None:
+            # an INLINE aggregate with no definition anywhere - the same
+            # synthesis the condition formulas use gives it a report function
+            summary = _synthesize_summary(phrase, model)
         if summary is not None:
             return f"$({summary.expression_name})"
         token = f"\x00{len(frozen)}\x00"
@@ -902,6 +906,106 @@ def _resolve_embedded_text(el, model, summary_by_name):
             "gap is visible; add the aggregate or binding by hand in PRD")
     if template != text:
         el.text_template = template
+
+
+# Op({field-or-formula} [, {group}]) inside a condition formula. Crystal
+# evaluates the aggregate inline; PRD needs it to exist as a report function.
+_AGG_IN_CONDITION = re.compile(
+    r"\b(Sum|Count|Average|Maximum|Minimum|DistinctCount)\s*"
+    r"\(\s*(\{[^{}]+\})\s*(?:,\s*(\{[^{}]+\}))?\s*\)", re.I)
+_AGG_OPS = {"sum": "Sum", "count": "Count", "average": "Average",
+            "maximum": "Maximum", "minimum": "Minimum",
+            "distinctcount": "DistinctCount"}
+
+
+def _synthesize_summary(phrase, model):
+    """A Summary for one aggregate call spelled inline ("Sum ({@x}, {g})"),
+    reusing an equivalent one when the report already defines it. Returns None
+    when the call is not a supported aggregate over a resolvable field."""
+    match = _AGG_IN_CONDITION.fullmatch(" ".join(phrase.split()))
+    if not match:
+        return None
+    op = _AGG_OPS[match.group(1).lower()]
+    fref, gref = match.group(2), match.group(3) or ""
+    kind, column = parse_field_ref(fref)
+    if kind == "formula":
+        if column not in model.formulas:
+            return None
+    elif kind != "db":
+        return None
+    _, gcolumn = parse_field_ref(gref) if gref else ("", "")
+    expr = re.sub(r"\W+", "_", f"{op}_{column}" + (f"_{gcolumn}" if gcolumn else ""))
+    summary = next((s for s in model.summaries if s.expression_name == expr), None)
+    if summary is None:
+        summary = Summary(name=" ".join(phrase.split()), operation=op,
+                          field_ref=fref, group_field=gcolumn,
+                          expression_name=expr)
+        model.summaries.append(summary)
+    return summary
+
+
+def _bind_condition_aggregates(pairs, model):
+    """Rewrite aggregate calls inside condition formulas as references to a
+    report function, synthesizing the summary when the report does not already
+    define it. "Sum ({@Late Invoices}, {CUST.NAME}) <> 0" cannot translate
+    inline — OpenFormula has no windowed Sum — but the writer emits every
+    model.summaries entry as a PRD function, so the aggregate becomes a
+    defined name the condition can simply reference. The synthesized function
+    accumulates over exactly the rows the Crystal aggregate saw."""
+    summary_by_name = {" ".join(s.name.split()): s for s in model.summaries}
+
+    def bind(match):
+        summary = (summary_by_name.get(" ".join(match.group(0).split()))
+                   or _synthesize_summary(match.group(0), model))
+        if summary is None:
+            return match.group(0)
+        return "{" + summary.expression_name + "}"
+
+    return [(attr, _AGG_IN_CONDITION.sub(bind, body)) for attr, body in pairs]
+
+
+def _combine_visibility(existing, extra):
+    """Both conditions must hold for the element to show. The translator emits
+    OpenFormula with a leading '=', so strip and re-wrap."""
+    left, right = existing.lstrip("="), extra.lstrip("=")
+    return f"=AND({left};{right})"
+
+
+def _push_section_condition_to_elements(section, model, context):
+    """Crystal lets a band area hold several sections, each with its own
+    suppression condition; PRD has one band per area, so the writer merges
+    them and the per-section condition has nowhere to live. Rather than drop
+    it, put it on the elements that came from that section: the same condition
+    over the same rows, evaluated per element.
+
+    What this does not reproduce is the collapse. Crystal removes a suppressed
+    section's height; hidden elements leave their band as tall as it was, so
+    the space shows as blank. That is a layout difference, not a data one, and
+    the note says so."""
+    notes = _convert_condition_formulas(section, model.field_types, context)
+    pushed = [(key, formula) for key, formula in section.style_expressions
+              if key == "visible"]
+    if not pushed:
+        return notes                     # nothing translated - notes explain why
+    section.style_expressions = [(k, f) for k, f in section.style_expressions
+                                 if k != "visible"]
+    for el in section.elements:
+        own = next((f for k, f in el.style_expressions if k == "visible"), "")
+        combined = pushed[0][1]
+        for _key, formula in pushed[1:]:
+            combined = _combine_visibility(combined, formula)
+        if own:
+            combined = _combine_visibility(own, combined)
+            el.style_expressions = [(k, f) for k, f in el.style_expressions
+                                    if k != "visible"]
+        el.style_expressions.append(("visible", combined))
+    notes.append(
+        f"conditional suppression{context} applied to the section's "
+        f"{len(section.elements)} element(s) instead of the band - Crystal "
+        "merges several sections into one PRD band. The elements hide exactly "
+        "as before; the band keeps its height, so verify the blank space where "
+        "Crystal would have collapsed the section")
+    return notes
 
 
 def _resolve_references(model):
@@ -1000,21 +1104,20 @@ def _resolve_references(model):
     for section in model.sections:
         for el in section.elements:
             if el.condition_formulas:
+                el.condition_formulas = _bind_condition_aggregates(
+                    el.condition_formulas, model)
                 el.notes.extend(_convert_condition_formulas(el, model.field_types))
         if not section.condition_formulas:
             continue
+        section.condition_formulas = _bind_condition_aggregates(
+            section.condition_formulas, model)
         context = f" (section {section.name or section.area_kind})"
         if band_counts[(section.area_kind, section.group_index)] == 1:
             model.issues.extend(_convert_condition_formulas(
                 section, model.field_types, context))
         else:
-            # several Crystal sections merge into one PRD band - a per-section
-            # condition cannot be applied to the merged band
-            for attr, body in section.condition_formulas:
-                snippet = " ".join(body.split())[:100]
-                model.issues.append(
-                    f"conditional {attr} formula not carried{context} "
-                    f"(sections merge into one PRD band): {snippet}")
+            model.issues.extend(
+                _push_section_condition_to_elements(section, model, context))
 
 
 def generate_sql(model):

@@ -7,6 +7,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.36.0] — 2026-07-27
+
+### Fixed
+
+- **The conditional-EnableSuppress gap — 93 dropped conditions down to 39.**
+  The largest fidelity gap in the corpus, closed from three directions:
+  - **Sections merging into one band (52 cases).** Crystal allows several
+    sections per band area with per-section suppression; PRD has one band, so
+    the condition had nowhere to live and was dropped. It now moves onto the
+    section's own elements — same condition, same rows, evaluated per element.
+    The one visible difference (Crystal collapses the suppressed section's
+    height; PRD keeps the band height and shows blank space) stays called out.
+  - **Aggregates inside conditions ("suppress unless Sum(...) > 0").**
+    OpenFormula has no windowed Sum, but the writer emits every summary as a
+    PRD report function — so the aggregate is synthesized as one and the
+    condition references it by name. The same synthesis now also resolves
+    inline aggregates in text-object prose, which closes the demo report's
+    last TODO: it converts with **zero manual items**.
+  - **Translator false positives.** A '[' inside a parameter NAME
+    ("{?$[FROMDATE]}") was refused as an array subscript — field references
+    are now masked before the blocker scan. A single trailing ';' (legal in
+    Crystal) no longer fails tokenization; two statements still refuse.
+- What remains of the 39 is genuinely manual: runtime state PRD does not have
+  (drilldowngrouplevel, currentfieldvalue, pagenumber-in-conditions) and
+  multi-statement variable formulas.
+
 ## [1.35.0] — 2026-07-27
 
 ### Added

@@ -1,6 +1,12 @@
 # Version
 
-**1.35.0** — 2026-07-27
+**1.36.0** — 2026-07-27
+
+**Conditional suppression now survives conversion** — the corpus's largest
+fidelity gap (93 dropped conditions) is down to 39, all genuinely manual.
+Conditions on merged sections ride their elements; aggregates in conditions
+become synthesized report functions. The demo report converts with zero
+manual items.
 
 **The Crystal demo now runs end to end.** "Try Crystal Reports" loads a real
 harvested report that ships its own `.rpt` and its own saved rows, so the

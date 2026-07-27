@@ -24,6 +24,22 @@ class TranslationError(Exception):
     pass
 
 
+def scannable(text):
+    """Text prepared for the blocker scan.
+
+    A field reference is opaque - "{?$[BOY_AB_FROMDATE]}" is a parameter whose
+    NAME contains brackets, not an array subscript - so blank the braced spans
+    before looking for blocker syntax. Otherwise a legal formula is refused
+    because of a character inside someone's parameter name.
+
+    Crystal also permits a trailing statement separator on a single-expression
+    formula ("if x then false else True;"). One trailing ';' is noise; two
+    statements are a real blocker, and those still trip the scan below.
+    """
+    masked = re.sub(r"\{[^}]*\}", "{}", re.sub(r"//[^\n]*", "", text or ""))
+    return re.sub(r";\s*$", "", masked.strip())
+
+
 BLOCKER_PATTERNS = [
     (r"(?i)\b(shared|global|local)\b", "variable scope declaration"),
     (r"(?i)\b(string|number|date|time|datetime|currency|boolean)var\b", "variable declaration"),
@@ -119,6 +135,9 @@ TOKEN_RE = re.compile(r"""
 
 
 def _tokenize(text):
+    # Crystal tolerates a trailing statement separator on a single-expression
+    # formula; a ';' anywhere else is two statements and still refuses below.
+    text = re.sub(r";\s*$", "", (text or "").strip())
     tokens, pos = [], 0
     while pos < len(text):
         m = TOKEN_RE.match(text, pos)
@@ -629,8 +648,12 @@ def translate_formula(name, text, field_types=None):
             note += " - verify scope matches the Crystal placement"
         f.notes.append(note)
         return f
-    stripped = re.sub(r"//[^\n]*", "", text)
-    alias = _LOCAL_ALIAS_RE.match(stripped.strip())
+    # two views of the formula: comment-stripped for paths that re-parse the
+    # matched text, field-masked (scannable) for the blocker scan only - a
+    # blocker character inside a {field name} is not blocker syntax
+    plain = re.sub(r"//[^\n]*", "", text)
+    stripped = scannable(text)
+    alias = _LOCAL_ALIAS_RE.match(plain.strip())
     if alias and not re.search(rf"\b{re.escape(alias.group('var'))}\b",
                                alias.group("expr"), re.IGNORECASE):
         # a readability alias, not real state - inline the expression
@@ -697,7 +720,7 @@ def translate_style_condition(attr, text, field_types=None):
     if mapping is None:
         raise TranslationError(f"no PRD style mapping for conditional {attr}")
     style_key, invert = mapping
-    stripped = re.sub(r"//[^\n]*", "", text)
+    stripped = scannable(text)
     for pattern, why in BLOCKER_PATTERNS:
         if re.search(pattern, stripped):
             raise TranslationError(why)

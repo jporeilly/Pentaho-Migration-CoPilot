@@ -35,6 +35,7 @@ _RULES = (
     # sub-report", "subreport 'x' converted as a nested PRD sub-report". The
     # pipeline did the work; the sentence is telling you what it chose.
     (APPLIED, re.compile(r"\bconverted (?:to|as|into)\b", re.I)),
+    (APPLIED, re.compile(r"\bapplied to the\b", re.I)),
     (APPLIED, re.compile(r"\bresolved to column\b", re.I)),
     # "summary 'StdDev of APR' has no PRD report function - computed as a
     # windowed SQL column (STDDEV_SAMP ... OVER ...)". The workaround shipped;
