@@ -23,13 +23,15 @@ APPLIED = "applied"
 MANUAL = "manual"
 INFO = "info"
 
-# Ordered: first match wins.
+# Ordered: first match wins. Patterns are unanchored on purpose — the same
+# note reaches us bare from model.issues and prefixed with its band
+# ("`PageHeader`: ...") from the markdown report.
 _RULES = (
-    (APPLIED, re.compile(r"^\s*layout auto-fit:", re.I)),
+    (APPLIED, re.compile(r"\blayout auto-fit:", re.I)),
     (APPLIED, re.compile(r"\bnudged apart\b|\bgrown to fit\b|\bscaled by\b", re.I)),
     (APPLIED, re.compile(r"\brecovered\b.*\brpt-rs\b", re.I)),
-    (INFO, re.compile(r"^\s*image carved from the \.rpt", re.I)),
-    (INFO, re.compile(r"^\s*chart migrated as a PRD legacy chart", re.I)),
+    (INFO, re.compile(r"\bimage carved from the \.rpt", re.I)),
+    (INFO, re.compile(r"\bchart migrated as a PRD legacy chart", re.I)),
     (MANUAL, re.compile(r"\bnot carried\b|\brebuild by hand\b|\bby hand\b"
                         r"|\bhand-add\b|\bno PRD\b|\bunresolved\b", re.I)),
 )

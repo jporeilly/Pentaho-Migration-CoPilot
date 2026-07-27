@@ -6,6 +6,17 @@ const STATUS_ICON = { converted: '·', in_review: '⚠', verified: '✓', failed
 
 const TRIAGE_ICON = { READY: '✓', REVIEW: '⚠', BLOCKED: '✋' }
 
+// Filter chips over the report table. "NONE" is the honest bucket for reports
+// that have never been triaged — otherwise they hide inside "all" and a
+// consultant thinks the sweep covered them.
+const VERDICTS = [
+  { key: 'all', label: 'All' },
+  { key: 'READY', label: '✓ READY' },
+  { key: 'REVIEW', label: '⚠ REVIEW' },
+  { key: 'BLOCKED', label: '✋ BLOCKED' },
+  { key: 'NONE', label: 'not triaged' },
+]
+
 export default function ProjectPage({ onBack, onOpen, context }) {
   const [rows, setRows] = useState(null)
   const [reports, setReports] = useState([])
@@ -15,6 +26,10 @@ export default function ProjectPage({ onBack, onOpen, context }) {
   const [expanded, setExpanded] = useState(null)     // report file with open detail
   const [parityBusy, setParityBusy] = useState(null) // report file being checked
   const [agentError, setAgentError] = useState('')
+  // A real engagement lands 150 reports in here; without a filter the table is
+  // a scroll, not a worklist.
+  const [reportQuery, setReportQuery] = useState('')
+  const [reportVerdict, setReportVerdict] = useState('all')
 
   const refresh = useCallback(async () => {
     const res = await fetch('/project')
@@ -115,6 +130,14 @@ export default function ProjectPage({ onBack, onOpen, context }) {
     { key: 'talend', label: 'Talend jobs', list: talendRows },
   ].filter((f) => f.list.length > 0)
   const visible = (key) => showAll || !context || context === key
+
+  const reportNeedle = reportQuery.trim().toLowerCase()
+  const shownReports = reports.filter((r) => {
+    if (reportVerdict !== 'all'
+        && (r.triage_verdict || 'NONE') !== reportVerdict) return false
+    if (!reportNeedle) return true
+    return `${r.name} ${r.file}`.toLowerCase().includes(reportNeedle)
+  })
   const filtered = context && !showAll
 
   function familyStats(list) {
@@ -251,7 +274,11 @@ export default function ProjectPage({ onBack, onOpen, context }) {
     {reports.length > 0 && visible('crystal') && (
       <section className="card">
         <header>
-          <h2>Crystal reports <span>{reports.length} converted</span></h2>
+          <h2>Crystal Reports <span>
+            {shownReports.length === reports.length
+              ? `${reports.length} converted`
+              : `${shownReports.length} of ${reports.length}`}
+          </span></h2>
           <div className="triage-bar">
             <input
               className="jndi-input"
@@ -286,7 +313,35 @@ export default function ProjectPage({ onBack, onOpen, context }) {
           numbers rendered from the converted .prpt — PASS / NEAR / FAIL.
           Re-run triage after re-converting; verdicts persist in the store.
         </Explain>
-        <StatsStrip list={reports} />
+        <div className="filters report-filters">
+          {VERDICTS.map((v) => {
+            const n = v.key === 'all'
+              ? reports.length
+              : reports.filter((r) => (r.triage_verdict || 'NONE') === v.key).length
+            return (
+              <button
+                key={v.key}
+                className={reportVerdict === v.key ? 'active' : ''}
+                onClick={() => setReportVerdict(v.key)}
+                disabled={n === 0 && v.key !== 'all'}
+              >
+                {v.label} {n}
+              </button>
+            )
+          })}
+          <input
+            className="jndi-input report-search"
+            placeholder="Filter by report or file name…"
+            value={reportQuery}
+            onChange={(e) => setReportQuery(e.target.value)}
+          />
+          {(reportQuery || reportVerdict !== 'all') && (
+            <button onClick={() => { setReportQuery(''); setReportVerdict('all') }}>
+              clear
+            </button>
+          )}
+        </div>
+        <StatsStrip list={shownReports} />
         {agentError && <div className="error">{agentError}</div>}
         <div className="table-scroll">
           <table className="project-table">
@@ -304,7 +359,7 @@ export default function ProjectPage({ onBack, onOpen, context }) {
               </tr>
             </thead>
             <tbody>
-              {reports.map((r) => {
+              {shownReports.map((r) => {
                 const detail = triageDetail(r)
                 const reasons = detail.reasons || []
                 return (

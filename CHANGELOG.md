@@ -17,9 +17,16 @@ deliberately — not one per work session.
   read as outstanding work and buried the few entries that genuinely need a
   decision. Notes are now classified — **manual** (a Crystal behaviour with no
   PRD equivalent), **applied** (done, worth a glance) and **info**
-  (provenance) — with the latter two folded away. Statement of Account drops
-  from 16 alarming bullets to 4 real ones. Classification is deterministic:
+  (provenance) — with the latter two folded away, in the UI **and in the
+  generated conversion report**. Statement of Account drops from 16 alarming
+  bullets to 3 real ones. Classification is deterministic:
   an estimate should not move because a model felt differently today.
+- **A filter over the Crystal Reports table on the Project page** — verdict
+  chips (READY / REVIEW / BLOCKED / not triaged, each with its count) and a
+  name search. A real engagement lands 150+ reports there, which is a scroll
+  rather than a worklist; the effort strip recalculates for whatever is
+  filtered, so "how long for just the REVIEW ones" is one click. Reports that
+  have never been triaged get their own bucket instead of hiding inside "all".
 - The layout wireframe opens **scaled to fit** for reports taller than the
   viewport, with an "Actual detail" toggle. A single 440pt chart band used to
   draw thousands of pixels tall, so the reviewer scrolled past acres of one

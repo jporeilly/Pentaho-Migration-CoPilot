@@ -38,6 +38,14 @@ class TestClassification:
             "chart migrated as a PRD legacy chart collecting detail rows - "
             "verify aggregation semantics match the Crystal summary") == INFO
 
+    def test_the_band_prefix_does_not_change_the_verdict(self):
+        """The markdown report prefixes notes with their band; the API does
+        not. Same note, same bucket."""
+        bare = "image carved from the .rpt binary and matched by aspect ratio"
+        assert classify_todo(bare) == classify_todo(f"`PageHeader`: {bare}") == INFO
+        fix = "layout auto-fit: Detail - 2 text box(es) grown to fit their font"
+        assert classify_todo(fix) == classify_todo(f"`Detail`: {fix}") == APPLIED
+
     def test_an_unrecognized_note_counts_as_work(self):
         """Over-report rather than lose it — a dropped note is a surprise on
         the engagement, an extra one is a minute of reading."""
