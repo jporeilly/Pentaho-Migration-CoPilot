@@ -243,6 +243,11 @@ def _parse_object(obj):
             el.notes.append(
                 "cross-tab converted to a nested PRD crosstab sub-report - "
                 "verify row/column grouping and aggregation in PRD")
+            if ct is not None and ct.get("Recovered") == "rpt-rs":
+                el.notes.append(
+                    "cross-tab grid recovered from the .rpt binary by rpt-rs "
+                    "(the SAP SDK cannot export it) - verify the rows, columns "
+                    "and aggregations against the report in the Crystal designer")
         else:
             el.kind = "unknown"
             el.text = f"CrossTabObject ({el.name or 'cross-tab'} - definition not in dump)"
@@ -612,8 +617,32 @@ def _resolve_crosstab(el, model):
     from pentaho_migration.reports.model import CROSSTAB_AGG_MAP
 
     def _bare(ref):
+        """A cross-tab binding -> the column the PRD crosstab groups on.
+        Accepts database fields, formulas (which become PRD expressions), and
+        Crystal's duplicate-usage suffix (a field grouped twice is stored as
+        `Table.Field1`)."""
+        kind, name = parse_field_ref(ref)
+        if kind == "formula":
+            return name if name in model.formulas else ""
         column = _chart_column(ref, model)
-        return column if column in model.field_types else ""
+        if column in model.field_types:
+            return column
+        # rpt-rs reports the raw stored name, which uses the XML name-escape
+        # convention for characters illegal in an identifier (`_x0020_` = space);
+        # RptToXml normalises those to underscores. Decode, then normalise.
+        decoded = re.sub(r"_x([0-9A-Fa-f]{4})_",
+                         lambda m: chr(int(m.group(1), 16)), column)
+        for candidate in (decoded, re.sub(r"\W", "_", decoded)):
+            if candidate in model.field_types:
+                return candidate
+        stripped = re.sub(r"\d+$", "", column)
+        if stripped and stripped != column and stripped in model.field_types:
+            el.notes.append(
+                f"cross-tab binding {ref!r} resolved to column {stripped!r} "
+                "(Crystal suffixes a field grouped more than once) - verify "
+                "the grouping level in PRD")
+            return stripped
+        return ""
 
     rows = [_bare(r) for r in el.crosstab_rows]
     cols = [_bare(c) for c in el.crosstab_columns]
@@ -636,8 +665,26 @@ def _resolve_crosstab(el, model):
                 + ", ".join(bad_ops)
                 + f" (supported: {', '.join(CROSSTAB_AGG_MAP)})")
         return
-    el.crosstab_rows = rows
-    el.crosstab_columns = cols
+    def _dedupe(levels, axis):
+        """Crystal can group the SAME field at several granularities (a date by
+        year then by month, via per-group options). PRD dimensions are plain
+        columns, so repeated levels would produce a degenerate grid: keep one
+        and say what was dropped."""
+        seen, kept = set(), []
+        for column in levels:
+            if column in seen:
+                el.notes.append(
+                    f"cross-tab groups {column!r} more than once on the {axis} "
+                    "axis (Crystal per-group date/interval options) - kept a "
+                    "single level; add a derived column per granularity in the "
+                    "query to reproduce the original nesting")
+                continue
+            seen.add(column)
+            kept.append(column)
+        return kept
+
+    el.crosstab_rows = _dedupe(rows, "row")
+    el.crosstab_columns = _dedupe(cols, "column")
     el.crosstab_summaries = sums
 
 

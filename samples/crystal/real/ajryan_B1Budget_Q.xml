@@ -398,7 +398,19 @@ TRUE, 'Year'
                 </Border>
                 <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
                 <ObjectFormatConditionFormulas />
-              </CrossTabObject>
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{@DataEntryCodeAndName}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{Data.Date1}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{Data.BudgetValue}" Operation="Sum" />
+                    <Field FieldName="{Data.ActualValue}" Operation="Sum" />
+                    <Field FieldName="{@Difference}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
               <FieldObject Name="BudgetName1" Kind="FieldObject" Top="0" Left="240" Width="5280" Height="600" DataSource="{Data.BudgetName}">
                 <FieldFormat>
                   <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />

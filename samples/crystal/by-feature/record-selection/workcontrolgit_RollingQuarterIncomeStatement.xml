@@ -254,7 +254,19 @@ year({?end_date}))</FormulaFieldDefinition>
                 </Border>
                 <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
                 <ObjectFormatConditionFormulas />
-              </CrossTabObject>
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{Account_x0020_Type}" />
+                    <Field FieldName="{Account_x0020_Heading_x0020_Name}" />
+                    <Field FieldName="{Account_x0020_Name}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{@date}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{variance_xtab.Amount}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
             </ReportObjects>
           </Section>
         </Sections>

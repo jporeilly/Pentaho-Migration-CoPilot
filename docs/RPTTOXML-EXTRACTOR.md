@@ -133,8 +133,10 @@ null even for OnChangeOfGroup). The fork now ALSO emits RAS-side
 field's FormulaForm); the converter dedupes by Name preferring reset-aware
 entries and maps plain running totals to group-scoped Item* functions.
 
-Still open (smaller): cross-tab grid definitions (SDK-sealed — hand-add
-`<CrossTabDefinition>`, see CRYSTAL-COVERAGE.md).
+**Cross-tab grid definitions — RESOLVED (2026-07-25), outside the SDK:**
+sealed behind reserved COM slots in the SAP model, so recovered from the
+binary with rpt-rs instead — see the section below and
+`report-crosstabs` in CRYSTAL-COVERAGE.md.
 
 **Evaluated alternative — rpt-rs (2026-07-25):**
 [MrSrsen/rpt-rs](https://github.com/MrSrsen/rpt-rs) (MPL-2.0) is a pure-Rust
@@ -172,12 +174,24 @@ not the library); and cross-tab records decode including
 `CrossTabDimension → CrossTabDimensionGroup → CrossTabDimensionField`
 with real field names (e.g. `Data.Date1`).
 
-**Status.** The blocker is understood and removable, so the earlier
-"re-evaluate at their next tag" condition no longer applies. Remaining work
-before adopting it: `xml-dump` surfaces the `CrossTabObject` but not yet the
-dimensions as `RowFields`/`ColumnFields`/`SummaryFields`, so an adapter must
-either read the raised model or the record tree. The project still
-self-describes as experimental/unstable, and the patch is ours until it is
-upstreamed. The SAP-based fork pipeline remains the corpus-proven default.
-Evaluation trees live untracked under `tools/rpt-rs*` (the patch is applied
-in `tools/rpt-rs-src`).
+**Status: ADOPTED for cross-tab recovery.** The fix was submitted upstream
+([MrSrsen/rpt-rs#1](https://github.com/MrSrsen/rpt-rs/pull/1)) with the
+repro and a regression test. Locally, `tools/rpt-rs-src` also carries a
+second change that teaches `xml-dump` to emit the decoded grid as
+`<CrossTabDefinition>` (`crates/rpt-cli/src/export/objects.rs` —
+the model already decoded `columns`/`rows`/`measures`, they were simply
+marked "not exported").
+
+`pentaho-migrate report-crosstabs <dump> [rpt]` shells out to that binary,
+lifts the definitions and injects them into the RptToXml dump — the ordinary
+conversion path then produces a live PRD crosstab. See
+`src/pentaho_migration/reports/rpt_crosstabs.py`. The tool is located via
+`RPT_RS_PATH`, `tools/rpt-rs/rpt[.exe]`, the cargo build output, or `PATH`;
+when it is missing, cross-tabs keep their hand-add TODO exactly as before —
+nothing else in the pipeline depends on it.
+
+**Corpus result: 12 cross-tabs across 10 reports recovered**, all converting
+to live crosstabs (previously all were TODOs). The SAP-based fork remains
+the default extractor for everything else; rpt-rs is used only for the
+records the SDK refuses to expose. Evaluation/build trees live untracked
+under `tools/rpt-rs*`.

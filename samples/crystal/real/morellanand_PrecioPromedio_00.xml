@@ -78,7 +78,19 @@ else
                 </Border>
                 <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
                 <ObjectFormatConditionFormulas />
-              </CrossTabObject>
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{vw_OrderCrystal1.publication_date}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{@ProdPos}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{vw_OrderCrystal1.subtotal}" Operation="Sum" />
+                    <Field FieldName="{vw_OrderCrystal1.Pagina}" Operation="Sum" />
+                    <Field FieldName="{@PPromedio}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
             </ReportObjects>
           </Section>
         </Sections>

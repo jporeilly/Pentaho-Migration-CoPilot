@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.34.0] — 2026-07-25
+
+### Added
+
+- **Cross-tab grids recovered automatically** (`report-crosstabs`). The SAP
+  SDK seals a cross-tab's rows/columns/measures behind reserved COM slots,
+  so until now every cross-tab needed a hand-written
+  `<CrossTabDefinition>`. They are now read **straight from the .rpt
+  binary** with [rpt-rs](https://github.com/MrSrsen/rpt-rs) and injected
+  into the dump, after which the ordinary pipeline produces a live PRD
+  crosstab. **Corpus: 12 cross-tabs across 10 reports recovered — all
+  convert**; corpus TODO placeholders 26 → 14 and triage 98 → 105 READY
+  of 150.
+- Cross-tab resolution now handles what real reports actually contain:
+  **formula dimensions** (`{@Name}`), Crystal's **stored-name escaping**
+  (`_x0020_` → space → the RptToXml underscore form), **duplicate-usage
+  suffixes** (a field grouped twice is stored as `Field1`), and **repeated
+  levels** (the same field grouped at two granularities is deduped with a
+  note explaining that PRD needs a derived column per granularity).
+  Every recovered grid is review-flagged; anything that cannot be bound to
+  a query column stays an honest TODO.
+- rpt-rs integration is optional and self-describing: located via
+  `RPT_RS_PATH`, `tools/rpt-rs/`, the cargo build, or `PATH`; when absent,
+  cross-tabs keep their hand-add TODO and nothing else changes.
+
+### Fixed
+
+- **Upstream contribution**: rpt-rs decoded nothing on Windows because the
+  OLE root component (`\` there, `/` on Unix) survived its stream-path
+  filter, so `Contents` was never recognised. One-line fix plus a
+  regression test submitted as
+  [MrSrsen/rpt-rs#1](https://github.com/MrSrsen/rpt-rs/pull/1); with it,
+  their own fixture decodes 1,475 records and 600 of their tests pass.
+  (An earlier changelog entry called this tool "broken on Windows and
+  parked" — that conclusion was wrong and is corrected here.)
+
 ## [1.33.0] — 2026-07-25
 
 ### Added

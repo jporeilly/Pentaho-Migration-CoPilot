@@ -804,6 +804,39 @@ def report_portfolio(
     typer.echo(f"{len(results)} report(s) triaged ({ready} READY) -> {target}")
 
 
+@app.command("report-crosstabs")
+def report_crosstabs(
+    dump: Path = typer.Argument(..., help="RptToXml dump (.xml), or a directory of them"),
+    rpt: Path = typer.Argument(None, help=".rpt binary (default: same stem in samples/crystal-rpt)"),
+    rpt_dir: Path = typer.Option(Path("samples/crystal-rpt"), help="where to look for .rpt binaries"),
+) -> None:
+    """Recover cross-tab grid definitions from the .rpt binaries and inject
+    them into the dumps, so cross-tabs convert to live PRD crosstabs instead
+    of TODOs. The SAP SDK seals these behind reserved COM slots; this reads
+    them with rpt-rs (see `report-env`)."""
+    from pentaho_migration.reports.rpt_crosstabs import (
+        describe_availability, enrich_dump, find_rpt_rs)
+
+    if find_rpt_rs() is None:
+        typer.echo(describe_availability())
+        raise typer.Exit(code=2)
+
+    dumps = sorted(dump.glob("*.xml")) if dump.is_dir() else [dump]
+    total = enriched_files = 0
+    for path in dumps:
+        binary = rpt if rpt is not None else rpt_dir / (path.stem + ".rpt")
+        if not binary.is_file():
+            continue
+        count = enrich_dump(path, binary)
+        if count:
+            enriched_files += 1
+            total += count
+            typer.echo(f"  {path.name}: recovered {count} cross-tab definition(s)")
+    typer.echo(f"{total} cross-tab(s) recovered across {enriched_files} dump(s)")
+    if total == 0:
+        raise typer.Exit(code=1)
+
+
 @app.command("report-env")
 def report_env() -> None:
     """Preflight for the Crystal pipeline: is everything installed?"""

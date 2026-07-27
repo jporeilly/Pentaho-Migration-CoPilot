@@ -54,7 +54,17 @@
                 </Border>
                 <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
                 <ObjectFormatConditionFormulas />
-              </CrossTabObject>
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{DataTable1.Customer_Name}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{DataTable1.Product_Name}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{DataTable1.Product_Qty}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
             </ReportObjects>
           </Section>
         </Sections>

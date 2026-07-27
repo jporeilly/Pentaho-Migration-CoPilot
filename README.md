@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (IBM DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.33.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
+Version **1.34.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -237,6 +237,7 @@ pentaho-migrate report-classify [dir]       # classify a corpus by feature into 
 pentaho-migrate report-triage <dir> --jndi <ds> # batch triage agent: READY/REVIEW/BLOCKED verdict per report
 pentaho-migrate report-gaps [directory]     # Crystal corpus coverage: parse rate, formula rates, portfolio effort
 pentaho-migrate report-images <dump> [rpt]  # carve embedded logos/pictures from the .rpt binary into the dump (SDK can't read them)
+pentaho-migrate report-crosstabs <dump> [rpt] # recover cross-tab grids from the .rpt binary (SDK seals them) -> live PRD crosstabs
 pentaho-migrate report-scrub [directory]    # blank credentials RptToXml copies out of .rpt files — run before sharing dumps
 pentaho-migrate report-batch [directory]    # convert a Crystal corpus into the project store (joins the portfolio)
 ```
