@@ -7,6 +7,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.36.1] — 2026-07-27
+
+### Fixed
+
+- **Crystal's PageHeader now renders — it maps to PRD's physical page-header
+  band.** It was being emitted into a repeating details-header, which lives
+  inside the innermost group: a letterhead rendered above each detail block
+  or, on grouped reports, not visibly at all — while the page FOOTER (already
+  on the physical band) worked. The one known difference is called out as a
+  conversion note: on page 1 PRD prints the page header above the report
+  header, where Crystal prints it below; every other page is identical.
+- **Special fields embedded bare in text objects are interpolated.** RptToXml
+  flattens `"Page " + {PageNumber}` to the literal text "Page PageNumber",
+  which the braced-marker scan never saw — it printed verbatim at the
+  customer. Bare `PageNumber`/`TotalPageCount`/`PrintDate` (and friends) now
+  become `$(PageofPages)` / `$(report.date, ...)` message interpolations,
+  whole-word matched, with the page function emitted whenever a template
+  references it. The demo report's footer reads "Page 1 / 3" instead of
+  "Page PageNumber".
+
 ## [1.36.0] — 2026-07-27
 
 ### Fixed

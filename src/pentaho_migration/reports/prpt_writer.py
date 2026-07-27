@@ -50,8 +50,12 @@ NS_WIZARD = "http://reporting.pentaho.org/namespaces/engine/attributes/wizard"
 
 
 def _needs_page_function(model):
-    return any(el.kind == "special" and el.column in ("pagenumber", "pagenofm", "totalpagecount")
-               for s in model.sections for el in s.elements)
+    # standalone special elements, or a text template that interpolates the
+    # page number ("Page PageNumber" text objects resolve to $(PageofPages))
+    return any(
+        (el.kind == "special" and el.column in ("pagenumber", "pagenofm", "totalpagecount"))
+        or "$(PageofPages)" in getattr(el, "text_template", "")
+        for s in model.sections for el in s.elements)
 
 
 def _band_content(sections, band_type, tp="", sp="style:"):
@@ -125,26 +129,15 @@ def build_layout_xml(model, root_type="master-report"):
                 f"<group-footer>{_root_band(footers, 'group-footer')}</group-footer>"
                 f"</group>")
         # innermost: the data body with the detail band. Crystal's PageHeader
-        # becomes a REPEATING details-header: Crystal prints page 1 as
-        # ReportHeader then PageHeader, but PRD's physical page-header always
-        # tops the page — a repeating details-header renders below the
-        # masthead on page 1 and repeats on continuation pages, matching what
-        # Crystal users expect (this is also how PRD's own samples do column
-        # labels).
+        # maps to PRD's physical page-header (see build_styles_xml) - a
+        # details-header was tried and is the wrong band: it lives inside the
+        # innermost group, so a letterhead rendered above each detail block
+        # (or, with grouped reports, not visibly at all) instead of topping
+        # the page the way the page-FOOTER already tops the bottom.
         details = model.sections_of("Detail")
-        ph_content, ph_height, ph_bg = _band_content(model.sections_of("PageHeader"), "details-header")
-        ph_style = ("<style:element-style>"
-                    '<style:page-band-styles repeat="true"/>'
-                    + (f'<style:border-styles background-color={quoteattr(ph_bg)}/>' if ph_bg else "")
-                    + "</style:element-style>") if ph_content else ""
-        details_header = (
-            f'<details-header core:element-type="details-header" '
-            f'xmlns:report-designer="http://reporting.pentaho.org/namespaces/report-designer/2.0" '
-            f'report-designer:visual-height="{_num(ph_height)}">{ph_style}{ph_content}</details-header>'
-            if ph_content else '<details-header core:element-type="details-header"/>')
         return (
             '<data-body core:element-type="group-data-body">'
-            f"{details_header}"
+            '<details-header core:element-type="details-header"/>'
             f"<details>{_root_band(details, 'itemband')}</details>"
             '<no-data><root-level-content core:element-type="no-data-band"/></no-data>'
             '<details-footer core:element-type="details-footer"/>'
@@ -303,10 +296,13 @@ def _page_band_bg(bg):
 
 
 def build_styles_xml(model):
-    # Crystal's PageHeader lives in the layout as a repeating details-header
-    # (see build_layout_xml); only the PageFooter maps to the physical page
-    # band, whose bottom-of-every-page semantics match Crystal's.
+    # Both Crystal page bands map to PRD's physical page bands. One known
+    # difference, called out as a conversion note: Crystal prints page 1 as
+    # ReportHeader then PageHeader, while PRD's page-header tops every page
+    # including the first. Losing the letterhead on every page (what any other
+    # mapping costs) is strictly worse than that page-1 band-order swap.
     p = model.page
+    ph_content, _, ph_bg = _band_content(model.sections_of("PageHeader"), "page-header", tp="layout:", sp="")
     pf_content, _, pf_bg = _band_content(model.sections_of("PageFooter"), "page-footer", tp="layout:", sp="")
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -316,7 +312,7 @@ def build_styles_xml(model):
         f'margin-left="{_num(p.margin_left)}" margin-bottom="{_num(p.margin_bottom)}" '
         f'margin-right="{_num(p.margin_right)}"/>'
         '<layout:watermark core:element-type="watermark"></layout:watermark>'
-        '<layout:page-header core:element-type="page-header"></layout:page-header>'
+        f'<layout:page-header core:element-type="page-header">{_page_band_bg(ph_bg)}{ph_content}</layout:page-header>'
         f'<layout:page-footer core:element-type="page-footer">{_page_band_bg(pf_bg)}{pf_content}</layout:page-footer>'
         "</style>")
 

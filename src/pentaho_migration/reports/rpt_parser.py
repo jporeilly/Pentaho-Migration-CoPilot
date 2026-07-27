@@ -293,6 +293,14 @@ def _parse_report(root):
     _parse_areas(root, model)
     _resolve_references(model)
 
+    if (any(s.elements for s in model.sections_of("PageHeader"))
+            and any(s.elements for s in model.sections_of("ReportHeader"))):
+        model.issues.append(
+            "PageHeader converted to PRD's physical page-header band - on "
+            "page 1 it prints ABOVE the report header, where Crystal prints "
+            "it below; every other page is identical. Swap the page-1 order "
+            "in PRD only if the customer notices")
+
     if subs is not None:
         for rep in subs.findall("Report"):
             child = _parse_report(rep)
@@ -833,6 +841,22 @@ _SUMMARY_CALL = re.compile(
     r"\b[A-Za-z][A-Za-z0-9]*\s*\(\s*\{[^{}]+\}\s*(?:,\s*\{[^{}]+\}\s*)*\)")
 
 
+# RptToXml flattens a special field embedded in a text object to its BARE name
+# - "Page " + {PageNumber} arrives as the text "Page PageNumber" - so the
+# braced-marker scan never sees it. These are the runtime values PRD can also
+# interpolate. Whole-word, case-exact: prose legitimately containing the word
+# "PageNumber" is imaginable but a report printing it literally is not.
+_BARE_SPECIALS = {
+    "PageNumber": "$(PageofPages)",
+    "PageNofM": "$(PageofPages)",
+    "TotalPageCount": "$(PageofPages)",
+    "PrintDate": "$(report.date, date, MMM d, yyyy)",
+    "DataDate": "$(report.date, date, MMM d, yyyy)",
+    "ModificationDate": "$(report.date, date, MMM d, yyyy)",
+}
+_BARE_SPECIAL_RE = re.compile(r"\b(" + "|".join(_BARE_SPECIALS) + r")\b")
+
+
 def _resolve_embedded_text(el, model, summary_by_name):
     """Crystal text objects can carry field references INSIDE their prose:
     "The total amount due is {@statement amount} and is payable...". Emitted as
@@ -844,7 +868,20 @@ def _resolve_embedded_text(el, model, summary_by_name):
     keeps a note: printing '{@thing}' is bad, but silently dropping the phrase
     the letter is built around is worse."""
     text = el.text or ""
+    bare = _BARE_SPECIAL_RE.search(text)
+    if "{" not in text and not bare:
+        return
     if "{" not in text:
+        # only bare specials - substitute and note which page/date semantics
+        # were assumed (PageNumber alone becomes the "n / m" form)
+        el.text_template = _BARE_SPECIAL_RE.sub(
+            lambda m: _BARE_SPECIALS[m.group(1)], text)
+        if any(m.group(1) in ("PageNumber", "TotalPageCount")
+               for m in _BARE_SPECIAL_RE.finditer(text)):
+            el.notes.append(
+                'special field in text rendered as "page n / m" '
+                "($(PageofPages)) - adjust the format in PRD if the report "
+                "showed only the bare number")
         return
     unresolved = []
 
@@ -894,6 +931,7 @@ def _resolve_embedded_text(el, model, summary_by_name):
 
     template = _SUMMARY_CALL.sub(summary_call, text)
     template = _EMBEDDED.sub(substitute, template)
+    template = _BARE_SPECIAL_RE.sub(lambda m: _BARE_SPECIALS[m.group(1)], template)
     for token, phrase in frozen.items():
         template = template.replace(token, phrase)
     if unresolved:

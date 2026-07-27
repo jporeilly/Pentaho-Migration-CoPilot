@@ -141,6 +141,45 @@ class TestAggregateSynthesis:
         assert any("not carried" in n for n in split_todos(model.issues)[MANUAL])
 
 
+class TestBareSpecials:
+    """RptToXml flattens a special field embedded in a text object to its bare
+    name: "Page " + {PageNumber} arrives as the text "Page PageNumber" and
+    used to print literally."""
+
+    BAND = """\
+    <Section Name="S1" Height="240"><ReportObjects>
+      <TextObject Name="PgNum" Left="0" Top="0" Width="1440" Height="220">
+        <Text>Page PageNumber</Text></TextObject>
+      <TextObject Name="Printed" Left="0" Top="0" Width="1440" Height="220">
+        <Text>Printed on PrintDate</Text></TextObject>
+      <TextObject Name="Prose" Left="0" Top="0" Width="1440" Height="220">
+        <Text>See the page number column</Text></TextObject>
+    </ReportObjects></Section>"""
+
+    def test_bare_specials_become_interpolations(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, _report(self.BAND)))
+        els = {el.name: el for s in model.sections for el in s.elements}
+        assert els["PgNum"].text_template == "Page $(PageofPages)"
+        assert "$(report.date" in els["Printed"].text_template
+        assert any("page n / m" in n for n in els["PgNum"].notes)
+
+    def test_prose_containing_similar_words_is_untouched(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, _report(self.BAND)))
+        els = {el.name: el for s in model.sections for el in s.elements}
+        assert els["Prose"].text_template == ""   # stays a plain label
+
+    def test_the_page_function_is_emitted_for_templates(self, tmp_path):
+        import zipfile
+        from pentaho_migration.reports import write_prpt
+        model = load_report_model(_dump(tmp_path, _report(self.BAND)))
+        out = tmp_path / "out.prpt"
+        write_prpt(model, out)
+        dd = zipfile.ZipFile(out).read("datadefinition.xml").decode()
+        assert "PageOfPagesFunction" in dd, (
+            "a template interpolating $(PageofPages) needs the function "
+            "defined, or the message renders blank")
+
+
 class TestTranslatorUnblocked:
     def test_bracketed_parameter_name_is_not_an_array(self):
         f = translate_formula(

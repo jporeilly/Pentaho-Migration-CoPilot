@@ -412,10 +412,15 @@ def test_professional_formatting_carries_through(tmp_path):
     assert "image/png" in zf.read("META-INF/manifest.xml").decode()
     layout = zf.read("layout.xml").decode()
     assert "#133346" in layout                              # navy carried
-    # Crystal PageHeader lives in the layout as a repeating details-header
-    # (below the masthead on page 1), carrying its band background
-    assert 'page-band-styles repeat="true"' in layout
-    assert layout.count("#133346") >= 2  # masthead + column-header band fills
+    # Crystal's PageHeader maps to PRD's PHYSICAL page-header band in
+    # styles.xml - a details-header lives inside the innermost group and never
+    # topped the page, so letterheads silently vanished. The band background
+    # travels with it, so the navy fill now spans layout.xml AND styles.xml.
+    styles = zf.read("styles.xml").decode()
+    header_band = styles.split('<layout:page-header')[1].split('</layout:page-header>')[0]
+    assert "label" in header_band or "field" in header_band, (
+        "PageHeader content missing from the physical page-header band")
+    assert "#133346" in styles  # column-header band fill rides along
 
 
 def test_rich_parameters_become_list_parameters(tmp_path):
