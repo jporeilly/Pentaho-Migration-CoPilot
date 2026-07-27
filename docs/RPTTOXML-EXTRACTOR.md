@@ -141,13 +141,43 @@ Still open (smaller): cross-tab grid definitions (SDK-sealed — hand-add
 .rpt reader/renderer with no SAP runtime: `rpt xml-dump` emits
 RptToXml-compatible XML and the codebase parses **cross-tab row/column
 dimensions and measures from the binary** — exactly what the SAP SDK seals
-behind reserved slots. Evaluation of the pinned v0.2.0 release (Windows
-binary, checksum-verified, AND a from-source cargo build): **broken on
-Windows** — 0 records decoded from every corpus file *including the
-project's own README fixture* (stream names surface as `\\/Contents`,
-pointing at a path-separator bug in the CFB layer), renders blank pages.
-The project self-describes as experimental/unstable. Decision: keep the
-SAP-based fork pipeline (corpus-proven), re-evaluate rpt-rs at its next
-tag — if the Windows CFB bug is fixed, an adapter that injects
-`<CrossTabDefinition>` from its output would close the last manual
-cross-tab step. Evaluation trees live untracked under `tools/rpt-rs*`.
+behind reserved slots.
+
+*First evaluation (v0.2.0, release binary + from-source build) concluded
+"broken on Windows, parked". That conclusion was **wrong** — the cause is a
+one-line, Windows-only defect, and the tool works once it is fixed.*
+
+**Root cause (confirmed).** `StreamId::classify`
+(`crates/rpt/src/container/stream_id.rs`) splits the OLE entry path and
+filters out the root component with `s != "/"`. On Windows the root
+component stringifies as `\`, not `/`, so it survives the filter; every
+stream then has two components, takes the "nested entry" branch, and is
+returned as `Other("\\/Contents")` instead of `StreamId::Contents`. Since
+only `Contents` is marked `is_tslv()`, nothing is ever decoded → 0 records,
+blank renders. Verified independently: `Path::new("/Contents").components()`
+yields `["\\", "Contents"]` on Windows, and **their own test suite fails
+7 of 8 integration tests on Windows** before the fix.
+
+**Fix (proven locally).** Filter the Windows root too:
+
+```rust
+.filter(|s| !s.is_empty() && s != "/" && s != "\\")
+```
+
+After that single change, on this Windows box: their fixture
+`ajryan/B1Budget_M.rpt` decodes **1,475 records / 93 record types** with the
+full field list; **600 of their tests pass**, with one remaining failure
+that is a CRLF-vs-LF golden-file string comparison (test infrastructure,
+not the library); and cross-tab records decode including
+`CrossTabDimension → CrossTabDimensionGroup → CrossTabDimensionField`
+with real field names (e.g. `Data.Date1`).
+
+**Status.** The blocker is understood and removable, so the earlier
+"re-evaluate at their next tag" condition no longer applies. Remaining work
+before adopting it: `xml-dump` surfaces the `CrossTabObject` but not yet the
+dimensions as `RowFields`/`ColumnFields`/`SummaryFields`, so an adapter must
+either read the raised model or the record tree. The project still
+self-describes as experimental/unstable, and the patch is ours until it is
+upstreamed. The SAP-based fork pipeline remains the corpus-proven default.
+Evaluation trees live untracked under `tools/rpt-rs*` (the patch is applied
+in `tools/rpt-rs-src`).
