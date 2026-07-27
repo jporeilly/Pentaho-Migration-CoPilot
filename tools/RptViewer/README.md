@@ -42,7 +42,7 @@ saved without data — not a raw Crystal exception.
 ## Side-by-side review
 
 ```powershell
-.\tools\RptViewer\RptViewer.exe samples\crystal-rpt\Foo.rpt          # original
+.\tools\RptViewer\RptViewer.exe samples\crystal\corpus\Foo.rpt          # original
 pentaho-migrate report samples\crystal\real\Foo.xml --jndi MyDS      # converted .prpt -> open in PRD
 ```
 

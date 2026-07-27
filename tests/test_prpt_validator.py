@@ -13,7 +13,7 @@ from pentaho_migration.reports.prpt_validator import validate_prpts, validator_a
 
 from pathlib import Path
 
-SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
+SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "demo" / "branch_transactions.xml"
 
 needs_engine = pytest.mark.skipif(
     not validator_available(), reason="no local PRD install + Java")

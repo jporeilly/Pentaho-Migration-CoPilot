@@ -51,7 +51,7 @@ $out = Join-Path $here "RptViewer.exe"
 
 if ($LASTEXITCODE -eq 0 -and (Test-Path $out)) {
     Write-Host "Built $out"
-    Write-Host "Try:  .\tools\RptViewer\RptViewer.exe samples\crystal-rpt\ajryan_B1Budget_M.rpt"
+    Write-Host "Try:  .\tools\RptViewer\RptViewer.exe samples\crystal\corpus\ajryan_B1Budget_M.rpt"
 } else {
     Write-Host "Build failed."; exit 1
 }

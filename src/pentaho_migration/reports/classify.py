@@ -79,25 +79,49 @@ def detect_features(model) -> list[str]:
     return sorted(found)
 
 
-def classify_corpus(src: Path, dest: Path, progress=None):
+def has_saved_data(dump: Path) -> bool:
+    """True when the report carries its own rows (EnableSaveDataWithReport).
+    Those are the ones that RENDER in the Crystal viewer with no database —
+    the difference between a demo that shows data and one that shows an empty
+    grid."""
+    head = dump.read_text(encoding="utf-8", errors="replace")[:4000]
+    m = re.search(r'EnableSaveDataWithReport="([^"]*)"', head)
+    return bool(m) and m.group(1).strip().lower() == "true"
+
+
+def classify_corpus(src: Path, dest: Path, progress=None, rpt_dir: Path | None = None):
     """Scan every dump in src, copy each into dest/<feature>/ for every
     feature it demonstrates, and write dest/README.md. Returns
-    {filename: [features]}; parse failures are skipped with a note."""
+    {filename: [features]}; parse failures are skipped with a note.
+
+    When rpt_dir is given, the matching .rpt binary is copied in beside each
+    dump so a folder is a self-contained end-to-end demo: open the original in
+    the viewer, convert the dump, compare. Reports whose .rpt carries saved
+    data are marked, since only those render without the source database."""
     src, dest = Path(src), Path(dest)
+    rpt_dir = Path(rpt_dir) if rpt_dir else None
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir(parents=True)
 
     results, failures = {}, []
+    originals, viewable = {}, set()
     files = sorted(src.glob("*.xml"))
     for i, dump in enumerate(files):
         try:
             model = load_report_model(dump)
             results[dump.name] = detect_features(model)
+            binary = (rpt_dir / f"{dump.stem}.rpt") if rpt_dir else None
+            if binary is not None and binary.is_file():
+                originals[dump.name] = binary
+                if has_saved_data(dump):
+                    viewable.add(dump.name)
             for feature in results[dump.name]:
                 folder = dest / FEATURES[feature][0]
                 folder.mkdir(exist_ok=True)
                 shutil.copy2(dump, folder / dump.name)
+                if binary is not None and binary.is_file():
+                    shutil.copy2(binary, folder / binary.name)
         except Exception as exc:
             failures.append((dump.name, str(exc)[:80]))
         if progress:
@@ -106,15 +130,32 @@ def classify_corpus(src: Path, dest: Path, progress=None):
     lines = ["# Crystal corpus, classified by migration feature", "",
              f"{len(results)} reports scanned from `{src.as_posix()}`. A report "
              "demonstrating several features appears in several folders - "
-             "pick demo reports by the feature you want to show.", "",
-             "| Folder | Feature | Reports |", "| --- | --- | --- |"]
+             "pick demo reports by the feature you want to show.", ""]
+    if originals:
+        lines += [
+            f"Each folder also holds the matching **`.rpt` binary** ({len(originals)} "
+            f"of {len(results)} reports), so a folder is a self-contained "
+            "end-to-end demo:", "",
+            "```powershell",
+            r"tools\RptViewer\RptViewer.exe <report>.rpt      # the ORIGINAL",
+            "pentaho-migrate report <report>.xml --validate   # the CONVERTED .prpt",
+            "```", "",
+            f"**{len(viewable)} of those carry saved data** and render in the viewer "
+            "with no database (marked * below). The rest show layout only until you "
+            "pass --server/--db/--user/--password.", ""]
+    lines += ["| Folder | Feature | Reports | Viewer-ready |", "| --- | --- | --- | --- |"]
     for key, (folder, desc) in FEATURES.items():
-        count = sum(1 for feats in results.values() if key in feats)
-        if count:
-            lines.append(f"| `{folder}/` | {desc} | {count} |")
+        matching = [n for n, feats in results.items() if key in feats]
+        if matching:
+            ready = sum(1 for n in matching if n in viewable)
+            lines.append(f"| `{folder}/` | {desc} | {len(matching)} | {ready} |")
     lines += ["", "## Per-report features", ""]
     for name in sorted(results):
-        lines.append(f"- `{name}` — {', '.join(results[name])}")
+        mark = " *" if name in viewable else ""
+        lines.append(f"- `{name}`{mark} — {', '.join(results[name])}")
+    if viewable:
+        lines += ["", "`*` = carries saved data; renders in the Crystal viewer "
+                  "without its source database."]
     if failures:
         lines += ["", "## Skipped (parse failures)", ""]
         lines += [f"- `{n}`: {e}" for n, e in failures]

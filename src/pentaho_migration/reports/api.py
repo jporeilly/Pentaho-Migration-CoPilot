@@ -13,7 +13,7 @@ import time
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -29,7 +29,13 @@ from pentaho_migration.validator.effort import EffortEstimate
 logger = logging.getLogger("pentaho_migration.api.reports")
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SAMPLE_FILE = REPO_ROOT / "samples" / "crystal" / "branch_transactions.xml"
+# The "Try Crystal Reports" scenario. A REAL customer-style report (Xtreme
+# World Sales Report, harvested from GitHub) rather than an authored dump, so
+# the demo runs end to end: open the original .rpt in the Crystal viewer - it
+# carries 2,191 saved rows, so it renders with no database - then convert it
+# and open the .prpt in Report Designer.
+SAMPLE_NAME = "workcontrolgit_WorldSalesReport.xml"
+SAMPLE_FILE = REPO_ROOT / "samples" / "crystal" / "demo" / SAMPLE_NAME
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 
 router = APIRouter(prefix="/reports", tags=["reports"])
@@ -525,3 +531,49 @@ def translate_status(job: str) -> dict:
     if state is None:
         raise HTTPException(status_code=404, detail="unknown translation job")
     return state
+
+
+# --------------------------------------------------------- original .rpt viewer
+
+class ViewOriginalRequest(BaseModel):
+    dump: str          # the dump's file name; the .rpt is matched by stem
+
+
+@router.get("/original")
+def original_status(dump: str) -> dict:
+    """Can the ORIGINAL Crystal report for this dump be opened locally?
+    Drives the Inspect page's 'view original' button."""
+    from pentaho_migration.reports.rpt_viewer import describe
+
+    return describe(dump)
+
+
+@router.post("/original/open", dependencies=[Depends(require_api_key)])
+def open_original_report(req: ViewOriginalRequest, request: Request) -> dict:
+    """Launch the local Crystal viewer on the original .rpt.
+
+    This starts a desktop process, so it is deliberately narrow: LOCAL callers
+    only (the review UI runs on the consultant's own machine), a fixed viewer
+    executable, and a path that must resolve to a .rpt inside the allowed
+    sample roots — see reports/rpt_viewer.py."""
+    from pentaho_migration.reports.rpt_viewer import find_original, open_original
+
+    host = (request.client.host if request.client else "") or ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(
+            status_code=403,
+            detail="the report viewer can only be opened from the machine "
+                   "running the app")
+    original = find_original(req.dump)
+    if original is None:
+        raise HTTPException(
+            status_code=404,
+            detail="no .rpt binary for this report — authored dumps have no "
+                   "Crystal original; only extracted reports can be opened")
+    try:
+        open_original(original)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {"opened": str(original)}

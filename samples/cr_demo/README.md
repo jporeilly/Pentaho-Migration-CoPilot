@@ -3,7 +3,7 @@
 Nine authored RptToXml dumps of **increasing complexity**, all backed by the
 live `cscu_core` credit-union schema so each one **converts and renders
 end-to-end** against the real database. All pages are **A4 portrait**. This is the pipeline's golden-path
-regression and demo set; the 150-file GitHub corpus (`samples/crystal/real/`)
+regression and demo set; the 150-file GitHub corpus (`samples/crystal/corpus/`)
 stays the parser's real-world *variety* test.
 
 These are authored dumps, not extracted from `.rpt` binaries — the converter
@@ -32,11 +32,11 @@ from a real binary, run:
 python scripts/demo_crosstab_recovery.py
 ```
 
-which walks `samples/crystal-rpt/ajryan_B1Budget_M.rpt` from "cross-tab is a
+which walks `samples/crystal/corpus/ajryan_B1Budget_M.rpt` from "cross-tab is a
 TODO" to a live PRD crosstab.
 
 The flagship UI sample **Branch Transaction Summary - Prompt**
-(`../crystal/branch_transactions.xml`) demonstrates the working parameter
+(`../crystal/demo/branch_transactions.xml`) demonstrates the working parameter
 prompt: the record selection folds into the SQL WHERE, so changing the Branch
 prompt in Report Designer re-filters the report live.
 

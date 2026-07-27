@@ -7,7 +7,7 @@
 #      or pointed to by the RPTTOXML_PATH environment variable.
 #
 # Usage:
-#   .\scripts\extract-rpt.ps1                          # samples\crystal-rpt -> samples\crystal\real
+#   .\scripts\extract-rpt.ps1                          # samples\crystal\corpus -> samples\crystal\real
 #   .\scripts\extract-rpt.ps1 -InDir C:\customer\rpts -OutDir C:\customer\xml
 
 param(
@@ -17,7 +17,7 @@ param(
 
 $ErrorActionPreference = "Continue"
 $repoRoot = Split-Path -Parent $PSScriptRoot
-if ($InDir -eq "") { $InDir = Join-Path $repoRoot "samples\crystal-rpt" }
+if ($InDir -eq "") { $InDir = Join-Path $repoRoot "samples\crystal\corpus" }
 if ($OutDir -eq "") { $OutDir = Join-Path $repoRoot "samples\crystal\real" }
 
 # locate the extractor: prefer the fork (per-field formats + redaction),

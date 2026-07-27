@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pentaho_migration.reports import load_report_model
 
-REAL = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+REAL = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
 
 
 def _dump(rt_block):

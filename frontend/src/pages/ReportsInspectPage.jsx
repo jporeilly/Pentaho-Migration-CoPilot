@@ -1,6 +1,7 @@
 // Reports flow, step 1: structure + data source of the parsed Crystal report.
 // Deterministic view — everything here came straight out of the RptToXml dump.
 
+import { useEffect, useState } from 'react'
 import ConnectionPanel from '../components/ConnectionPanel.jsx'
 import Explain from '../components/Explain.jsx'
 import { TabbedLayoutPreview } from '../components/LayoutPreview.jsx'
@@ -19,6 +20,37 @@ const BAND_TIPS = {
 
 export default function ReportsInspectPage({ summary, file, onUpdate }) {
   const c = summary.counts
+  // The ORIGINAL .rpt can be opened in the local Crystal viewer when the dump
+  // came from one (authored demo dumps have no binary).
+  const [original, setOriginal] = useState(null)
+  const [viewerMsg, setViewerMsg] = useState('')
+
+  useEffect(() => {
+    const name = file?.name
+    if (!name) return
+    let live = true
+    fetch(`/reports/original?dump=${encodeURIComponent(name)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (live) setOriginal(d) })
+      .catch(() => {})
+    return () => { live = false }
+  }, [file])
+
+  async function openOriginal() {
+    setViewerMsg('')
+    try {
+      const res = await fetch('/reports/original/open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dump: file.name }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      setViewerMsg('Opened in the Crystal viewer — look for its window.')
+    } catch (err) {
+      setViewerMsg(err.message)
+    }
+  }
   const tiles = [
     { value: c.sections, label: 'bands', tip: 'Report sections parsed from the dump.' },
     { value: c.elements, label: 'elements', tip: 'Labels, fields, lines, and boxes placed on the bands.' },
@@ -29,7 +61,20 @@ export default function ReportsInspectPage({ summary, file, onUpdate }) {
 
   return (
     <>
-      <h2 className="subhead">{summary.name}</h2>
+      <div className="subhead-row">
+        <h2 className="subhead">{summary.name}</h2>
+        {original?.available && (
+          <button
+            className="ghost"
+            onClick={openOriginal}
+            title={`Open the original Crystal report in the local viewer:
+${original.original}`}
+          >
+            🔍 View original .rpt
+          </button>
+        )}
+      </div>
+      {viewerMsg && <p className="hint-line">{viewerMsg}</p>}
 
       <div className="tiles">
         {tiles.map((t) => (

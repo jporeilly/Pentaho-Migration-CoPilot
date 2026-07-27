@@ -17,7 +17,7 @@ from pentaho_migration.reports import load_report_model, write_prpt
 from pentaho_migration.reports.formula_translator import translate_formula
 from pentaho_migration.reports.prpt_writer import MIMETYPE
 
-SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
+SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "demo" / "branch_transactions.xml"
 
 client = TestClient(app)
 
@@ -219,7 +219,7 @@ def test_real_corpus_subreports_parse_and_join():
     """The Northwind employee list carries two nested subreport definitions;
     both parse into child models, and the child's visual table links become
     real JOIN ... ON clauses in the generated SQL."""
-    corpus = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+    corpus = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
     model = load_report_model(corpus / "Jakub-Syrek_EmployeeList_2.xml")
     assert set(model.subreports) == {"efficiency", "sqlquerry"}
     attached = [el for s in model.sections for el in s.elements
@@ -376,7 +376,7 @@ def test_truly_unsupported_summary_stays_todo(tmp_path):
 
 
 def test_real_dump_suppression_and_margins():
-    real = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+    real = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
     dumps = sorted(real.glob("*.xml"))
     if len(dumps) < 10:
         pytest.skip("extracted corpus not present")

@@ -13,8 +13,8 @@ from pentaho_migration.reports.rpt_crosstabs import (
     find_rpt_rs)
 
 REPO = Path(__file__).resolve().parents[1]
-RPT_DIR = REPO / "samples" / "crystal-rpt"
-REAL = REPO / "samples" / "crystal" / "real"
+RPT_DIR = REPO / "samples" / "crystal" / "corpus"
+REAL = REPO / "samples" / "crystal" / "corpus"
 
 needs_rpt_rs = pytest.mark.skipif(
     find_rpt_rs() is None, reason="rpt-rs CLI not installed")

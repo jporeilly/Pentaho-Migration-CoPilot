@@ -12,6 +12,14 @@ Pillow, converts to PNG, and matches blobs to the dump's PictureObjects by
 aspect ratio (layout boxes may be stretched, so matching is greedy best-score,
 and every injected image carries a verify note downstream).
 
+Read the STREAMS, not the file. An .rpt is an OLE compound file: a stream's
+bytes are chained through 512-byte sectors that are not necessarily contiguous
+on disk. Scanning raw file bytes therefore splices foreign sector data into any
+image bigger than one sector — which decodes without complaint and renders as a
+rolled or torn picture. So the scan runs per stream (embedded pictures live in
+their own `Embedding N/CONTENTS`), and only falls back to the raw bytes when the
+file is not a readable compound file.
+
 Honesty rules: only decode-proven images are used; a PictureObject with no
 plausible match keeps its TODO; report preview thumbnails (page-shaped DIBs
 Crystal saves) simply never win a match.
@@ -60,12 +68,50 @@ def _to_png(img):
     return out.getvalue()
 
 
-def carve_rpt_images(path):
-    """Signature-scan an .rpt (any binary, really) for embedded images.
-    Returns decode-proven CarvedImages, deduplicated per (width, height)
-    keeping the deepest bit-depth rendition (Crystal stores several)."""
-    data = path.read_bytes()
+def _carved_from_raw_bytes(path):
+    """The pre-stream carve: scan the file as one flat blob. Kept as the
+    fallback for anything that is not a compound file — and used by the tests
+    to prove the sector splicing this module now avoids."""
     found: dict = {}
+    _carve_blob(path.read_bytes(), found)
+    return list(found.values())
+
+
+def _streams(path):
+    """The .rpt's compound-file streams, longest first (pictures are big).
+    Falls back to the whole file when it is not a readable compound file, so
+    loose dumps and test fixtures still work."""
+    try:
+        import olefile
+    except ImportError:
+        return [path.read_bytes()]
+    try:
+        if not olefile.isOleFile(str(path)):
+            return [path.read_bytes()]
+        with olefile.OleFileIO(str(path)) as ole:
+            blobs = []
+            for entry in ole.listdir():
+                try:
+                    blobs.append(ole.openstream(entry).read())
+                except OSError:
+                    continue
+    except Exception:
+        return [path.read_bytes()]
+    blobs.sort(key=len, reverse=True)
+    return blobs or [path.read_bytes()]
+
+
+def carve_rpt_images(path):
+    """Signature-scan an .rpt for embedded images. Returns decode-proven
+    CarvedImages, deduplicated per (width, height) keeping the deepest
+    bit-depth rendition (Crystal stores several)."""
+    found: dict = {}
+    for data in _streams(path):
+        _carve_blob(data, found)
+    return list(found.values())
+
+
+def _carve_blob(data, found):
 
     def _keep(img, bpp, kind):
         if img.width < MIN_DIMENSION or img.height < MIN_DIMENSION:
@@ -109,7 +155,6 @@ def carve_rpt_images(path):
                 if (img := _try_decode(header + data[i:i + size])) is not None:
                     _keep(img, bpp, "dib")
         i += 4
-    return list(found.values())
 
 
 def _aspect_distance(box_aspect, image):
@@ -120,20 +165,41 @@ def _aspect_distance(box_aspect, image):
 
 def match_images(picture_boxes, images):
     """picture_boxes: [(key, width, height)] layout boxes (any unit — only the
-    ratio is used). Returns {key: CarvedImage}. Greedy best-score per box;
-    several boxes may share one image (a logo reused per band is normal).
-    A single box with a single candidate matches unconditionally (the box may
-    crop the raster, breaking the ratio)."""
+    ratio is used). Returns {key: CarvedImage}.
+
+    Confident pairs first: every (box, image) combination is scored and the
+    best ones claim each other, so a distinct image is never spent twice while
+    another image is still unused — three logos in a report come out as three
+    logos, not the best-matching one repeated. Only once the images run out may
+    the remainder reuse one, which is the honest reading of a report that
+    repeats a logo per band. A single box with a single candidate matches
+    unconditionally (the box may crop the raster, breaking the ratio)."""
     if not images:
         return {}
     if len(picture_boxes) == 1 and len(images) == 1:
         return {picture_boxes[0][0]: images[0]}
-    matched = {}
-    for key, w, h in picture_boxes:
-        aspect = (w / h) if h else 0.0
-        best = min(images, key=lambda img: _aspect_distance(aspect, img))
-        if _aspect_distance(aspect, best) <= MAX_ASPECT_DISTANCE:
-            matched[key] = best
+
+    scored = sorted(
+        (_aspect_distance((w / h) if h else 0.0, img), bi, ii)
+        for bi, (_key, w, h) in enumerate(picture_boxes)
+        for ii, img in enumerate(images))
+    matched, taken_boxes, taken_images = {}, set(), set()
+    for distance, bi, ii in scored:
+        if distance > MAX_ASPECT_DISTANCE:
+            break
+        if bi in taken_boxes or ii in taken_images:
+            continue
+        matched[picture_boxes[bi][0]] = images[ii]
+        taken_boxes.add(bi)
+        taken_images.add(ii)
+
+    # images exhausted but boxes left over — now reuse is the right answer
+    for distance, bi, ii in scored:
+        if distance > MAX_ASPECT_DISTANCE:
+            break
+        if bi not in taken_boxes:
+            matched[picture_boxes[bi][0]] = images[ii]
+            taken_boxes.add(bi)
     return matched
 
 

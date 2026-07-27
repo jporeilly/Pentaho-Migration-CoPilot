@@ -14,7 +14,7 @@ from pentaho_migration.reports.effort import build_report_effort
 from pentaho_migration.validator import build_effort, build_report
 
 ETL_SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "m_load_sales.xml"
-CRYSTAL_SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
+CRYSTAL_SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "demo" / "branch_transactions.xml"
 
 client = TestClient(app)
 

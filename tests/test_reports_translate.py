@@ -16,7 +16,7 @@ from pentaho_migration.llm import ExpressionTranslator, LLMSettings, Translation
 from pentaho_migration.reports import load_report_model
 from pentaho_migration.reports.llm_assist import translate_manual_formulas
 
-SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
+SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "demo" / "branch_transactions.xml"
 
 OLLAMA_SETTINGS = LLMSettings(provider="ollama", model="test-model")
 

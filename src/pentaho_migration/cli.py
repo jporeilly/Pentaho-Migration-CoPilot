@@ -564,21 +564,31 @@ def report_parity(
 
 @app.command("report-classify")
 def report_classify(
-    src: Path = typer.Argument(Path("samples/crystal/real")),
+    src: Path = typer.Argument(Path("samples/crystal/corpus")),
     dest: Path = typer.Option(
         Path("samples/crystal/by-feature"), "--out", "-o",
         help="Destination for the by-feature folder tree"),
+    rpt_dir: Path = typer.Option(
+        Path("samples/crystal/corpus"), "--rpt-dir",
+        help="Copy each report's .rpt binary in beside its dump, so every "
+             "folder is a self-contained end-to-end demo (pass a missing "
+             "path to skip)"),
 ) -> None:
     """Classify a Crystal corpus by migration feature: each report is copied
     into a folder per feature it demonstrates (sub-reports/, charts/, ...)
-    plus a generated README index - pick real-world demo reports by feature."""
+    plus a generated README index - pick real-world demo reports by feature.
+
+    The matching .rpt binary is copied in too, and reports carrying saved data
+    are marked: those are the ones that render in the Crystal viewer with no
+    database, so you can show original -> converted end to end."""
     from pentaho_migration.reports.classify import classify_corpus
 
     def progress(done: int, total: int) -> None:
         if done % 25 == 0 or done == total:
             typer.echo(f"  scanned {done}/{total}", err=True)
 
-    results = classify_corpus(src, dest, progress=progress)
+    results = classify_corpus(src, dest, progress=progress,
+                              rpt_dir=rpt_dir if rpt_dir.is_dir() else None)
     counts: dict[str, int] = {}
     for feats in results.values():
         for f in feats:
@@ -591,7 +601,7 @@ def report_classify(
 
 @app.command("report-gaps")
 def report_gaps(
-    directory: Path = typer.Argument(Path("samples/crystal/real")),
+    directory: Path = typer.Argument(Path("samples/crystal/corpus")),
     rate: float = typer.Option(150.0, "--rate", help="Consultant rate per hour"),
 ) -> None:
     """Batch-analyze every RptToXml dump in DIRECTORY: parse coverage, formula
@@ -658,7 +668,7 @@ def report_gaps(
 
 @app.command("report-batch")
 def report_batch(
-    directory: Path = typer.Argument(Path("samples/crystal/real")),
+    directory: Path = typer.Argument(Path("samples/crystal/corpus")),
     out_dir: Path = typer.Option(Path("output/crystal"), "--out", "-o"),
     jndi: str = typer.Option("", "--jndi", help="JNDI datasource for every report"),
     translate: bool = typer.Option(
@@ -745,7 +755,7 @@ def report_batch(
 
 
 @app.command("report-scrub")
-def report_scrub(directory: Path = typer.Argument(Path("samples/crystal/real"))) -> None:
+def report_scrub(directory: Path = typer.Argument(Path("samples/crystal/corpus"))) -> None:
     """Blank credentials (UserName/Password/logon properties) that RptToXml
     copies out of .rpt files into dumps. Run before committing or sharing."""
     from pentaho_migration.reports.sanitize import scrub_directory
@@ -757,7 +767,7 @@ def report_scrub(directory: Path = typer.Argument(Path("samples/crystal/real")))
 @app.command("report-images")
 def report_images(
     dump: Path = typer.Argument(..., help="RptToXml dump (.xml) to enrich"),
-    rpt: Path = typer.Argument(None, help=".rpt binary (default: same stem in samples/crystal-rpt)"),
+    rpt: Path = typer.Argument(None, help=".rpt binary (default: same stem in samples/crystal/corpus)"),
     out: Path = typer.Option(None, "-o", help="write enriched dump here (default: in place)"),
 ) -> None:
     """Carve embedded pictures out of the .rpt binary and inject them into the
@@ -768,7 +778,7 @@ def report_images(
     from pentaho_migration.reports.rpt_images import enrich_dump
 
     if rpt is None:
-        rpt = Path("samples/crystal-rpt") / (dump.stem + ".rpt")
+        rpt = Path("samples/crystal/corpus") / (dump.stem + ".rpt")
     if not rpt.is_file():
         typer.echo(f"no .rpt found at {rpt}")
         raise typer.Exit(code=2)
@@ -781,7 +791,7 @@ def report_images(
 
 @app.command("report-portfolio")
 def report_portfolio(
-    directory: Path = typer.Argument(Path("samples/crystal/real")),
+    directory: Path = typer.Argument(Path("samples/crystal/corpus")),
     jndi: str = typer.Option("", help="validate each report's SQL against this live JNDI target"),
     rate: float = typer.Option(150.0, help="consultant rate $/h for the cost figures"),
     out: Path = typer.Option(None, "-o", help="output HTML (default: <dir>/portfolio-report.html)"),
@@ -807,8 +817,8 @@ def report_portfolio(
 @app.command("report-crosstabs")
 def report_crosstabs(
     dump: Path = typer.Argument(..., help="RptToXml dump (.xml), or a directory of them"),
-    rpt: Path = typer.Argument(None, help=".rpt binary (default: same stem in samples/crystal-rpt)"),
-    rpt_dir: Path = typer.Option(Path("samples/crystal-rpt"), help="where to look for .rpt binaries"),
+    rpt: Path = typer.Argument(None, help=".rpt binary (default: same stem in samples/crystal/corpus)"),
+    rpt_dir: Path = typer.Option(Path("samples/crystal/corpus"), help="where to look for .rpt binaries"),
 ) -> None:
     """Recover cross-tab grid definitions from the .rpt binaries and inject
     them into the dumps, so cross-tabs convert to live PRD crosstabs instead

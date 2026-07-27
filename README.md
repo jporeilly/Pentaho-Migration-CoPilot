@@ -278,9 +278,9 @@ object-store components map through PDI's own mechanisms rather than invented st
 Hive over JDBC, HDFS over VFS (`hdfs://` on ordinary file steps), S3/Azure through
 VFS connections.
 
-`samples/crystal-rpt/` holds **150 genuine Crystal Reports `.rpt` binaries**
+`samples/crystal/corpus/` holds **150 genuine Crystal Reports `.rpt` binaries**
 harvested from public GitHub repositories, with fork-extracted, credential-scrubbed
-dumps in `samples/crystal/real/`. All 150 parse with zero errors; of their 726
+dumps in `samples/crystal/corpus/`. All 150 parse with zero errors; of their 726
 formulas, **80% translate deterministically** (auto + review, including idiom
 rewrites) before any LLM assist. Two things the free SAP SDK refuses to export
 are recovered straight from the `.rpt` binary: **embedded logos**

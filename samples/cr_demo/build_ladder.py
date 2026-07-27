@@ -679,4 +679,4 @@ if __name__ == "__main__":
     flagship()
     for f in sorted(OUT.glob("0*.xml")):
         print("wrote", f.name)
-    print("wrote ../crystal/branch_transactions.xml (flagship UI sample)")
+    print("wrote ../crystal/demo/branch_transactions.xml (flagship UI sample)")

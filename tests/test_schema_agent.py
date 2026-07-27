@@ -18,7 +18,7 @@ from pentaho_migration.reports.schema_agent import (
 
 client = TestClient(app)
 
-SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
+SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "demo" / "branch_transactions.xml"
 
 
 # ------------------------------------------------------------ JNDI resolution

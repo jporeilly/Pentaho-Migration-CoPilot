@@ -10,7 +10,7 @@ import pytest
 
 from pentaho_migration.reports import load_report_model
 
-CORPUS = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+CORPUS = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
 DUMPS = sorted(CORPUS.glob("*.xml")) if CORPUS.is_dir() else []
 
 

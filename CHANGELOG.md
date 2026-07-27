@@ -7,6 +7,45 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.35.0] — 2026-07-27
+
+### Fixed
+
+- **Embedded pictures were being torn by the compound-file layout.** An `.rpt`
+  is an OLE compound file: a stream's bytes are chained through 512-byte
+  sectors that need not be adjacent on disk. The carver scanned raw file bytes,
+  so any picture larger than one sector had foreign sector data spliced into
+  it — the DIB still decoded, and rendered as a rolled or torn image. Carving
+  now runs per stream (`Embedding N/CONTENTS`), falling back to raw bytes only
+  when the file is not a readable compound file. **17 corpus dumps carried
+  corrupted image bytes and have been re-carved.**
+- **A picture could be assigned an image that belonged to another picture.**
+  Matching was greedy per box, so the best-matching image could be spent twice
+  while a different image went unused — a scanned signature came out as a
+  second copy of the company logo. Confident pairs now claim each other first;
+  reuse only happens once the images genuinely run out (a logo repeated per
+  band).
+
+### Changed
+
+- **`samples/crystal/` tidied into three folders with one job each.**
+  `corpus/` holds all 150 harvested reports as `.rpt` + `.xml` pairs (the
+  binaries moved in from the old `samples/crystal-rpt/`); `demo/` holds the
+  curated showcase reports; `by-feature/` stays the generated index. See
+  [samples/crystal/README.md](samples/crystal/README.md).
+- **"Try Crystal Reports" now loads a real report that has its own data.** It
+  was an authored dump with no `.rpt`, so the demo could not start in the
+  Crystal viewer. It is now the Xtreme World Sales Report — 2,191 saved rows,
+  three nested groups, two charts, images — so the full path works: open the
+  original in the viewer, convert it, open the `.prpt` in Report Designer.
+  Two alternates ship beside it for the images story and for "show me
+  something recent" (AdventureWorks, saved 2026-05-20).
+- `report-classify` gained `--rpt-dir` and now copies each report's `.rpt` in
+  beside its dump, so every feature folder is a self-contained demo. The
+  generated index marks the **111 of 150** reports that carry saved data and
+  therefore render in the viewer with no database. Those copies are gitignored
+  (they duplicate `corpus/`) — re-run the command after a clone.
+
 ## [1.34.0] — 2026-07-25
 
 ### Added

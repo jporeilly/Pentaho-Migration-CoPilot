@@ -1,6 +1,6 @@
 [project]
 name = "pentaho-migration"
-version = "1.34.0"
+version = "1.35.0"
 description = "Migration Copilot - AI-assisted migration of legacy ETL (Informatica, Talend, DataStage) and BI reports (SAP Crystal Reports) into Pentaho"
 requires-python = ">=3.11"
 dependencies = [
@@ -10,6 +10,7 @@ dependencies = [
     "httpx>=0.27",
     "fpdf2>=2.8",
     "pillow>=10.0",   # image carving from .rpt binaries (reports/rpt_images.py)
+    "olefile>=0.46",  # .rpt is an OLE compound file - carve per stream, not per file
 ]
 
 [project.optional-dependencies]

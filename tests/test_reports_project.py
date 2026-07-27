@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from pentaho_migration.api.main import app
 from pentaho_migration.project import ReportRecord, list_reports, record_report, set_report_status
 
-SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "branch_transactions.xml"
+SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "demo" / "branch_transactions.xml"
 
 client = TestClient(app)
 

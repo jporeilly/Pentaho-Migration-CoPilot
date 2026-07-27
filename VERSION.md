@@ -1,12 +1,20 @@
 # Version
 
-**1.34.0** — 2026-07-25
+**1.35.0** — 2026-07-27
 
-**Phase 1 COMPLETE** — Informatica PowerCenter, SAP Crystal Reports, and
-Talend. This round closes the last Crystal manual step: **cross-tab grids
-are recovered straight from the .rpt binary** (`report-crosstabs`, via
-rpt-rs) instead of being hand-written, so 12 cross-tabs across 10 corpus
-reports now convert to live PRD crosstabs — corpus triage 105 READY of 150.
-The Windows defect that blocked rpt-rs was fixed and contributed upstream
-(MrSrsen/rpt-rs#1).
+**The Crystal demo now runs end to end.** "Try Crystal Reports" loads a real
+harvested report that ships its own `.rpt` and 2,191 saved rows, so the
+original opens in the Crystal viewer, converts, and lands in Report Designer
+without a database anywhere in the chain. `samples/crystal/` was tidied into
+`corpus/` (all 150 reports as `.rpt` + `.xml` pairs), `demo/` and the
+generated `by-feature/` index, which marks the **111 of 150** reports that
+carry saved data.
+
+Behind that, two image defects were fixed: pictures spanning more than one
+OLE sector were being carved with foreign bytes spliced in (17 corpus dumps
+re-carved), and a picture could be handed an image belonging to a different
+picture.
+
+Phase 1 remains complete — Informatica PowerCenter, SAP Crystal Reports, and
+Talend.
 See [CHANGELOG.md](CHANGELOG.md) for history.

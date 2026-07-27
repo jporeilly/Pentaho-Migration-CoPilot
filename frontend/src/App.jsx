@@ -114,7 +114,10 @@ export default function App() {
   async function loadCrystalSample() {
     const res = await fetch('/reports/sample', { cache: 'no-store' })
     const blob = await res.blob()
-    convertReport(new File([blob], 'branch_transactions.xml', { type: 'text/xml' }), 'CSCU')
+    // A real harvested report, not an authored dump - its .rpt ships beside it
+    // so the same report can be opened in the Crystal viewer first.
+    convertReport(new File([blob], 'workcontrolgit_WorldSalesReport.xml', { type: 'text/xml' }),
+                  'SampleData')
   }
 
   async function openFromProject(row) {

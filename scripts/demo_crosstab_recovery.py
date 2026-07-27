@@ -5,7 +5,7 @@ behind reserved COM slots), so an RptToXml dump describes only the box on the
 page. This script proves what that costs and how the binary reader recovers it,
 on a REAL report from the corpus:
 
-    samples/crystal-rpt/ajryan_B1Budget_M.rpt   (SAP Business One budget report)
+    samples/crystal/corpus/ajryan_B1Budget_M.rpt   (SAP Business One budget report)
 
   1. BEFORE — convert the dump as the SDK produced it: the cross-tab is a TODO.
   2. RECOVER — read the grid straight from the .rpt binary (rpt-rs) and inject
@@ -31,7 +31,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 
 REPORT = "ajryan_B1Budget_M"
 DUMP = REPO_ROOT / "samples" / "crystal" / "real" / f"{REPORT}.xml"
-BINARY = REPO_ROOT / "samples" / "crystal-rpt" / f"{REPORT}.rpt"
+BINARY = REPO_ROOT / "samples" / "crystal" / "corpus" / f"{REPORT}.rpt"
 
 
 def rule(title):

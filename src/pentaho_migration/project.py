@@ -65,7 +65,7 @@ def resolve_source_path(raw: str) -> Path | None:
         if candidate.is_file():
             return candidate
     for base in ("samples/informatica", "samples/talend", "samples/talend_demo",
-                 "samples/crystal/real", "samples/cr_demo", "samples/crystal"):
+                 "samples/crystal/corpus", "samples/cr_demo", "samples/crystal"):
         candidate = REPO_ROOT / base / p.name
         if candidate.is_file():
             return candidate

@@ -14,8 +14,8 @@ from pentaho_migration.reports import load_report_model
 from pentaho_migration.reports.rpt_images import (
     CarvedImage, carve_rpt_images, enrich_dump, match_images)
 
-RPT_DIR = Path(__file__).resolve().parents[1] / "samples" / "crystal-rpt"
-REAL = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "real"
+RPT_DIR = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
+REAL = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
 
 
 def _png_bytes(w, h, color=(200, 30, 30)):
@@ -30,6 +30,60 @@ def _dib_bytes(w, h):
     row = ((w * 24 + 31) // 32) * 4
     header = struct.pack("<IiiHHIIiiII", 40, w, h, 1, 24, 0, row * h, 0, 0, 0, 0)
     return header + b"\x40\x80\xc0" * (row * h // 3 + 1)
+
+
+class TestCompoundFileStreams:
+    """An .rpt is an OLE compound file. Any picture larger than one 512-byte
+    sector is chained across sectors that need not be adjacent on disk, so
+    scanning raw file bytes splices foreign data into the middle of the image.
+    It still decodes - it just renders torn - which is why this is pinned."""
+
+    REPORT = "souvikduttachoudhury_Statement_of_Account"
+
+    def _rpt(self):
+        p = RPT_DIR / f"{self.REPORT}.rpt"
+        if not p.exists():
+            pytest.skip("corpus .rpt not present")
+        return p
+
+    def test_every_embedded_picture_is_recovered_and_distinct(self):
+        """Three logos in the report means three different logos out."""
+        images = carve_rpt_images(self._rpt())
+        assert len(images) == 3
+        assert len({img.png for img in images}) == 3
+
+    def test_raw_byte_scanning_would_have_corrupted_one(self):
+        from pentaho_migration.reports import rpt_images
+
+        rpt = self._rpt()
+        clean = {(i.width, i.height): i.png for i in carve_rpt_images(rpt)}
+        raw = {(i.width, i.height): i.png
+               for i in rpt_images._carved_from_raw_bytes(rpt)}
+        shared = set(clean) & set(raw)
+        assert shared, "the raw scan should still find the same pictures"
+        assert any(clean[k] != raw[k] for k in shared), (
+            "this report is the regression fixture precisely because one of "
+            "its pictures spans sectors - if raw and stream carving now agree, "
+            "the fixture no longer exercises the bug")
+
+    def test_pictures_are_not_assigned_the_same_image_twice(self, tmp_path):
+        import xml.etree.ElementTree as ET
+
+        dump = REAL / f"{self.REPORT}.xml"
+        if not dump.exists():
+            pytest.skip("corpus dump not present")
+        tree = ET.parse(dump)
+        for pic in tree.getroot().iter("PictureObject"):
+            for data in pic.findall("ImageData"):
+                pic.remove(data)
+        stripped = tmp_path / "stripped.xml"
+        tree.write(stripped, encoding="utf-8", xml_declaration=True)
+
+        assert enrich_dump(stripped, self._rpt()) == 3
+        injected = [d.text for d in ET.parse(stripped).getroot().iter("ImageData")]
+        assert len(set(injected)) == 3, (
+            "a distinct image must not be spent on one box while another image "
+            "goes unused - that is how a signature becomes a second logo")
 
 
 class TestCarving:
