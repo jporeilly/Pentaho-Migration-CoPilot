@@ -228,6 +228,7 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
   th {{ text-align: left; color: var(--slate); font-weight: 600; font-size: 12px;
         text-transform: uppercase; letter-spacing: .4px;
         border-bottom: 2px solid #e3e9ed; padding: 8px; }}
+  th.n {{ text-align: right; }}
   td {{ padding: 12px 8px; border-bottom: 1px solid #eef2f4;
         vertical-align: top; }}
   td.n {{ text-align: right; font-variant-numeric: tabular-nums;

@@ -7,6 +7,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **The consultant report downloads as a PDF** as well as HTML and markdown.
+  All three render the same action plan from one function, so the document a
+  customer receives and the numbers quoted in the app cannot drift apart.
+- **The portfolio (triage) report gained the engagement plan.** The
+  per-report actions are rolled up by KIND of work — one row per kind, how
+  many reports it touches, total hours and cost — because a consultant staffs
+  by work type, not by report. Below it, the five heaviest reports get their
+  full action plan in tabs: the same why-it-matters / how / cost detail a
+  single-report consultant report carries. Tabs are self-contained (no CDN),
+  and print expanded.
+- Items and effort columns are right-aligned in the action plan.
+
 ## [1.39.2] - 2026-07-28
 
 ### Crystal fidelity, driven by the corpus audit and the release gate

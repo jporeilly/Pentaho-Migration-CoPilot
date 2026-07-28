@@ -423,6 +423,8 @@ def release_check_start(dump: UploadFile, jndi: str = "",
                 "consultant_report_markdown": markdown,
                 "consultant_report_html": build_consultant_report_html(
                     model, check, rate=rate),
+                "consultant_report_pdf": _consultant_pdf_base64(
+                    model, check, rate),
             }
             job["stage"] = "done"
             job["status"] = "done"
@@ -433,6 +435,23 @@ def release_check_start(dump: UploadFile, jndi: str = "",
 
     threading.Thread(target=run, daemon=True).start()
     return {"job": job_id}
+
+
+def _consultant_pdf_base64(model, check, rate) -> str:
+    """The consultant report as a base64 PDF, ready for a download button.
+    The whole document is a few kilobytes, so it rides in the job result
+    beside the HTML rather than needing a second request - and a failure to
+    build it must not lose the report formats that DID build."""
+    import base64
+
+    from pentaho_migration.reports.consultant_pdf import (
+        build_consultant_report_pdf)
+    try:
+        return base64.b64encode(
+            build_consultant_report_pdf(model, check, rate=rate)).decode()
+    except Exception:
+        logger.exception("consultant PDF failed for %s", model.name)
+        return ""
 
 
 @router.get("/release-check/status")
@@ -483,6 +502,7 @@ def release_check(dump: UploadFile, jndi: str = "",
                      for f in check.findings],
         "llm_annotated": annotated,
         "consultant_report_markdown": markdown,
+        "consultant_report_pdf": _consultant_pdf_base64(model, check, 150.0),
     }
 
 

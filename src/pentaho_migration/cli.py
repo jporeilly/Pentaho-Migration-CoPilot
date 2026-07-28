@@ -612,9 +612,13 @@ def report_release_check(
     markdown = build_consultant_report(model, dump, dump.with_suffix(".prpt"), check)
     target = out or dump.with_suffix(".consultant.md")
     target.write_text(markdown, encoding="utf-8")
+    from pentaho_migration.reports.consultant_pdf import (
+        build_consultant_report_pdf)
     from pentaho_migration.reports.consultant_report import build_consultant_report_html
     target.with_suffix(".html").write_text(
         build_consultant_report_html(model, check), encoding="utf-8")
+    target.with_suffix(".pdf").write_bytes(
+        build_consultant_report_pdf(model, check))
     typer.echo(f"{check.verdict}: original {check.original_pages}pp vs "
                f"converted {check.converted_pages}pp, "
                f"{len(check.findings)} finding(s)")

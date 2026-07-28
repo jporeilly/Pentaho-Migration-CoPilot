@@ -24,6 +24,15 @@ function downloadHtml(html, filename) {
   URL.revokeObjectURL(a.href)
 }
 
+function downloadPdf(base64, filename) {
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }))
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
 function downloadText(text, filename) {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([text], { type: 'text/markdown' }))
@@ -269,6 +278,13 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
                   gate.consultant_report_html,
                   report.filename.replace(/\.prpt$/, '.consultant.html'))}>
                   ⬇ Consultant report (.html)
+                </button>
+              )}
+              {gate.consultant_report_pdf && (
+                <button className="ghost" onClick={() => downloadPdf(
+                  gate.consultant_report_pdf,
+                  report.filename.replace(/\.prpt$/, '.consultant.pdf'))}>
+                  ⬇ .pdf
                 </button>
               )}
               <button className="ghost" onClick={() => downloadText(

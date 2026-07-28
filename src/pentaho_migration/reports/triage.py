@@ -54,6 +54,10 @@ class TriageResult:
     manual_hours: float = 0.0
     brief: str = ""                # optional LLM "what to check first"
     parse_error: str = ""
+    # The report's own action plan, captured here because triage already has
+    # the parsed model in hand - re-parsing 150 dumps to build the portfolio
+    # view would double the wait for numbers we have already computed.
+    actions: list = field(default_factory=list)
 
 
 def _todo_category(el) -> str:
@@ -99,6 +103,9 @@ def triage_one(dump: Path, jndi: str = "", check_sql: bool = True) -> TriageResu
     effort = build_report_effort(model)
     result.copilot_hours = effort.copilot_hours
     result.manual_hours = effort.manual_hours
+
+    from pentaho_migration.reports.action_plan import build_action_plan
+    result.actions = build_action_plan(model)
 
     qa = lint_layout(model)
     result.layout_errors = len(qa.errors)

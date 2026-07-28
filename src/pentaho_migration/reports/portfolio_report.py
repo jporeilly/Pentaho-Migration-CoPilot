@@ -71,6 +71,112 @@ def _money(hours, rate):
     return f"${hours * rate:,.0f}"
 
 
+PRIORITY_INK = {1: BAD, 2: "#8a6d17", 3: SLATE}
+PRIORITY_BG = {1: "#fdecea", 2: "#fdf5e3", 3: "#eef2f4"}
+
+
+def _portfolio_actions(results, rate):
+    """The same actions the per-report consultant reports carry, rolled up
+    across the corpus: one row per kind of work, with how many reports it
+    touches and what the whole lot costs. This is the engagement plan - a
+    consultant staffs by kind of work, not by report."""
+    from pentaho_migration.reports.action_plan import PRIORITY_LABEL
+
+    rolled: dict = {}
+    for r in results:
+        for a in getattr(r, "actions", None) or []:
+            key = (a.priority, a.title)
+            entry = rolled.setdefault(key, {
+                "how": a.how, "why": a.why, "reports": 0, "items": 0,
+                "hours": 0.0})
+            entry["reports"] += 1
+            entry["items"] += a.count
+            entry["hours"] += a.hours
+    if not rolled:
+        return "", 0.0
+    total = sum(e["hours"] for e in rolled.values())
+    rows = []
+    for (priority, title), e in sorted(
+            rolled.items(), key=lambda kv: (kv[0][0], -kv[1]["hours"])):
+        rows.append(
+            f'<tr><td><span class="pchip" style="background:'
+            f'{PRIORITY_BG[priority]};color:{PRIORITY_INK[priority]}">'
+            f'{escape(PRIORITY_LABEL[priority])}</span></td>'
+            f'<td><b>{escape(title)}</b><div class="muted">{escape(e["how"])}'
+            f"</div></td>"
+            f'<td class="num">{e["reports"]}</td>'
+            f'<td class="num">{e["items"]}</td>'
+            f'<td class="num">{e["hours"]:,.1f}h<div class="muted">'
+            f'{_money(e["hours"], rate)}</div></td></tr>')
+    table = ("<table><thead><tr><th>Priority</th><th>Work</th>"
+             "<th class='num'>Reports</th><th class='num'>Items</th>"
+             "<th class='num'>Effort</th></tr></thead><tbody>"
+             + "".join(rows) + "</tbody></table>")
+    return table, total
+
+
+def _hardest_tabs(results, rate, top_n=5):
+    """Full action plans for the hardest reports, in tabs. These are the ones
+    that decide the schedule, so they get the same detail a single-report
+    consultant report gives - why each action matters, and how to do it."""
+    from pentaho_migration.reports.action_plan import PRIORITY_LABEL
+
+    ranked = [r for r in results if getattr(r, "actions", None)]
+    ranked.sort(key=lambda r: (-r.copilot_hours, r.name or r.file))
+    ranked = ranked[:top_n]
+    if not ranked:
+        return ""
+    tabs, panes = [], []
+    for i, r in enumerate(ranked):
+        label = escape((r.name or r.file)[:34])
+        tabs.append(f'<button class="tab{" on" if i == 0 else ""}" '
+                    f'onclick="showPlan({i})" id="tab{i}">{label}'
+                    f'<span>{r.copilot_hours:.1f}h</span></button>')
+        blocks = []
+        for n, a in enumerate(r.actions, 1):
+            where = ""
+            if a.where:
+                where = ('<div class="where">'
+                         + escape(", ".join(str(w) for w in a.where[:6]))
+                         + "</div>")
+            items = "".join(f"<li>{escape(str(x))}</li>" for x in a.items[:8])
+            blocks.append(
+                f'<div class="act">'
+                f'<div class="acthead" style="background:{PRIORITY_BG[a.priority]}">'
+                f'<b>{n}. {escape(a.title)}</b>'
+                f'<span style="color:{PRIORITY_INK[a.priority]}">'
+                f'{escape(PRIORITY_LABEL[a.priority])} · {a.hours:,.2f}h · '
+                f'{_money(a.hours, rate)}</span></div>'
+                f'<p><b>Why it matters.</b> {escape(a.why)}</p>'
+                f'<p><b>How.</b> {escape(a.how)}</p>'
+                f"{where}"
+                + (f"<ul>{items}</ul>" if items else "") + "</div>")
+        total = sum(a.hours for a in r.actions)
+        panes.append(
+            f'<div class="pane{" on" if i == 0 else ""}" id="pane{i}">'
+            f'<p class="muted">{escape(r.name or r.file)} — '
+            f'<b>{r.verdict}</b> · {len(r.actions)} action(s) · '
+            f'{total:,.2f}h ({_money(total, rate)})</p>'
+            + "".join(blocks) + "</div>")
+    return f"""
+<h2>The hardest reports, action by action</h2>
+<p class="muted">The {len(ranked)} reports carrying the most work. These decide
+the schedule, so each one gets its full plan — the same detail its own
+consultant report carries.</p>
+<div class="tabs">{"".join(tabs)}</div>
+{"".join(panes)}
+<script>
+function showPlan(i) {{
+  document.querySelectorAll('.pane').forEach(function (p, j) {{
+    p.className = 'pane' + (i === j ? ' on' : '');
+  }});
+  document.querySelectorAll('.tab').forEach(function (t, j) {{
+    t.className = 'tab' + (i === j ? ' on' : '');
+  }});
+}}
+</script>"""
+
+
 def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Reports Migration — Consultant Portfolio Report"):
     """results: list[TriageResult] (triage_corpus output)."""
     n = len(results) or 1
@@ -125,6 +231,10 @@ def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Rep
         f"<td>{escape('; '.join(r.reasons[:3]) or '—')}</td></tr>"
         for r in focus)
 
+    plan_table, plan_total = _portfolio_actions(results, rate)
+    plan_money = _money(plan_total, rate)
+    hardest_tabs = _hardest_tabs(results, rate)
+
     sql_line = ""
     if jndi:
         sql_line = (f"<p>SQL validated against <code>{escape(jndi)}</code>: "
@@ -163,7 +273,31 @@ def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Rep
   .muted {{ color: {SLATE}; }}
   footer {{ margin-top: 44px; font-size: 11.5px; color: {SLATE};
             border-top: 1px solid #dfe5ea; padding-top: 10px; }}
-  @media print {{ header.mast {{ -webkit-print-color-adjust: exact; }} }}
+  .pchip {{ display: inline-block; padding: 2px 9px; border-radius: 999px;
+            font-size: 11px; font-weight: bold; white-space: nowrap; }}
+  .tabs {{ display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 0; }}
+  .tab {{ background: {LIGHT}; border: 1px solid #dfe5ea; border-bottom: none;
+          border-radius: 8px 8px 0 0; padding: 8px 14px; cursor: pointer;
+          font-size: 13px; color: {SLATE}; font-family: inherit; }}
+  .tab span {{ display: block; font-size: 11px; color: {GOLD};
+               font-weight: bold; }}
+  .tab.on {{ background: {NAVY}; color: #fff; border-color: {NAVY}; }}
+  .pane {{ display: none; border: 1px solid #dfe5ea; border-radius: 0 8px 8px 8px;
+           padding: 16px 18px; }}
+  .pane.on {{ display: block; }}
+  .act {{ margin: 0 0 14px; }}
+  .acthead {{ display: flex; justify-content: space-between; gap: 12px;
+              padding: 7px 11px; border-radius: 6px; font-size: 13.5px; }}
+  .acthead b {{ color: {NAVY}; }}
+  .acthead span {{ font-size: 12px; font-weight: bold; white-space: nowrap; }}
+  .act p {{ margin: 6px 0 0; font-size: 13px; }}
+  .act ul {{ margin: 6px 0 0; font-size: 12.5px; color: {SLATE}; }}
+  .where {{ font-family: ui-monospace, Consolas, monospace; font-size: 11.5px;
+            color: {SLATE}; margin-top: 5px; }}
+  @media print {{
+    header.mast {{ -webkit-print-color-adjust: exact; }}
+    .pane {{ display: block; }} .tabs {{ display: none; }}
+  }}
 </style></head><body>
 <header class="mast"><h1>{escape(title)}</h1>
 <p>{len(results)} reports triaged · generated {now} · Migration Copilot v{__version__}</p></header>
@@ -198,6 +332,14 @@ block is added to the dump; images carve automatically at extraction.</p>
 <p class="muted">How many hand-touches each report needs — the tail is where the
 engagement hours live.</p>
 {load_chart}
+
+<h2>Priority actions across the portfolio</h2>
+<p class="muted">The same actions the per-report consultant reports carry,
+rolled up by kind of work — {plan_total:,.1f}h ({plan_money}) in total. Staff
+by the rows here; the reports below tell you where each row lands.</p>
+{plan_table}
+
+{hardest_tabs}
 
 <h2>Focus list — the 10 heaviest reports</h2>
 <table><thead><tr><th>Report</th><th>Verdict</th><th>Est. hours</th><th>Est. cost</th><th>Top reasons</th></tr></thead>
