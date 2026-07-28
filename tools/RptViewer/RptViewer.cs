@@ -184,6 +184,17 @@ namespace RptViewer
             Height = 800;
             StartPosition = FormStartPosition.CenterScreen;
 
+            // Launched from the review app's web server, the window opens
+            // BEHIND the browser (Windows denies foreground to background
+            // processes). The TopMost flash is the sanctioned workaround:
+            // the window comes to the front once, then behaves normally.
+            Shown += (s, e) =>
+            {
+                TopMost = true;
+                Activate();
+                TopMost = false;
+            };
+
             var viewer = new CrystalDecisions.Windows.Forms.CrystalReportViewer
             {
                 Dock = DockStyle.Fill,

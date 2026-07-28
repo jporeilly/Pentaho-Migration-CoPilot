@@ -11,6 +11,25 @@ deliberately — not one per work session.
 
 ### Changed
 
+- **🔍 PDF preview shows the report pages as images in a popup, with the
+  embedded data.** It rendered into a new browser tab (dead under popup
+  blockers and in embedded panes), with an empty dataset even when the bundle
+  carried rows, and then — as an inline PDF — with a second scrollbar fighting
+  the page and a black void where browsers lack a PDF plugin. Now: the engine
+  renders live when saved rows are embedded, the pages come back as PNG
+  images (pypdfium2, in the [api] extra), and the modal has one scrollbar.
+  Falls back to the browser's PDF display if the rasterizer is absent.
+- **🔍 Open in Report Designer** button on the Download step: converts and
+  launches the result straight into the local PRD — the demo's closing beat,
+  one click instead of download-then-file-open. Same bounds as the Crystal
+  viewer launcher: local callers only, fixed executable, bundle written only
+  into `output/prd-open/`.
+- The Crystal viewer window now opens **in the foreground** (TopMost flash on
+  show) — launched from the web server it used to appear behind the browser.
+- View-style buttons use 🔍 consistently.
+- **docs/DEMO-WALKTHROUGH.md** — the scripted 10-minute end-to-end demo, every
+  step verified live before it was written.
+
 - **Light is the default color theme.** First paint is light too (the bare
   CSS `:root` now carries the light palette, so there is no dark flash before
   the theme script runs). A previously saved theme choice still wins — anyone

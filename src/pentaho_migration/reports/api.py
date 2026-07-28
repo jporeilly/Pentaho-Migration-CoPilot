@@ -307,14 +307,55 @@ def _load_upload(data: bytes, filename: str, jndi: str):
     return _load_dump_upload(data, filename, jndi)
 
 
+@router.post("/open-prd", dependencies=[Depends(require_api_key)])
+async def open_in_report_designer(dump: UploadFile, request: Request,
+                                  jndi: str = "") -> dict:
+    """Convert and open the result straight in the local Pentaho Report
+    Designer - the demo's closing beat, one click instead of download +
+    file-open. Starts a desktop process, so the same bounds as the Crystal
+    viewer launcher apply: LOCAL callers only, a fixed executable, and the
+    bundle is produced server-side by the same conversion the download uses."""
+    import io as _io
+
+    from pentaho_migration.reports.prd_launcher import open_in_prd, prd_available
+
+    host = (request.client.host if request.client else "") or ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(
+            status_code=403,
+            detail="Report Designer can only be opened from the machine "
+                   "running the app")
+    reason = prd_available()
+    if reason:
+        raise HTTPException(status_code=503, detail=reason)
+    data = await dump.read()
+    source_name = dump.filename or "upload.xml"
+    model = _load_upload(data, source_name, jndi)
+    buf = _io.BytesIO()
+    with tempfile.NamedTemporaryFile(suffix=".prpt", delete=False) as tf:
+        prpt_tmp = Path(tf.name)
+    try:
+        write_prpt(model, prpt_tmp, saved_rows=model.saved_rows)
+        target = open_in_prd(prpt_tmp.read_bytes(), model.name)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    finally:
+        prpt_tmp.unlink(missing_ok=True)
+    return {"opened": str(target),
+            "embedded_rows": len(model.saved_rows.rows) if model.saved_rows else 0}
+
+
 @router.post("/preview", dependencies=[Depends(require_api_key)])
-async def preview(dump: UploadFile, jndi: str = ""):
-    """Design-time PDF preview: convert, then render the .prpt through the
-    real Pentaho Reporting engine with an empty dataset (layout, labels,
-    bands - no database needed). 503 when no local PRD install exists."""
+async def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
+    """Preview through the real Pentaho Reporting engine. With embedded saved
+    data the render is LIVE (real rows, no database); otherwise design-time
+    (layout only). `format=pages` returns the pages as PNG images in JSON -
+    browsers without an inline PDF plugin (embedded panes) show them anyway.
+    503 when no local PRD install exists."""
     from fastapi.responses import Response as RawResponse
 
-    from pentaho_migration.reports.prpt_validator import render_prpt_pdf, validator_available
+    from pentaho_migration.reports.prpt_validator import (
+        render_prpt_pdf, render_prpt_pdf_live, validator_available)
 
     if not validator_available():
         raise HTTPException(
@@ -329,11 +370,48 @@ async def preview(dump: UploadFile, jndi: str = ""):
         prpt = Path(td) / f"{safe}.prpt"
         write_prpt(model, prpt, saved_rows=model.saved_rows)
         try:
-            pdf = render_prpt_pdf(prpt)
+            # embedded rows make the live render self-sufficient - the preview
+            # should show what PRD will show, which is the data
+            pdf = (render_prpt_pdf_live(prpt) if model.saved_rows is not None
+                   else render_prpt_pdf(prpt))
         except RuntimeError as exc:
             raise HTTPException(status_code=500, detail=str(exc))
+
+    if format == "pages":
+        return {"pages": _pdf_to_page_images(pdf),
+                "embedded_rows": len(model.saved_rows.rows) if model.saved_rows else 0}
     return RawResponse(pdf, media_type="application/pdf",
                        headers={"Content-Disposition": f'inline; filename="{safe}.preview.pdf"'})
+
+
+MAX_PREVIEW_PAGES = 12
+
+
+def _pdf_to_page_images(pdf: bytes) -> list:
+    """First pages of a PDF as base64 PNG data URLs (pypdfium2, permissive
+    license). Raises 503 when the rasterizer is unavailable - the UI then
+    falls back to the browser's own PDF display."""
+    try:
+        import pypdfium2 as pdfium
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail="page-image preview needs pypdfium2 (pip install pypdfium2)")
+    import io as _io
+
+    doc = pdfium.PdfDocument(pdf)
+    pages = []
+    try:
+        total = len(doc)
+        for i in range(min(total, MAX_PREVIEW_PAGES)):
+            bitmap = doc[i].render(scale=1.4)
+            buf = _io.BytesIO()
+            bitmap.to_pil().save(buf, format="PNG")
+            pages.append("data:image/png;base64,"
+                         + base64.b64encode(buf.getvalue()).decode("ascii"))
+    finally:
+        doc.close()
+    return pages
 
 
 @router.get("/sample", include_in_schema=False)
