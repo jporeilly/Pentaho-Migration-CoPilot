@@ -42,8 +42,8 @@ def open_in_prd(prpt_bytes: bytes, name: str) -> Path:
     target.write_bytes(prpt_bytes)
     # .bat needs the shell host; the command list stays fixed - only the
     # bundle path (which we just wrote) varies.
-    subprocess.Popen(
+    from pentaho_migration.reports.proc import popen_detached
+    popen_detached(
         ["cmd.exe", "/c", str(prd / "report-designer.bat"), str(target)],
-        cwd=str(prd), shell=False,
-        creationflags=getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0))
+        cwd=str(prd), shell=False)
     return target

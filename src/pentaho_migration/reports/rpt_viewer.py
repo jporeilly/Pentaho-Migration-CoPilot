@@ -101,9 +101,11 @@ def open_original(rpt_path: Path) -> None:
         raise ValueError(
             f"refusing to open {rpt_path} - only .rpt files inside the sample "
             "folders (or ORIGINAL_RPT_DIRS) may be opened")
-    # Fixed executable, single validated argument, no shell.
-    subprocess.Popen([str(VIEWER), str(rpt_path.resolve())], shell=False,
-                     cwd=str(REPO_ROOT))
+    # Fixed executable, single validated argument, no shell - and DETACHED,
+    # so the window survives app restarts (side-by-side demos depend on it).
+    from pentaho_migration.reports.proc import popen_detached
+    popen_detached([str(VIEWER), str(rpt_path.resolve())], shell=False,
+                   cwd=str(REPO_ROOT))
 
 
 def describe(dump_name: str) -> dict:

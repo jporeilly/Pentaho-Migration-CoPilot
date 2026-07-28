@@ -7,6 +7,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **Launchers are a consultant's preflight**: `run.ps1` / `run.sh` (and
+  `run.bat`) now print a version banner, check what THIS machine can demo —
+  Report Designer, SAP Crystal runtime, RptToXml, the viewer — with a green
+  [OK] or an amber pointer per capability, then the app URL, the demo
+  walkthrough path and the quick-start line.
+- The Crystal viewer and Report Designer launch **detached** — they survive
+  app restarts, so the side-by-side (original next to converted) stays on
+  screen.
+- Task queue for fidelity round 2 (per-statement variance incl. the blank
+  Due Date column, rich text runs, true underlay z-order) is captured in the
+  tracker with diagnoses.
+
 ## [1.39.1] — 2026-07-28
 
 ### Fixed
