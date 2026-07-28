@@ -63,6 +63,8 @@ class ReleaseCheck:
     groups_matching: int = 0   # ... and how many span the SAME pages as the original
     pages_compared: int = 0    # pages compared by APPEARANCE, not just text
     pages_pairable: int = 0    # ... out of this many that could be paired
+    groups_with_breaks: int = 0     # groups that span more than one page
+    groups_breaking_alike: int = 0  # ... and break in the SAME PLACE as the original
     findings: list = field(default_factory=list)
 
 
@@ -192,11 +194,22 @@ def _boilerplate(pages: list) -> set:
     plus a stray Total counts as widowed."""
     from collections import Counter
 
+    # Counted against the POPULATED pages, not all of them. The demo's
+    # original leaves 37 near-empty spill pages out of 74, so its legal
+    # footer prints on exactly half and a 60%-of-all-pages rule found NO
+    # furniture at all - which left the page-break comparison quoting the
+    # copyright block as if it were statement content, and sparseness
+    # measured against an empty furniture set.
     seen = Counter()
+    populated = 0
     for page in pages:
-        for line in {l for l in map(_normalize_line, page.splitlines()) if l}:
+        lines = {l for l in map(_normalize_line, page.splitlines()) if l}
+        if len(lines) < 3:          # a spill page carries no furniture
+            continue
+        populated += 1
+        for line in lines:
             seen[line] += 1
-    threshold = max(2, int(len(pages) * 0.6))
+    threshold = max(2, int(populated * 0.6))
     return {line for line, n in seen.items() if n >= threshold}
 
 
@@ -218,6 +231,31 @@ def _group_spans(pages: list, values: list) -> dict:
     for value in values:
         spans[value] = sum(1 for p in pages if value in p)
     return spans
+
+
+def _group_breaks(pages: list, values: list) -> dict:
+    """value -> what content lands LAST on each page the group spans.
+
+    A span count says a statement takes two pages in both renders. It does
+    not say the original breaks after the letter and the conversion breaks
+    halfway down the invoice table, which is the difference a reader sees.
+    The last real line before each break is that position, said in content
+    rather than in millimetres - so it survives the two engines disagreeing
+    about where exactly the page ends.
+
+    Page furniture is excluded: every page ends with the same legal footer,
+    and comparing that would say every statement breaks identically."""
+    furniture = _boilerplate(pages)
+    breaks: dict = {}
+    for value in values:
+        on = [i for i, page in enumerate(pages) if value in page]
+        marks = []
+        for i in on[:-1]:                      # the last page has no break
+            content = [line for line in map(_normalize_line, pages[i].splitlines())
+                       if line and line not in furniture]
+            marks.append(content[-1] if content else "")
+        breaks[value] = tuple(marks)
+    return breaks
 
 
 def compare_renders(original_pdf: bytes, converted_pdf: bytes,
@@ -329,6 +367,29 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
                 "different number of pages than the original",
                 evidence=[f"{v[:40]}: original {o} page(s) -> converted {c}"
                           for v, o, c in drifted[:8]]))
+
+        # 6b. WHERE each statement breaks, not just how many pages it takes.
+        # A statement that runs 1-2 in both renders still reads wrong if the
+        # original breaks after the letter and the conversion breaks halfway
+        # down the invoice table.
+        orig_breaks = _group_breaks(orig_pages, group_values)
+        conv_breaks = _group_breaks(conv_pages, group_values)
+        multipage = [v for v in group_values if orig_spans[v] > 1]
+        moved = [v for v in multipage
+                 if conv_spans[v] > 1 and orig_breaks[v] != conv_breaks[v]]
+        result.groups_with_breaks = len(multipage)
+        result.groups_breaking_alike = len(multipage) - len(moved)
+        if moved:
+            result.findings.append(Finding(
+                "warning", "group-breaks",
+                f"{len(moved)} of {len(multipage)} multi-page group(s) break "
+                "in a DIFFERENT PLACE than the original - the same number of "
+                "pages, split somewhere else",
+                evidence=[f"{v[:34]}: original ends p1 with "
+                          f"{(orig_breaks[v][0] or '(nothing)')[:44]!r}, "
+                          f"converted with "
+                          f"{(conv_breaks[v][0] or '(nothing)')[:44]!r}"
+                          for v in moved[:6]]))
 
     if delta and delta / max(len(orig_pages), 1) > PAGE_DELTA_WARN:
         if (result.groups_checked

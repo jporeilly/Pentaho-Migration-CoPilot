@@ -187,3 +187,59 @@ class TestRegressionFixtures:
             layout = zipfile.ZipFile(out).read("layout.xml").decode()
         assert layout.count("Mark Elroy") >= 3, (
             "the signature block must ride every letter variant")
+
+
+class TestWhereStatementsBreak:
+    """A span COUNT says a statement takes two pages in both renders. It does
+    not say the original breaks after the letter and the conversion breaks
+    halfway down the invoice table, which is the difference a reader sees."""
+
+    def test_same_page_count_but_a_different_break_is_caught(self, monkeypatch):
+        _patch_pages(
+            monkeypatch,
+            ["Wheels Inc.\n8 Harbour Road\nSan Diego CA\nlegal footer here",
+             "Wheels Inc.\n2002/04/03 2886 43.50\nTotal 43.50\nlegal footer here"],
+            ["Wheels Inc.\n8 Harbour Road\nSan Diego CA\n2002/04/03 2886 43.50\n"
+             "legal footer here",
+             "Wheels Inc.\nTotal 43.50\nlegal footer here"])
+        check = rc.compare_renders(b"ORIG", b"CONV", group_values=["Wheels Inc."])
+        breaks = next(f for f in check.findings if f.code == "group-breaks")
+        assert breaks.severity == "warning"
+        assert check.groups_with_breaks == 1
+        assert check.groups_breaking_alike == 0
+        # the span count alone saw nothing wrong
+        assert check.groups_matching == check.groups_checked
+
+    def test_an_identical_break_is_not_flagged(self, monkeypatch):
+        pages = ["Wheels Inc.\n8 Harbour Road\nSan Diego CA\nlegal footer here",
+                 "Wheels Inc.\nTotal 43.50\nlegal footer here"]
+        _patch_pages(monkeypatch, pages, list(pages))
+        check = rc.compare_renders(b"ORIG", b"CONV", group_values=["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "group-breaks"]
+        assert check.groups_breaking_alike == check.groups_with_breaks == 1
+
+    def test_a_single_page_group_has_no_break_to_compare(self, monkeypatch):
+        _patch_pages(monkeypatch, ["Acme Ltd\nTotal 10.00\nlegal footer here"],
+                     ["Acme Ltd\nTotal 10.00\nlegal footer here"])
+        check = rc.compare_renders(b"ORIG", b"CONV", group_values=["Acme Ltd"])
+        assert check.groups_with_breaks == 0
+        assert not [f for f in check.findings if f.code == "group-breaks"]
+
+
+class TestFurnitureIsFoundOnPopulatedPages:
+    """The demo's original leaves 37 near-empty spill pages out of 74, so its
+    legal footer prints on exactly half. A 60%-of-ALL-pages rule found no
+    furniture at all, which left the break comparison quoting the copyright
+    block as if it were statement content."""
+
+    def test_footer_on_half_the_pages_is_still_furniture(self):
+        content = "Acme\nreal content line\nlegal footer here\nBusiness Objects"
+        pages = [content] * 5 + ["", "", "", "", ""]     # 5 populated, 5 spill
+        furniture = rc._boilerplate(pages)
+        assert any("legal footer" in f for f in furniture)
+
+    def test_a_line_on_one_page_is_not_furniture(self):
+        pages = ["Acme\nunique to this page\nlegal footer here\nshared two",
+                 "Beta\nsomething else\nlegal footer here\nshared two"]
+        furniture = rc._boilerplate(pages)
+        assert not any("unique to this page" in f for f in furniture)

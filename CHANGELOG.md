@@ -39,6 +39,26 @@ deliberately — not one per work session.
   walkthrough's "known rough edges" no longer lists things that have since
   been fixed.
 
+## [Unreleased]
+
+- **The gate checks WHERE statements break, not just how many pages they
+  take.** A span count said 36 of 36 groups matched while a statement still
+  split halfway down its invoice table instead of after the letter. Each
+  multi-page group now carries the last real line before every break, and the
+  two renders are compared on that. The demo has one multi-page statement and
+  it breaks in the wrong place - the original ends page 1 with the customer
+  address, the conversion with an invoice row.
+- **Page furniture was never being detected.** Repeated headers and footers
+  are found by counting lines that appear on most pages, measured against ALL
+  pages - and the demo original leaves 37 near-empty spill pages out of 74, so
+  its legal footer prints on exactly half and nothing cleared a 60% bar. The
+  count is now against POPULATED pages. That fixed the break comparison
+  quoting the copyright block as statement content, and sparseness had been
+  measured against an empty furniture set too.
+- Wording follows the measurement: the app and both consultant reports now say
+  groups take the same **number** of pages and, separately, how many break in
+  the same **place**. "Match the original exactly" was only ever about counts.
+
 ## [1.40.0] - 2026-07-28
 
 ### The gate can see

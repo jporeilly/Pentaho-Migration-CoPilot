@@ -305,7 +305,10 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             Rendered original ({gate.original_pages} pages, SAP viewer) vs
             converted ({gate.converted_pages} pages, Pentaho engine).
             {gate.groups_checked > 0 &&
-              ` Statement pagination: ${gate.groups_matching} of ${gate.groups_checked} groups match the original exactly.`}
+              ` Statement pagination: ${gate.groups_matching} of ${gate.groups_checked} groups take the same number of pages as the original` +
+              (gate.groups_with_breaks
+                ? `, and ${gate.groups_breaking_alike} of ${gate.groups_with_breaks} multi-page ones break in the same place.`
+                : '.')}
             {gate.llm_annotated > 0 && ` ${gate.llm_annotated} finding(s) annotated by the LLM.`}
           </p>
           {gate.findings.length === 0 ? (

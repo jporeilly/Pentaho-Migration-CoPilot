@@ -110,8 +110,10 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
                            "compared against the original")
     elif check.verdict == "SHIP":
         verdict, vclass = "SHIP", "vgreen"
-        verdict_note = ("Both reports were rendered and compared: the "
-                        "conversion matches the original.")
+        verdict_note = ("Both reports were rendered and compared - data, "
+                        "pagination and the appearance of the pages checked - "
+                        "and no difference was found. Evidence, not a proof "
+                        "of equivalence.")
     else:
         verdict, vclass = "REVIEW", "vamber"
         verdict_note = (f"{len(check.findings)} difference(s) between the "
@@ -123,10 +125,13 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
     if check is not None and getattr(check, "verdict", "") != "UNAVAILABLE":
         spans = ""
         if getattr(check, "groups_checked", 0):
-            ok = check.groups_matching == check.groups_checked
             spans = (f'<div class="ev"><b>{check.groups_matching} of '
-                     f"{check.groups_checked}</b><span>group(s) span the same "
-                     f'pages as the original{" — exact" if ok else ""}</span></div>')
+                     f"{check.groups_checked}</b><span>group(s) take the same "
+                     "<b>number</b> of pages as the original</span></div>")
+        if getattr(check, "groups_with_breaks", 0):
+            spans += (f'<div class="ev"><b>{check.groups_breaking_alike} of '
+                      f"{check.groups_with_breaks}</b><span>multi-page "
+                      "group(s) break in the same <b>place</b></span></div>")
         pages_html = (
             '<div class="evs">'
             f'<div class="ev"><b>{check.original_pages}</b><span>pages, '
@@ -396,9 +401,13 @@ def build_consultant_report(model, source_path, prpt_path,
             f"- Converted render: **{check.converted_pages} pages** "
             "(Pentaho Reporting engine, embedded data)",
             *([f"- Statement pagination: **{check.groups_matching} of "
-               f"{check.groups_checked}** group(s) span exactly the same "
+               f"{check.groups_checked}** group(s) take the same NUMBER of "
                "pages as the original"]
               if getattr(check, "groups_checked", 0) else []),
+            *([f"- Page breaks: **{check.groups_breaking_alike} of "
+               f"{check.groups_with_breaks}** multi-page group(s) break in "
+               "the same PLACE"]
+              if getattr(check, "groups_with_breaks", 0) else []),
             ""]
         if check.findings:
             lines += ["### Findings", ""]
