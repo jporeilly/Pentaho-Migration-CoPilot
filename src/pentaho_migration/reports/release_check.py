@@ -68,6 +68,26 @@ class ReleaseCheck:
     findings: list = field(default_factory=list)
 
 
+def _outliers(worst: list, factor: float = 1.6, cap: int = 4) -> list:
+    """Pages that differ MUCH more than the rest, named individually.
+
+    A report-wide difference is one finding - but collapsing to it must not
+    bury a page that is wrong in its own way. A statement whose total was
+    pushed onto a page of its own differs far more than the repeating band
+    does, and saying only "every page differs the same way" would hide it."""
+    if len(worst) < 4:
+        return []
+    fractions = sorted(f for _o, _c, f, _w in worst)
+    median = fractions[len(fractions) // 2]
+    odd = [(o, c, f) for o, c, f, _w in worst if f > median * factor]
+    if not odd:
+        return []
+    odd.sort(key=lambda x: -x[2])
+    return [f"worse than the rest: original p{o + 1} vs converted p{c + 1} "
+            f"({f:.0%} against a typical {median:.0%}) - look at this page"
+            for o, c, f in odd[:cap]]
+
+
 def _appearance_finding(visual: dict) -> Finding:
     """One finding for a visual difference, said once.
 
@@ -98,6 +118,7 @@ def _appearance_finding(visual: dict) -> Finding:
             evidence=[f"{lo:.0%}-{hi:.0%} of each page affected",
                       f"e.g. original p{o + 1} vs converted p{c + 1} "
                       f"({f:.0%} of the page)"]
+            + _outliers(worst)
             + ([f"{len(worst) - len(hits)} further page(s) differ elsewhere"]
                if len(worst) > len(hits) else []))
     return Finding(

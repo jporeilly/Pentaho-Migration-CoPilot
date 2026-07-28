@@ -32,7 +32,13 @@ GRID_COLS, GRID_ROWS = 16, 22  # ~A4 proportions
 # divides them; 0.04 sits in the middle.
 CELL_TOLERANCE = 0.04          # ink-density change before a cell counts
 PAGE_TOLERANCE = 0.06          # fraction of cells differing before a page does
-MAX_PAGES_COMPARED = 12        # sampled evenly; the count is always reported
+# EVERY pairable page. A sample cannot see the page it did not look at, and
+# the defects this exists to catch - an orphaned total, a panel missing from
+# one statement - live on specific pages. Rasterizing at RENDER_SCALE is
+# cheap: a 58-page report is well under a second of the gate's two minutes.
+# The cap is a runaway guard for a report of thousands of pages, not a
+# sampling strategy, and whatever it drops is reported.
+MAX_PAGES_COMPARED = 2000
 MIN_TEXT_OVERLAP = 0.4         # below this two pages are not the same page
 
 

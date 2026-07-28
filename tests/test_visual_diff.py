@@ -156,3 +156,41 @@ class TestGlobalDifferencesAreSaidOnce:
         f = self._finding(pages, 11)
         assert "REPORT-WIDE" in f.message
         assert any("further page(s) differ elsewhere" in e for e in f.evidence)
+
+
+class TestGlobalDoesNotBuryAWorsePage:
+    """Collapsing to one report-wide finding is right for the repeating
+    defect and wrong if it hides a page that is broken in its OWN way -
+    the statement whose total was orphaned onto a page by itself."""
+
+    def _finding(self, pages, compared):
+        from pentaho_migration.reports.release_check import _appearance_finding
+        return _appearance_finding({"compared": compared,
+                                    "available": compared, "pages": pages})
+
+    def test_a_much_worse_page_is_named_inside_the_global_finding(self):
+        pages = [(i, i, 0.2, "middle of the page - content differs")
+                 for i in range(12)]
+        pages.append((7, 7, 0.7, "middle of the page - the conversion is "
+                                 "missing something the original prints"))
+        f = self._finding(pages, 13)
+        assert "REPORT-WIDE" in f.message          # still one defect...
+        assert any("original p8 vs converted p8" in e for e in f.evidence)
+        assert any("worse than the rest" in e for e in f.evidence)
+
+    def test_an_evenly_bad_report_names_no_outlier(self):
+        """Every page equally wrong is the global case and nothing else -
+        naming an 'outlier' there would be noise."""
+        pages = [(i, i, 0.2, "middle of the page - content differs")
+                 for i in range(12)]
+        f = self._finding(pages, 12)
+        assert not any("worse than the rest" in e for e in f.evidence)
+
+    def test_outliers_are_capped_so_the_finding_stays_readable(self):
+        pages = [(i, i, 0.1, "middle of the page - content differs")
+                 for i in range(20)]
+        pages += [(30 + i, 30 + i, 0.8, "middle of the page - content differs")
+                  for i in range(9)]
+        odd = [e for e in self._finding(pages, 29).evidence
+               if "worse than the rest" in e]
+        assert 0 < len(odd) <= 4

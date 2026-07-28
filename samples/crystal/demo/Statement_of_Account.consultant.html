@@ -1,0 +1,184 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>Consultant Report — Statement_of_Account</title>
+<style>
+  :root { --navy: #133346; --gold: #c9a24a; --slate: #5b7185; --light: #f2f5f7; }
+  * { box-sizing: border-box; }
+  body { font: 15px/1.6 system-ui, "Segoe UI", Roboto, sans-serif;
+         color: #17242e; max-width: 1000px; margin: 0 auto 60px;
+         padding: 0 22px; background: #fff; }
+  .masthead { background: var(--navy); color: #fff; margin: 0 -22px 26px;
+               padding: 26px 30px 22px; border-bottom: 4px solid var(--gold); }
+  .masthead h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: -.2px; }
+  .masthead p { margin: 0; color: #b9c9d4; font-size: 13px; }
+  .badge { display: inline-block; float: right; font-weight: 700;
+            padding: 7px 16px; border-radius: 999px; font-size: 15px; }
+  .vgreen { background: #0f7a34; color: #fff; }
+  .vamber { background: var(--gold); color: #2b2107; }
+  .vgrey  { background: #48606f; color: #dfe8ee; }
+  h2 { color: var(--navy); margin: 34px 0 10px; font-size: 19px;
+        border-bottom: 2px solid #e3e9ed; padding-bottom: 6px; }
+  h2 .sub { font-weight: 400; font-size: 13px; color: var(--slate); }
+  .lede { background: var(--light); border-left: 4px solid var(--gold);
+           padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 0 0 18px; }
+  .kpis { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+  .kpi { flex: 1 1 160px; background: var(--light); border-radius: 12px;
+          padding: 14px 18px; }
+  .kpi b { display: block; font-size: 25px; color: var(--navy);
+            line-height: 1.2; }
+  .kpi.gold b { color: #8a6d17; }
+  .kpi span { font-size: 12px; color: var(--slate); }
+  .rolls { display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0 18px; }
+  .roll { flex: 1 1 180px; border-radius: 12px; padding: 12px 16px;
+           border: 1px solid #e3e9ed; }
+  .roll b { display: block; font-size: 22px; }
+  .roll span { display: block; font-size: 12px; color: var(--slate); }
+  .roll.p1 { background: #fdecea; } .roll.p1 b { color: #c0392b; }
+  .roll.p2 { background: #fdf5e3; } .roll.p2 b { color: #8a6d17; }
+  .roll.p3 { background: #eef2f4; } .roll.p3 b { color: var(--slate); }
+  .evs { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 4px; }
+  .ev { flex: 1 1 170px; border: 1px solid #e3e9ed; border-radius: 10px;
+         padding: 10px 14px; }
+  .ev b { display: block; font-size: 20px; color: var(--navy); }
+  .ev span { font-size: 12px; color: var(--slate); }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th { text-align: left; color: var(--slate); font-weight: 600; font-size: 12px;
+        text-transform: uppercase; letter-spacing: .4px;
+        border-bottom: 2px solid #e3e9ed; padding: 8px; }
+  th.n { text-align: right; }
+  td { padding: 12px 8px; border-bottom: 1px solid #eef2f4;
+        vertical-align: top; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums;
+          white-space: nowrap; width: 92px; }
+  td.num { width: 30px; color: var(--slate); font-weight: 700; }
+  .plan tr.act:hover td { background: #fbfcfd; }
+  .plan .title { font-weight: 650; color: var(--navy); font-size: 15px;
+                  margin-bottom: 3px; }
+  .plan .why, .plan .how { font-size: 13.5px; margin: 3px 0; }
+  .plan .how { color: #2f4756; }
+  .where { font-size: 12px; color: var(--slate); margin-top: 5px;
+            font-family: ui-monospace, Consolas, monospace; }
+  .chip { display: inline-block; padding: 3px 10px; border-radius: 999px;
+           font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .chip.p1 { background: #fdecea; color: #c0392b; }
+  .chip.p2 { background: #fdf5e3; color: #8a6d17; }
+  .chip.p3 { background: #eef2f4; color: var(--slate); }
+  .finding { border-radius: 10px; padding: 12px 16px; margin: 10px 0;
+              border-left: 4px solid var(--slate); background: var(--light); }
+  .finding.sev1 { border-left-color: #c0392b; background: #fdecea; }
+  .finding.sev2 { border-left-color: var(--gold); background: #fdf5e3; }
+  .finding ul { margin: 6px 0; }
+  .fix { margin: 6px 0 0; }
+  .muted { color: var(--slate); }
+  .clean { background: #eaf7ee; border-left: 4px solid #0f7a34;
+            padding: 12px 16px; border-radius: 0 8px 8px 0; }
+  code { background: #fff; padding: 1px 6px; border-radius: 4px;
+          font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; color: var(--slate); font-size: 13px; }
+  .ref dt { font-weight: 650; color: var(--navy); margin-top: 10px; }
+  .ref dd { margin: 2px 0 0 0; font-size: 13.5px; }
+  footer { margin-top: 40px; color: var(--slate); font-size: 12.5px;
+            border-top: 2px solid #e3e9ed; padding-top: 12px; }
+  @media print {
+    body { max-width: none; } .masthead { margin: 0 0 20px; }
+    tr.act, .finding { break-inside: avoid; }
+    details[open] summary ~ * { display: block; }
+  }
+</style></head><body>
+
+<div class="masthead">
+  <span class="badge vamber">REVIEW</span>
+  <h1>Statement_of_Account</h1>
+  <p>Consultant report · SAP Crystal Reports → Pentaho Report Designer ·
+     generated 2026-07-28 20:16</p>
+</div>
+
+<p class="lede"><b>REVIEW.</b> 2 difference(s) between the rendered conversion and the rendered original. Each is listed with its evidence below.
+ There are 4 actions below, 0.61h ($92) in total.</p>
+
+<div class="kpis">
+  <div class="kpi"><b>0.61h</b><span>to finish this report
+      ($92)</span></div>
+  <div class="kpi"><b>4.5h</b><span>to rebuild it by hand instead
+      ($675)</span></div>
+  <div class="kpi gold"><b>$525</b><span>avoided —
+      78% of a from-scratch rebuild</span></div>
+</div>
+
+<h2>Action plan <span class="sub">— highest priority first; within a
+    priority, the heaviest first</span></h2>
+<div class="rolls"><div class="roll p1"><b>0.00h</b><span>P1 · blocks release</span><span class="muted">0 item(s) · $0</span></div><div class="roll p2"><b>0.51h</b><span>P2 · correctness</span><span class="muted">4 item(s) · $76</span></div><div class="roll p3"><b>0.10h</b><span>P3 · cosmetic</span><span class="muted">1 item(s) · $15</span></div></div>
+<table class='plan'><tr><th></th><th>Priority</th><th>Action</th><th class='n'>Items</th><th class='n'>Effort</th></tr>
+<tr class="act">
+  <td class="num">1</td>
+  <td><span class="chip p2">P2 · correctness</span></td>
+  <td>
+    <div class="title">Review the flagged layout differences</div>
+    <div class="why"><b>Why it matters.</b> Content that reflowed or pages that filled differently. Not wrong data, but the customer notices a total that slipped onto its own page.</div>
+    <div class="how"><b>How.</b> In Report Designer, check band heights and the Keep Together flag on the groups named below (right-click the group band &gt; Attributes).</div>
+    <div class="where">appearance</div><details><summary>1 item(s)</summary><ul><li>REPORT-WIDE: the middle of the page differs on 58 of the 58 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement</li></ul></details>
+  </td>
+  <td class="n">1</td>
+  <td class="n">0.25h<div class="muted">$38</div></td>
+</tr>
+<tr class="act">
+  <td class="num">2</td>
+  <td><span class="chip p2">P2 · correctness</span></td>
+  <td>
+    <div class="title">Wire up the data source</div>
+    <div class="why"><b>Why it matters.</b> The bundle carries 53 rows recovered from the .rpt so it opens and renders with no database. That is a preview dataset, not a live feed.</div>
+    <div class="how"><b>How.</b> When the customer is ready for live data, Data tab &gt; swap the inline table for the JNDI datasource already defined in the bundle (SampleData), then verify the generated SELECT - joins and aliases especially.</div>
+    <div class="where">SampleData</div>
+  </td>
+  <td class="n">1</td>
+  <td class="n">0.20h<div class="muted">$30</div></td>
+</tr>
+<tr class="act">
+  <td class="num">3</td>
+  <td><span class="chip p2">P2 · correctness</span></td>
+  <td>
+    <div class="title">Glance over the formulas that translated with a caveat</div>
+    <div class="why"><b>Why it matters.</b> These produce a value; the question is whether it is the value Crystal produced. Scope and rounding are the usual differences.</div>
+    <div class="how"><b>How.</b> Compare each against the Crystal original - the conversion report prints them side by side.</div>
+    <div class="where">Late Invoices, statement amount</div><details><summary>2 item(s)</summary><ul><li>Late Invoices: Crystal If without Else: default branch emitted (0) to match Crystal&#x27;s implicit default</li><li>statement amount: Sum aggregate rewritten as a PRD TotalGroupSumFunction over [ORDER_AMOUNT] grouped by [CUSTOMER_NAME] - verify scope matches the Crystal placement</li></ul></details>
+  </td>
+  <td class="n">2</td>
+  <td class="n">0.06h<div class="muted">$9</div></td>
+</tr>
+<tr class="act">
+  <td class="num">4</td>
+  <td><span class="chip p3">P3 · cosmetic</span></td>
+  <td>
+    <div class="title">Work through the remaining notes</div>
+    <div class="why"><b>Why it matters.</b> Items that need a judgement call but do not fall into a group.</div>
+    <div class="how"><b>How.</b> Each note names what the pipeline found and why it stopped.</div>
+    <details><summary>1 item(s)</summary><ul><li>special field in text rendered as &quot;page n / m&quot; ($(PageofPages)) - adjust the format in PRD if the report showed only the bare number</li></ul></details>
+  </td>
+  <td class="n">1</td>
+  <td class="n">0.10h<div class="muted">$15</div></td>
+</tr></table>
+
+<h2>How the two renders compare <span class="sub">— the original through the
+    SAP viewer, the conversion through the Pentaho engine</span></h2>
+<div class="evs"><div class="ev"><b>74</b><span>pages, original (SAP Crystal viewer)</span></div><div class="ev"><b>58</b><span>pages, converted (Pentaho engine)</span></div><div class="ev"><b>36 of 36</b><span>group(s) take the same <b>number</b> of pages as the original</span></div></div>
+
+<h2>Evidence — where the renders differ</h2><div class="finding sev3"><b>1. ℹ [pages]</b> the conversion is more compact: 58 pages vs 74 - the original leaves near-empty spill pages (43 of them) that the conversion consolidates; every statement still spans the same pages as the original<p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div><div class="finding sev2"><b>2. ⚠ [appearance]</b> REPORT-WIDE: the middle of the page differs on 58 of the 58 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement<ul><li><code>15%-29% of each page affected</code></li><li><code>e.g. original p47 vs converted p39 (29% of the page)</code></li></ul><p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div>
+
+<h2>What converted</h2>
+<table><tr><td>Bands</td><td>21</td></tr><tr><td>Elements</td><td>41</td></tr><tr><td>Groups</td><td>2</td></tr><tr><td>Parameters</td><td>0</td></tr><tr><td>Summaries</td><td>3</td></tr><tr><td>Sub-reports</td><td>0</td></tr><tr><td>Formulas</td><td>3 translated · 2 to check · 0 to rebuild</td></tr><tr><td>Data source</td><td>SampleData</td></tr><tr><td>Embedded rows</td><td>53</td></tr></table>
+
+<h2>Doing the work in Report Designer <span class='sub'>— only the steps this report needs</span></h2><dl class='ref'><dt>Publishing</dt><dd>File &gt; Publish, or copy the .prpt into the solution repository. The JNDI name in the bundle must exist on the server — that is the most common cause of a report that works locally and fails published.</dd></dl>
+
+<details><summary>Every remaining note, verbatim (1)</summary>
+<ul><li>special field in text rendered as &quot;page n / m&quot; ($(PageofPages)) - adjust the format in PRD if the report showed only the bare number</li></ul></details>
+<details><summary>Handled automatically (11) — verify only,
+  no action expected</summary><ul><li>conditional EnableSuppress converted to a &#x27;visible&#x27; style expression (section GroupHeader2Section6) - verify against Crystal: {Sum_Late_Invoices_CUSTOMER_NAME} &lt;&gt;0</li><li>conditional EnableSuppress converted to a &#x27;visible&#x27; style expression (section GroupHeader2Section11) - verify against Crystal: {Sum_Late_Invoices_CUSTOMER_NAME} &lt;&gt;1</li><li>conditional EnableSuppress converted to a &#x27;visible&#x27; style expression (section GroupHeader2Section5) - verify against Crystal: {Sum_Late_Invoices_CUSTOMER_NAME} &lt; 2</li><li>layout auto-fit: GroupHeader G2 - 2 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: GroupHeader G2 - 1 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: GroupHeader G2 - 1 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: GroupHeader G2 - 1 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: GroupHeader G2 - 1 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: GroupHeader G2 - 5 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: Detail - 5 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li><li>layout auto-fit: GroupFooter G2 - 1 text box(es) grown to fit their font (descenders would have clipped); verify nothing now touches the element below</li></ul></details>
+<details><summary>Provenance notes (3)</summary>
+<ul><li>image carved from the .rpt binary and matched by aspect ratio - verify it is the right picture</li><li>image carved from the .rpt binary and matched by aspect ratio - verify it is the right picture</li><li>image carved from the .rpt binary and matched by aspect ratio - verify it is the right picture</li></ul></details>
+
+<footer>Conversion and the render comparison are deterministic; any LLM
+resolution note is advisory and marked as such. Effort is costed at
+$150/h — change the rate in the app and regenerate. Nothing in this
+report is a guess: where the pipeline could not prove a conversion it says so
+rather than emitting something that looks right.</footer>
+</body></html>

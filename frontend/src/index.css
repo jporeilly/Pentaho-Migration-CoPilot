@@ -787,8 +787,14 @@ span.triage-chip { cursor: default; }
 
 /* PDF preview as a modal: one scrollbar (the PDF's own), page locked behind
    the backdrop - inline embedding gave the page two fighting scrollbars. */
-.pdf-modal { width: min(960px, 94vw); max-height: 92vh; display: flex; flex-direction: column; }
-.pdf-modal .pdf-frame { flex: 1; height: auto; min-height: 60vh; border-radius: 0 0 8px 8px; border: none; }
+/* A full page at a readable zoom, not a letterbox. The preview is the whole
+   report now, with the viewer's own navigation and outline panel, so it is
+   worth the screen - a 960px box left a statement too small to read and its
+   outline panel squeezed out entirely. */
+.pdf-modal { width: min(1500px, 97vw); height: 95vh; max-height: 95vh;
+             display: flex; flex-direction: column; }
+.pdf-modal .pdf-frame { flex: 1; height: auto; min-height: 78vh;
+                        border-radius: 0 0 8px 8px; border: none; }
 .pdf-modal > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
 .pdf-modal-actions { display: flex; align-items: center; gap: .5rem; }
 
