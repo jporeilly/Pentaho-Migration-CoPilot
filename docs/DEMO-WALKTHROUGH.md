@@ -54,11 +54,21 @@ Walk the stepper:
 - **Release check** — the download buttons stay locked until it finishes, and
   the progress bar names each stage. It renders the **original through the
   SAP viewer** and the **conversion through the Pentaho engine**, then
-  compares the two PDFs four ways: the numbers as a set, the lines of text,
-  where each statement breaks across pages, and — page by page — how they
-  **look**. This report comes back **⚠ REVIEW**: *36 of 36 statements take
-  the same number of pages as the original*, and the appearance check flags a
-  fill the conversion is missing (see the rough edges below).
+  compares the two PDFs five ways: the numbers as a set, the lines of text,
+  where each statement breaks across pages, whether any statement's **total
+  broke away from the statement it belongs to**, and — page by page — how
+  they **look**. This report comes back **⚠ REVIEW**: *36 of 36 statements
+  take the same number of pages as the original*, no split totals, and the
+  appearance check flags a fill the conversion is missing (see the rough
+  edges below).
+
+  The total check is worth a sentence if anyone asks how the gate knows: it
+  matches on the **amount**, because the statement states its own total in
+  prose ("outstanding invoices totalling $758.13") and that figure has to
+  print on the page that declares it. A value common to both halves is the
+  only thing that proves which customer a stranded fragment belongs to —
+  position alone would guess. It caught 21 of 36 statements when every
+  other check was green.
 
   Talk track: *"It renders both and compares them, and it is telling you
   about a difference I would otherwise have to hope you didn't notice."*
@@ -114,11 +124,11 @@ letterhead, same watermark and signature, same $43.50.
   SAP SDK will not open. Talk track: *"That is the boundary of what the free
   SDK exposes, and the tool tells you where the boundary is instead of
   quietly rendering something close."*
-- **The conversion is 58 pages against the original's 74** — and that is the
-  conversion being *better*, not worse: all 36 statements take the same
-  number of pages as the original, and the original leaves 37 near-empty
-  spill pages that the conversion consolidates. The gate reports the delta as information rather
-  than a defect, and says so on the page.
+- **The conversion is 37 pages against the original's 74** — and that is the
+  conversion being *better*, not worse: every statement prints on one page,
+  exactly as in the original, and the original follows each one with a blank
+  spill page that the conversion simply does not emit. The gate reports the
+  delta as information rather than a defect, and says so on the page.
 - **Rich text inside one text object loses its runs.** A Crystal text object
   with mixed bold/regular formatting converts with the first run's font
   throughout. The extractor flattens the object to one string and one font,
