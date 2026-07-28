@@ -9,6 +9,12 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **An empty cell prints empty.** PRD skips an element whose value is null -
+  background included - so a field sitting over one of Crystal'''s full-width
+  row rules stopped masking it, and every row with no purchase-order number
+  grew a long underline the original never had. Data fields now declare an
+  empty `null-value`, so a blank cell renders and paints exactly as it does
+  when the data is present.
 - **The converted report carries Crystal's group tree.** The viewer's
   left-hand tree - countries, then customers within each - is how anyone
   navigates a long statement run, and the .prpt had no equivalent: opening it

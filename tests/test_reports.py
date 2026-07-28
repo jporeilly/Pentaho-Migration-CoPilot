@@ -614,3 +614,57 @@ class TestIdentifierQuoting:
         sql = load_report_model(dump, None).sql
         assert '"dataroot/Cust"' in sql
         assert "FROM dataroot/Cust" not in sql
+
+
+class TestEmptyCellsPrintEmpty:
+    """PRD skips an element whose value is null - background included - so a
+    field sitting over one of Crystal's full-width row rules stopped masking
+    it, and every row with no purchase-order number grew a long underline the
+    original never had. An empty cell must print as EMPTY, not as whatever
+    lies under it."""
+
+    def _layout(self, tmp_path):
+        import textwrap
+        import zipfile
+
+        from pentaho_migration.reports import load_report_model, write_prpt
+
+        dump = tmp_path / "n.xml"
+        dump.write_text(textwrap.dedent("""\
+            <Report Name="N" FileName="n.rpt">
+              <Database><Tables><Table Name="T" Alias="T"><Fields>
+                <Field Name="PO_NUM" ValueType="StringField"/>
+                <Field Name="AMT" ValueType="NumberField"/>
+                <Field Name="WHEN" ValueType="DateField"/>
+              </Fields></Table></Tables></Database>
+              <DataDefinition><RecordSelectionFormula/></DataDefinition>
+              <ReportDefinition><Areas>
+                <Area Kind="Detail"><Sections>
+                  <Section Name="D1" Height="240"><ReportObjects>
+                    <FieldObject Name="F1" Left="0" Top="0" Width="1440"
+                                 Height="220" DataSource="{T.PO_NUM}"/>
+                    <FieldObject Name="F2" Left="1500" Top="0" Width="1440"
+                                 Height="220" DataSource="{T.AMT}"/>
+                    <FieldObject Name="F3" Left="3000" Top="0" Width="1440"
+                                 Height="220" DataSource="{T.WHEN}"/>
+                  </ReportObjects></Section>
+                </Sections></Area>
+              </Areas></ReportDefinition>
+            </Report>"""), encoding="utf-8")
+        out = tmp_path / "n.prpt"
+        write_prpt(load_report_model(dump, None), out)
+        with zipfile.ZipFile(out) as z:
+            return z.read("layout.xml").decode("utf-8")
+
+    def test_every_data_field_declares_an_empty_null_value(self, tmp_path):
+        layout = self._layout(tmp_path)
+        for kind in ("text-field", "number-field", "date-field"):
+            assert kind in layout, f"{kind} not emitted by the fixture"
+        assert layout.count('core:null-value=""') == 3
+
+    def test_the_attribute_is_in_the_core_namespace(self, tmp_path):
+        """`null-value` is a real core attribute in the engine's element
+        metadata - a made-up name would be dropped silently at parse."""
+        layout = self._layout(tmp_path)
+        assert 'xmlns:core="http://reporting.pentaho.org/namespaces/engine/classic/core/1.0"' \
+            in layout or "core:null-value" in layout

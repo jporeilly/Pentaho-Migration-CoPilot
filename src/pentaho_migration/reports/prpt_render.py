@@ -9,6 +9,15 @@ NUMERIC_TYPES = {"NumberField", "CurrencyField", "IntegerField", "Int16sField",
                  "Int32sField", "Int64sField", "DecimalField"}
 DATE_TYPES = {"DateField", "DateTimeField", "TimeField"}
 
+# An empty cell must print as EMPTY, not as whatever happens to lie under it.
+# PRD skips an element whose value is null - background included - so a field
+# over one of Crystal's full-width row rules stopped masking it, and every row
+# with no purchase-order number grew a long underline the original never had
+# (the stray marks in the gaps BETWEEN fields are the same rule showing
+# through). Giving the field an empty null-value makes it render, and paint,
+# exactly as it does when the data is present.
+NULL_BLANK = ' core:null-value=""'
+
 
 def _num(v):
     return ("%g" % round(float(v), 2))
@@ -141,14 +150,17 @@ def render_element(el, tp="", sp="style:"):
         if el.value_type in NUMERIC_TYPES:
             fmt = el.format_string or _number_format(el.value_type)
             return (f'<{tp}number-field core:element-type="number-field" '
-                    f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}>"
+                    f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}"
+                    f"{NULL_BLANK}>"
                     f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}number-field>")
         if el.value_type in DATE_TYPES:
             fmt = el.format_string or _date_format(el.value_type)
             return (f'<{tp}date-field core:element-type="date-field" '
-                    f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}>"
+                    f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}"
+                    f"{NULL_BLANK}>"
                     f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}date-field>")
-        return (f'<{tp}text-field core:element-type="text-field" core:field={quoteattr(el.column)}>'
+        return (f'<{tp}text-field core:element-type="text-field" '
+                f"core:field={quoteattr(el.column)}{NULL_BLANK}>"
                 f"{_style_block(el, sp)}{_style_expr_block(el)}</{tp}text-field>")
     if el.kind == "chart":
         return _render_chart(el, tp, sp)
