@@ -55,6 +55,8 @@ class ReleaseCheck:
     reason: str = ""           # why UNAVAILABLE, when it is
     original_pages: int = 0
     converted_pages: int = 0
+    groups_checked: int = 0    # per-group span comparison: how many identities
+    groups_matching: int = 0   # ... and how many span the SAME pages as the original
     findings: list = field(default_factory=list)
 
 
@@ -115,8 +117,46 @@ def _line_pages(pages: list) -> dict:
     return out
 
 
-def compare_renders(original_pdf: bytes, converted_pdf: bytes) -> ReleaseCheck:
-    """Deterministic comparison of the two renders."""
+def _boilerplate(pages: list) -> set:
+    """Normalized lines that appear on most pages - page furniture (headers,
+    legal footers). Excluded from sparseness so a page holding only furniture
+    plus a stray Total counts as widowed."""
+    from collections import Counter
+
+    seen = Counter()
+    for page in pages:
+        for line in {l for l in map(_normalize_line, page.splitlines()) if l}:
+            seen[line] += 1
+    threshold = max(2, int(len(pages) * 0.6))
+    return {line for line, n in seen.items() if n >= threshold}
+
+
+def _sparse_pages(pages: list) -> list:
+    """Page indices carrying almost no content beyond the furniture -
+    the widowed Total/Remit pages the eye catches instantly."""
+    furniture = _boilerplate(pages)
+    sparse = []
+    for i, page in enumerate(pages):
+        content = {l for l in map(_normalize_line, page.splitlines()) if l}
+        if len(content - furniture) <= 3:
+            sparse.append(i)
+    return sparse
+
+
+def _group_spans(pages: list, values: list) -> dict:
+    """value -> number of pages it appears on."""
+    spans: dict = {}
+    for value in values:
+        spans[value] = sum(1 for p in pages if value in p)
+    return spans
+
+
+def compare_renders(original_pdf: bytes, converted_pdf: bytes,
+                    group_values: list | None = None) -> ReleaseCheck:
+    """Deterministic comparison of the two renders. `group_values` (e.g. the
+    customer names from the embedded saved rows) enables the per-group span
+    comparison - the check that answers "does each statement occupy the same
+    pages as the original"."""
     result = ReleaseCheck()
     orig_pages = _pdf_pages_text(original_pdf)
     conv_pages = _pdf_pages_text(converted_pdf)
@@ -184,6 +224,37 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes) -> ReleaseCheck:
             evidence=[f"p{o + 1} -> p{c + 1}: {l[:70]}"
                       for l, o, c in moved[:MOVED_LINE_CAP]]))
 
+    # 5. widowed pages: near-empty pages (a Total/Remit separated from its
+    # statement). The original may legitimately have some - the finding is
+    # about having MORE of them than it does.
+    orig_sparse = _sparse_pages(orig_pages)
+    conv_sparse = _sparse_pages(conv_pages)
+    if len(conv_sparse) > len(orig_sparse) + 2:
+        result.findings.append(Finding(
+            "warning", "widowed-pages",
+            f"{len(conv_sparse)} near-empty page(s) vs {len(orig_sparse)} in "
+            "the original - group footers are separating from their content; "
+            "check band heights and keep-together",
+            evidence=[f"converted p{p + 1}" for p in conv_sparse[:8]]))
+
+    # 6. per-group page spans: does each customer/statement occupy the same
+    # number of pages as the original?
+    if group_values:
+        orig_spans = _group_spans(orig_pages, group_values)
+        conv_spans = _group_spans(conv_pages, group_values)
+        drifted = [(v, orig_spans[v], conv_spans[v]) for v in group_values
+                   if orig_spans[v] and conv_spans[v]
+                   and orig_spans[v] != conv_spans[v]]
+        result.groups_checked = len(group_values)
+        result.groups_matching = len(group_values) - len(drifted)
+        if len(drifted) > max(2, len(group_values) // 10):
+            result.findings.append(Finding(
+                "warning", "group-spans",
+                f"{len(drifted)} of {len(group_values)} group(s) span a "
+                "different number of pages than the original",
+                evidence=[f"{v[:40]}: original {o} page(s) -> converted {c}"
+                          for v, o, c in drifted[:8]]))
+
     # conservative gate: anything worth a sentence is worth a look
     result.verdict = "SHIP" if not result.findings else "REVIEW"
     return result
@@ -214,7 +285,30 @@ def run_release_check(model, rpt_path: Path) -> ReleaseCheck:
     except RuntimeError as exc:
         return ReleaseCheck(verdict="UNAVAILABLE",
                             reason=f"converted render failed: {exc}")
-    return compare_renders(original_pdf, converted_pdf)
+    return compare_renders(original_pdf, converted_pdf,
+                           group_values=_innermost_group_values(model))
+
+
+def _innermost_group_values(model, cap: int = 60) -> list:
+    """Distinct values of the innermost group, in row order, from the
+    embedded saved rows - the per-statement identities the span check keys
+    on. Empty when there is no saved data (the check simply skips)."""
+    saved = getattr(model, "saved_rows", None)
+    groups = [g.column for g in getattr(model, "groups", [])]
+    if saved is None or not groups:
+        return []
+    columns = [c[0] for c in saved.columns]
+    if groups[-1] not in columns:
+        return []
+    idx = columns.index(groups[-1])
+    values = []
+    for row in saved.rows:
+        value = str(row[idx] or "").strip()
+        if value and value not in values:
+            values.append(value)
+        if len(values) >= cap:
+            break
+    return values
 
 
 def annotate_findings_with_llm(check: ReleaseCheck, model, settings=None,

@@ -78,9 +78,14 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
 
     pages_html = ""
     if check is not None and check.verdict != "UNAVAILABLE":
+        spans = ""
+        if getattr(check, "groups_checked", 0):
+            spans = (f" · statement pagination: <b>{check.groups_matching} of "
+                     f"{check.groups_checked}</b> groups match the original exactly")
         pages_html = (f"<p>Rendered original: <b>{check.original_pages} "
                       f"pages</b> (SAP viewer) · converted: "
-                      f"<b>{check.converted_pages} pages</b> (Pentaho engine)</p>")
+                      f"<b>{check.converted_pages} pages</b> (Pentaho engine)"
+                      f"{spans}</p>")
 
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>Consultant Report — {esc(model.name)}</title>
@@ -149,6 +154,10 @@ def build_consultant_report(model, source_path, prpt_path,
             "Crystal viewer, saved data)",
             f"- Converted render: **{check.converted_pages} pages** "
             "(Pentaho Reporting engine, embedded data)",
+            *([f"- Statement pagination: **{check.groups_matching} of "
+               f"{check.groups_checked}** group(s) span exactly the same "
+               "pages as the original"]
+              if getattr(check, "groups_checked", 0) else []),
             ""]
         if check.findings:
             lines += ["### Findings", ""]

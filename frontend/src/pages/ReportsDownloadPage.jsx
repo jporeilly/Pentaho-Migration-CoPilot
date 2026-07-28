@@ -265,6 +265,8 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
           <p className="muted">
             Rendered original ({gate.original_pages} pages, SAP viewer) vs
             converted ({gate.converted_pages} pages, Pentaho engine).
+            {gate.groups_checked > 0 &&
+              ` Statement pagination: ${gate.groups_matching} of ${gate.groups_checked} groups match the original exactly.`}
             {gate.llm_annotated > 0 && ` ${gate.llm_annotated} finding(s) annotated by the LLM.`}
           </p>
           {gate.findings.length === 0 ? (

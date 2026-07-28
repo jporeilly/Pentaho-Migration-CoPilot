@@ -398,7 +398,11 @@ async def release_check_start(dump: UploadFile, jndi: str = "",
                                  if model.saved_rows is not None
                                  else render_prpt_pdf(prpt))
             job["stage"] = "comparing"
-            check = compare_renders(original_pdf, converted_pdf)
+            from pentaho_migration.reports.release_check import (
+                _innermost_group_values)
+            check = compare_renders(
+                original_pdf, converted_pdf,
+                group_values=_innermost_group_values(model))
             annotated = 0
             if llm and check.findings:
                 job["stage"] = "annotating"
@@ -409,6 +413,8 @@ async def release_check_start(dump: UploadFile, jndi: str = "",
                 "verdict": check.verdict,
                 "original_pages": check.original_pages,
                 "converted_pages": check.converted_pages,
+                "groups_checked": check.groups_checked,
+                "groups_matching": check.groups_matching,
                 "findings": [{"severity": f.severity, "code": f.code,
                               "message": f.message, "evidence": f.evidence,
                               "resolution": f.resolution}
