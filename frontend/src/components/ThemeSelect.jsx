@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 
 const THEMES = [
+  { id: 'light', label: 'Light' },
   { id: 'midnight', label: 'Midnight' },
   { id: 'slate', label: 'Slate' },
   { id: 'pentaho', label: 'Pentaho' },
-  { id: 'light', label: 'Light' },
 ]
 
 export default function ThemeSelect() {
   const [theme, setTheme] = useState(
-    () => localStorage.getItem('mc-theme') ?? 'midnight',
+    () => localStorage.getItem('mc-theme') ?? 'light',
   )
 
   useEffect(() => {

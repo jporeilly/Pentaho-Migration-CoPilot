@@ -9,6 +9,14 @@ deliberately — not one per work session.
 
 ## [1.37.0] — 2026-07-28
 
+### Changed
+
+- **Light is the default color theme.** First paint is light too (the bare
+  CSS `:root` now carries the light palette, so there is no dark flash before
+  the theme script runs). A previously saved theme choice still wins — anyone
+  who picked Midnight keeps Midnight; the picker in ⚙ Settings is unchanged,
+  with Light listed first.
+
 ### Added
 
 - **The converted .prpt opens in Report Designer showing REAL DATA, with no
