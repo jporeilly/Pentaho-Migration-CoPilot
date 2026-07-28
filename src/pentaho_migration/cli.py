@@ -663,6 +663,55 @@ def report_classify(
     typer.echo(f"index: {dest / 'README.md'}")
 
 
+@app.command("report-sample-db")
+def report_sample_db(
+    directory: Path = typer.Argument(Path("samples/crystal"),
+                                     help="Folder of RptToXml dumps (.rpt beside each)"),
+    out: Path = typer.Option(Path("output/sample-db"), "--out", "-o",
+                             help="Where to write the .sql and its manifest"),
+    database: str = typer.Option("xtreme", "--database", "-d",
+                                 help="Database name to create"),
+    dialect: str = typer.Option("mysql", "--dialect",
+                                help="SQL dialect to emit"),
+    only: str = typer.Option("", "--only",
+                             help="Only reports whose connection names this, "
+                                  "e.g. 'xtreme' or a customer's server"),
+) -> None:
+    """Rebuild a queryable database from the data saved inside the reports.
+
+    During a PoC the customer hands over .rpt files and no database. The
+    schema is recoverable in full - every table, column and type is declared
+    in the reports themselves - and the data comes from the rows Crystal
+    saved inside them, so the generated SELECT can be run for real instead
+    of described.
+
+    The data is a result set, not a table dump: a column no report selected
+    has no values, and a row every report filtered out was never saved. The
+    manifest says exactly which, because a consultant who assumes otherwise
+    will be wrong in front of the customer."""
+    from pentaho_migration.reports.sample_db import build
+
+    if dialect not in ("mysql",):
+        typer.echo(f"unsupported dialect: {dialect}", err=True)
+        raise typer.Exit(code=2)
+    sql, md, tables = build(directory, database=database, dialect=dialect,
+                            only=only)
+    out.mkdir(parents=True, exist_ok=True)
+    sql_path = out / f"{database}.sql"
+    md_path = out / f"{database}.manifest.md"
+    sql_path.write_text(sql, encoding="utf-8")
+    md_path.write_text(md, encoding="utf-8")
+    rows = sum(len(t.rows) for t in tables.values())
+    typer.echo(f"{len(tables)} table(s), {rows:,} row(s) recovered")
+    for name in sorted(tables):
+        t = tables[name]
+        filled = sum(1 for c in t.columns.values() if c.populated)
+        typer.echo(f"  {name:18} {len(t.rows):6,} row(s)  "
+                   f"{filled}/{len(t.columns)} column(s) carry data")
+    typer.echo(f"sql:      {sql_path}")
+    typer.echo(f"manifest: {md_path}")
+
+
 @app.command("report-gaps")
 def report_gaps(
     directory: Path = typer.Argument(Path("samples/crystal/corpus")),

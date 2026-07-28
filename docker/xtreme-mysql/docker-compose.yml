@@ -1,0 +1,35 @@
+# MySQL carrying the Xtreme sample data rebuilt from the reports themselves.
+#
+# The point is to have a REAL JNDI target for the demo: the converted .prpt
+# already renders from the rows embedded in its bundle, which proves the
+# layout but says nothing about the generated SQL. Pointing it at this
+# proves the query.
+#
+#   docker compose up -d
+#   pentaho-migrate report-sample-db samples/crystal --only xtreme
+#   docker compose exec -T mysql mysql -uroot -pxtreme < ../../output/sample-db/xtreme.sql
+#
+# lower_case_table_names is left at the Linux default (0, case-sensitive)
+# on purpose: the corpus carries both CUSTOMER (Derby build of Xtreme) and
+# Customer (Access build), which are different tables with different column
+# naming, and folding the case would silently lose one.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: xtreme-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: xtreme
+      MYSQL_DATABASE: xtreme
+    ports:
+      - "3307:3306"        # 3307 so a local MySQL on 3306 still works
+    volumes:
+      - xtreme-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pxtreme"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  xtreme-data:
