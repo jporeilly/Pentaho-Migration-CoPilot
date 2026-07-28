@@ -120,3 +120,57 @@ class TestUnderlayStaysInsideItsBand:
         order = re.findall(r"<(content|label|message|text-field)\b", layout)
         assert order, "nothing rendered"
         assert order[0] == "content", f"watermark is not first: {order}"
+
+
+class TestWhiteIsNoFill:
+    """RptToXml exports <BackgroundColor Name="White"/> on virtually every
+    object whether or not Crystal applies a fill. Painting it made each label
+    an opaque tile, which hid the grey Total box sitting behind the "Total:"
+    label and the amount."""
+
+    def _layout(self, tmp_path, bg):
+        model = _model(tmp_path, _report(f"""
+            <Section Name="D1" Height="240"><ReportObjects>
+              <BoxObject Name="B" Top="0" Left="0" Width="3479" Height="390"
+                         LineThickness="20">
+                <BackgroundColor Name="grey" A="255" R="219" G="219" B="219"/>
+                <BorderColor Name="Black" A="255" R="0" G="0" B="0"/>
+              </BoxObject>
+              <TextObject Name="T" Top="0" Left="200" Width="1440"
+                          Height="220"><Text>Total:</Text>
+                <BackgroundColor Name="{bg[0]}" A="255" R="{bg[1]}"
+                                 G="{bg[2]}" B="{bg[3]}"/>
+              </TextObject>
+            </ReportObjects></Section>"""))
+        out = tmp_path / "w.prpt"
+        write_prpt(model, out)
+        with zipfile.ZipFile(out) as z:
+            return z.read("layout.xml").decode("utf-8")
+
+    def test_a_white_label_background_is_not_painted(self, tmp_path):
+        layout = self._layout(tmp_path, ("White", 255, 255, 255))
+        assert 'background-color="#ffffff"' not in layout
+
+    def test_a_real_colour_still_is(self, tmp_path):
+        """Only white is treated as no-fill; a deliberate colour survives."""
+        layout = self._layout(tmp_path, ("teal", 64, 128, 128))
+        assert 'background-color="#408080"' in layout
+
+    def test_the_box_keeps_its_own_fill(self, tmp_path):
+        layout = self._layout(tmp_path, ("White", 255, 255, 255))
+        assert 'fill-color="#dbdbdb"' in layout
+        assert 'fill-shape="true"' in layout
+
+
+class TestPicturesFillTheirBox:
+    def test_a_picture_scales_to_fill_rather_than_letterbox(self, tmp_path):
+        """Crystal scales a picture to fill its box. Preserving the aspect
+        letterboxed the statement's watermark to 315pt inside a 475pt box,
+        so it read as clipped."""
+        model = _model(tmp_path, _report(UNDERLAY_WITH_SPACER))
+        out = tmp_path / "p.prpt"
+        write_prpt(model, out)
+        with zipfile.ZipFile(out) as z:
+            layout = z.read("layout.xml").decode("utf-8")
+        assert 'scale="true"' in layout
+        assert 'keep-aspect-ratio="false"' in layout

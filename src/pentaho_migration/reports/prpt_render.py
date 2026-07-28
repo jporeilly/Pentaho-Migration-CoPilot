@@ -64,7 +64,13 @@ def _border_styles(el, sp):
     rule), so only the authored sides are emitted — a full box would draw
     vertical lines between adjacent cells that Crystal never showed."""
     attrs = []
-    if el.bg_color:
+    # White is Crystal's "no fill", not an opaque white. RptToXml exports
+    # <BackgroundColor Name="White"/> on virtually every object whether or
+    # not a fill is applied, so painting it made every label an opaque tile -
+    # which is what hid the grey Total box behind the "Total:" label and the
+    # amount. The section parser already drops white for this reason; element
+    # backgrounds now do the same.
+    if el.bg_color and el.bg_color.lower() not in ("#ffffff", "#fff"):
         attrs.append(f"background-color={quoteattr(el.bg_color)}")
     if el.border_width and el.border_color:
         sides = el.border_sides or ("top", "bottom", "left", "right")
@@ -189,7 +195,13 @@ def render_element(el, tp="", sp="style:"):
                    f"RepositoryResourceBundleLoader;{el.resource_path};")
             return (f'<{tp}content core:element-type="content">'
                     f"<{sp}element-style>"
-                    f'<{sp}content-styles scale="true" keep-aspect-ratio="true"/>'
+                    # Crystal scales a picture to FILL its box; preserving the
+                    # aspect letterboxed the statement's watermark to 315pt
+                    # inside a 475pt box, so it read as clipped. The logos are
+                    # unaffected - their boxes already match their natural
+                    # aspect (2.61 vs 2.61) - and where a box does differ,
+                    # stretching is what Crystal shows.
+                    f'<{sp}content-styles scale="true" keep-aspect-ratio="false"/>'
                     f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
                     f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
                     f"</{sp}element-style>"
