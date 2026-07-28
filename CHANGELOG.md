@@ -9,6 +9,19 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The converted report carries Crystal's group tree.** The viewer's
+  left-hand tree - countries, then customers within each - is how anyone
+  navigates a long statement run, and the .prpt had no equivalent: opening it
+  in Report Designer gave a flat scroll. Every group header now carries a
+  `bookmark` band style bound to its own column, so the PDF outline panel
+  reproduces the tree - from PRD and the Pentaho Server, not just from the
+  app'''s own preview. The engine attaches every bookmark to the root outline
+  (PdfLogicalPageDrawable.drawBookmark), so a real hierarchy is not reachable;
+  inner groups are indented with non-breaking spaces instead, which reads as
+  the tree it represents. Verified by rendering, not by reading XML: 45
+  entries on the demo statement, and all 35 corpus reports that have groups
+  emit one, nesting up to 4 levels deep.
+
 - **Every LLM button now appears only when there is something for it to do.**
   `✨ Translate` and `✨ AI-assist` were already gated on a real count;
   `🤖 Suggest a solution` was not, and offered itself on steps that convert

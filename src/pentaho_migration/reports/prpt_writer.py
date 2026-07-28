@@ -46,6 +46,10 @@ from pentaho_migration.reports.model import (
     CROSSTAB_AGG_MAP, RUNNING_CLASS_MAP, SUMMARY_CLASS_MAP)
 from pentaho_migration.reports.prpt_render import _num, render_element
 
+# Outline indent for nested groups. A NON-BREAKING space, because a PDF
+# viewer is free to collapse ordinary leading spaces in an outline title.
+NBSP = " "
+
 NS_CROSSTAB = "http://reporting.pentaho.org/namespaces/engine/attributes/crosstab"
 NS_WIZARD = "http://reporting.pentaho.org/namespaces/engine/attributes/wizard"
 
@@ -239,16 +243,33 @@ def _section_band(section, tp="", sp="style:", behind_elements=None):
             f"{exprs}{content}</{tp}band>")
 
 
-def _root_band(sections, element_type):
+def _root_band(sections, element_type, bookmark_field="", bookmark_depth=0):
     content, height, _bg = _band_content(sections, element_type)
     # The parent stacks its section sub-bands; each sub-band paints its own
     # background and carries its own suppress condition.
     style = ('<style:element-style><style:band-styles layout="block"/>'
              "</style:element-style>")
+    # Crystal's viewer navigates a long report by its GROUP TREE - countries,
+    # then customers within each. PRD's equivalent is the `bookmark` band
+    # style: a group header carrying one becomes an entry in the PDF outline
+    # panel, bound to the group's own column so every value labels its entry.
+    #
+    # The engine's PDF writer attaches every bookmark to the ROOT outline
+    # (PdfLogicalPageDrawable.drawBookmark -> new PdfOutline(getRootOutline(),
+    # ...)), so a real hierarchy is not reachable from here. Inner groups are
+    # INDENTED instead, which reads as the tree it represents in every PDF
+    # viewer's outline panel.
+    bookmark = ""
+    if bookmark_field:
+        indent = NBSP * 4 * bookmark_depth
+        formula = (f'="{indent}" & [{bookmark_field}]' if indent
+                   else f"=[{bookmark_field}]")
+        bookmark = ('<style-expression style-key="bookmark" '
+                    f"formula={quoteattr(formula)}/>")
     return (f'<root-level-content core:element-type="{element_type}" '
             f'xmlns:report-designer="http://reporting.pentaho.org/namespaces/report-designer/2.0" '
             f'report-designer:visual-height="{_num(height)}">'
-            f"{style}{content}</root-level-content>")
+            f"{style}{bookmark}{content}</root-level-content>")
 
 
 # ---------------------------------------------------------------- layout.xml
@@ -268,7 +289,9 @@ def build_layout_xml(model, root_type="master-report"):
                 f'<group core:element-type="relational-group" '
                 f'core:group-fields={quoteattr(g.column)} core:name={quoteattr(g.column)}>'
                 f"<fields><field>{escape(g.column)}</field></fields>"
-                f"<group-header>{_root_band(headers, 'group-header')}</group-header>"
+                f"<group-header>"
+                f"{_root_band(headers, 'group-header', bookmark_field=g.column, bookmark_depth=i)}"
+                f"</group-header>"
                 f"{body}"
                 f"<group-footer>{_root_band(footers, 'group-footer')}</group-footer>"
                 f"</group>")
