@@ -1,17 +1,17 @@
 """The portfolio report's engagement plan.
 
 A consultant staffs an engagement by KIND of work, not by report, so the
-per-report action plans are rolled up here - and the handful of reports that
-decide the schedule get their full plan in a tab. Two things must hold: the
-roll-up must add up to the per-report plans it came from, and the tabs must
-be self-contained (the report is mailed as one file and opened offline).
+per-report action plans are rolled up here - and each row of the focus list
+opens into the full plan for that report. Two things must hold: the roll-up
+must add up to the per-report plans it came from, and the page must be
+self-contained (it is mailed as one file and opened offline).
 """
 
 import textwrap
 
 from pentaho_migration.reports.action_plan import build_action_plan
 from pentaho_migration.reports.portfolio_report import (
-    _hardest_tabs, _portfolio_actions, build_portfolio_report_html)
+    _focus_table, _portfolio_actions, build_portfolio_report_html)
 from pentaho_migration.reports.triage import TriageResult, triage_one
 
 
@@ -85,34 +85,45 @@ class TestRollUp:
         assert table == "" and total == 0.0
 
 
-class TestHardestTabs:
-    def test_the_heaviest_reports_get_their_full_plan(self, tmp_path):
+class TestFocusListExpands:
+    """The focus list already answers "which reports do I open first", so
+    each row carries its own plan behind a click rather than a parallel
+    section a consultant has to cross-reference."""
+
+    def test_a_row_expands_into_its_full_plan(self, tmp_path):
         results = _triaged(tmp_path, 3)
         for i, r in enumerate(results):      # make the ranking unambiguous
             r.copilot_hours = 10.0 - i
-        html = _hardest_tabs(results, 150.0, top_n=2)
-        assert 'id="pane0"' in html and 'id="pane1"' in html
-        assert 'id="pane2"' not in html
+        html = _focus_table(results, 150.0, top_n=2)
+        assert 'id="fplan0"' in html and 'id="fplan1"' in html
+        assert 'id="fplan2"' not in html
         assert "Why it matters." in html and "How." in html
 
-    def test_the_first_tab_is_open_and_the_rest_are_not(self, tmp_path):
-        html = _hardest_tabs(_triaged(tmp_path, 3), 150.0, top_n=3)
-        assert html.count('class="pane on"') == 1
-        assert html.count('class="tab on"') == 1
+    def test_every_plan_starts_collapsed(self, tmp_path):
+        """Ten expanded plans would bury the table the list exists to be."""
+        html = _focus_table(_triaged(tmp_path, 3), 150.0)
+        assert 'class="plandetail on"' not in html
 
-    def test_tabs_need_no_network_to_work(self, tmp_path):
-        """The portfolio report is mailed as one file and opened offline; a
-        CDN script would leave the customer with dead tabs."""
-        html = _hardest_tabs(_triaged(tmp_path, 2), 150.0)
-        assert "function showPlan" in html
-        assert "http://" not in html and "https://" not in html
+    def test_a_report_with_no_plan_is_not_clickable(self):
+        html = _focus_table([TriageResult(file="x.xml")], 150.0)
+        assert "togglePlan" not in html and "plandetail" not in html
 
-    def test_reports_with_no_plan_are_skipped(self):
-        assert _hardest_tabs([TriageResult(file="x.xml")], 150.0) == ""
+    def test_the_collapsed_row_stays_scannable(self, tmp_path):
+        """One clipped reason keeps every row the same height; the full list
+        is one click away."""
+        results = _triaged(tmp_path, 1)
+        results[0].reasons = ["x" * 200, "second", "third"]
+        html = _focus_table(results, 150.0)
+        assert "x" * 200 not in html
+        assert "+2 more" in html
 
 
 def test_the_whole_page_still_builds(tmp_path):
     html = build_portfolio_report_html(_triaged(tmp_path, 3))
     assert "Priority actions across the portfolio" in html
-    assert "The hardest reports, action by action" in html
+    assert "function togglePlan" in html
+    # self-contained: mailed as one file and opened offline, so nothing may
+    # be FETCHED (an xmlns URL is a namespace, not a network request)
+    assert "<script src" not in html and "<link" not in html
+    assert 'src="http' not in html
     assert html.strip().endswith("</html>")

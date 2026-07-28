@@ -15,10 +15,20 @@ deliberately — not one per work session.
 - **The portfolio (triage) report gained the engagement plan.** The
   per-report actions are rolled up by KIND of work — one row per kind, how
   many reports it touches, total hours and cost — because a consultant staffs
-  by work type, not by report. Below it, the five heaviest reports get their
-  full action plan in tabs: the same why-it-matters / how / cost detail a
-  single-report consultant report carries. Tabs are self-contained (no CDN),
-  and print expanded.
+  by work type, not by report. Under it, **each row of the focus list opens
+  into that report's full action plan** — the same why-it-matters / how /
+  cost detail a single-report consultant report carries, behind the report a
+  consultant just picked rather than in a parallel list to cross-reference.
+  Rows stay one line high so the table can still be scanned. Self-contained
+  (no CDN) and prints expanded.
+- **Generated SQL quotes identifiers that need it.** Crystal names columns
+  `Last Name` and tables `dataroot/Customer_Query`; emitted bare, the SELECT
+  was not parseable SQL at all. Plain identifiers are left alone, so the
+  common case still reads the way a consultant would write it by hand.
+- **A report that reaches past its saved data fails legibly.** Crystal caches
+  rows for the master report only, so a report whose sub-reports carry their
+  own queries renders its own bands and then asks the database for the rest.
+  That now says so instead of printing a Java stack trace.
 - Items and effort columns are right-aligned in the action plan.
 
 ## [1.39.2] - 2026-07-28

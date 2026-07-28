@@ -104,6 +104,16 @@ def _render_failure(prpt_path, stderr: str) -> str:
                 "too, so a headless render has no values to use; open it in "
                 "Report Designer and supply them, or give the parameters "
                 "default values")
+    if ("ReportDataFactoryException" in stderr
+            and ("object not found" in stderr
+                 or "user lacks privilege" in stderr)):
+        # Crystal caches saved data for the MASTER report only, so a report
+        # whose sub-reports carry their own queries renders its own bands
+        # from the embedded rows and then asks the database for the rest.
+        return ("the report reached the database for data the .rpt did not "
+                "cache - Crystal saves rows for the master report only, so a "
+                "sub-report's query has nothing embedded to fall back on. "
+                "Point the bundle at the real connection to preview it whole")
     return "live render failed - stderr: " + stderr[-800:]
 
 

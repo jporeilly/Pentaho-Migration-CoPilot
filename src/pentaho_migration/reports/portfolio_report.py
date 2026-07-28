@@ -115,66 +115,80 @@ def _portfolio_actions(results, rate):
     return table, total
 
 
-def _hardest_tabs(results, rate, top_n=5):
-    """Full action plans for the hardest reports, in tabs. These are the ones
-    that decide the schedule, so they get the same detail a single-report
-    consultant report gives - why each action matters, and how to do it."""
+def _clip(text, limit):
+    text = str(text)
+    return text if len(text) <= limit else text[:limit - 1].rstrip() + "…"
+
+
+def _plan_detail(actions, rate):
+    """One report's action plan, laid out for the row that expands under it:
+    a compact ordered list, each action leading with what it costs."""
     from pentaho_migration.reports.action_plan import PRIORITY_LABEL
 
-    ranked = [r for r in results if getattr(r, "actions", None)]
-    ranked.sort(key=lambda r: (-r.copilot_hours, r.name or r.file))
-    ranked = ranked[:top_n]
-    if not ranked:
-        return ""
-    tabs, panes = [], []
-    for i, r in enumerate(ranked):
-        label = escape((r.name or r.file)[:34])
-        tabs.append(f'<button class="tab{" on" if i == 0 else ""}" '
-                    f'onclick="showPlan({i})" id="tab{i}">{label}'
-                    f'<span>{r.copilot_hours:.1f}h</span></button>')
-        blocks = []
-        for n, a in enumerate(r.actions, 1):
-            where = ""
-            if a.where:
-                where = ('<div class="where">'
-                         + escape(", ".join(str(w) for w in a.where[:6]))
-                         + "</div>")
-            items = "".join(f"<li>{escape(str(x))}</li>" for x in a.items[:8])
-            blocks.append(
-                f'<div class="act">'
-                f'<div class="acthead" style="background:{PRIORITY_BG[a.priority]}">'
-                f'<b>{n}. {escape(a.title)}</b>'
-                f'<span style="color:{PRIORITY_INK[a.priority]}">'
-                f'{escape(PRIORITY_LABEL[a.priority])} · {a.hours:,.2f}h · '
-                f'{_money(a.hours, rate)}</span></div>'
-                f'<p><b>Why it matters.</b> {escape(a.why)}</p>'
-                f'<p><b>How.</b> {escape(a.how)}</p>'
-                f"{where}"
-                + (f"<ul>{items}</ul>" if items else "") + "</div>")
-        total = sum(a.hours for a in r.actions)
-        panes.append(
-            f'<div class="pane{" on" if i == 0 else ""}" id="pane{i}">'
-            f'<p class="muted">{escape(r.name or r.file)} — '
-            f'<b>{r.verdict}</b> · {len(r.actions)} action(s) · '
-            f'{total:,.2f}h ({_money(total, rate)})</p>'
-            + "".join(blocks) + "</div>")
-    return f"""
-<h2>The hardest reports, action by action</h2>
-<p class="muted">The {len(ranked)} reports carrying the most work. These decide
-the schedule, so each one gets its full plan — the same detail its own
-consultant report carries.</p>
-<div class="tabs">{"".join(tabs)}</div>
-{"".join(panes)}
-<script>
-function showPlan(i) {{
-  document.querySelectorAll('.pane').forEach(function (p, j) {{
-    p.className = 'pane' + (i === j ? ' on' : '');
-  }});
-  document.querySelectorAll('.tab').forEach(function (t, j) {{
-    t.className = 'tab' + (i === j ? ' on' : '');
-  }});
-}}
-</script>"""
+    blocks = []
+    for a in actions:
+        where = ""
+        if a.where:
+            where = ('<div class="where">Where: '
+                     + escape(", ".join(str(w) for w in a.where[:6]))
+                     + ("" if len(a.where) <= 6
+                        else f" +{len(a.where) - 6} more") + "</div>")
+        items = "".join(f"<li>{escape(str(x))}</li>" for x in a.items[:6])
+        more = ("" if len(a.items) <= 6 else
+                f'<li class="muted">and {len(a.items) - 6} more</li>')
+        blocks.append(
+            f'<li class="act">'
+            f'<div class="acthead">'
+            f'<span class="pchip" style="background:{PRIORITY_BG[a.priority]};'
+            f'color:{PRIORITY_INK[a.priority]}">'
+            f'{escape(PRIORITY_LABEL[a.priority])}</span>'
+            f'<b>{escape(a.title)}</b>'
+            f'<span class="cost">{a.hours:,.2f}h &middot; {_money(a.hours, rate)}</span>'
+            f"</div>"
+            f'<p><b>Why it matters.</b> {escape(a.why)}</p>'
+            f'<p><b>How.</b> {escape(a.how)}</p>'
+            f"{where}"
+            + (f"<ul>{items}{more}</ul>" if items else "") + "</li>")
+    return f'<ol class="plan">{"".join(blocks)}</ol>'
+
+
+def _focus_table(results, rate, top_n=10):
+    """The heaviest reports, each row expanding into its own action plan.
+
+    The plan lives here rather than in a section of its own: the focus list
+    is already the answer to "which reports do I open first", so the detail
+    belongs behind the report a consultant just picked, not repeated in a
+    parallel list they have to cross-reference."""
+    focus = sorted(results, key=lambda r: r.copilot_hours, reverse=True)[:top_n]
+    rows = []
+    for i, r in enumerate(focus):
+        actions = getattr(r, "actions", None) or []
+        name = escape(r.name or r.file)
+        # the collapsed row is for SCANNING - one clipped reason keeps every
+        # row the same height, and the full list is one click away
+        reasons = escape(_clip(r.reasons[0], 90) if r.reasons else "-")
+        if len(r.reasons) > 1:
+            reasons += (f'<span class="muted"> +{len(r.reasons) - 1} more'
+                        "</span>")
+        rows.append(
+            f'<tr class="focus{" clickable" if actions else ""}"'
+            + (f' onclick="togglePlan({i})" id="frow{i}"' if actions else "")
+            + f'><td><span class="caret">{"&#9656;" if actions else "&nbsp;"}'
+              f'</span><span class="fname">{name}</span></td>'
+            f'<td><span class="chip" style="color:{VERDICT_COLORS[r.verdict]}">'
+            f"{r.verdict}</span></td>"
+            f'<td class="num">{r.copilot_hours:.1f}h</td>'
+            f'<td class="num">{_money(r.copilot_hours, rate)}</td>'
+            f"<td>{reasons}</td></tr>")
+        if actions:
+            total = sum(a.hours for a in actions)
+            rows.append(
+                f'<tr class="plandetail" id="fplan{i}"><td colspan="5">'
+                f'<p class="muted">{len(actions)} action(s) &middot; '
+                f"{total:,.2f}h ({_money(total, rate)}) - highest priority "
+                "first</p>"
+                + _plan_detail(actions, rate) + "</td></tr>")
+    return "".join(rows)
 
 
 def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Reports Migration — Consultant Portfolio Report"):
@@ -211,7 +225,6 @@ def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Rep
 
     formulas_total = (auto + review + manual) or 1
     saved_h = manual_h - copilot_h
-    focus = sorted(results, key=lambda r: r.copilot_hours, reverse=True)[:10]
 
     verdict_bar = _stacked_bar(
         [(v, verdicts.get(v, 0), VERDICT_COLORS[v]) for v in ("READY", "REVIEW", "BLOCKED")])
@@ -223,17 +236,9 @@ def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Rep
     load_chart = _hbar_chart([(f"{k} review item(s)", v, SLATE)
                               for k, v in load_bins.items()])
 
-    focus_rows = "".join(
-        f"<tr><td>{escape(r.name or r.file)}</td>"
-        f'<td><span class="chip" style="color:{VERDICT_COLORS[r.verdict]}">{r.verdict}</span></td>'
-        f"<td class='num'>{r.copilot_hours:.1f}h</td>"
-        f"<td class='num'>{_money(r.copilot_hours, rate)}</td>"
-        f"<td>{escape('; '.join(r.reasons[:3]) or '—')}</td></tr>"
-        for r in focus)
-
     plan_table, plan_total = _portfolio_actions(results, rate)
     plan_money = _money(plan_total, rate)
-    hardest_tabs = _hardest_tabs(results, rate)
+    focus_rows = _focus_table(results, rate)
 
     sql_line = ""
     if jndi:
@@ -275,28 +280,36 @@ def build_portfolio_report_html(results, rate=150.0, jndi="", title="Crystal Rep
             border-top: 1px solid #dfe5ea; padding-top: 10px; }}
   .pchip {{ display: inline-block; padding: 2px 9px; border-radius: 999px;
             font-size: 11px; font-weight: bold; white-space: nowrap; }}
-  .tabs {{ display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 0; }}
-  .tab {{ background: {LIGHT}; border: 1px solid #dfe5ea; border-bottom: none;
-          border-radius: 8px 8px 0 0; padding: 8px 14px; cursor: pointer;
-          font-size: 13px; color: {SLATE}; font-family: inherit; }}
-  .tab span {{ display: block; font-size: 11px; color: {GOLD};
-               font-weight: bold; }}
-  .tab.on {{ background: {NAVY}; color: #fff; border-color: {NAVY}; }}
-  .pane {{ display: none; border: 1px solid #dfe5ea; border-radius: 0 8px 8px 8px;
-           padding: 16px 18px; }}
-  .pane.on {{ display: block; }}
-  .act {{ margin: 0 0 14px; }}
-  .acthead {{ display: flex; justify-content: space-between; gap: 12px;
-              padding: 7px 11px; border-radius: 6px; font-size: 13.5px; }}
-  .acthead b {{ color: {NAVY}; }}
-  .acthead span {{ font-size: 12px; font-weight: bold; white-space: nowrap; }}
-  .act p {{ margin: 6px 0 0; font-size: 13px; }}
-  .act ul {{ margin: 6px 0 0; font-size: 12.5px; color: {SLATE}; }}
+  tr.focus.clickable {{ cursor: pointer; }}
+  tr.focus.clickable:hover td {{ background: {LIGHT}; }}
+  tr.focus.on td {{ background: {LIGHT}; font-weight: bold; }}
+  .caret {{ display: inline-block; width: 14px; color: {GOLD};
+            font-weight: bold; vertical-align: top; }}
+  /* a long report name must wrap BESIDE the caret, not under it */
+  .fname {{ display: inline-block; vertical-align: top; word-break: break-word;
+            max-width: calc(100% - 18px); }}
+  tr.plandetail {{ display: none; }}
+  tr.plandetail.on {{ display: table-row; }}
+  tr.plandetail > td {{ background: #fbfcfd; padding: 14px 18px 18px;
+                        border-bottom: 3px solid {NAVY}; }}
+  ol.plan {{ margin: 6px 0 0; padding-left: 22px; }}
+  li.act {{ margin: 0 0 16px; }}
+  li.act::marker {{ color: {SLATE}; font-weight: bold; }}
+  .acthead {{ display: flex; align-items: baseline; gap: 10px;
+              flex-wrap: wrap; }}
+  .acthead b {{ color: {NAVY}; font-size: 14px; }}
+  .acthead .cost {{ margin-left: auto; font-size: 12.5px; font-weight: bold;
+                    color: {NAVY}; white-space: nowrap; }}
+  li.act p {{ margin: 5px 0 0; font-size: 13px; line-height: 1.5; }}
+  li.act ul {{ margin: 6px 0 0; font-size: 12.5px; color: {SLATE};
+               padding-left: 18px; }}
   .where {{ font-family: ui-monospace, Consolas, monospace; font-size: 11.5px;
             color: {SLATE}; margin-top: 5px; }}
   @media print {{
     header.mast {{ -webkit-print-color-adjust: exact; }}
-    .pane {{ display: block; }} .tabs {{ display: none; }}
+    tr.plandetail {{ display: table-row; }}
+    .caret {{ display: none; }}
+    li.act {{ break-inside: avoid; }}
   }}
 </style></head><body>
 <header class="mast"><h1>{escape(title)}</h1>
@@ -336,14 +349,26 @@ engagement hours live.</p>
 <h2>Priority actions across the portfolio</h2>
 <p class="muted">The same actions the per-report consultant reports carry,
 rolled up by kind of work — {plan_total:,.1f}h ({plan_money}) in total. Staff
-by the rows here; the reports below tell you where each row lands.</p>
+by the rows here; the focus list below tells you where each row lands.</p>
 {plan_table}
 
-{hardest_tabs}
-
 <h2>Focus list — the 10 heaviest reports</h2>
-<table><thead><tr><th>Report</th><th>Verdict</th><th>Est. hours</th><th>Est. cost</th><th>Top reasons</th></tr></thead>
+<p class="muted">Where the engagement hours are. <b>Click a report</b> to open
+its full action plan — the same detail its own consultant report carries.</p>
+<table class="focuslist"><thead><tr><th>Report</th><th>Verdict</th>
+<th class="num">Est. hours</th><th class="num">Est. cost</th>
+<th>Top reasons</th></tr></thead>
 <tbody>{focus_rows}</tbody></table>
+<script>
+function togglePlan(i) {{
+  var row = document.getElementById('fplan' + i);
+  var head = document.getElementById('frow' + i);
+  var open = row.className.indexOf('on') >= 0;
+  row.className = 'plandetail' + (open ? '' : ' on');
+  head.className = 'focus clickable' + (open ? '' : ' on');
+  head.querySelector('.caret').innerHTML = open ? '\\u25b8' : '\\u25be';
+}}
+</script>
 
 <footer>
 Assumptions: hours are the per-report Copilot effort estimates (parse-time

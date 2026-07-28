@@ -1286,6 +1286,34 @@ def _resolve_references(model):
             section.style_expressions.append(("visible", formula))
 
 
+_PLAIN_IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_$]*")
+
+
+def quote_ident(name: str) -> str:
+    """One SQL identifier, quoted only when it has to be.
+
+    Crystal happily names a column "Last Name" or a table
+    "dataroot/Customer_Query" (an XML-backed report). Emitted bare, the SELECT
+    is not parseable SQL at all and the report cannot render - three corpus
+    reports failed on exactly this. ANSI double quotes are the portable form
+    and are what the Pentaho engine's own HSQLDB expects; a plain identifier
+    is left alone so the common case reads the way a consultant would write
+    it by hand. An embedded quote is doubled, per the standard."""
+    name = str(name)
+    if _PLAIN_IDENT.fullmatch(name):
+        return name
+    return '"' + name.replace('"', '""') + '"'
+
+
+def qualify_ident(table: str, column: str = "") -> str:
+    """A dotted reference with each part quoted independently - a quoted
+    "a.b" would name ONE column called "a.b", not column b of table a."""
+    parts = [quote_ident(p) for p in str(table).split(".") if p]
+    if column:
+        parts.append(quote_ident(column))
+    return ".".join(parts)
+
+
 def generate_sql(model):
     """Build a SELECT statement from the columns the layout actually uses."""
     used = []
@@ -1293,8 +1321,9 @@ def generate_sql(model):
     def _add(column):
         if not column or column not in model.field_types:
             return
-        qualified = next((f"{t}.{column}" for t, fs in model.tables.items()
-                          if column in fs), column)
+        qualified = next((qualify_ident(t, column)
+                          for t, fs in model.tables.items()
+                          if column in fs), quote_ident(column))
         if qualified not in used:
             used.append(qualified)
 
@@ -1304,9 +1333,9 @@ def generate_sql(model):
                 qualified = None
                 for tname, fields in model.tables.items():
                     if el.column in fields:
-                        qualified = f"{tname}.{el.column}"
+                        qualified = qualify_ident(tname, el.column)
                         break
-                item = qualified or el.column
+                item = qualified or quote_ident(el.column)
                 if item not in used:
                     used.append(item)
             elif el.kind == "chart":
@@ -1322,7 +1351,7 @@ def generate_sql(model):
     for g in model.groups:
         for tname, fields in model.tables.items():
             if g.column in fields:
-                q = f"{tname}.{g.column}"
+                q = qualify_ident(tname, g.column)
                 if q not in used:
                     used.insert(0, q)
     if not used:
@@ -1339,21 +1368,26 @@ def generate_sql(model):
             for link in list(remaining_links):
                 (st, sc), (dt, dc) = link
                 if st in placed and dt not in placed and dt in table_names:
-                    joins.append(f"JOIN {dt} ON {st}.{sc} = {dt}.{dc}")
+                    joins.append(f"JOIN {qualify_ident(dt)} ON "
+                                 f"{qualify_ident(st, sc)} = "
+                                 f"{qualify_ident(dt, dc)}")
                     placed.append(dt)
                 elif dt in placed and st not in placed and st in table_names:
-                    joins.append(f"JOIN {st} ON {dt}.{dc} = {st}.{sc}")
+                    joins.append(f"JOIN {qualify_ident(st)} ON "
+                                 f"{qualify_ident(dt, dc)} = "
+                                 f"{qualify_ident(st, sc)}")
                     placed.append(st)
                 else:
                     continue
                 remaining_links.remove(link)
                 progress = True
-        leftovers = [t for t in table_names if t not in placed]
-        from_clause = placed[0] + ("\n" + "\n".join(joins) if joins else "")
+        leftovers = [qualify_ident(t) for t in table_names if t not in placed]
+        from_clause = (qualify_ident(placed[0])
+                       + ("\n" + "\n".join(joins) if joins else ""))
         if leftovers:
             from_clause = ", ".join([from_clause] + leftovers)
     else:
-        from_clause = ", ".join(table_names)
+        from_clause = ", ".join(qualify_ident(t) for t in table_names)
     sql = "SELECT\n  " + ",\n  ".join(used) + f"\nFROM {from_clause}"
 
     # PRD relational groups need pre-sorted data: order by the group columns
@@ -1361,8 +1395,8 @@ def generate_sql(model):
     def _qualify(column):
         for tname, fields in model.tables.items():
             if column in fields:
-                return f"{tname}.{column}"
-        return column
+                return qualify_ident(tname, column)
+        return quote_ident(column)
 
     order = [f"{_qualify(g.column)}{' DESC' if g.descending else ''}"
              for g in model.groups if g.column]

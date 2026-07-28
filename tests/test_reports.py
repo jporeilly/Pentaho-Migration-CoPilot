@@ -557,3 +557,60 @@ def test_chart_migrates_to_legacy_chart(tmp_path):
     assert "PieChartExpression" in layout
     assert "PieDataSetCollector" in layout
     assert "Gantt" in layout  # TODO placeholder text present
+
+
+class TestIdentifierQuoting:
+    """Crystal names columns "Last Name" and tables "dataroot/Customer_Query"
+    (an XML-backed report). Emitted bare, the generated SELECT is not
+    parseable SQL at all - three corpus reports produced a query the engine
+    could not read."""
+
+    def test_a_plain_identifier_is_left_alone(self):
+        from pentaho_migration.reports.rpt_parser import quote_ident
+        for name in ("CUSTOMER", "ORDER_ID", "_x", "a$b", "T1"):
+            assert quote_ident(name) == name
+
+    def test_spaces_and_punctuation_are_quoted(self):
+        from pentaho_migration.reports.rpt_parser import quote_ident
+        assert quote_ident("Last Name") == '"Last Name"'
+        assert quote_ident("dataroot/Customer_Query") == '"dataroot/Customer_Query"'
+        assert quote_ident("2ndTable") == '"2ndTable"'
+
+    def test_an_embedded_quote_is_doubled(self):
+        from pentaho_migration.reports.rpt_parser import quote_ident
+        assert quote_ident('we"ird') == '"we""ird"'
+
+    def test_each_part_of_a_dotted_name_is_quoted_separately(self):
+        """A quoted "a.b" names ONE column called 'a.b', not column b of
+        table a - quoting the whole string would silently change the query."""
+        from pentaho_migration.reports.rpt_parser import qualify_ident
+        assert qualify_ident("dataroot/T", "Last Name") == \
+            '"dataroot/T"."Last Name"'
+        assert qualify_ident("CUSTOMER", "COUNTRY") == "CUSTOMER.COUNTRY"
+
+    def test_the_generated_select_quotes_where_it_must(self, tmp_path):
+        import textwrap
+
+        from pentaho_migration.reports import load_report_model
+
+        dump = tmp_path / "q.xml"
+        dump.write_text(textwrap.dedent("""\
+            <Report Name="Q" FileName="q.rpt">
+              <Database><Tables>
+                <Table Name="dataroot/Cust" Alias="dataroot/Cust"><Fields>
+                  <Field Name="Last Name" ValueType="StringField"/>
+                </Fields></Table>
+              </Tables></Database>
+              <DataDefinition><RecordSelectionFormula/></DataDefinition>
+              <ReportDefinition><Areas>
+                <Area Kind="Detail"><Sections>
+                  <Section Name="D1" Height="240"><ReportObjects>
+                    <FieldObject Name="F1" Left="0" Top="0" Width="1440"
+                      Height="220" DataSource="{dataroot/Cust.Last Name}"/>
+                  </ReportObjects></Section>
+                </Sections></Area>
+              </Areas></ReportDefinition>
+            </Report>"""), encoding="utf-8")
+        sql = load_report_model(dump, None).sql
+        assert '"dataroot/Cust"' in sql
+        assert "FROM dataroot/Cust" not in sql
