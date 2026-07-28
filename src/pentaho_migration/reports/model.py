@@ -216,6 +216,7 @@ class ReportModel:
     summaries: list = field(default_factory=list)
     groups: list = field(default_factory=list)
     record_sorts: list = field(default_factory=list)  # (bare column, descending) detail ordering
+    saved_rows: object = None  # rpt_saved.SavedRows recovered from the .rpt binary, or None
     table_links: list = field(default_factory=list)   # ((table, col), (table, col)) visual links
     param_sql_columns: dict = field(default_factory=dict)  # param name -> folded SQL column expr
     window_columns: list = field(default_factory=list)  # (alias, sql func, column, group column) folded window aggregates

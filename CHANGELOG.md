@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.37.0] — 2026-07-28
+
+### Added
+
+- **The converted .prpt opens in Report Designer showing REAL DATA, with no
+  database anywhere.** A report saved with its data carries the cached rowset
+  inside the .rpt; it is now recovered and embedded as a PRD inline-table
+  dataset answering the report query, with the report SQL riding along as the
+  `source-sql` query — going live is picking a query, not rebuilding a
+  datasource. Applies to raw `.rpt` drops, to dump uploads whose original is
+  known (the Try button included), and to the CLI when the `.rpt` sits beside
+  the dump. Verified live: the demo statement renders 83 pages of real
+  customers through the engine with no datasource configured. Rows cap at
+  5,000 (a demo dataset, not a warehouse) with a note.
+- The stored cell encodings were calibrated against independently known
+  values (the SAP viewer render, AdventureWorks/Xtreme data, a MilkoScan
+  report whose milk-fat percentages are physical reality): Number/Currency
+  doubles hold the value **x100**; Date is a midnight-based Julian Day
+  Number; DateTime packs the JDN in the low 32 bits and seconds-since-
+  midnight in the high; the engine's date-family bean converters parse
+  exactly `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. All pinned by tests.
+- The "View original .rpt" button now works for drag-and-dropped binaries
+  too — uploads are kept in `output/uploaded-rpt/` inside the viewer's
+  allowed roots.
+
+### Fixed
+
+- **rpt-rs fork: the fixed-width saved-data reader typed every cell as i32**,
+  so a memo-less unpacked report (AdventureWorks: one DateTime + one Currency
+  column) decoded to garbage integers — the low half of every double. The
+  reader now decodes each inline field per its declared type, sharing the
+  packed reader's cell codecs. Column types also fall back to the bare field
+  name when the saved catalog qualifies fields with a table the report does
+  not use (`Customer.Country` vs a `Customer_Query` table) — that was every
+  column of World Sales arriving as `Int32s`.
+
 ## [1.36.1] — 2026-07-27
 
 ### Added

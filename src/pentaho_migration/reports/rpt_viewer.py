@@ -26,10 +26,31 @@ VIEWER = REPO_ROOT / "tools" / "RptViewer" / "RptViewer.exe"
 BUILD_SCRIPT = "tools/RptViewer/build.ps1"
 
 
+# Uploaded .rpt binaries are kept here (name-sanitized) so the "View original"
+# button works for drag-and-dropped files too, not just the samples tree.
+UPLOAD_CACHE = REPO_ROOT / "output" / "uploaded-rpt"
+
+
+def cache_uploaded_rpt(rpt_path: Path) -> Path | None:
+    """Keep a copy of an uploaded .rpt inside the viewer's allowed roots.
+    Best-effort: a failure only means the button stays absent."""
+    import re
+    import shutil
+
+    try:
+        stem = re.sub(r"[^\w.\- ]+", "_", Path(rpt_path).stem).strip() or "upload"
+        UPLOAD_CACHE.mkdir(parents=True, exist_ok=True)
+        target = UPLOAD_CACHE / f"{stem}.rpt"
+        shutil.copy2(rpt_path, target)
+        return target
+    except OSError:
+        return None
+
+
 def _allowed_roots() -> list[Path]:
     """Folders a .rpt may be opened from. ORIGINAL_RPT_DIRS (os.pathsep-
     separated) adds the customer's own extraction folder."""
-    roots = [REPO_ROOT / "samples"]
+    roots = [REPO_ROOT / "samples", UPLOAD_CACHE]
     for extra in os.environ.get("ORIGINAL_RPT_DIRS", "").split(os.pathsep):
         if extra.strip():
             roots.append(Path(extra.strip()))

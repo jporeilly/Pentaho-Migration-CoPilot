@@ -441,13 +441,13 @@ def build_datadefinition_xml(model, parameter_mappings=None):
 
 # ------------------------------------------------------------- datasources
 
-def build_sql_ds_xml(model):
+def build_sql_ds_xml(model, query_name="default"):
     return (
         f'<data:sql-datasource xmlns:data="{NS_SQL}">'
         "<data:config/>"
         f"<data:jndi><data:path>{escape(model.jndi)}</data:path></data:jndi>"
         "<data:query-definitions>"
-        '<data:query name="default"><data:static-query>'
+        f'<data:query name="{escape(query_name)}"><data:static-query>'
         f"{escape(model.sql)}"
         "</data:static-query></data:query>"
         + "".join(
@@ -470,8 +470,13 @@ def _lov_sql(model, column):
             f"ORDER BY 1")
 
 
-def build_compound_ds_xml():
+def build_compound_ds_xml(with_inline=False):
+    # The inline table (recovered saved data) answers the report query; the
+    # SQL factory rides along under "source-sql" so switching to live data in
+    # PRD is picking a query, not rebuilding a datasource.
+    inline = '<data:data-factory href="inline-ds.xml"/>' if with_inline else ""
     return (f'<data:compound-datasource xmlns:data="{NS_COMPOUND}">'
+            f'{inline}'
             '<data:data-factory href="sql-ds.xml"/>'
             "</data:compound-datasource>")
 
@@ -577,7 +582,11 @@ def _collect_subreports(model):
     return subs
 
 
-def write_prpt(model, out_path):
+def write_prpt(model, out_path, saved_rows=None):
+    """saved_rows: a rpt_saved.SavedRows recovered from the .rpt binary. When
+    given, the bundle's report query is an INLINE TABLE of those rows - the
+    .prpt opens in PRD showing real data with no database - and the report
+    SQL ships beside it as the "source-sql" query for going live."""
     images = _collect_images(model)  # assigns resource paths before layout is built
     subreports = _collect_subreports(model)  # assigns hrefs before layout is built
     has_crosstab = any(el.kind == "crosstab" for _, el, _ in subreports)
@@ -590,9 +599,14 @@ def write_prpt(model, out_path):
         "settings.xml": SETTINGS_XML,
         "meta.xml": build_meta_xml(
             model, spec_version=(5, 0, 0) if has_crosstab else None),
-        "datasources/sql-ds.xml": build_sql_ds_xml(model),
-        "datasources/compound-ds.xml": build_compound_ds_xml(),
+        "datasources/sql-ds.xml": build_sql_ds_xml(
+            model, query_name="source-sql" if saved_rows else "default"),
+        "datasources/compound-ds.xml": build_compound_ds_xml(
+            with_inline=saved_rows is not None),
     }
+    if saved_rows is not None:
+        from pentaho_migration.reports.rpt_saved import build_inline_ds_xml
+        docs["datasources/inline-ds.xml"] = build_inline_ds_xml(saved_rows)
     media = {name: "text/xml" for name in docs}
     for dirname, el, child in subreports:
         layout = (build_crosstab_layout_xml(child, el) if el.kind == "crosstab"

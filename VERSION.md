@@ -1,6 +1,6 @@
 # Version
 
-**1.36.1** — 2026-07-27
+**1.37.0** — 2026-07-28
 
 **Conditional suppression now survives conversion** — the corpus's largest
 fidelity gap (93 dropped conditions) is down to 39, all genuinely manual.
@@ -8,7 +8,12 @@ Conditions on merged sections ride their elements; aggregates in conditions
 become synthesized report functions. The demo report converts with zero
 manual items.
 
-**The Crystal demo now runs end to end.** "Try Crystal Reports" loads a real
+**The converted .prpt now opens in Report Designer showing real data with
+no database** — the saved rows inside the .rpt are recovered, typed and
+embedded as the report's inline dataset (SQL rides along as `source-sql`).
+That was the last gap in the end-to-end story.
+
+**The Crystal demo runs end to end.** "Try Crystal Reports" loads a real
 harvested report that ships its own `.rpt` and its own saved rows, so the
 original opens in the Crystal viewer, converts, and lands in Report Designer
 without a database anywhere in the chain. It is picked for converting clean -

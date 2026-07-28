@@ -43,6 +43,10 @@ _RULES = (
     (APPLIED, re.compile(r"\bcomputed as a\b|\brewritten as a\b|\bemitted as a "
                          r"PRD\b|\bgenerated in the bundle\b", re.I)),
     (INFO, re.compile(r"\bimage carved from the \.rpt", re.I)),
+    # "53 saved data row(s) recovered from the .rpt and embedded as the
+    # report's dataset" / the row-cap note - the good news, not a work item.
+    (INFO, re.compile(r"\brecovered from the \.rpt and embedded\b", re.I)),
+    (INFO, re.compile(r"\bare embedded \(a demo dataset\b", re.I)),
     (INFO, re.compile(r"\bchart migrated as a PRD legacy chart", re.I)),
     (MANUAL, re.compile(r"\bnot carried\b|\brebuild by hand\b|\bby hand\b"
                         r"|\bhand-add\b|\bno PRD\b|\bunresolved\b", re.I)),

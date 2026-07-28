@@ -353,6 +353,22 @@ def report(
     )
 
     model = load_report_model(dump, jndi or None)
+
+    # When the .rpt sits beside the dump (the corpus/demo pair convention),
+    # recover its saved rows so the .prpt opens in PRD showing real data.
+    binary = dump.with_suffix(".rpt")
+    if binary.is_file():
+        from pentaho_migration.reports.rpt_saved import load_saved_rows
+        model.saved_rows = load_saved_rows(binary)
+        if model.saved_rows is not None:
+            typer.echo(f"  saved data: {len(model.saved_rows.rows):,} row(s) "
+                       "recovered from the .rpt - embedded as the report dataset")
+            model.issues.append(
+                f"{len(model.saved_rows.rows):,} saved data row(s) recovered "
+                "from the .rpt and embedded as the report's dataset - PRD "
+                "shows them with no database; switch to the 'source-sql' "
+                "query to go live against the real datasource")
+            model.issues.extend(model.saved_rows.notes)
     if translate:
         from pentaho_migration.llm import TranslationError
         from pentaho_migration.reports.llm_assist import translate_manual_formulas
@@ -365,7 +381,7 @@ def report(
     out_dir.mkdir(parents=True, exist_ok=True)
     safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
     out_path = out_dir / f"{safe}.prpt"
-    write_prpt(model, out_path)
+    write_prpt(model, out_path, saved_rows=model.saved_rows)
     report_path = out_path.with_suffix(".conversion.md")
     report_path.write_text(
         build_conversion_report(model, dump, out_path), encoding="utf-8"

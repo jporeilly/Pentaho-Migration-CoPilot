@@ -229,8 +229,15 @@ def _check_upload_size(data: bytes) -> None:
 def _load_rpt_upload(data: bytes, filename: str, jndi: str):
     """A customer's file is the .rpt itself - run the same extraction chain
     the corpus scripts use (RptToXml + credential scrub + cross-tab
-    recovery), then parse the dump exactly as if it had been uploaded."""
+    recovery), then parse the dump exactly as if it had been uploaded.
+
+    Two extras only the binary makes possible: the SAVED ROWS are recovered
+    and embedded so the converted .prpt opens in PRD showing real data with
+    no database, and the .rpt is kept in the viewer cache so the "View
+    original" button works for uploads too."""
     from pentaho_migration.reports.rpt_extract import extract_rpt
+    from pentaho_migration.reports.rpt_saved import load_saved_rows
+    from pentaho_migration.reports.rpt_viewer import cache_uploaded_rpt
 
     with tempfile.TemporaryDirectory() as workdir:
         rpt = Path(workdir) / (Path(filename).stem + ".rpt")
@@ -240,25 +247,53 @@ def _load_rpt_upload(data: bytes, filename: str, jndi: str):
         except RuntimeError as exc:
             raise HTTPException(status_code=422, detail=str(exc))
         try:
-            return load_report_model(dump, jndi or None)
+            model = load_report_model(dump, jndi or None)
         except Exception as exc:
             raise HTTPException(
                 status_code=422,
                 detail=f"extracted, but could not parse the dump: {exc}")
+        model.saved_rows = load_saved_rows(rpt)
+        if model.saved_rows is not None:
+            model.issues.append(
+                f"{len(model.saved_rows.rows):,} saved data row(s) recovered "
+                "from the .rpt and embedded as the report's dataset - PRD "
+                "shows them with no database; switch to the 'source-sql' "
+                "query to go live against the real datasource")
+            model.issues.extend(model.saved_rows.notes)
+        cache_uploaded_rpt(rpt)
+        return model
 
 
-def _load_dump_upload(data: bytes, jndi: str):
-    """An RptToXml dump uploaded directly."""
+def _load_dump_upload(data: bytes, filename: str, jndi: str):
+    """An RptToXml dump uploaded directly. When the ORIGINAL .rpt is known
+    (same stem in the samples tree or the upload cache - the corpus/demo pair
+    convention), its saved rows are recovered and embedded, so the Try-button
+    demo ships real data exactly like a raw .rpt drop does."""
     with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as tf:
         tf.write(data)
         tmp = Path(tf.name)
     try:
-        return load_report_model(tmp, jndi or None)
+        model = load_report_model(tmp, jndi or None)
     except Exception as exc:
         raise HTTPException(status_code=422,
                             detail=f"could not parse RptToXml file: {exc}")
     finally:
         tmp.unlink(missing_ok=True)
+
+    from pentaho_migration.reports.rpt_saved import load_saved_rows
+    from pentaho_migration.reports.rpt_viewer import find_original
+
+    original = find_original(filename)
+    if original is not None:
+        model.saved_rows = load_saved_rows(original)
+        if model.saved_rows is not None:
+            model.issues.append(
+                f"{len(model.saved_rows.rows):,} saved data row(s) recovered "
+                "from the .rpt and embedded as the report's dataset - PRD "
+                "shows them with no database; switch to the 'source-sql' "
+                "query to go live against the real datasource")
+            model.issues.extend(model.saved_rows.notes)
+    return model
 
 
 def _load_upload(data: bytes, filename: str, jndi: str):
@@ -269,7 +304,7 @@ def _load_upload(data: bytes, filename: str, jndi: str):
     _check_upload_size(data)
     if looks_like_rpt(data[:8]):
         return _load_rpt_upload(data, filename, jndi)
-    return _load_dump_upload(data, jndi)
+    return _load_dump_upload(data, filename, jndi)
 
 
 @router.post("/preview", dependencies=[Depends(require_api_key)])
@@ -292,7 +327,7 @@ async def preview(dump: UploadFile, jndi: str = ""):
     safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
     with tempfile.TemporaryDirectory() as td:
         prpt = Path(td) / f"{safe}.prpt"
-        write_prpt(model, prpt)
+        write_prpt(model, prpt, saved_rows=model.saved_rows)
         try:
             pdf = render_prpt_pdf(prpt)
         except RuntimeError as exc:
@@ -319,7 +354,7 @@ def _build_response(model, source_name: str) -> ReportConversionResponse:
     safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
     with tempfile.TemporaryDirectory() as td:
         out = Path(td) / f"{safe}.prpt"
-        write_prpt(model, out)
+        write_prpt(model, out, saved_rows=model.saved_rows)
         prpt_bytes = out.read_bytes()
     markdown = build_conversion_report(model, source_name, f"{safe}.prpt")
     return ReportConversionResponse(
@@ -508,7 +543,7 @@ async def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dic
                        else numbers_from_pdf(ref_data))
         with tempfile.TemporaryDirectory() as td:
             prpt = Path(td) / "parity.prpt"
-            write_prpt(model, prpt)
+            write_prpt(model, prpt, saved_rows=model.saved_rows)
             rendered = numbers_from_pdf(render_prpt_pdf_live(prpt))
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))

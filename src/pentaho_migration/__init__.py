@@ -1,3 +1,3 @@
 """Migration Copilot: AI-assisted migration of legacy ETL into Pentaho Data Integration."""
 
-__version__ = "1.36.1"
+__version__ = "1.37.0"
