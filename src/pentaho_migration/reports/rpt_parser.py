@@ -780,6 +780,8 @@ def _parse_areas(root, model):
                 fmt, "EnableUnderlaySection", default="false").lower() in ("true", "1")
             suppress_blank = fmt is not None and _attr(
                 fmt, "EnableSuppressIfBlank", default="false").lower() in ("true", "1")
+            keep_together = fmt is not None and _attr(
+                fmt, "EnableKeepTogether", default="false").lower() in ("true", "1")
             section = Section(
                 area_kind=kind,
                 name=_attr(sec, "Name", default=""),
@@ -794,6 +796,7 @@ def _parse_areas(root, model):
                 new_page_after=new_page_after,
                 underlay=underlay,
                 suppress_if_blank=suppress_blank,
+                keep_together=keep_together,
             )
             if fmt is not None:
                 section.condition_formulas = _condition_formula_pairs(fmt)

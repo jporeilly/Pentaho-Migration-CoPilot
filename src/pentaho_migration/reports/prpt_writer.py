@@ -228,9 +228,15 @@ def _section_band(section, tp="", sp="style:", behind_elements=None):
     content_bottom = max((el.y + el.height for el in section.elements
                           if getattr(el, "visible", True)), default=0.0)
     height = max(section.height, content_bottom)
+    # Crystal's "Keep Together": the band moves whole to the next page rather
+    # than splitting across one. PRD spells it `avoid-page-break`. Without it
+    # a statement broke halfway down its invoice table where the original
+    # broke after the letter - same page count, wrong place.
+    keep = ('<{0}common-styles avoid-page-break="true"/>'.format(sp)
+            if section.keep_together else "")
     styles = [f'<{sp}band-styles layout="canvas"'
               + (' pagebreak-after="true"' if section.new_page_after else "")
-              + "/>",
+              + "/>", keep,
               f'<{sp}spatial-styles x="0" y="0" '
               f'min-width="100%" min-height="{_num(height)}"/>']
     if section.bg_color:

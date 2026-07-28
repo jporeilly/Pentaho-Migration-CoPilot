@@ -243,3 +243,33 @@ class TestFurnitureIsFoundOnPopulatedPages:
                  "Beta\nsomething else\nlegal footer here\nshared two"]
         furniture = rc._boilerplate(pages)
         assert not any("unique to this page" in f for f in furniture)
+
+
+class TestGroupPageMatching:
+    """Two traps that both invented findings on the demo."""
+
+    def test_a_name_inside_a_longer_name_is_not_claimed(self, monkeypatch):
+        """"Wheels Inc." matches inside "Sporting Wheels Inc.", so one
+        statement looked like two spread fourteen pages apart - and the
+        break comparison then reported a difference that did not exist."""
+        pages = ["To: Sporting Wheels Inc.\nTotal 10.00",
+                 "unrelated filler page",
+                 "To: Wheels Inc.\nTotal 20.00"]
+        values = ["Sporting Wheels Inc.", "Wheels Inc."]
+        assert rc._pages_of(pages, "Wheels Inc.", values) == [2]
+        assert rc._pages_of(pages, "Sporting Wheels Inc.", values) == [0]
+
+    def test_only_consecutive_pages_count_as_one_span(self):
+        """A statement occupies consecutive pages. A gap means the string
+        turned up somewhere else, not that the statement was split."""
+        pages = ["Acme here", "someone else", "Acme here again"]
+        assert rc._pages_of(pages, "Acme", ["Acme"]) == [0]
+
+    def test_a_real_two_page_statement_is_kept_whole(self):
+        pages = ["Acme page one", "Acme page two", "Beta page one"]
+        assert rc._pages_of(pages, "Acme", ["Acme", "Beta"]) == [0, 1]
+
+    def test_the_span_count_uses_the_same_rule(self, monkeypatch):
+        pages = ["To: Sporting Wheels Inc.", "filler", "To: Wheels Inc."]
+        spans = rc._group_spans(pages, ["Sporting Wheels Inc.", "Wheels Inc."])
+        assert spans == {"Sporting Wheels Inc.": 1, "Wheels Inc.": 1}

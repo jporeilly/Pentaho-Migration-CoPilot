@@ -147,6 +147,11 @@ class Section:
     new_page_after: bool = False  # Crystal EnableNewPageAfter -> PRD pagebreak-after
     underlay: bool = False    # Crystal EnableUnderlaySection: paints BEHIND following sections
     suppress_if_blank: bool = False  # Crystal EnableSuppressIfBlank: collapse when nothing prints
+    # Crystal EnableKeepTogether: the band moves to the next page
+    # rather than splitting across one. Without it a statement broke
+    # halfway down its invoice table where the original broke after
+    # the letter.
+    keep_together: bool = False
 
 
 @dataclass

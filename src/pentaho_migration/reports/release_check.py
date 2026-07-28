@@ -225,12 +225,37 @@ def _sparse_pages(pages: list) -> list:
     return sparse
 
 
+def _pages_of(pages: list, value: str, values: list) -> list:
+    """Indices of the pages this group value actually occupies.
+
+    Two traps, both of which produced phantom findings on the demo:
+
+    A plain substring test claims another customer's pages - "Wheels Inc."
+    matches inside "Sporting Wheels Inc.", so one statement looked like two
+    spread 14 pages apart. A page is only this value's if no LONGER value
+    containing it is also on the page.
+
+    And the pages a statement occupies are CONSECUTIVE. Anything else is a
+    coincidence of names or a repeated string, so only the longest run
+    counts - a gap is not a page break."""
+    longer = [v for v in values if v != value and value in v]
+    hits = [i for i, page in enumerate(pages)
+            if value in page and not any(v in page for v in longer)]
+    best: list = []
+    run: list = []
+    for i in hits:
+        if run and i == run[-1] + 1:
+            run.append(i)
+        else:
+            run = [i]
+        if len(run) > len(best):
+            best = list(run)
+    return best
+
+
 def _group_spans(pages: list, values: list) -> dict:
-    """value -> number of pages it appears on."""
-    spans: dict = {}
-    for value in values:
-        spans[value] = sum(1 for p in pages if value in p)
-    return spans
+    """value -> number of consecutive pages it occupies."""
+    return {value: len(_pages_of(pages, value, values)) for value in values}
 
 
 def _group_breaks(pages: list, values: list) -> dict:
@@ -248,7 +273,7 @@ def _group_breaks(pages: list, values: list) -> dict:
     furniture = _boilerplate(pages)
     breaks: dict = {}
     for value in values:
-        on = [i for i, page in enumerate(pages) if value in page]
+        on = _pages_of(pages, value, values)
         marks = []
         for i in on[:-1]:                      # the last page has no break
             content = [line for line in map(_normalize_line, pages[i].splitlines())
