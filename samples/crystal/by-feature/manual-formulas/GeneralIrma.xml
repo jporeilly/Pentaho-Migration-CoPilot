@@ -1,0 +1,327 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="samples/crystal/corpus/GeneralIrma.rpt" HasSavedData="False">
+  <Embedinfo>
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+  </Embedinfo>
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="False" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="16119" PageContentWidth="11187" PaperOrientation="Portrait" PaperSize="PaperA4" PaperSource="FormSource" PrinterDuplex="Vertical" PrinterName="">
+    <PageMargins bottomMargin="360" leftMargin="360" rightMargin="360" topMargin="360" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks />
+    <Tables>
+      <Table Alias="GetGpdValues" ClassName="CrystalReports.CommandTable" Name="Command">
+        <ConnectionInfo Database_DLL="crdb_ado.dll" QE_DatabaseName="MilkoScanFT3" QE_DatabaseType="OLE DB (ADO)" QE_LogonProperties="" QE_ServerDescription="irma-w10\sqlexpress" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Command>Select 1</Command>
+        <Fields>
+          <Field Description="" FormulaForm="{GetGpdValues.Expr1000}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="GetGpdValues.Expr1000" Name="Expr1000" ShortName="Expr1000" Type="crFieldValueTypeInt32sField" UseCount="0" />
+        </Fields>
+      </Table>
+      <Table Alias="GetHeaderData" ClassName="CrystalReports.CommandTable" Name="Command">
+        <ConnectionInfo Database_DLL="crdb_ado.dll" QE_DatabaseName="MilkoScanFT3" QE_DatabaseType="OLE DB (ADO)" QE_LogonProperties="" QE_ServerDescription="irma-w10\sqlexpress" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Command>Select		ins.Name as InstrumentName
+		,	ig.Name as InstrumentGroupName
+		,	net.Name as NetworkName
+		,	ins.SerialNumber 
+		,	ins.InstrumentLogicalID
+
+From		tblMfCdInstrument ins
+Inner Join	tblMfCdInstrumentGroup ig
+	on		ig.InstrumentGroupLogicalID = ins.InstrumentGroupLogicalID
+Inner Join	tblMfCdNetwork net
+	on		net.NetworkID = ig.NetworkID
+Where		ins.Obsolete = 0
+	and		ig.Obsolete = 0</Command>
+        <Fields>
+          <Field Description="" FormulaForm="{GetHeaderData.InstrumentName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="GetHeaderData.InstrumentName" Name="InstrumentName" ShortName="InstrumentName" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{GetHeaderData.InstrumentGroupName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="GetHeaderData.InstrumentGroupName" Name="InstrumentGroupName" ShortName="InstrumentGroupName" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{GetHeaderData.NetworkName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="GetHeaderData.NetworkName" Name="NetworkName" ShortName="NetworkName" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{GetHeaderData.SerialNumber}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="GetHeaderData.SerialNumber" Name="SerialNumber" ShortName="SerialNumber" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{GetHeaderData.InstrumentLogicalID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="GetHeaderData.InstrumentLogicalID" Name="InstrumentLogicalID" ShortName="InstrumentLogicalID" Type="crFieldValueTypeInt32sField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula />
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions>
+      <FormulaFieldDefinition FormulaName="{@LocalMeasureTime}" Kind="FormulaField" Name="LocalMeasureTime" NumberOfBytes="8" ValueType="DateTimeField" Syntax="crFormulaSyntaxCrystal">//ShiftDateTime({GetGpdValues.AnalysisTime}, "UTC,0", {?TimeZone})</FormulaFieldDefinition>
+    </FormulaFieldDefinitions>
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions />
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="2176" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <TextObject Name="Text11" Kind="TextObject" Top="195" Left="615" Width="4860" Height="420" MaxNumberOfLines="0">
+                <Text>Report title
+</Text>
+                <Color Name="ff000f37" A="255" R="0" G="15" B="55" />
+                <Font Bold="True" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="22" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="14" SizeinPoints="14" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text6" Kind="TextObject" Top="1780" Left="6616" Width="1741" Height="270" MaxNumberOfLines="0">
+                <Text>Serialnumber:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text8" Kind="TextObject" Top="1400" Left="6616" Width="1741" Height="315" MaxNumberOfLines="0">
+                <Text>Instrument group:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text7" Kind="TextObject" Top="1025" Left="6616" Width="1741" Height="300" MaxNumberOfLines="0">
+                <Text>Network:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text9" Kind="TextObject" Top="1690" Left="1035" Width="1199" Height="266" MaxNumberOfLines="0">
+                <Text>Instrument: </Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldObject Name="InstrumentName1" Kind="FieldObject" Top="1690" Left="2400" Width="2554" Height="266" DataSource="{GetHeaderData.InstrumentName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="InstrumentGroupName1" Kind="FieldObject" Top="1400" Left="8504" Width="2551" Height="315" DataSource="{GetHeaderData.InstrumentGroupName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="SerialNumber1" Kind="FieldObject" Top="1775" Left="8504" Width="2551" Height="270" DataSource="{GetHeaderData.SerialNumber}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="NetworkName1" Kind="FieldObject" Top="1025" Left="8504" Width="2551" Height="300" DataSource="{GetHeaderData.NetworkName}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line2" Kind="LineObject" Top="120" Left="495" Width="0" Height="431" Bottom="551" EnableExtendToBottomOfSection="False" EndSectionName="ReportHeaderSection1" LineStyle="SingleLine" LineThickness="70" Right="495">
+                <LineColor Name="ffff701f" A="255" R="255" G="112" B="31" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="SingleLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ffff701f" A="255" R="255" G="112" B="31" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <PictureObject Name="Picture1" Kind="PictureObject" Top="370" Left="9410" Width="1481" Height="244">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <ImageData Carved="true">iVBORw0KGgoAAAANSUhEUgAAANUAAAAnCAIAAAAXeJrGAAAJT0lEQVR4nO1cT0wiWRqv3uyJDX8mgVN1UjWHTcALTCR6A0zoZLwo6lw2q0110gfHRJvRQ+sYI67Tox66FyWhPXQyRY/HBoq+2IkkXXCDYLq8UN6WSpoTJFNimvOmeL21BBTqvarCcrO/g9FY7/Go93vf+77f+773wP/3f2B3BGrWT836VHYiNlscX+V4QbxuscUKhmEcL1xdt/o0IXA7iTswDAuMj9jMJo+LCIyPYHcBEX7wXV/B4yJslr9IP80mnb4FW6xUa41qrc7xVbHZEputi0thYCtr+8ViGEbiDvKhQ/qJ2z0u0mYxdT72APvr37A7wvbyXHR5DqGh2GwxuTJbrLClilBraDIYt5MIjLsC4yOhoBfTE3oMXobbSYQeedHeaifYYqU9SF4J1aBASCwkmMQa+PPP2L0CkyvT6Xw2d655zxeXwsWlcJj8YDWbQkEvNevT3JywxUosearH4GVcXAqSgUHlX7VWjx6lmFxZiQ1Gg1BrdK66e8O/GH0aS55qbjB6cXXdSmYKyUyBwO3R5R/UewiAedT68RAGjwzAvGSmgA0X94B/TK4cefF2+JMn1BpP1o8l3m8uINtCsdmi1l/ravPUI0af/vTr79hdwND8M8LkXVwKEwu/PAt/H9t8DNtWbLYC87uau1Dagnp+PHyzJ+NPmFHB8UJgftcgluMw+cEztSE24bwi45MvGr+DPfce2D9APjVesBz/dyJf4pE7vLiUhsSebHUpCLchGk+pIZ9/zAV+sVlMHhcpNr9w/H97UyjT9Ee1Vt+Jp5Cbu52E/CqAfwIkJLlzJS4THP/cTiK2uYBpBPKhpGD1Qmy2Qksv0d6v20lQs77QIy+Qx3rB8QKIQxEcSkBB7v2ekofpdB62fwK3R8KTgfGR3pVzI6q1evVzneOFtjgnwK6u6BE0+axmk/R6g96bHeKeuBsInEA+ZIuV3mUDp//5x1zsyRamMwLzuwiGCqwN5YECnS5E4+8QWKjEF+R44bvpDahuwzM++mAR00IrVhiz20afQi1yArezJ1u3LWyF4HiB4wV5hIbz/+h0AYF84Rkf934PKkqlZn1cdn86OAr7WYfJD50bzY3o3CsVIrqiVjQG+6BC8onNFuwOE13+QSX5wIFN5wgNx79o/B1sE2TLYbOYmMQaAgWjg9ymaq0O22f1M3QTNeD4KmwThC81EMbiH50uwG6I/jGXym2L3v+RwO1QTfIlvr8JRLAToaVXdHp4oSiCorkTT0XjKVgR4D7xL0afQjeBl+W6YLOYEDrpzxUSktBY+9zlyfoxObESefF24P6uCaxmRYF8J3biKXJihXp+zOTKmhDRQPGH2Gx9430K1WQ6OCqfZKsEObECZXqtZpN4/kZD7/62lAiPiyRxux65LeqVZ5BM4HGRgTFpnAqVKXT9RWx+TRNCAEgT6vMAW4LumZr1YxohEp6EOoO6um5xvNDnG0WoSTXqGvaflAj5T7eTAKli7SlXJND0BzXrU8k/kEyQzZ3vdNAxMCaNUOGCGV7+1UDbGY2nYCfsj/IbhDV3I9hiZWLhF6gmmcRq/2Qtz9SGTucf1naSDsgWU/MGIi/eHiY/YPpgOjgaGBvpo8Uay/8Tm1+gnidwu1bkQ/PHB4os7MmW26mBobotSefJ+vE33qehpZdMrowhIbb5ODyjQYLPjcjmzn/69fdvJ555pjbodOFGf9FA/IPVzNRrUXrDZjGxJ1sI+g4UsrnzmaVX5MQKGgvpg8Vt1fmq/XFxKYDQqjd8NhD//icBJMZMYhVW4oGFUGvMLL0KzO8ihKXR5blP2T35xFknXF23duIpz/R6p6H5P/+GgVDQW/14lEms6m0L8yW+a4IVwuMi2JOtT9m98IwPQZdRDqHW+G5a2o4Nxz/Y/VQPOV5XhIJeJrH2R/nNb/uL08FRnaZZqDVCSy/RxDmPi6APFsXzN5nEanjGp5/NfrJ+DIQUA+Vf3ZYOcxuEWkNstrQKQRBsBpoDarNIKSTgDJRrJ+OAI3kNI2Wh1oi8eKvmWCgU9ILQvp23woMiPTXZa72g1o+57D4c/wjcjiy5DZwtBE2LLVW0KldD0DXVi3CeDiUPpCqxJWmy2SKvUrtOZgrRlTn1IRqJO6hZB4Z9jZE1XDBCrcHkynD8I3GH+to+DaeTOStrxT/Ys9cb81vVwGaRCnhlGahaqzNnZbZUQc4AZ87KEWpSwxH2LhhQSIpcL0en88by/2DVsmSmoIkXyBYrsKtZ7zJhEndEqEkmsfavj4doEh2CR4HgSNAHi9WPR9vLcwjuLMcLBuIfOBGCbvL8WIsqJ+hOQo/05Z8MEnfQB4u/7UM7c0OLz2wWU3R5jj3ZgqXg1XXLaPzzw36HfIkfmI3XHwjFnQRu19v+dYGa9el0lKIVuhJLFcJY/AMrCS0vbZg5IDS8NRo+PJq6p3qAwO3G4h9IG0FY6DvxVGB+F2rHkbJXpjYQyCcdqys7LGZy5Rh9qokfRqcLsB6qx0UOfIbjhWg8pUm6IccLsDFcYGzEQPqfDOb1qmdqAzakypf4byeehWek4rf+m6OaS2TcToLe/1HhwxwvyBk9filDjiBxh/SzfR8UpgxMrsyclWHXCUiQGfiY2PyyE0+B7Cm3kyAfSldUwd6mxfECWGmwUxZ65DUi/0jcwZ5sodX/gqtbgDgC7iaT/wVKaNWIqFaziXm9iqZ450t810dbOxSc3skGNgl5tBFqEnacIN2wa1nKh8JdLxNUkLQ1S8RKZOmqrqAh+ScfRyKXoF9dt3rnWyXcToJ5vaph0s1Ve5Dgd82HGglro/zpNEKr2QSOZwzn/8nwuAju/Z5Bgr7p4Kj60tfhwO2Ulq6GmZF6ILb5GNh+4/IPbMTc+z00bVMrWM2mTGKVSawZfEY7k8yNPFQCt3/K7hm3/rwX0eW56scj/dJ0b4PVbNpuf/SQpT40WM2mf/68YHDyPQt/z2X3O4Uhg/p/XbBZJHchtvk4ljyl03m97wKU/CdqUmVpxdDgNvxowa0xEWqy14ExUP2lcoCAnzkra1vd4x9zSXlHfetloMAWK3S6oG1ulQz/2NfbqtXozNVaHSiU2oYXyq/UfrB99A4yG2fY+2B/tC/y5quf6+AOKOXxMrhCXtbk9L4CH+0WeawNWakJjI+Ai+T1GK18j5Z81xsUKYFSI79PheXA/wZvb/JamJ60vQAAAABJRU5ErkJggg==</ImageData></PictureObject>
+              <BoxObject Name="Box1" Kind="BoxObject" Top="39" Left="20" Width="11033" Height="4638" Bottom="513" EnableExtendToBottomOfSection="False" EndSectionName="PageFooterSection1" LineStyle="SingleLine" LineThickness="30" Right="11053">
+                <LineColor Name="ff000f37" A="255" R="0" G="15" B="55" />
+                <Border BottomLineStyle="SingleLine" HasDropShadow="False" LeftLineStyle="SingleLine" RightLineStyle="SingleLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ff000f37" A="255" R="0" G="15" B="55" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </BoxObject>
+              <LineObject Name="Line1" Kind="LineObject" Top="2133" Left="180" Width="10734" Height="0" Bottom="2133" EnableExtendToBottomOfSection="False" EndSectionName="ReportHeaderSection1" LineStyle="SingleLine" LineThickness="20" Right="10914">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="407" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="797" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <TextObject Name="Text12" Kind="TextObject" Top="118" Left="7303" Width="3578" Height="241" MaxNumberOfLines="0">
+                <Text>ANALYTICS BEYOND MEASURE   </Text>
+                <Color Name="ffff701f" A="255" R="255" G="112" B="31" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldObject Name="PageNofM1" Kind="FieldObject" Top="144" Left="4108" Width="2508" Height="228" DataSource="PageNofM">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="MosaicRep" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

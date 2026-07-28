@@ -5,7 +5,7 @@ report comes out, and **at no point is a database configured**. Every step
 below was run and verified before this script was written.
 
 The demo report is a real harvested account statement
-(`samples/crystal/demo/souvikduttachoudhury_Statement_of_Account.*`):
+(`samples/crystal/demo/Statement_of_Account.*`):
 letterhead, watermark, a scanned signature, two nested groups, a running
 total, 74 pages of data saved inside the `.rpt`.
 
@@ -85,8 +85,8 @@ letterhead, same watermark and signature, same $43.50.
 
 | They ask for... | Do this |
 | --- | --- |
-| "Something recent, not a 2002 report" | Same flow with `demo/ljokhan_AdventureWorks-TotalSalesByYear` — saved May 2026, AdventureWorks, converts with zero manual work. |
-| "Show me a hard one" | `demo/workcontrolgit_WorldSalesReport` — pie chart, three nested groups, a drill-down design, and Crystal's Top-5-plus-Others group selection, which PRD has no equivalent for. Comes back **⚠ REVIEW** — 6 actions, 2.27h, of which 2 items block release, each naming its fix. The honesty demo. |
+| "Something recent, not a 2002 report" | Same flow with `demo/AdventureWorks-TotalSalesByYear` — saved May 2026, AdventureWorks, converts with zero manual work. |
+| "Show me a hard one" | `demo/WorldSalesReport` — pie chart, three nested groups, a drill-down design, and Crystal's Top-5-plus-Others group selection, which PRD has no equivalent for. Comes back **⚠ REVIEW** — 6 actions, 2.27h, of which 2 items block release, each naming its fix. The honesty demo. |
 | "What about our 3,000 reports?" | **📁 Project** page: 150-report corpus with triage verdicts (filter to ⚠ REVIEW, show reasons), then **📊 Consultant report** — the portfolio document. It leads with the engagement plan (the same actions rolled up by *kind* of work, so you staff against the rows), and **clicking any report in the focus list opens its full plan**. Printable. |
 | A specific feature (sub-reports, cross-tabs, images...) | `samples/crystal/by-feature/` — every corpus report filed by what it demonstrates; the README marks the 111 that carry their own data. |
 

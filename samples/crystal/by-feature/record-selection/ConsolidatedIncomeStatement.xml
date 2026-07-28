@@ -1,0 +1,271 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="samples/crystal/corpus/ConsolidatedIncomeStatement.rpt" HasSavedData="True">
+  <Embedinfo>
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+  </Embedinfo>
+  <Summaryinfo KeywordsinReport="" ReportAuthor="© 2018 SAP® BusinessObjects™. All rights reserved. " ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="15120" PageContentWidth="11520" PaperOrientation="Portrait" PaperSize="DefaultPaperSize" PaperSource="FormSource" PrinterDuplex="Default" PrinterName="">
+    <PageMargins bottomMargin="360" leftMargin="360" rightMargin="360" topMargin="360" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks />
+    <Tables>
+      <Table Alias="variance_xtab" ClassName="CrystalReports.Procedure" Name="dataroot/variance_xtab">
+        <ConnectionInfo Database_DLL="crdb_xml.dll" QE_DatabaseName="" QE_DatabaseType="" QE_LogonProperties="" QE_ServerDescription="C:\Program Files (x86)\SAP BusinessObjects\SAP BusinessObjects Enterprise XI 4.0\Samples\En\Reports\Report Data\variance_xtab2.xml C:\Program Files (x86)\SAP BusinessObjects\SAP BusinessObjects Enterprise XI 4.0\Samples\En\Reports\Report Data\variance_xtab.xsd" QE_SQLDB="False" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{variance_xtab.Account_Type}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Type" Name="Account_Type" ShortName="Account_Type" Type="crFieldValueTypeStringField" UseCount="6" />
+          <Field Description="" FormulaForm="{variance_xtab.Account_Heading_Name}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Heading_Name" Name="Account_Heading_Name" ShortName="Account_Heading_Name" Type="crFieldValueTypeStringField" UseCount="6" />
+          <Field Description="" FormulaForm="{variance_xtab.Account_Name}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Name" Name="Account_Name" ShortName="Account_Name" Type="crFieldValueTypeStringField" UseCount="6" />
+          <Field Description="" FormulaForm="{variance_xtab.Account_Number}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Account_Number" Name="Account_Number" ShortName="Account_Number" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{variance_xtab.Type}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="512" LongName="variance_xtab.Type" Name="Type" ShortName="Type" Type="crFieldValueTypeStringField" UseCount="6" />
+          <Field Description="" FormulaForm="{variance_xtab.Month}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="variance_xtab.Month" Name="Month" ShortName="Month" Type="crFieldValueTypeInt16sField" UseCount="2" />
+          <Field Description="" FormulaForm="{variance_xtab.Year}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="2" LongName="variance_xtab.Year" Name="Year" ShortName="Year" Type="crFieldValueTypeInt16sField" UseCount="2" />
+          <Field Description="" FormulaForm="{variance_xtab.Amount}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="variance_xtab.Amount" Name="Amount" ShortName="Amount" Type="crFieldValueTypeNumberField" UseCount="2" />
+          <Field Description="" FormulaForm="{variance_xtab.Internal_ID}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="variance_xtab.Internal_ID" Name="Internal_ID" ShortName="Internal_ID" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula> (  {variance_xtab.Year} = year({?end_date})  AND   (  {variance_xtab.Month} &lt;= month({?end_date})  )   )  </RecordSelectionFormula>
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions>
+      <FormulaFieldDefinition FormulaName="{@date}" Kind="FormulaField" Name="date" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">cdate({variance_xtab.Year}, {variance_xtab.Month}, 1)</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@endMonth}" Kind="FormulaField" Name="endMonth" NumberOfBytes="4" ValueType="DateField" Syntax="crFormulaSyntaxCrystal">cdate(year({?end_date}),month({?end_date}), 1)</FormulaFieldDefinition>
+    </FormulaFieldDefinitions>
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions>
+      <ParameterFieldDefinition AllowCustomCurrentValues="True" EditMask="" EnableAllowEditingDefaultValue="True" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?end_date}" HasCurrentValue="True" IsOptionalPrompt="False" Kind="ParameterField" Name="end_date" NumberOfBytes="4" ParameterFieldName="end_date" ParameterFieldUsage="InUse, DataFetching" ParameterType="ReportParameter" ParameterValueKind="DateParameter" PromptText="Enter date:" ReportName="" ValueType="DateField">
+        <ParameterDefaultValues />
+        <ParameterInitialValues />
+        <ParameterCurrentValues>
+          <ParameterCurrentValue Description="" Value="28/02/2017 00:00:00" />
+        </ParameterCurrentValues>
+      </ParameterFieldDefinition>
+    </ParameterFieldDefinitions>
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="1536" Kind="ReportHeader" Name="ReportHeaderSection2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <PictureObject Name="RO_Header_Fade1" Kind="PictureObject" Top="0" Left="0" Width="11535" Height="1236">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <ImageData Carved="true">iVBORw0KGgoAAAANSUhEUgAABNwAAABnCAIAAABU7MjiAAACzUlEQVR4nO3dwW2AMBAAQYyPKP2/UlNaShRSxj4804ARv9XhY319/1wAAABQmPu+k4MBAABgnu0lAAAA0Ji9TUoBAABozHO/0dEAAACcbvZe9TMAAABwqHl8vQsAAEBkLN8FAACgMp8mpQAAAERmuVIKAABAZPb6rc4GAADgcLP3rp8BAACAQ82z/KcUAACAxuxt0xEAAACN2RYdAQAAELF9FwAAgMx8XH/d6QAAABzNhVIAAAAyc9+6FAAAgIY7pQAAAGTGH2EAAAComJQCAACQmXGlFAAAgIgkBQAAIDO7OxsAAIDDmZQCAACQmb3e7nQAAACONmut+hkAAAA41GxNCgAAQMR/SgEAAMiIUgAAADK27wIAAJCZ57Z9FwAAgIZJKQAAABm/hAEAACBj0REAAACZWa87pQAAADR8vgsAAEDG57sAAABkbN8FAAAgM/flTikAAAANk1IAAAAys0xKAQAAiNi+CwAAQMbnuwAAAGRMSgEAAMiYlAIAAJARpQAAAGRm274LAABAxKQUAACAjCgFAAAgY/suAAAAGZNSAAAAMrNWdzgAAABnMykFAAAgI0oBAADIiFIAAAAyohQAAICMKAUAACAjSgEAAMiIUgAAADKiFAAAgIwoBQAAICNKAQAAyKz3fbvTAQAAOJpJKQAAABlRCgAAQEaUAgAAkBGlAAAAZEQpAAAAGVEKAABARpQCAACQEaUAAABkRCkAAAAZUQoAAEBGlAIAAJARpQAAAGREKQAAABlRCgAAQEaUAgAAkBGlAAAAZEQpAAAAGVEKAABARpQCAACQEaUAAABkRCkAAAAZUQoAAEBGlAIAAJARpQAAAGREKQAAABlRCgAAQEaUAgAAkBGlAAAAZEQpAAAAGVEKAABARpQCAACQEaUAAABkRCkAAAAZUQoAAEBGlAIAAJARpQAAAGREKQAAABlRCgAAwFX5B7gjEhSkM27+AAAAAElFTkSuQmCC</ImageData></PictureObject>
+              <LineObject Name="Line1" Kind="LineObject" Top="1425" Left="15" Width="11535" Height="0" Bottom="1425" EnableExtendToBottomOfSection="True" EndSectionName="ReportHeaderSection2" LineStyle="SingleLine" LineThickness="30" Right="11550">
+                <LineColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <TextObject Name="Text9" Kind="TextObject" Top="555" Left="30" Width="11325" Height="480" MaxNumberOfLines="0">
+                <Text>Consolidated Income Statement</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Verdana" GdiCharSet="1" GdiVerticalFont="False" Height="25" IsSystemFont="False" Italic="False" Name="Verdana" OriginalFontName="Verdana" Size="15" SizeinPoints="15" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text2" Kind="TextObject" Top="1125" Left="600" Width="7080" Height="300" MaxNumberOfLines="0">
+                <Text>     YTD Information through {?end_date}</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Microsoft Sans Serif" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Microsoft Sans Serif" OriginalFontName="Arial Unicode MS" Size="11" SizeinPoints="11" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="True" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="fff2f9ff" A="255" R="242" G="249" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+          <Section Height="1997" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <CrossTabObject Name="CrossTab1" Kind="CrossTabObject" Top="90" Left="105" Width="9835" Height="1817">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="SingleLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{Account_x0020_Type}" />
+                    <Field FieldName="{Account_x0020_Heading_x0020_Name}" />
+                    <Field FieldName="{Account_x0020_Name}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{@date}" />
+                    <Field FieldName="{Type}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{variance_xtab.Amount}" Operation="Sum" />
+                    <Field FieldName="{variance_xtab.Amount}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
+              <CrossTabObject Name="CrossTab2" Kind="CrossTabObject" Top="90" Left="9600" Width="6467" Height="1817">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{Account_x0020_Type}" />
+                    <Field FieldName="{Account_x0020_Heading_x0020_Name}" />
+                    <Field FieldName="{Account_x0020_Name}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{@date}" />
+                    <Field FieldName="{Type}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{variance_xtab.Amount}" Operation="Sum" />
+                    <Field FieldName="{variance_xtab.Amount}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="902" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="226" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="220" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+          <Section Height="1659" Kind="ReportFooter" Name="ReportFooterSection2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <PictureObject Name="Picture2" Kind="PictureObject" Top="423" Left="12" Width="11527" Height="1236">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <ImageData Carved="true">iVBORw0KGgoAAAANSUhEUgAABNwAAABnCAIAAABU7MjiAAACzUlEQVR4nO3dwW2AMBAAQYyPKP2/UlNaShRSxj4804ARv9XhY319/1wAAABQmPu+k4MBAABgnu0lAAAA0Ji9TUoBAABozHO/0dEAAACcbvZe9TMAAABwqHl8vQsAAEBkLN8FAACgMp8mpQAAAERmuVIKAABAZPb6rc4GAADgcLP3rp8BAACAQ82z/KcUAACAxuxt0xEAAACN2RYdAQAAELF9FwAAgMx8XH/d6QAAABzNhVIAAAAyc9+6FAAAgIY7pQAAAGTGH2EAAAComJQCAACQmXGlFAAAgIgkBQAAIDO7OxsAAIDDmZQCAACQmb3e7nQAAACONmut+hkAAAA41GxNCgAAQMR/SgEAAMiIUgAAADK27wIAAJCZ57Z9FwAAgIZJKQAAABm/hAEAACBj0REAAACZWa87pQAAADR8vgsAAEDG57sAAABkbN8FAAAgM/flTikAAAANk1IAAAAys0xKAQAAiNi+CwAAQMbnuwAAAGRMSgEAAMiYlAIAAJARpQAAAGRm274LAABAxKQUAACAjCgFAAAgY/suAAAAGZNSAAAAMrNWdzgAAABnMykFAAAgI0oBAADIiFIAAAAyohQAAICMKAUAACAjSgEAAMiIUgAAADKiFAAAgIwoBQAAICNKAQAAyKz3fbvTAQAAOJpJKQAAABlRCgAAQEaUAgAAkBGlAAAAZEQpAAAAGVEKAABARpQCAACQEaUAAABkRCkAAAAZUQoAAEBGlAIAAJARpQAAAGREKQAAABlRCgAAQEaUAgAAkBGlAAAAZEQpAAAAGVEKAABARpQCAACQEaUAAABkRCkAAAAZUQoAAEBGlAIAAJARpQAAAGREKQAAABlRCgAAQEaUAgAAkBGlAAAAZEQpAAAAGVEKAABARpQCAACQEaUAAABkRCkAAAAZUQoAAEBGlAIAAJARpQAAAGREKQAAABlRCgAAwFX5B7gjEhSkM27+AAAAAElFTkSuQmCC</ImageData></PictureObject>
+              <LineObject Name="Line2" Kind="LineObject" Top="276" Left="12" Width="11520" Height="0" Bottom="276" EnableExtendToBottomOfSection="False" EndSectionName="ReportFooterSection2" LineStyle="SingleLine" LineThickness="30" Right="11532">
+                <LineColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="ffe67300" A="255" R="230" G="115" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <PictureObject Name="Picture3" Kind="PictureObject" Top="423" Left="10481" Width="979" Height="485">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <ImageData Carved="true">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</ImageData></PictureObject>
+              <TextObject Name="Text1" Kind="TextObject" Top="600" Left="144" Width="8928" Height="241" MaxNumberOfLines="0">
+                <Text>© 2018 SAP® BusinessObjects™. All rights reserved.</Text>
+                <Color Name="ff6699cc" A="255" R="102" G="153" B="204" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="13" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="8" SizeinPoints="8" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="220" Kind="PageFooter" Name="PageFooterSection2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="True" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

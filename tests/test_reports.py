@@ -220,7 +220,7 @@ def test_real_corpus_subreports_parse_and_join():
     both parse into child models, and the child's visual table links become
     real JOIN ... ON clauses in the generated SQL."""
     corpus = Path(__file__).resolve().parents[1] / "samples" / "crystal" / "corpus"
-    model = load_report_model(corpus / "Jakub-Syrek_EmployeeList_2.xml")
+    model = load_report_model(corpus / "EmployeeList_2.xml")
     assert set(model.subreports) == {"efficiency", "sqlquerry"}
     attached = [el for s in model.sections for el in s.elements
                 if el.kind == "subreport" and el.subreport is not None]

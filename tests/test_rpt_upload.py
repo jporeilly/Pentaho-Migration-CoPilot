@@ -17,7 +17,7 @@ from pentaho_migration.reports.rpt_extract import (
     OLE_MAGIC, extraction_available, looks_like_rpt)
 
 REPO = Path(__file__).resolve().parents[1]
-CORPUS_RPT = REPO / "samples" / "crystal" / "corpus" / "gerardo-lijs_DataSetReport.rpt"
+CORPUS_RPT = REPO / "samples" / "crystal" / "corpus" / "DataSetReport.rpt"
 
 client = TestClient(app, client=("127.0.0.1", 12345))
 

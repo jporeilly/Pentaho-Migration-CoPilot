@@ -83,7 +83,7 @@ class TestInlineDatasource:
 @pytest.mark.skipif(find_rpt_rs() is None, reason="rpt-rs not available")
 class TestEndToEnd:
     def test_demo_statement_rows_recover_with_real_values(self):
-        rpt = DEMO / "souvikduttachoudhury_Statement_of_Account.rpt"
+        rpt = DEMO / "Statement_of_Account.rpt"
         if not rpt.exists():
             pytest.skip("demo .rpt not present")
         saved = load_saved_rows(rpt)
@@ -96,7 +96,7 @@ class TestEndToEnd:
         assert row0["ORDER_DATE"] == date(2002, 4, 3)
 
     def test_bundle_embeds_the_rows_and_keeps_the_sql(self, tmp_path):
-        dump = DEMO / "souvikduttachoudhury_Statement_of_Account.xml"
+        dump = DEMO / "Statement_of_Account.xml"
         rpt = dump.with_suffix(".rpt")
         if not rpt.exists():
             pytest.skip("demo pair not present")

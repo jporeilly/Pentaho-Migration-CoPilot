@@ -111,7 +111,7 @@ class TestAgainstTheEngine:
         if not validator_available():
             pytest.skip("no local PRD install + Java")
         demo = (Path(__file__).resolve().parents[1] / "samples" / "crystal"
-                / "demo" / "souvikduttachoudhury_Statement_of_Account.xml")
+                / "demo" / "Statement_of_Account.xml")
         if not demo.exists():
             pytest.skip("demo dump not present")
         model = load_report_model(demo, None)

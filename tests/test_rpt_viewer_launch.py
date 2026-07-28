@@ -22,9 +22,9 @@ remote_client = TestClient(app, client=("10.0.0.5", 51234))
 
 class TestMatching:
     def test_extracted_dump_finds_its_binary(self):
-        if not (REPO / "samples" / "crystal" / "corpus" / "ajryan_B1Budget_M.rpt").exists():
+        if not (REPO / "samples" / "crystal" / "corpus" / "B1Budget_M.rpt").exists():
             pytest.skip("corpus .rpt not present")
-        found = rpt_viewer.find_original("ajryan_B1Budget_M.xml")
+        found = rpt_viewer.find_original("B1Budget_M.xml")
         assert found is not None and found.suffix == ".rpt"
 
     def test_authored_dump_has_no_binary(self):
@@ -96,9 +96,9 @@ class TestApi:
         assert body["reason"]          # always explains why not
 
     def test_status_for_an_extracted_report(self):
-        if not (REPO / "samples" / "crystal" / "corpus" / "ajryan_B1Budget_M.rpt").exists():
+        if not (REPO / "samples" / "crystal" / "corpus" / "B1Budget_M.rpt").exists():
             pytest.skip("corpus .rpt not present")
-        body = client.get("/reports/original?dump=ajryan_B1Budget_M.xml").json()
+        body = client.get("/reports/original?dump=B1Budget_M.xml").json()
         if rpt_viewer.viewer_available():
             assert body["available"] is True
             assert body["original"].endswith(".rpt")
@@ -118,6 +118,6 @@ class TestApi:
         monkeypatch.setattr(rpt_viewer, "open_original",
                             lambda p: called.append(p))
         res = remote_client.post("/reports/original/open",
-                                 json={"dump": "ajryan_B1Budget_M.xml"})
+                                 json={"dump": "B1Budget_M.xml"})
         assert res.status_code == 403
         assert called == []

@@ -42,7 +42,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 # sections into one band). Feature density alone was the wrong instinct: the
 # densest report in the corpus is a drill-down report, and drill-down has no
 # PRD equivalent, so it arrives with a page of TODOs. True, and a bad opening.
-SAMPLE_NAME = "souvikduttachoudhury_Statement_of_Account.xml"
+SAMPLE_NAME = "Statement_of_Account.xml"
 SAMPLE_FILE = REPO_ROOT / "samples" / "crystal" / "demo" / SAMPLE_NAME
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 

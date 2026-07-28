@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="samples/crystal/corpus/PrecioPromedio_00.rpt" HasSavedData="True">
+  <Embedinfo />
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="" ReportSubject="" ReportTitle="" />
+  <ReportOptions EnableSaveDataWithReport="True" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="11225" PageContentWidth="16360" PaperOrientation="Landscape" PaperSize="PaperA4" PaperSource="FormSource" PrinterDuplex="Simplex" PrinterName="">
+    <PageMargins bottomMargin="341" leftMargin="240" rightMargin="240" topMargin="341" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks />
+    <Tables>
+      <Table Alias="vw_OrderCrystal1" ClassName="CrystalReports.Table" Name="vw_OrderCrystal">
+        <ConnectionInfo Database_DLL="crdb_odbc.dll" QE_DatabaseName="sales" QE_DatabaseType="ODBC (RDO)" QE_LogonProperties="" QE_ServerDescription="TRAFICO01" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Fields>
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.state}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="34" LongName="vw_OrderCrystal1.state" Name="state" ShortName="state" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.printed_order_number}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="vw_OrderCrystal1.printed_order_number" Name="printed_order_number" ShortName="printed_order_number" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.publication_date}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="vw_OrderCrystal1.publication_date" Name="publication_date" ShortName="publication_date" Type="crFieldValueTypeDateField" UseCount="4" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.height}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="vw_OrderCrystal1.height" Name="height" ShortName="height" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.width}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="vw_OrderCrystal1.width" Name="width" ShortName="width" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.Pagina}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="vw_OrderCrystal1.Pagina" Name="Pagina" ShortName="Pagina" Type="crFieldValueTypeNumberField" UseCount="2" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.total}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="vw_OrderCrystal1.total" Name="total" ShortName="total" Type="crFieldValueTypeNumberField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.subtotal}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="vw_OrderCrystal1.subtotal" Name="subtotal" ShortName="subtotal" Type="crFieldValueTypeNumberField" UseCount="2" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.section_id}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="vw_OrderCrystal1.section_id" Name="section_id" ShortName="section_id" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.Producto}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="152" LongName="vw_OrderCrystal1.Producto" Name="Producto" ShortName="Producto" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.section_detail_id}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="vw_OrderCrystal1.section_detail_id" Name="section_detail_id" ShortName="section_detail_id" Type="crFieldValueTypeInt32sField" UseCount="0" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.Posicion}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="92" LongName="vw_OrderCrystal1.Posicion" Name="Posicion" ShortName="Posicion" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{vw_OrderCrystal1.Parrilla}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="vw_OrderCrystal1.Parrilla" Name="Parrilla" ShortName="Parrilla" Type="crFieldValueTypeStringField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula> (   (   NOT  HasValue({?Periodo})  )   OR  {vw_OrderCrystal1.publication_date} = {?Periodo}  )  </RecordSelectionFormula>
+    <Groups />
+    <SortFields />
+    <FormulaFieldDefinitions>
+      <FormulaFieldDefinition FormulaName="{@PPromedio}" Kind="FormulaField" Name="PPromedio" NumberOfBytes="8" ValueType="NumberField" Syntax="crFormulaSyntaxCrystal">if {vw_OrderCrystal1.Pagina}=0
+then
+    0 
+else 
+ {vw_OrderCrystal1.subtotal}/{vw_OrderCrystal1.Pagina}</FormulaFieldDefinition>
+      <FormulaFieldDefinition FormulaName="{@ProdPos}" Kind="FormulaField" Name="ProdPos" NumberOfBytes="244" ValueType="StringField" Syntax="crFormulaSyntaxCrystal">{vw_OrderCrystal1.Producto} &amp; "-" &amp; {vw_OrderCrystal1.Posicion}</FormulaFieldDefinition>
+    </FormulaFieldDefinitions>
+    <GroupNameFieldDefinitions />
+    <ParameterFieldDefinitions>
+      <ParameterFieldDefinition AllowCustomCurrentValues="True" EditMask="" EnableAllowEditingDefaultValue="True" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?Periodo}" HasCurrentValue="True" IsOptionalPrompt="True" Kind="ParameterField" Name="Periodo" NumberOfBytes="4" ParameterFieldName="Periodo" ParameterFieldUsage="InUse, ShowOnPanel, EditableOnPanel, DataFetching" ParameterType="ReportParameter" ParameterValueKind="DateParameter" PromptText="Especificar Periodo:" ReportName="" ValueType="DateField">
+        <ParameterDefaultValues />
+        <ParameterInitialValues />
+        <ParameterCurrentValues>
+          <ParameterCurrentValue Description="" />
+        </ParameterCurrentValues>
+      </ParameterFieldDefinition>
+    </ParameterFieldDefinitions>
+    <RunningTotalFieldDefinitions />
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="2156" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <CrossTabObject Name="CrossTab1" Kind="CrossTabObject" Top="0" Left="240" Width="5448" Height="2156">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="True" EnableCloseAtPageBreak="True" EnableKeepTogether="False" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <CrossTabDefinition Recovered="rpt-rs">
+                  <RowFields>
+                    <Field FieldName="{vw_OrderCrystal1.publication_date}" />
+                  </RowFields>
+                  <ColumnFields>
+                    <Field FieldName="{@ProdPos}" />
+                  </ColumnFields>
+                  <SummaryFields>
+                    <Field FieldName="{vw_OrderCrystal1.subtotal}" Operation="Sum" />
+                    <Field FieldName="{vw_OrderCrystal1.Pagina}" Operation="Sum" />
+                    <Field FieldName="{@PPromedio}" Operation="Sum" />
+                  </SummaryFields>
+                </CrossTabDefinition></CrossTabObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="221" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="600" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

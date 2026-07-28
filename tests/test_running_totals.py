@@ -81,7 +81,7 @@ class TestParsing:
 def test_corpus_running_total_resolves():
     """A real corpus report's {#...} reference binds to a generated
     group-scoped report function."""
-    dump = REAL / "worrallbrian_MostRecentStructuringOfCanadianCities.xml"
+    dump = REAL / "MostRecentStructuringOfCanadianCities.xml"
     if not dump.exists():
         import pytest
         pytest.skip("corpus not present")

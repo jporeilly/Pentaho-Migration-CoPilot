@@ -38,7 +38,7 @@ class TestCompoundFileStreams:
     scanning raw file bytes splices foreign data into the middle of the image.
     It still decodes - it just renders torn - which is why this is pinned."""
 
-    REPORT = "souvikduttachoudhury_Statement_of_Account"
+    REPORT = "Statement_of_Account"
 
     def _rpt(self):
         p = RPT_DIR / f"{self.REPORT}.rpt"
@@ -102,10 +102,10 @@ class TestCarving:
         p.write_bytes(_png_bytes(4, 4))
         assert carve_rpt_images(p) == []
 
-    @pytest.mark.skipif(not (RPT_DIR / "LarsBusk_GeneralIrma.rpt").exists(),
+    @pytest.mark.skipif(not (RPT_DIR / "GeneralIrma.rpt").exists(),
                         reason="corpus .rpt not present")
     def test_real_rpt_yields_decoded_logo(self):
-        found = carve_rpt_images(RPT_DIR / "LarsBusk_GeneralIrma.rpt")
+        found = carve_rpt_images(RPT_DIR / "GeneralIrma.rpt")
         assert any(i.width == 213 and i.height == 39 for i in found)
 
 
@@ -180,11 +180,11 @@ class TestEnrichment:
         assert "ImageData" not in dump.read_text(encoding="utf-8")
 
 
-@pytest.mark.skipif(not (REAL / "LarsBusk_GeneralIrma.xml").exists(),
+@pytest.mark.skipif(not (REAL / "GeneralIrma.xml").exists(),
                     reason="corpus dump not present")
 def test_corpus_dump_carries_carved_logo():
     """The enriched corpus dump converts with its real logo embedded."""
-    model = load_report_model(REAL / "LarsBusk_GeneralIrma.xml")
+    model = load_report_model(REAL / "GeneralIrma.xml")
     imgs = [e for s in model.sections for e in s.elements
             if e.kind == "image" and e.image_bytes]
     assert imgs, "expected the carved logo in the enriched corpus dump"

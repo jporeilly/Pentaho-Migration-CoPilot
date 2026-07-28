@@ -22,7 +22,7 @@ The `by-feature/README.md` marks them with `*`.
 
 ## The demo path
 
-`demo/souvikduttachoudhury_Statement_of_Account.*` — a customer account
+`demo/Statement_of_Account.*` — a customer account
 statement: letterhead, watermark, a scanned signature, two nested groups, a
 running total, 74 pages of saved rows.
 
@@ -34,16 +34,16 @@ Two extremes were tried and rejected, which is worth knowing before you swap it:
 
 | Report | Why not |
 | --- | --- |
-| `ljokhan_AdventureWorks-TotalSalesByYear` | Converts perfectly — **zero** manual work, saved 2026-05-20 — but it is two elements and a chart. Nothing to be impressed by. Keep it for "show me something recent". |
-| `workcontrolgit_WorldSalesReport` | The richest report in the corpus: live pie chart, three nested groups, 2,191 rows. It is also a **drill-down** report, and drill-down has no PRD equivalent, so it lands with sixteen real TODOs. A good honesty demo, a bad opening one. |
+| `AdventureWorks-TotalSalesByYear` | Converts perfectly — **zero** manual work, saved 2026-05-20 — but it is two elements and a chart. Nothing to be impressed by. Keep it for "show me something recent". |
+| `WorldSalesReport` | The richest report in the corpus: live pie chart, three nested groups, 2,191 rows. It is also a **drill-down** report, and drill-down has no PRD equivalent, so it lands with sixteen real TODOs. A good honesty demo, a bad opening one. |
 
 The rest of the corpus is one command away — `by-feature/` groups all 150 by
 what they demonstrate, so "show me one with sub-reports" is a folder, not a
 search.
 
 ```powershell
-tools\RptViewer\RptViewer.exe samples\crystal\demo\workcontrolgit_WorldSalesReport.rpt
-pentaho-migrate report samples\crystal\demo\workcontrolgit_WorldSalesReport.xml -o output --validate
+tools\RptViewer\RptViewer.exe samples\crystal\demo\WorldSalesReport.rpt
+pentaho-migrate report samples\crystal\demo\WorldSalesReport.xml -o output --validate
 ```
 
 Then open the generated `.prpt` in Report Designer. The layout, groups, charts

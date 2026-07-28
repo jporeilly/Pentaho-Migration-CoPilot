@@ -1,0 +1,1192 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Report Name="" FileName="samples/crystal/corpus/CarteraEdadesFix.rpt" HasSavedData="False">
+  <Embedinfo>
+    <Embed Name="Ole" Size="20" MD5Hash="i4UWFmkip9ijTE4P2UVX3g==" />
+  </Embedinfo>
+  <Summaryinfo KeywordsinReport="" ReportAuthor="" ReportComments="{6405d920-3b07-4710-9dc4-bd8d6f7d25df}" ReportSubject="" ReportTitle="Cartera Por Edades 2 (Vendedor)" />
+  <ReportOptions EnableSaveDataWithReport="False" EnableSavePreviewPicture="True" EnableSaveSummariesWithReport="True" EnableUseDummyData="False" initialDataContext="" initialReportPartName="" />
+  <PrintOptions PageContentHeight="11222" PageContentWidth="18842" PaperOrientation="Landscape" PaperSize="PaperLetter" PaperSource="FormSource" PrinterDuplex="Simplex" PrinterName="">
+    <PageMargins bottomMargin="144" leftMargin="360" rightMargin="360" topMargin="144" />
+    <PageMarginConditionFormulas />
+  </PrintOptions>
+  <SubReports />
+  <Database>
+    <TableLinks />
+    <Tables>
+      <Table Alias="Command" ClassName="CrystalReports.CommandTable" Name="Command">
+        <ConnectionInfo Database_DLL="crdb_ado.dll" QE_DatabaseName="SAP_TeximColombia" QE_DatabaseType="OLE DB (ADO)" QE_LogonProperties="" QE_ServerDescription="SAP-FT2" QE_SQLDB="True" SSO_Enabled="False" UserName="" Password="" />
+        <Command>Declare @SN as nvarchar(15)
+Declare @Asesor as nvarchar(155)
+set @SN =  '%'
+set @Asesor = '{?Asesor}'
+SELECT 
+c.SlpName, a.CardCode as Codigo, b.CardName as 'Cliente',  
+CASE WHEN a.DocSubType = 'DN' Then 'ND' Else 'FV' End as Tipo,
+a.DocNum, a.DocDate as Fecha, a.DocDueDate as Fec_Venc,
+GETDATE() as Fec_Corte, -datediff(day,getdate(),a.DocDueDate) as Dias,
+a.DocTotal as Total, a.PaidToDate as Abonos, (a.DocTotal-a.PaidToDate) as Saldo 
+INTO #TEMP
+FROM OINV a  INNER JOIN OCRD b ON a.CardCode=b.CardCode 
+LEFT JOIN OSLP c ON a.SlpCode=c.SlpCode
+WHERE DocStatus = 'O'  and b.CardName Like @SN and b.CardType like 'C'
+and c.SlpName like @Asesor
+
+UNION ALL
+
+SELECT c.SlpName, a.CardCode, b.CardName, 'NC' AS Tipo, a.DocNum, a.DocDate, a.DocDueDate,
+GETDATE() as Fec_Corte,-datediff(day,getdate(),a.DocDueDate) as Dias,
+a.DocTotal*-1 as DocTotal, a.PaidToDate*-1 as PaidToDate, (a.DocTotal-a.PaidToDate)*-1 as Saldo
+FROM ORIN a  INNER JOIN OCRD b ON a.CardCode=b.CardCode 
+LEFT JOIN OSLP c ON a.SlpCode=c.SlpCode
+WHERE DocStatus = 'O'  and b.CardName Like @SN and b.CardType like 'C'
+and c.SlpName like @Asesor
+
+
+UNION ALL
+
+SELECT c.SlpName, a.ShortName, b.CardName,  'PR' as Tipo,  a.TransID, a.DueDate, a.DueDate,  
+GETDATE() as Fec_Corte, -datediff(day,getdate(),a.DueDate) as Dias,
+a.Credit*-1 as DocTotal, 0 as PaidToDate, a.BalDueCred*-1 as Saldo
+FROM JDT1 a INNER JOIN OCRD b ON a.ShortName=b.CardCode
+LEFT JOIN OSLP c ON b.SlpCode=c.SlpCode
+WHERE a.BalDueCred &gt; 0  and a.TransType='24' and b.CardName Like @SN and b.CardType like 'C'
+and c.SlpName like @Asesor
+
+
+UNION ALL
+
+SELECT c.SlpName, a.ShortName, b.CardName,  'AS' as Tipo, a.TransID, a.DueDate, a.DueDate,  
+GETDATE() as Fec_Corte, -datediff(day,getdate(),a.DueDate) as Dias,
+a.Credit*-1 as DocTotal, 0 as PaidToDate, a.BalDueCred*-1 as Saldo
+FROM JDT1 a INNER JOIN OCRD b ON a.ShortName=b.CardCode
+LEFT JOIN OSLP c ON b.SlpCode=c.SlpCode
+WHERE a.BalDueCred &gt; 0  and a.TransType='30' and b.CardName Like @SN and b.CardType like 'C'
+and c.SlpName like @Asesor
+
+ORDER BY a.CardCode
+
+
+SELECT 
+T1.City,
+T0.SlpName, T0.Codigo, T0.Cliente, T1.Phone1, T1.Phone2, T1.Cellular, T1.E_Mail, T1.CntctPrsn, T1.Address, 
+T0.Tipo, T0.DocNum, T0.Fecha, T0.Fec_Venc, T0.Fec_Corte, T0.Dias,
+T0.Total, T0.Abonos, T0.Saldo ,
+CASE WHEN Dias &lt;= 0 THEN Saldo ELSE 0 END AS 'Corriente',
+CASE WHEN Dias BETWEEN 1 AND 30 THEN Saldo ELSE 0 END AS '0 - 30',
+CASE WHEN Dias BETWEEN 31 AND 60 THEN Saldo ELSE 0 END AS '31 - 60',
+CASE WHEN Dias BETWEEN 61 AND 90 THEN Saldo ELSE 0 END AS '61 - 90',
+CASE WHEN Dias &gt;= 91 THEN Saldo ELSE 0 END AS 'Mas de 90', Saldo AS VR_TOTAL
+FROM #TEMP T0
+LEFT JOIN OCRD T1 ON T0.Codigo = T1.CardCode
+ORDER BY T1.City, T0.SlpName, T0.Cliente, T0.Fec_Venc
+
+drop table #TEMP
+</Command>
+        <Fields>
+          <Field Description="" FormulaForm="{Command.City}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="Command.City" Name="City" ShortName="City" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Command.SlpName}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="312" LongName="Command.SlpName" Name="SlpName" ShortName="SlpName" Type="crFieldValueTypeStringField" UseCount="2" />
+          <Field Description="" FormulaForm="{Command.Codigo}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="32" LongName="Command.Codigo" Name="Codigo" ShortName="Codigo" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Cliente}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="Command.Cliente" Name="Cliente" ShortName="Cliente" Type="crFieldValueTypeStringField" UseCount="4" />
+          <Field Description="" FormulaForm="{Command.Phone1}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Command.Phone1" Name="Phone1" ShortName="Phone1" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Phone2}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="42" LongName="Command.Phone2" Name="Phone2" ShortName="Phone2" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Command.Cellular}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="102" LongName="Command.Cellular" Name="Cellular" ShortName="Cellular" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.E_Mail}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="Command.E_Mail" Name="E_Mail" ShortName="E_Mail" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.CntctPrsn}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="182" LongName="Command.CntctPrsn" Name="CntctPrsn" ShortName="CntctPrsn" Type="crFieldValueTypeStringField" UseCount="0" />
+          <Field Description="" FormulaForm="{Command.Address}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="202" LongName="Command.Address" Name="Address" ShortName="Address" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Tipo}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="6" LongName="Command.Tipo" Name="Tipo" ShortName="Tipo" Type="crFieldValueTypeStringField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.DocNum}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Command.DocNum" Name="DocNum" ShortName="DocNum" Type="crFieldValueTypeInt32sField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Fecha}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Fecha" Name="Fecha" ShortName="Fecha" Type="crFieldValueTypeDateTimeField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Fec_Venc}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Fec_Venc" Name="Fec_Venc" ShortName="Fec_Venc" Type="crFieldValueTypeDateTimeField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Fec_Corte}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Fec_Corte" Name="Fec_Corte" ShortName="Fec_Corte" Type="crFieldValueTypeDateTimeField" UseCount="0" />
+          <Field Description="" FormulaForm="{Command.Dias}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="4" LongName="Command.Dias" Name="Dias" ShortName="Dias" Type="crFieldValueTypeInt32sField" UseCount="15" />
+          <Field Description="" FormulaForm="{Command.Total}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Total" Name="Total" ShortName="Total" Type="crFieldValueTypeNumberField" UseCount="14" />
+          <Field Description="" FormulaForm="{Command.Abonos}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Abonos" Name="Abonos" ShortName="Abonos" Type="crFieldValueTypeNumberField" UseCount="1" />
+          <Field Description="" FormulaForm="{Command.Saldo}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Saldo" Name="Saldo" ShortName="Saldo" Type="crFieldValueTypeNumberField" UseCount="3" />
+          <Field Description="" FormulaForm="{Command.Corriente}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Corriente" Name="Corriente" ShortName="Corriente" Type="crFieldValueTypeNumberField" UseCount="3" />
+          <Field Description="" FormulaForm="{Command.0 - 30}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.0 - 30" Name="0 - 30" ShortName="0 - 30" Type="crFieldValueTypeNumberField" UseCount="3" />
+          <Field Description="" FormulaForm="{Command.31 - 60}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.31 - 60" Name="31 - 60" ShortName="31 - 60" Type="crFieldValueTypeNumberField" UseCount="3" />
+          <Field Description="" FormulaForm="{Command.61 - 90}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.61 - 90" Name="61 - 90" ShortName="61 - 90" Type="crFieldValueTypeNumberField" UseCount="3" />
+          <Field Description="" FormulaForm="{Command.Mas de 90}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.Mas de 90" Name="Mas de 90" ShortName="Mas de 90" Type="crFieldValueTypeNumberField" UseCount="3" />
+          <Field Description="" FormulaForm="{Command.VR_TOTAL}" HeadingText="" IsRecurring="True" Kind="crFieldKindDBField" Length="8" LongName="Command.VR_TOTAL" Name="VR_TOTAL" ShortName="VR_TOTAL" Type="crFieldValueTypeNumberField" UseCount="0" />
+        </Fields>
+      </Table>
+    </Tables>
+  </Database>
+  <DataDefinition>
+    <GroupSelectionFormula />
+    <RecordSelectionFormula />
+    <Groups>
+      <Group ConditionField="{Command.SlpName}" />
+      <Group ConditionField="{Command.Cliente}" />
+    </Groups>
+    <SortFields>
+      <SortField Field="{Command.SlpName}" SortDirection="AscendingOrder" SortType="GroupSortField" />
+      <SortField Field="{Command.Cliente}" SortDirection="AscendingOrder" SortType="GroupSortField" />
+      <SortField Field="{Command.Cliente}" SortDirection="AscendingOrder" SortType="GroupSortField" />
+      <SortField Field="{Command.Dias}" SortDirection="DescendingOrder" SortType="RecordSortField" />
+    </SortFields>
+    <FormulaFieldDefinitions />
+    <GroupNameFieldDefinitions>
+      <GroupNameFieldDefinition FormulaName="GroupName ({Command.SlpName})" Group="CrystalDecisions.CrystalReports.Engine.Group" GroupNameFieldName="Group #1 Name: Command.SlpName" Kind="GroupNameField" Name="GroupName ({Command.SlpName})" NumberOfBytes="65534" ValueType="StringField" />
+      <GroupNameFieldDefinition FormulaName="GroupName ({Command.Cliente})" Group="CrystalDecisions.CrystalReports.Engine.Group" GroupNameFieldName="Group #2 Name: Command.Cliente" Kind="GroupNameField" Name="GroupName ({Command.Cliente})" NumberOfBytes="65534" ValueType="StringField" />
+    </GroupNameFieldDefinitions>
+    <ParameterFieldDefinitions>
+      <ParameterFieldDefinition AllowCustomCurrentValues="True" EditMask="" EnableAllowEditingDefaultValue="True" EnableAllowMultipleValue="False" EnableNullValue="False" FormulaName="{?Asesor}" HasCurrentValue="False" IsOptionalPrompt="False" Kind="ParameterField" Name="Asesor" NumberOfBytes="65534" ParameterFieldName="Asesor" ParameterFieldUsage="InUse, DataFetching" ParameterType="StoreProcedureParameter" ParameterValueKind="StringParameter" PromptText="Asesor" ReportName="" ValueType="StringField">
+        <ParameterDefaultValues />
+        <ParameterInitialValues />
+        <ParameterCurrentValues />
+      </ParameterFieldDefinition>
+    </ParameterFieldDefinitions>
+    <RunningTotalFieldDefinitions>
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotSaldoCliente}" Kind="RunningTotalField" Name="TotSaldoCliente" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Saldo}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotSaldoAsesor}" Kind="RunningTotalField" Name="TotSaldoAsesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Saldo}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Tot0_30}" Kind="RunningTotalField" Name="Tot0_30" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.0 - 30}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Tot31_60}" Kind="RunningTotalField" Name="Tot31_60" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.31 - 60}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Tot61_90}" Kind="RunningTotalField" Name="Tot61_90" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.61 - 90}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotMasde90}" Kind="RunningTotalField" Name="TotMasde90" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Mas de 90}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Total0_30Asesor}" Kind="RunningTotalField" Name="Total0_30Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.0 - 30}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotCorrienteCliente}" Kind="RunningTotalField" Name="TotCorrienteCliente" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Corriente}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotCorrienteAsesor}" Kind="RunningTotalField" Name="TotCorrienteAsesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Corriente}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Total31_60Asesor}" Kind="RunningTotalField" Name="Total31_60Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.31 - 60}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#Total61_90Asesor}" Kind="RunningTotalField" Name="Total61_90Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.61 - 90}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition EvaluationConditionType="NoCondition" FormulaName="{#TotalMasde90Asesor}" Kind="RunningTotalField" Name="TotalMasde90Asesor" NumberOfBytes="8" Operation="Sum" OperationParameter="0" ResetConditionType="OnChangeOfGroup" SummarizedField="{Command.Mas de 90}" ValueType="NumberField" />
+      <RunningTotalFieldDefinition Name="TotSaldoCliente" FormulaName="{#TotSaldoCliente}" Operation="Sum" SummarizedField="{Command.Saldo}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="TotSaldoAsesor" FormulaName="{#TotSaldoAsesor}" Operation="Sum" SummarizedField="{Command.Saldo}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="Tot0_30" FormulaName="{#Tot0_30}" Operation="Sum" SummarizedField="{Command.0 - 30}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="Tot31_60" FormulaName="{#Tot31_60}" Operation="Sum" SummarizedField="{Command.31 - 60}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="Tot61_90" FormulaName="{#Tot61_90}" Operation="Sum" SummarizedField="{Command.61 - 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="TotMasde90" FormulaName="{#TotMasde90}" Operation="Sum" SummarizedField="{Command.Mas de 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="Total0_30Asesor" FormulaName="{#Total0_30Asesor}" Operation="Sum" SummarizedField="{Command.0 - 30}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="TotCorrienteCliente" FormulaName="{#TotCorrienteCliente}" Operation="Sum" SummarizedField="{Command.Corriente}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.Cliente}" />
+      <RunningTotalFieldDefinition Name="TotCorrienteAsesor" FormulaName="{#TotCorrienteAsesor}" Operation="Sum" SummarizedField="{Command.Corriente}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="Total31_60Asesor" FormulaName="{#Total31_60Asesor}" Operation="Sum" SummarizedField="{Command.31 - 60}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="Total61_90Asesor" FormulaName="{#Total61_90Asesor}" Operation="Sum" SummarizedField="{Command.61 - 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+      <RunningTotalFieldDefinition Name="TotalMasde90Asesor" FormulaName="{#TotalMasde90Asesor}" Operation="Sum" SummarizedField="{Command.Mas de 90}" EvaluationConditionType="NoCondition" ResetConditionType="OnChangeOfGroup" EvaluateCondition="" ResetCondition="{Command.SlpName}" />
+    </RunningTotalFieldDefinitions>
+    <SQLExpressionFields />
+    <SummaryFields />
+  </DataDefinition>
+  <CustomFunctions />
+  <ReportDefinition>
+    <Areas>
+      <Area Kind="ReportHeader" Name="ReportHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="0" Kind="ReportHeader" Name="ReportHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageHeader" Name="PageHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="1789" Kind="PageHeader" Name="PageHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <TextObject Name="Text12" Kind="TextObject" Top="480" Left="4080" Width="12600" Height="720" MaxNumberOfLines="0">
+                <Text>CARTERA POR EDADES
+(VENDEDORES)</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="31" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="20" SizeinPoints="20" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldObject Name="PrintDate1" Kind="FieldObject" Top="120" Left="16560" Width="2160" Height="238" DataSource="PrintDate">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LongMonth" YearFormat="LongYear" FormatString="MMMM/dd/yyyy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line4" Kind="LineObject" Top="1305" Left="120" Width="18600" Height="0" Bottom="1305" EnableExtendToBottomOfSection="False" EndSectionName="PageHeaderSection1" LineStyle="SingleLine" LineThickness="40" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <TextObject Name="Text5" Kind="TextObject" Top="1440" Left="3480" Width="780" Height="240" MaxNumberOfLines="0">
+                <Text>VENCE
+</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <LineObject Name="Line2" Kind="LineObject" Top="1680" Left="120" Width="18600" Height="0" Bottom="1680" EnableExtendToBottomOfSection="False" EndSectionName="PageHeaderSection1" LineStyle="SingleLine" LineThickness="40" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <TextObject Name="Text6" Kind="TextObject" Top="1440" Left="7200" Width="1070" Height="240" MaxNumberOfLines="0">
+                <Text>TOT. DOC.</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text11" Kind="TextObject" Top="1440" Left="8760" Width="1080" Height="240" MaxNumberOfLines="0">
+                <Text>ABONOS</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text14" Kind="TextObject" Top="1440" Left="10440" Width="830" Height="240" MaxNumberOfLines="0">
+                <Text>SALDO</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldHeadingObject Name="Text17" Kind="FieldHeadingObject" Top="1440" Left="11870" Width="960" Height="221" FieldObjectName="Corriente1" MaxNumberOfLines="0">
+                <Text>Corriente</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text18" Kind="FieldHeadingObject" Top="1440" Left="13490" Width="840" Height="221" FieldObjectName="Field1" MaxNumberOfLines="0">
+                <Text>0 - 30</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text19" Kind="FieldHeadingObject" Top="1440" Left="16320" Width="960" Height="221" FieldObjectName="Field2" MaxNumberOfLines="0">
+                <Text>61 - 90</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <FieldHeadingObject Name="Text20" Kind="FieldHeadingObject" Top="1440" Left="14880" Width="960" Height="221" FieldObjectName="Field3" MaxNumberOfLines="0">
+                <Text>31 - 60</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <TextObject Name="Text22" Kind="TextObject" Top="1440" Left="4958" Width="1200" Height="240" MaxNumberOfLines="0">
+                <Text>DIAS  VENC.
+</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldHeadingObject Name="Text23" Kind="FieldHeadingObject" Top="1440" Left="17520" Width="1205" Height="221" FieldObjectName="Masde901" MaxNumberOfLines="0">
+                <Text>Mas de 90</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldHeadingObject>
+              <TextObject Name="Text24" Kind="TextObject" Top="1440" Left="720" Width="830" Height="240" MaxNumberOfLines="0">
+                <Text>No.DOC
+</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text25" Kind="TextObject" Top="1440" Left="120" Width="480" Height="240" MaxNumberOfLines="0">
+                <Text>TIPO</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <TextObject Name="Text8" Kind="TextObject" Top="1440" Left="1925" Width="1200" Height="240" MaxNumberOfLines="0">
+                <Text>FECHA DOC</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <PictureObject Name="Picture3" Kind="PictureObject" Top="120" Left="120" Width="3047" Height="1080">
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              <ImageData Carved="true">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</ImageData></PictureObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="GroupHeader" Name="GroupHeaderArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="True" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False">
+          <GroupAreaFormat EnableKeepGroupTogether="False" EnableRepeatGroupHeader="False" VisibleGroupNumberPerPage="0" />
+        </AreaFormat>
+        <Sections>
+          <Section Height="315" Kind="GroupHeader" Name="GroupHeaderSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="GroupHeader" Name="GroupHeaderArea2">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False">
+          <GroupAreaFormat EnableKeepGroupTogether="False" EnableRepeatGroupHeader="False" VisibleGroupNumberPerPage="0" />
+        </AreaFormat>
+        <Sections>
+          <Section Height="515" Kind="GroupHeader" Name="GroupHeaderSection2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="Cliente1" Kind="FieldObject" Top="0" Left="1550" Width="4930" Height="221" DataSource="{Command.Cliente}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Teal" A="255" R="0" G="128" B="128" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="True" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Italic" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Phone11" Kind="FieldObject" Top="0" Left="7200" Width="2554" Height="221" DataSource="{Command.Phone1}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text15" Kind="TextObject" Top="0" Left="6590" Width="490" Height="240" MaxNumberOfLines="0">
+                <Text>TEL:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldObject Name="Cellular1" Kind="FieldObject" Top="0" Left="10560" Width="2554" Height="221" DataSource="{Command.Cellular}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text16" Kind="TextObject" Top="0" Left="9960" Width="490" Height="240" MaxNumberOfLines="0">
+                <Text>CEL:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <LineObject Name="Line3" Kind="LineObject" Top="480" Left="120" Width="18600" Height="0" Bottom="480" EnableExtendToBottomOfSection="False" EndSectionName="GroupHeaderSection2" LineStyle="SingleLine" LineThickness="20" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <FieldObject Name="EMail1" Kind="FieldObject" Top="240" Left="1550" Width="4930" Height="221" DataSource="{Command.E_Mail}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text1" Kind="TextObject" Top="240" Left="6590" Width="1277" Height="240" MaxNumberOfLines="0">
+                <Text>DIRECCION:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+              <FieldObject Name="Address1" Kind="FieldObject" Top="240" Left="8040" Width="6960" Height="221" DataSource="{Command.Address}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Codigo1" Kind="FieldObject" Top="0" Left="120" Width="1320" Height="221" DataSource="{Command.Codigo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Teal" A="255" R="0" G="128" B="128" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text9" Kind="TextObject" Top="240" Left="120" Width="1277" Height="240" MaxNumberOfLines="0">
+                <Text>email:</Text>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="Detail" Name="DetailArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="240" Kind="Detail" Name="DetailSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="Dias1" Kind="FieldObject" Top="0" Left="5150" Width="480" Height="221" DataSource="{Command.Dias}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Tipo1" Kind="FieldObject" Top="0" Left="120" Width="389" Height="221" DataSource="{Command.Tipo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="DocNum1" Kind="FieldObject" Top="0" Left="600" Width="1200" Height="221" DataSource="{Command.DocNum}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="FecVenc1" Kind="FieldObject" Top="0" Left="3240" Width="1200" Height="221" DataSource="{Command.Fec_Venc}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="NumericDay" MonthFormat="ShortMonth" YearFormat="ShortYear" FormatString="MMM/d/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Total1" Kind="FieldObject" Top="0" Left="7200" Width="1200" Height="221" DataSource="{Command.Total}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Abonos1" Kind="FieldObject" Top="0" Left="8630" Width="1200" Height="221" DataSource="{Command.Abonos}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Saldo1" Kind="FieldObject" Top="0" Left="10080" Width="1294" Height="238" DataSource="{Command.Saldo}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Corriente1" Kind="FieldObject" Top="0" Left="11520" Width="1320" Height="221" DataSource="{Command.Corriente}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Field1" Kind="FieldObject" Top="0" Left="13080" Width="1200" Height="221" DataSource="{Command.0 - 30}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Field2" Kind="FieldObject" Top="0" Left="16080" Width="1200" Height="221" DataSource="{Command.61 - 90}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Field3" Kind="FieldObject" Top="0" Left="14520" Width="1320" Height="221" DataSource="{Command.31 - 60}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Masde901" Kind="FieldObject" Top="0" Left="17520" Width="1205" Height="221" DataSource="{Command.Mas de 90}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Fecha1" Kind="FieldObject" Top="0" Left="1930" Width="1190" Height="221" DataSource="{Command.Fecha}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="NumericDay" MonthFormat="ShortMonth" YearFormat="ShortYear" FormatString="MMM/d/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="False" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Regular" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({Command.Total}) &lt; 0 THEN&#13;&#10;crBlue&#13;&#10;else&#13;&#10;if ({Command.Total}) &gt; 0 and ({Command.Dias}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="HorizontalCenterAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="GroupFooter" Name="GroupFooterArea2">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="480" Kind="GroupFooter" Name="GroupFooterSection2">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="TotSaldo1" Kind="FieldObject" Top="0" Left="9821" Width="1553" Height="238" DataSource="{#TotSaldoCliente}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Teal" A="255" R="0" G="128" B="128" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line1" Kind="LineObject" Top="0" Left="124" Width="18596" Height="0" Bottom="0" EnableExtendToBottomOfSection="False" EndSectionName="GroupFooterSection2" LineStyle="SingleLine" LineThickness="20" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <FieldObject Name="Tot0301" Kind="FieldObject" Top="0" Left="12986" Width="1294" Height="238" DataSource="{#Tot0_30}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;&#13;&#10;if ({#Tot0_30}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;    if ({#Tot0_30}) = 0 THEN&#13;&#10;    crWhite&#13;&#10;    else    &#13;&#10;    if ({#Tot0_30}) &lt; 0 THEN&#13;&#10;    crBlue&#13;&#10;    else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Tot31601" Kind="FieldObject" Top="0" Left="14635" Width="1205" Height="238" DataSource="{#Tot31_60}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({#Tot31_60}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;    if ({#Tot31_60}) = 0 THEN&#13;&#10;    crWhite&#13;&#10;    else    &#13;&#10;    if ({#Tot31_60}) &lt; 0 THEN&#13;&#10;    crBlue&#13;&#10;    else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Tot61901" Kind="FieldObject" Top="0" Left="16080" Width="1200" Height="238" DataSource="{#Tot61_90}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({#Tot61_90}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;    if ({#Tot61_90}) = 0 THEN&#13;&#10;    crWhite&#13;&#10;    else    &#13;&#10;    if ({#Tot61_90}) &lt; 0 THEN&#13;&#10;    crBlue&#13;&#10;    else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="TotMasde901" Kind="FieldObject" Top="0" Left="17400" Width="1320" Height="238" DataSource="{#TotMasde90}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Red" A="255" R="255" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas Color="// This conditional formatting formula must return one of the following Color Constants:&#13;&#10;// &#13;&#10;// Color (red, green, blue)&#13;&#10;// crBlack&#13;&#10;// crMaroon&#13;&#10;// crGreen&#13;&#10;// crOlive&#13;&#10;// crNavy&#13;&#10;// crPurple&#13;&#10;// crTeal&#13;&#10;// crSilver&#13;&#10;// crRed&#13;&#10;// crLime&#13;&#10;// crYellow&#13;&#10;// crBlue&#13;&#10;// crFuchsia&#13;&#10;// crAqua&#13;&#10;// crWhite&#13;&#10;// crNoColor&#13;&#10;// &#13;&#10;if ({#TotMasde90}) &gt; 0 THEN&#13;&#10;crRed&#13;&#10;else&#13;&#10;    if ({#TotMasde90}) = 0 THEN&#13;&#10;    crWhite&#13;&#10;    else    &#13;&#10;    if ({#TotMasde90}) &lt; 0 THEN&#13;&#10;    crBlue&#13;&#10;    else&#13;&#10;crBlack;" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="TotCorrienteClietne1" Kind="FieldObject" Top="0" Left="11640" Width="1200" Height="221" DataSource="{#TotCorrienteCliente}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Teal" A="255" R="0" G="128" B="128" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Underline" SystemFontName="" Underline="True" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text4" Kind="TextObject" Top="0" Left="7680" Width="1920" Height="240" MaxNumberOfLines="0">
+                <Text>Totales Cliente:</Text>
+                <Color Name="Teal" A="255" R="0" G="128" B="128" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="GroupFooter" Name="GroupFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="478" Kind="GroupFooter" Name="GroupFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="TotSaldoAsesor1" Kind="FieldObject" Top="0" Left="9518" Width="1856" Height="263" DataSource="{#TotSaldoAsesor}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line8" Kind="LineObject" Top="360" Left="120" Width="18600" Height="0" Bottom="360" EnableExtendToBottomOfSection="False" EndSectionName="GroupFooterSection1" LineStyle="SingleLine" LineThickness="40" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <LineObject Name="Line9" Kind="LineObject" Top="0" Left="9960" Width="8760" Height="0" Bottom="0" EnableExtendToBottomOfSection="False" EndSectionName="GroupFooterSection1" LineStyle="SingleLine" LineThickness="0" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <FieldObject Name="Total030Asesor1" Kind="FieldObject" Top="0" Left="12955" Width="1325" Height="263" DataSource="{#Total0_30Asesor}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="TotCorrienteAsesor1" Kind="FieldObject" Top="0" Left="11520" Width="1320" Height="263" DataSource="{#TotCorrienteAsesor}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Total3160Asesor1" Kind="FieldObject" Top="0" Left="14515" Width="1325" Height="221" DataSource="{#Total31_60Asesor}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="Total6190Aseosr1" Kind="FieldObject" Top="0" Left="15955" Width="1325" Height="221" DataSource="{#Total61_90Asesor}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <FieldObject Name="TotalMasde90Asesor1" Kind="FieldObject" Top="0" Left="17395" Width="1325" Height="221" DataSource="{#TotalMasde90Asesor}">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="0" CurrencySymbolFormat="NoSymbol" CurrencySymbol="$" CurrencyPosition="crCurrencyPositionFormatLeadingCurrencyInsideNegative" EnableUseLeadingZero="True" NegativeFormat="LeadingMinus" RoundingFormat="RoundToUnit" FormatString="#,##0;-#,##0" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="17" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="11" SizeinPoints="11" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text3" Kind="TextObject" Top="0" Left="7680" Width="1920" Height="360" MaxNumberOfLines="0">
+                <Text>Totales Asesor:</Text>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="ReportFooter" Name="ReportFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="False" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="0" Kind="ReportFooter" Name="ReportFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects />
+          </Section>
+        </Sections>
+      </Area>
+      <Area Kind="PageFooter" Name="PageFooterArea1">
+        <AreaFormat EnableHideForDrillDown="False" EnableKeepTogether="True" EnableNewPageAfter="True" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="True" EnableResetPageNumberAfter="False" EnableSuppress="False" />
+        <Sections>
+          <Section Height="525" Kind="PageFooter" Name="PageFooterSection1">
+            <SectionFormat CssClass="" EnableKeepTogether="True" EnableNewPageAfter="False" EnableNewPageBefore="False" EnablePrintAtBottomOfPage="False" EnableResetPageNumberAfter="False" EnableSuppress="False" EnableSuppressIfBlank="False" EnableUnderlaySection="False">
+              <SectionAreaConditionFormulas />
+              <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+            </SectionFormat>
+            <ReportObjects>
+              <FieldObject Name="PageNofM1" Kind="FieldObject" Top="120" Left="16200" Width="2520" Height="221" DataSource="PageNofM">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Black" A="255" R="0" G="0" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="16" IsSystemFont="False" Italic="True" Name="Arial" OriginalFontName="Arial" Size="10" SizeinPoints="10" Strikeout="False" Style="Bold, Italic" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="RightAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <LineObject Name="Line5" Kind="LineObject" Top="0" Left="120" Width="18600" Height="0" Bottom="0" EnableExtendToBottomOfSection="False" EndSectionName="PageFooterSection1" LineStyle="SingleLine" LineThickness="40" Right="18720">
+                <LineColor Name="Black" A="255" R="0" G="0" B="0" />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="SingleLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="DefaultAlign" />
+                <ObjectFormatConditionFormulas />
+              </LineObject>
+              <FieldObject Name="GroupNameSlpName1" Kind="FieldObject" Top="120" Left="1113" Width="11040" Height="360" DataSource="GroupName ({Command.SlpName})">
+                <FieldFormat>
+                  <NumericFieldFormat DecimalPlaces="2" CurrencySymbolFormat="NoSymbol" EnableUseLeadingZero="False" NegativeFormat="LeadingMinus" RoundingFormat="RoundToHundredth" FormatString="#,##0.00;-#,##0.00" />
+                  <DateFieldFormat DayFormat="LeadingZeroNumericDay" MonthFormat="LeadingZeroNumericMonth" YearFormat="ShortYear" FormatString="MM/dd/yy" />
+                </FieldFormat>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </FieldObject>
+              <TextObject Name="Text2" Kind="TextObject" Top="120" Left="120" Width="960" Height="360" MaxNumberOfLines="0">
+                <Text>Asesor:</Text>
+                <Color Name="Green" A="255" R="0" G="128" B="0" />
+                <Font Bold="True" FontFamily="Arial" GdiCharSet="1" GdiVerticalFont="False" Height="19" IsSystemFont="False" Italic="False" Name="Arial" OriginalFontName="Arial" Size="12" SizeinPoints="12" Strikeout="False" Style="Bold" SystemFontName="" Underline="False" Unit="Point" />
+                <FontColorConditionFormulas />
+                <Border BottomLineStyle="NoLine" HasDropShadow="False" LeftLineStyle="NoLine" RightLineStyle="NoLine" TopLineStyle="NoLine">
+                  <BorderConditionFormulas />
+                  <BackgroundColor Name="White" A="255" R="255" G="255" B="255" />
+                  <BorderColor Name="Black" A="255" R="0" G="0" B="0" />
+                </Border>
+                <ObjectFormat CssClass="" EnableCanGrow="False" EnableCloseAtPageBreak="True" EnableKeepTogether="True" EnableSuppress="False" HorizontalAlignment="LeftAlign" />
+                <ObjectFormatConditionFormulas />
+              </TextObject>
+            </ReportObjects>
+          </Section>
+        </Sections>
+      </Area>
+    </Areas>
+  </ReportDefinition>
+</Report>

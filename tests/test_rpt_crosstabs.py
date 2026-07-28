@@ -162,8 +162,8 @@ class TestEnrichment:
     def test_real_report_recovers_and_converts(self, tmp_path):
         """End-to-end on a real corpus cross-tab: the SDK could not export the
         grid, rpt-rs recovers it, and the report converts to a live crosstab."""
-        source = REAL / "ajryan_B1Budget_M.xml"
-        binary = RPT_DIR / "ajryan_B1Budget_M.rpt"
+        source = REAL / "B1Budget_M.xml"
+        binary = RPT_DIR / "B1Budget_M.rpt"
         if not (source.exists() and binary.exists()):
             pytest.skip("corpus report not present")
         dump = _stripped_copy(source, tmp_path)
@@ -177,8 +177,8 @@ class TestEnrichment:
 
     @needs_rpt_rs
     def test_existing_definition_is_never_overwritten(self, tmp_path):
-        source = REAL / "ajryan_B1Budget_M.xml"
-        binary = RPT_DIR / "ajryan_B1Budget_M.rpt"
+        source = REAL / "B1Budget_M.xml"
+        binary = RPT_DIR / "B1Budget_M.rpt"
         if not (source.exists() and binary.exists()):
             pytest.skip("corpus report not present")
         dump = _stripped_copy(source, tmp_path)
@@ -187,7 +187,7 @@ class TestEnrichment:
 
     @needs_rpt_rs
     def test_extraction_reports_axes_and_operations(self):
-        binary = RPT_DIR / "ajryan_B1Budget_M.rpt"
+        binary = RPT_DIR / "B1Budget_M.rpt"
         if not binary.exists():
             pytest.skip("corpus .rpt not present")
         definitions = extract_definitions(binary)
