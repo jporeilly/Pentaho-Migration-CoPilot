@@ -228,6 +228,20 @@ def _section_band(section, tp="", sp="style:", behind_elements=None):
     content_bottom = max((el.y + el.height for el in section.elements
                           if getattr(el, "visible", True)), default=0.0)
     height = max(section.height, content_bottom)
+    # Trailing empty space in a band that is followed by a page break cannot
+    # be seen - nothing renders in it and the page ends immediately after.
+    # Reserving it anyway is what split 21 of the demo's 36 statements: the
+    # group footer declared 138.75pt while its content ended at 80.25pt, the
+    # page had 125pt left, so a band that would have FIT jumped to the next
+    # page and took the statement's total with it.
+    #
+    # Only when a break follows, only when the slack is genuinely empty (a
+    # background fill or a box would show it), and never for an empty band -
+    # Crystal's declared height is what makes a zero-height detail band print
+    # one page instead of one per row.
+    if (section.new_page_after and content_bottom and not section.bg_color
+            and height > content_bottom):
+        height = content_bottom
     # Crystal's "Keep Together": the band moves whole to the next page rather
     # than splitting across one. PRD spells it `avoid-page-break`. Without it
     # a statement broke halfway down its invoice table where the original

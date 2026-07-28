@@ -5,59 +5,34 @@
 **⚠ REVIEW** — differences found; each one is listed below with a proposed resolution or consultant guidance.
 
 - Original render: **74 pages** (SAP Crystal viewer, saved data)
-- Converted render: **58 pages** (Pentaho Reporting engine, embedded data)
+- Converted render: **37 pages** (Pentaho Reporting engine, embedded data)
 - Statement pagination: **36 of 36** group(s) take the same NUMBER of pages as the original
 
 ### Findings
 
-**1. ✋ [orphaned-total] 21 statement(s) print their total on a page of its own, away from the statement it belongs to - the original keeps them together**
-   - `Cycles and Sports: total alone on converted p3`
-   - `Magazzini: total alone on converted p7`
-   - `Canal City Cycle: total alone on converted p9`
-   - `Alley Cat Cycles: total alone on converted p14`
-   - `Benny - The Spokes Person: total alone on converted p16`
-   - `Blazing Saddles: total alone on converted p19`
-   - `C-Gate Cycle Shoppe: total alone on converted p21`
-   - `City Cyclists: total alone on converted p23`
+**1. ℹ [pages] the conversion is more compact: 37 pages vs 74 - the original leaves near-empty spill pages (43 of them) that the conversion consolidates; every statement still spans the same pages as the original**
    - *No automatic resolution - consultant judgment needed.*
 
-**2. ℹ [pages] the conversion is more compact: 58 pages vs 74 - the original leaves near-empty spill pages (43 of them) that the conversion consolidates; every statement still spans the same pages as the original**
-   - *No automatic resolution - consultant judgment needed.*
-
-**3. ⚠ [appearance] REPORT-WIDE: the middle of the page differs on 58 of the 58 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement**
-   - `15%-29% of each page affected`
-   - `e.g. original p47 vs converted p39 (29% of the page)`
+**2. ⚠ [appearance] REPORT-WIDE: the middle of the page differs on 37 of the 37 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement**
+   - `18%-23% of each page affected`
+   - `e.g. original p47 vs converted p24 (23% of the page)`
    - *No automatic resolution - consultant judgment needed.*
 
 ## Action plan
 
-**5 action(s), 1.11h ($167) in total.** Highest priority first; within a priority, the heaviest first.
+**4 action(s), 0.61h ($92) in total.** Highest priority first; within a priority, the heaviest first.
 
-- P1 · blocks release: **0.50h** ($75) across 1 item(s)
 - P2 · correctness: **0.51h** ($76) across 4 item(s)
 - P3 · cosmetic: **0.10h** ($15) across 1 item(s)
 
 | # | Priority | Action | Items | Effort |
 |---|---|---|---|---|
-| 1 | P1 · blocks release | Reconcile the rendered output against the original | 1 | 0.50h ($75) |
-| 2 | P2 · correctness | Review the flagged layout differences | 1 | 0.25h ($38) |
-| 3 | P2 · correctness | Wire up the data source | 1 | 0.20h ($30) |
-| 4 | P2 · correctness | Glance over the formulas that translated with a caveat | 2 | 0.06h ($9) |
-| 5 | P3 · cosmetic | Work through the remaining notes | 1 | 0.10h ($15) |
+| 1 | P2 · correctness | Review the flagged layout differences | 1 | 0.25h ($38) |
+| 2 | P2 · correctness | Wire up the data source | 1 | 0.20h ($30) |
+| 3 | P2 · correctness | Glance over the formulas that translated with a caveat | 2 | 0.06h ($9) |
+| 4 | P3 · cosmetic | Work through the remaining notes | 1 | 0.10h ($15) |
 
-### 1. Reconcile the rendered output against the original
-
-*P1 · blocks release · 1 item(s) · 0.50h ($75)*
-
-**Why it matters.** The release gate rendered both reports and found differences the customer would see on the page - missing values, dropped lines or content that moved. Until these are closed the conversion is not equivalent to the Crystal original.
-
-**How.** Open the .prpt in Report Designer and preview it beside the original in the Crystal viewer (the app's View original button opens both). Work the evidence lines below one at a time; each names the exact value or line that differs.
-
-Where: `orphaned-total`
-
-- 21 statement(s) print their total on a page of its own, away from the statement it belongs to - the original keeps them together
-
-### 2. Review the flagged layout differences
+### 1. Review the flagged layout differences
 
 *P2 · correctness · 1 item(s) · 0.25h ($38)*
 
@@ -67,9 +42,9 @@ Where: `orphaned-total`
 
 Where: `appearance`
 
-- REPORT-WIDE: the middle of the page differs on 58 of the 58 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement
+- REPORT-WIDE: the middle of the page differs on 37 of the 37 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement
 
-### 3. Wire up the data source
+### 2. Wire up the data source
 
 *P2 · correctness · 1 item(s) · 0.20h ($30)*
 
@@ -80,7 +55,7 @@ Where: `appearance`
 Where: `SampleData`
 
 
-### 4. Glance over the formulas that translated with a caveat
+### 3. Glance over the formulas that translated with a caveat
 
 *P2 · correctness · 2 item(s) · 0.06h ($9)*
 
@@ -93,7 +68,7 @@ Where: `Late Invoices`, `statement amount`
 - Late Invoices: Crystal If without Else: default branch emitted (0) to match Crystal's implicit default
 - statement amount: Sum aggregate rewritten as a PRD TotalGroupSumFunction over [ORDER_AMOUNT] grouped by [CUSTOMER_NAME] - verify scope matches the Crystal placement
 
-### 5. Work through the remaining notes
+### 4. Work through the remaining notes
 
 *P3 · cosmetic · 1 item(s) · 0.10h ($15)*
 
