@@ -1,6 +1,24 @@
 # Version
 
-**1.39.1** — 2026-07-28
+**1.39.2** — 2026-07-28
+
+**A chart report converts to one page again.** A Crystal section can
+legitimately declare a height of zero — that is how a chart report collapses
+its per-row detail band — and the parser was raising every section to a 20pt
+floor. The AdventureWorks demo printed 187 pages against the original's one.
+It now matches the original exactly.
+
+**Saved-data recovery stopped losing whole reports.** Strings stored as
+UTF-16LE came back decoded big-endian, and some `.rpt` files declare every
+saved column as an integer while the batches hold text — which made the
+engine fail on the first cell and refuse to load the bundle at all. Types
+now come from the recovered values rather than from metadata that lies.
+
+**Conditional suppression not carried is down from 39 to 9**, and the nine
+that remain are genuine Crystal shared-variable state. `PercentOfSum` prints
+a real share instead of the raw total. The demo statement passes the release
+gate: **SHIP**, with 36 of 36 statements spanning the same pages as the
+original.
 
 **Conditional suppression now survives conversion** — the corpus's largest
 fidelity gap (93 dropped conditions) is down to 39, all genuinely manual.

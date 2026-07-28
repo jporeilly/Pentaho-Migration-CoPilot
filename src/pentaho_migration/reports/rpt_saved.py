@@ -59,11 +59,27 @@ def _jdn_to_date(serial: int) -> date:
     return date(1970, 1, 1) + timedelta(days=serial - _JDN_EPOCH)
 
 
+def _repair_byteswapped_utf16(text: str) -> str:
+    """Undo a UTF-16 byte-order mix-up in a recovered string.
+
+    Crystal stores some saved strings as UTF-16LE, and those come back
+    decoded as big-endian: "Mendoza" arrives as a run of CJK-looking
+    characters whose low byte is always zero (M = 0x4D reads as U+4D00).
+    That signature is what makes the repair safe to apply automatically -
+    genuine CJK text has non-zero low bytes almost immediately, so it is
+    never mistaken for a swapped Latin string."""
+    if not text or not all(ord(c) > 0xFF and not ord(c) & 0xFF for c in text):
+        return text
+    return "".join(chr(ord(c) >> 8) for c in text)
+
+
 def _convert_cell(raw: str | None, value_type: str):
     """One stored cell -> a real Python value. Unparseable cells return the
     raw text rather than None - visible beats vanished."""
     if raw is None:
         return None
+    if isinstance(raw, str):
+        raw = _repair_byteswapped_utf16(raw)
     try:
         if value_type in ("Number", "Currency"):
             # the /100 un-scaling introduces float dust (20565.620600000002);
@@ -179,6 +195,27 @@ def _cell_text(value) -> str:
     return str(value)
 
 
+def _effective_types(saved: SavedRows):
+    """(column declaration, cell type) per column, trusting the RECOVERED
+    VALUES over the declared Crystal type.
+
+    Some .rpt files report every saved column as Int32s while the batches
+    plainly hold text. Declaring java.lang.Integer for a column of country
+    names makes the engine fail on the first cell and the whole bundle
+    refuses to load - the report is lost to a metadata lie. The values are
+    the ground truth here, so a column holding any string is a String
+    column."""
+    out = []
+    for i, (_short, vt) in enumerate(saved.columns):
+        decl, cell = _JAVA_TYPES.get(vt, ("java.lang.String", None))
+        values = [row[i] for row in saved.rows
+                  if i < len(row) and row[i] is not None]
+        if values and any(isinstance(v, str) for v in values):
+            decl, cell = "java.lang.String", None
+        out.append((decl, cell))
+    return out
+
+
 def build_inline_ds_xml(saved: SavedRows, query_name: str = "default") -> str:
     """The recovered rowset as a PRD inline-table datasource document
     (datasources/inline-ds.xml) whose table answers `query_name`."""
@@ -190,17 +227,17 @@ def build_inline_ds_xml(saved: SavedRows, query_name: str = "default") -> str:
         '"http://reporting.pentaho.org/namespaces/datasources/inline/1.0">',
         f"<data:inline-table name={quoteattr(query_name)}><data:definition>",
     ]
-    for short, vt in saved.columns:
-        decl = _JAVA_TYPES.get(vt, ("java.lang.String",))[0]
+    types = _effective_types(saved)
+    for (short, _vt), (decl, _cell) in zip(saved.columns, types):
         parts.append(f"<data:column name={quoteattr(short)} type={quoteattr(decl)}/>")
     parts.append("</data:definition>")
     for row in saved.rows:
         parts.append("<data:row>")
-        for (short, vt), value in zip(saved.columns, row):
+        for (_short, _vt), (_decl, cell_type), value in zip(
+                saved.columns, types, row):
             if value is None:
                 parts.append('<data:data null="true"/>')
                 continue
-            cell_type = _JAVA_TYPES.get(vt, (None, None))[1]
             attr = f" type={quoteattr(cell_type)}" if cell_type else ""
             parts.append(f"<data:data{attr}>{escape(_cell_text(value))}</data:data>")
         parts.append("</data:row>")

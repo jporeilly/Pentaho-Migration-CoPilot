@@ -101,22 +101,52 @@ def _convert_condition_formulas(target, field_types, context=""):
     """Turn a Section's/Element's raw condition formulas into PRD style
     expressions where the translator can prove them; everything else becomes
     the honest 'not carried' note. Returns the fallback notes."""
-    from .formula_translator import TranslationError, translate_style_condition
+    from .formula_translator import (
+        NO_PRINT_EFFECT, TranslationError, translate_style_conditions)
 
     notes = []
     for attr, body in target.condition_formulas:
         snippet = " ".join(body.split())[:100]
+        why = NO_PRINT_EFFECT.get(attr.lower())
+        if why:
+            # not a failure to fix: nothing a paged report can render, so it
+            # is recorded and kept out of the manual backlog
+            notes.append(
+                f"conditional {attr} has no effect in a PRD report{context} "
+                f"- {why}: {snippet}")
+            continue
+        body = _resolve_current_field_value(body, target)
         try:
-            key, formula = translate_style_condition(attr, body, field_types)
+            pairs = translate_style_conditions(attr, body, field_types)
         except TranslationError as e:
             notes.append(
                 f"conditional {attr} formula not carried{context} ({e}): {snippet}")
             continue
-        target.style_expressions.append((key, formula))
+        target.style_expressions.extend(pairs)
+        keys = "' + '".join(key for key, _ in pairs)
         notes.append(
-            f"conditional {attr} converted to a '{key}' style expression{context} "
+            f"conditional {attr} converted to a '{keys}' style expression{context} "
             f"- verify against Crystal: {snippet}")
     return notes
+
+
+_CURRENT_FIELD_VALUE = re.compile(r"\bcurrentfieldvalue\b", re.I)
+
+
+def _resolve_current_field_value(body, target):
+    """In a Crystal HIGHLIGHTING expression, CurrentFieldValue means "the
+    value of the element this format is attached to". Substituting the
+    element's `column` - the PRD-side name of whatever it displays - covers
+    every element kind uniformly, including a summary field, whose Crystal
+    source reads 'Sum ({@Line_Debit})' but whose value on the PRD side is the
+    generated report function. A section has no value of its own, so its
+    formulas are left to fail honestly rather than be guessed at."""
+    if not _CURRENT_FIELD_VALUE.search(body):
+        return body
+    column = (getattr(target, "column", "") or "").strip()
+    if not column or not re.fullmatch(r"[^{}]+", column):
+        return body
+    return _CURRENT_FIELD_VALUE.sub(lambda _m: "{" + column + "}", body)
 
 
 def _numeric_format_from_parts(node):
@@ -383,6 +413,20 @@ def _attach_subreports(model):
                 + " - verify layout and data")
 
 
+def _normalize_value_type(raw: str) -> str:
+    """Crystal reports a field's type two ways: the bare name on formula
+    definitions ("DateField") and the SDK enum on database fields
+    ("crFieldValueTypeDateField"). Only the bare form matches the pipeline's
+    type sets, so an un-stripped enum silently made every DATABASE field a
+    plain string - dates printed ISO instead of their Crystal format and
+    currency columns lost their symbol."""
+    value = (raw or "").strip()
+    for prefix in ("crFieldValueType", "crFieldValue", "crValueType"):
+        if value.startswith(prefix):
+            return value[len(prefix):] or "StringField"
+    return value or "StringField"
+
+
 def _parse_database(root, model):
     for table in root.iter("Table"):
         tname = _attr(table, "Name", "Alias", default="TABLE")
@@ -391,7 +435,8 @@ def _parse_database(root, model):
             fname = _attr(f, "Name", "ShortName", default="")
             fname = fname.split(".")[-1].strip("{}")
             if fname:
-                fields[fname] = _attr(f, "ValueType", "Type", default="StringField")
+                fields[fname] = _normalize_value_type(
+                    _attr(f, "ValueType", "Type", default="StringField"))
         model.tables[tname] = fields
         for fname, vtype in fields.items():
             model.field_types[fname] = vtype
@@ -458,7 +503,9 @@ def _parse_data_definition(root, model):
         if name:
             model.formulas[name] = Formula(
                 name=name, text=text,
-                value_type=_attr(f, "ValueType", default=""))
+                value_type=_normalize_value_type(
+                    _attr(f, "ValueType", default="")) if _attr(
+                        f, "ValueType", default="") else "")
 
     for p in dd.iter("ParameterFieldDefinition"):
         name = _attr(p, "Name", "ParameterFieldName", default="").strip("{}?")
@@ -474,7 +521,8 @@ def _parse_data_definition(root, model):
                     default_values.append(text)
         model.parameters.append(Parameter(
             name=name,
-            value_type=_attr(p, "ValueType", default="StringField"),
+            value_type=_normalize_value_type(
+                _attr(p, "ValueType", default="StringField")),
             prompt=_attr(p, "PromptText", "Prompt", default=""),
             default=_attr(p, "DefaultValue", default="") or (default_values[0] if default_values else ""),
             multi_value=_attr(p, "EnableAllowMultipleValue", default="false").lower() in ("true", "1"),
@@ -558,10 +606,29 @@ def _parse_summaries(dd, model):
         # out which one it is.
         label = _summary_label(name) or op
         expr_name = re.sub(r"\W+", "_", f"{label}_{column}" + (f"_{gcolumn}" if gcolumn else ""))
+        percent_of = None
+        if label.lower() == "percentofsum":
+            # PercentOfSum(field, ownGroup [, outerGroup]) - the share of the
+            # outer group's sum, or of the report's grand total when the
+            # third argument is absent. Emitted as a real PRD quotient
+            # function; left as a plain Sum it printed the raw total in a
+            # percent column ("% 603"), which reads as data, not as a gap.
+            args = re.findall(r"\{([^{}]+)\}", name or "")
+            percent_of = (parse_field_ref("{" + args[2] + "}")[1]
+                          if len(args) > 2 else "")
         model.summaries.append(Summary(
             name=name.strip("{}#"), operation=op, field_ref=fref,
-            group_field=gcolumn, expression_name=expr_name))
-        if label.lower().startswith(("percentof", "percentage")):
+            group_field=gcolumn, expression_name=expr_name,
+            percent_of=percent_of))
+        if percent_of is not None:
+            model.issues.append(
+                f"summary '{name.strip('{}#')}' converted to a PRD "
+                "percent-of-total function (this group's sum over "
+                + (f"the {percent_of} total" if percent_of
+                   else "the report total")
+                + ") - Crystal stores the operation as 'Sum', so verify the "
+                "scope reads as a share and not a running total")
+        elif label.lower().startswith(("percentof", "percentage")):
             model.issues.append(
                 f"summary '{name.strip('{}#')}' is a percent-of-total, but "
                 f"Crystal stores its operation as {op!r} - PRD would total the "
@@ -709,7 +776,11 @@ def _parse_areas(root, model):
             section = Section(
                 area_kind=kind,
                 name=_attr(sec, "Name", default=""),
-                height=_twips(sec, "Height", default=20.0) or 20.0,
+                # A declared Height of 0 is REAL and must survive: a chart
+                # report collapses its detail band to nothing, and forcing a
+                # 20pt floor turned 5000 invisible rows into 187 blank pages
+                # where Crystal prints one. Only a MISSING height defaults.
+                height=_twips(sec, "Height", default=20.0),
                 group_index=group_index,
                 suppressed=suppressed,
                 bg_color=band_bg if band_bg not in ("#ffffff",) else "",

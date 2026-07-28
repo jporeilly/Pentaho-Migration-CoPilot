@@ -48,6 +48,10 @@ _RULES = (
     (INFO, re.compile(r"\brecovered from the \.rpt and embedded\b", re.I)),
     (INFO, re.compile(r"\bare embedded \(a demo dataset\b", re.I)),
     (INFO, re.compile(r"\bchart migrated as a PRD legacy chart", re.I)),
+    # "conditional ToolTipText has no effect in a PRD report - tool-tips do
+    # not exist in paged output". Crystal had it; paper cannot show it. There
+    # is no work here, so it must not read as backlog.
+    (INFO, re.compile(r"\bhas no effect in a PRD report\b", re.I)),
     (MANUAL, re.compile(r"\bnot carried\b|\brebuild by hand\b|\bby hand\b"
                         r"|\bhand-add\b|\bno PRD\b|\bunresolved\b", re.I)),
 )

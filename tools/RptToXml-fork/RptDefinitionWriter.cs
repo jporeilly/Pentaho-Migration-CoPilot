@@ -1251,6 +1251,10 @@ namespace RptToXml
 				// (the engine API exposes just the No/Fixed/Floating enum)
 				string rasSymbol = null;
 				string rasPosition = "";
+				string rasThousands = "";
+				string rasDateOrder = "";
+				string rasSep1 = null;
+				string rasSep2 = null;
 				try
 				{
 					var rasField = rasrdmRo as CRReportDefModel.ISCRFieldObject;
@@ -1260,6 +1264,20 @@ namespace RptToXml
 					{
 						rasSymbol = rasNf.CurrencySymbol;
 						try { rasPosition = rasNf.CurrencyPosition.ToString(); } catch { }
+						// the engine model has no grouping flag; RAS does, and
+						// without it every integer printed as "2,886"
+						try { rasThousands = rasNf.ThousandsSeparator.ToString(); } catch { }
+					}
+					// the engine model exposes only day/month/year STYLE - the
+					// ORDER and separators live in RAS, so "2002/04/3" was
+					// being emitted as "MM/d/yyyy"
+					var rasDf = rasField == null || rasField.FieldFormat == null
+						? null : rasField.FieldFormat.DateFormat;
+					if (rasDf != null)
+					{
+						try { rasDateOrder = rasDf.DateOrder.ToString(); } catch { }
+						try { rasSep1 = rasDf.DateFirstSeparator; } catch { }
+						try { rasSep2 = rasDf.DateSecondSeparator; } catch { }
 					}
 				}
 				catch { }
@@ -1280,7 +1298,10 @@ namespace RptToXml
 						try { WriteAttributeString(writer, "EnableUseLeadingZero", nf.EnableUseLeadingZero.ToString()); } catch { }
 						try { WriteAttributeString(writer, "NegativeFormat", nf.NegativeFormat.ToString()); } catch { }
 						try { WriteAttributeString(writer, "RoundingFormat", nf.RoundingFormat.ToString()); } catch { }
-						WriteAttributeString(writer, "FormatString", BuildNumericFormatString(nf, rasSymbol));
+						if (!string.IsNullOrEmpty(rasThousands))
+							WriteAttributeString(writer, "ThousandsSeparator", rasThousands);
+						WriteAttributeString(writer, "FormatString",
+							BuildNumericFormatString(nf, rasSymbol, rasThousands, rasPosition));
 						writer.WriteEndElement();
 					}
 				}
@@ -1294,7 +1315,14 @@ namespace RptToXml
 						try { WriteAttributeString(writer, "DayFormat", df.DayFormat.ToString()); } catch { }
 						try { WriteAttributeString(writer, "MonthFormat", df.MonthFormat.ToString()); } catch { }
 						try { WriteAttributeString(writer, "YearFormat", df.YearFormat.ToString()); } catch { }
-						WriteAttributeString(writer, "FormatString", BuildDateFormatString(df));
+						if (!string.IsNullOrEmpty(rasDateOrder))
+							WriteAttributeString(writer, "DateOrder", rasDateOrder);
+						if (!string.IsNullOrEmpty(rasSep1))
+							WriteAttributeString(writer, "DateFirstSeparator", rasSep1);
+						if (!string.IsNullOrEmpty(rasSep2))
+							WriteAttributeString(writer, "DateSecondSeparator", rasSep2);
+						WriteAttributeString(writer, "FormatString",
+							BuildDateFormatString(df, rasDateOrder, rasSep1, rasSep2));
 						writer.WriteEndElement();
 					}
 				}
@@ -1304,12 +1332,30 @@ namespace RptToXml
 			catch { }
 		}
 
-		private static string BuildNumericFormatString(NumericFieldFormat nf, string rasSymbol)
+		private static string BuildNumericFormatString(NumericFieldFormat nf, string rasSymbol,
+			string rasThousands, string rasPosition)
 		{
 			try
 			{
 				int places = nf.DecimalPlaces;
-				string body = "#,##0" + (places > 0 ? "." + new string('0', places) : "");
+				// grouping is a REAL setting (RAS ThousandsSeparator), not an
+				// assumption - Crystal prints invoice id 2886, not 2,886
+				// An explicit OFF from RAS is honoured. When RAS says ON it is
+				// not decisive: this SDK reports True for integer id fields
+				// that Crystal itself renders ungrouped ("2886", while the same
+				// report groups amounts as "1,139.55" - verified against the
+				// viewer's own PDF). Decimal places is the signal that
+				// separates money from identifiers. A genuinely grouped
+				// integer column would need its FormatString edited in PRD.
+				bool grouped = true;
+				if (!string.IsNullOrEmpty(rasThousands))
+				{
+					string g = rasThousands.ToLowerInvariant();
+					grouped = !(g.Contains("false") || g == "0" || g.Contains("no"));
+				}
+				if (grouped && places == 0) grouped = false;
+				string body = (grouped ? "#,##0" : "0")
+					+ (places > 0 ? "." + new string('0', places) : "");
 				string symbol = "";
 				try
 				{
@@ -1319,7 +1365,12 @@ namespace RptToXml
 						symbol = string.IsNullOrEmpty(rasSymbol) ? "$" : rasSymbol;
 				}
 				catch { }
-				string positive = symbol.Length > 0 ? symbol + " " + body : body;
+				// Crystal abuts the symbol ("$43.50"); a trailing position puts
+				// it after. No invented spacing either way.
+				string positive = body;
+				if (symbol.Length > 0)
+					positive = (rasPosition ?? "").IndexOf("Trailing", StringComparison.OrdinalIgnoreCase) >= 0
+						? body + symbol : symbol + body;
 				string negStyle = "LeadingMinus";
 				try { negStyle = nf.NegativeFormat.ToString(); } catch { }
 				string negative;
@@ -1335,7 +1386,8 @@ namespace RptToXml
 			catch { return ""; }
 		}
 
-		private static string BuildDateFormatString(DateFieldFormat df)
+		private static string BuildDateFormatString(DateFieldFormat df, string rasOrder,
+			string rasSep1, string rasSep2)
 		{
 			try
 			{
@@ -1363,11 +1415,20 @@ namespace RptToXml
 						: y.IndexOf("No", StringComparison.OrdinalIgnoreCase) == 0 ? "" : "yyyy";
 				}
 				catch { }
+				// ORDER comes from RAS (crDateOrderYearMonthDay etc); month/day/
+				// year was hardcoded before, so "2002/04/3" emitted as "MM/d/yyyy"
+				var order = new System.Collections.Generic.List<string>();
+				string o = (rasOrder ?? "").ToLowerInvariant();
+				if (o.Contains("yearmonthday")) { order.Add(year); order.Add(month); order.Add(day); }
+				else if (o.Contains("daymonthyear")) { order.Add(day); order.Add(month); order.Add(year); }
+				else { order.Add(month); order.Add(day); order.Add(year); }
 				var parts = new System.Collections.Generic.List<string>();
-				if (month.Length > 0) parts.Add(month);
-				if (day.Length > 0) parts.Add(day);
-				if (year.Length > 0) parts.Add(year);
-				return string.Join("/", parts);
+				foreach (var part in order) if (part.Length > 0) parts.Add(part);
+				string sep1 = string.IsNullOrEmpty(rasSep1) ? "/" : rasSep1;
+				string sep2 = string.IsNullOrEmpty(rasSep2) ? sep1 : rasSep2;
+				if (parts.Count == 3) return parts[0] + sep1 + parts[1] + sep2 + parts[2];
+				if (parts.Count == 2) return parts[0] + sep1 + parts[1];
+				return parts.Count == 1 ? parts[0] : "";
 			}
 			catch { return ""; }
 		}

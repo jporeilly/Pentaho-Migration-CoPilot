@@ -21,14 +21,74 @@ from pentaho_migration.reports.conversion_report import build_conversion_report
 NAVY, GOLD, SLATE, LIGHT = "#133346", "#c9a24a", "#5b7185", "#f2f5f7"
 
 
+PRIORITY_COLOR = {1: "#c0392b", 2: "#c9a24a", 3: "#5b7185"}
+PRIORITY_BG = {1: "#fdecea", 2: "#fdf5e3", 3: "#eef2f4"}
+
+
+def _plan_html(actions, rate, esc):
+    """The action plan: the part a consultant actually works from. One row
+    per action, priority-ordered, each carrying what it costs and what
+    happens if it is skipped."""
+    from pentaho_migration.reports.action_plan import PRIORITY_LABEL
+
+    if not actions:
+        return ('<p class="clean">Nothing outstanding — this report converts '
+                "clean. Open it in Report Designer, point it at the database "
+                "and publish.</p>")
+    rows = []
+    for n, a in enumerate(actions, 1):
+        where = ""
+        if a.where:
+            shown = ", ".join(esc(str(w)) for w in a.where[:6])
+            more = f" +{len(a.where) - 6} more" if len(a.where) > 6 else ""
+            where = f'<div class="where">{shown}{more}</div>'
+        items = ""
+        if a.items:
+            lis = "".join(f"<li>{esc(str(i))}</li>" for i in a.items[:12])
+            extra = (f"<li class='muted'>… and {len(a.items) - 12} more</li>"
+                     if len(a.items) > 12 else "")
+            items = (f"<details><summary>{len(a.items)} item(s)</summary>"
+                     f"<ul>{lis}{extra}</ul></details>")
+        rows.append(f"""
+<tr class="act">
+  <td class="num">{n}</td>
+  <td><span class="chip p{a.priority}">{esc(PRIORITY_LABEL[a.priority])}</span></td>
+  <td>
+    <div class="title">{esc(a.title)}</div>
+    <div class="why"><b>Why it matters.</b> {esc(a.why)}</div>
+    <div class="how"><b>How.</b> {esc(a.how)}</div>
+    {where}{items}
+  </td>
+  <td class="n">{a.count}</td>
+  <td class="n">{a.hours:,.2f}h<div class="muted">${a.hours * rate:,.0f}</div></td>
+</tr>""")
+    return ("<table class='plan'><tr><th></th><th>Priority</th>"
+            "<th>Action</th><th class='n'>Items</th><th class='n'>Effort</th></tr>"
+            + "".join(rows) + "</table>")
+
+
+def _rollup_html(totals, rate, esc):
+    from pentaho_migration.reports.action_plan import PRIORITY_LABEL
+
+    cells = []
+    for pri in (1, 2, 3):
+        n, h = totals.get(pri, (0, 0.0))
+        cells.append(
+            f'<div class="roll p{pri}"><b>{h:,.2f}h</b>'
+            f'<span>{esc(PRIORITY_LABEL[pri])}</span>'
+            f'<span class="muted">{n} item(s) · ${h * rate:,.0f}</span></div>')
+    return f'<div class="rolls">{"".join(cells)}</div>'
+
+
 def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
-    """The per-migration consultant report in the SAME dress as the Project
-    portfolio report: KPI cards up top (verdict, effort hours, $ saved), then
-    the release-check findings with their resolutions, then the work list.
-    Self-contained HTML - prints to PDF, mails, survives without the app."""
+    """The per-migration consultant report: a prioritised, costed ACTION PLAN
+    first, then the evidence behind it. Self-contained HTML - prints to PDF,
+    mails, survives without the app."""
+    from pentaho_migration.reports.action_plan import (
+        build_action_plan, plan_totals)
     from pentaho_migration.reports.effort import build_report_effort
-    from pentaho_migration.reports.model import is_todo_element
-    from pentaho_migration.reports.todo_kinds import MANUAL, split_todos
+    from pentaho_migration.reports.todo_kinds import (
+        APPLIED, INFO, MANUAL, split_todos)
 
     esc = _html.escape
     effort = build_report_effort(model)
@@ -37,175 +97,272 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
     saved_h = max(manual_h - copilot_h, 0.0)
     money = lambda h: f"${h * rate:,.0f}"
 
-    if check is None or check.verdict == "UNAVAILABLE":
-        verdict_html = f'<span style="color:{SLATE}">◻ NOT RUN</span>'
+    actions = build_action_plan(model, check)
+    totals = plan_totals(actions)
+    plan_hours = totals["total"][1]
+    blockers = totals.get(1, (0, 0.0))[0]
+
+    if check is None or getattr(check, "verdict", "") == "UNAVAILABLE":
+        verdict, vclass = "NOT RUN", "vgrey"
         verdict_note = esc(getattr(check, "reason", "") or
-                           "original .rpt / render environment not available")
+                           "the original .rpt or a local render environment "
+                           "was not available, so the conversion has not been "
+                           "compared against the original")
     elif check.verdict == "SHIP":
-        verdict_html = '<span style="color:#0ca30c">✅ SHIP</span>'
-        verdict_note = "rendered conversion matches the original"
+        verdict, vclass = "SHIP", "vgreen"
+        verdict_note = ("Both reports were rendered and compared: the "
+                        "conversion matches the original.")
     else:
-        verdict_html = f'<span style="color:{GOLD}">⚠ REVIEW</span>'
-        verdict_note = (f"{len(check.findings)} finding(s) - each with a "
-                        "resolution or guidance below")
+        verdict, vclass = "REVIEW", "vamber"
+        verdict_note = (f"{len(check.findings)} difference(s) between the "
+                        "rendered conversion and the rendered original. Each "
+                        "is listed with its evidence below.")
+
+    # --- evidence: how the two renders compare -------------------------
+    pages_html = ""
+    if check is not None and getattr(check, "verdict", "") != "UNAVAILABLE":
+        spans = ""
+        if getattr(check, "groups_checked", 0):
+            ok = check.groups_matching == check.groups_checked
+            spans = (f'<div class="ev"><b>{check.groups_matching} of '
+                     f"{check.groups_checked}</b><span>group(s) span the same "
+                     f'pages as the original{" — exact" if ok else ""}</span></div>')
+        pages_html = (
+            '<div class="evs">'
+            f'<div class="ev"><b>{check.original_pages}</b><span>pages, '
+            "original (SAP Crystal viewer)</span></div>"
+            f'<div class="ev"><b>{check.converted_pages}</b><span>pages, '
+            "converted (Pentaho engine)</span></div>"
+            f"{spans}</div>")
 
     findings_html = ""
-    if check is not None and check.findings:
+    if check is not None and getattr(check, "findings", None):
         rows = []
         for n, f in enumerate(check.findings, 1):
-            icon = {"error": "✋", "warning": "⚠"}.get(f.severity, "ℹ")
+            sev = {"error": ("✋", "sev1"), "warning": ("⚠", "sev2")}.get(
+                f.severity, ("ℹ", "sev3"))
             ev = "".join(f"<li><code>{esc(str(e))}</code></li>"
                          for e in f.evidence[:8])
-            resolution = (f'<p class="fix">→ {esc(f.resolution)}</p>'
+            resolution = (f'<p class="fix"><b>Resolution.</b> {esc(f.resolution)}</p>'
                           if f.resolution else
-                          '<p class="fix muted">No automatic resolution - '
-                          "consultant judgment needed.</p>")
+                          '<p class="fix muted">No automatic resolution — this '
+                          "one needs a consultant's judgement.</p>")
             rows.append(
-                f'<div class="finding"><b>{n}. {icon} [{esc(f.code)}]</b> '
-                f"{esc(f.message)}<ul>{ev}</ul>{resolution}</div>")
-        findings_html = "<h2>Release-check findings</h2>" + "".join(rows)
+                f'<div class="finding {sev[1]}"><b>{n}. {sev[0]} '
+                f"[{esc(f.code)}]</b> {esc(f.message)}"
+                + (f"<ul>{ev}</ul>" if ev else "") + resolution + "</div>")
+        findings_html = ("<h2>Evidence — where the renders differ</h2>"
+                         + "".join(rows))
 
+    notes = [n for s in model.sections for el in s.elements for n in el.notes]
+    notes += model.issues
+    buckets = split_todos(notes)
+    applied_html = "".join(f"<li>{esc(a)}</li>" for a in buckets[APPLIED][:40])
+    info_html = "".join(f"<li>{esc(i)}</li>" for i in buckets[INFO][:40])
+    manual_html = "".join(f"<li>{esc(m)}</li>" for m in buckets[MANUAL])
+
+    structure = [("Bands", f"{len(model.sections)}"),
+                 ("Elements", f"{sum(len(s.elements) for s in model.sections)}"),
+                 ("Groups", f"{len(model.groups)}"),
+                 ("Parameters", f"{len(model.parameters)}"),
+                 ("Summaries", f"{len(model.summaries)}"),
+                 ("Sub-reports", f"{len(model.subreports)}")]
     counts = {"auto": 0, "review": 0, "manual": 0}
     for f in model.formulas.values():
         counts[f.status] = counts.get(f.status, 0) + 1
-    notes = [n for s in model.sections for el in s.elements for n in el.notes]
-    notes += [f"{s.area_kind}: {el.kind}" for s in model.sections
-              for el in s.elements if is_todo_element(el)]
-    notes += model.issues
-    manual_work = split_todos(notes)[MANUAL]
-    work_html = ("".join(f"<li>{esc(w)}</li>" for w in manual_work)
-                 or "<li>Nothing - every note was handled automatically.</li>")
-
-    pages_html = ""
-    if check is not None and check.verdict != "UNAVAILABLE":
-        spans = ""
-        if getattr(check, "groups_checked", 0):
-            spans = (f" · statement pagination: <b>{check.groups_matching} of "
-                     f"{check.groups_checked}</b> groups match the original exactly")
-        pages_html = (f"<p>Rendered original: <b>{check.original_pages} "
-                      f"pages</b> (SAP viewer) · converted: "
-                      f"<b>{check.converted_pages} pages</b> (Pentaho engine)"
-                      f"{spans}</p>")
-
-    # --- where the effort goes: a breakdown the consultant can act on ---
-    from pentaho_migration.reports.todo_kinds import APPLIED, INFO
-    buckets = split_todos(notes)
-    areas = []                       # (area, count, what to do)
-    if counts["manual"]:
-        areas.append(("Formulas to rebuild by hand", counts["manual"],
-                      "Open each in PRD's formula editor - the conversion "
-                      "report lists the original Crystal text beside what it "
-                      "could prove."))
-    if counts["review"]:
-        areas.append(("Formulas translated, needing a glance", counts["review"],
-                      "Deterministic translations whose semantics are worth "
-                      "confirming against the Crystal original."))
-    suppress = [n for n in buckets[MANUAL] if "EnableSuppress" in n]
-    if suppress:
-        areas.append(("Conditional suppression not carried", len(suppress),
-                      "Crystal hides sections on a condition PRD cannot "
-                      "express; recreate as a band visibility expression or "
-                      "accept the section always printing."))
-    cosmetic = [n for n in buckets[MANUAL]
-                if "conditional" in n.lower() and "EnableSuppress" not in n]
-    if cosmetic:
-        areas.append(("Conditional formatting not carried", len(cosmetic),
-                      "Colour/tooltip/style conditions - cosmetic; apply as "
-                      "PRD style expressions where the customer cares."))
-    others = [n for n in buckets[MANUAL]
-              if n not in suppress and n not in cosmetic]
-    if others:
-        areas.append(("Other items needing judgment", len(others),
-                      "Listed in full below."))
-    if check is not None and check.findings:
-        blocking = [f for f in check.findings if f.severity in ("error", "warning")]
-        if blocking:
-            areas.append(("Release-check findings", len(blocking),
-                          "Rendered-output differences vs the original, with "
-                          "a proposed resolution each."))
-    areas_html = "".join(
-        f"<tr><td>{esc(a)}</td><td class='n'>{n}</td><td>{esc(w)}</td></tr>"
-        for a, n, w in areas) or (
-        "<tr><td colspan='3'>Nothing outstanding - this report converts clean."
-        "</td></tr>")
-
-    applied_html = "".join(f"<li>{esc(a)}</li>" for a in buckets[APPLIED][:20])
-    info_html = "".join(f"<li>{esc(i)}</li>" for i in buckets[INFO][:20])
-
-    structure = [("Bands", len(model.sections)),
-                 ("Elements", sum(len(s.elements) for s in model.sections)),
-                 ("Groups", len(model.groups)),
-                 ("Parameters", len(model.parameters)),
-                 ("Summaries", len(model.summaries)),
-                 ("Sub-reports", len(model.subreports))]
-    structure_html = "".join(f"<tr><td>{k}</td><td class='n'>{v}</td></tr>"
+    structure.append(("Formulas",
+                      f"{counts['auto']} translated · {counts['review']} to "
+                      f"check · {counts['manual']} to rebuild"))
+    structure.append(("Data source", esc(model.jndi or "—")))
+    rows_n = len(getattr(getattr(model, "saved_rows", None), "rows", []) or [])
+    structure.append(("Embedded rows", f"{rows_n:,}" if rows_n else "none"))
+    structure_html = "".join(f"<tr><td>{k}</td><td>{v}</td></tr>"
                              for k, v in structure)
-    data_rows = (len(model.saved_rows.rows)
-                 if getattr(model, "saved_rows", None) else 0)
+
+    kinds = {a.kind for a in actions}
+    reference_html = _reference_html(kinds, esc)
 
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>Consultant Report — {esc(model.name)}</title>
 <style>
-  body {{ font: 14px/1.55 system-ui, "Segoe UI", sans-serif; color: #17242e;
-         max-width: 920px; margin: 32px auto; padding: 0 20px; }}
-  h1 {{ color: {NAVY}; border-bottom: 3px solid {GOLD}; padding-bottom: 8px; margin-bottom: 4px; }}
-  h2 {{ color: {NAVY}; margin-top: 30px; border-bottom: 1px solid #dfe6ea; padding-bottom: 4px; }}
-  .kpis {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0; }}
-  .kpi {{ flex: 1 1 150px; background: {LIGHT}; border-radius: 10px; padding: 14px 18px; }}
-  .kpi b {{ display: block; font-size: 24px; color: {NAVY}; }}
-  .kpi.gold b {{ color: {GOLD}; }}
-  .kpi span {{ font-size: 12px; color: {SLATE}; }}
+  :root {{ --navy: {NAVY}; --gold: {GOLD}; --slate: {SLATE}; --light: {LIGHT}; }}
+  * {{ box-sizing: border-box; }}
+  body {{ font: 15px/1.6 system-ui, "Segoe UI", Roboto, sans-serif;
+         color: #17242e; max-width: 1000px; margin: 0 auto 60px;
+         padding: 0 22px; background: #fff; }}
+  .masthead {{ background: var(--navy); color: #fff; margin: 0 -22px 26px;
+               padding: 26px 30px 22px; border-bottom: 4px solid var(--gold); }}
+  .masthead h1 {{ margin: 0 0 4px; font-size: 26px; letter-spacing: -.2px; }}
+  .masthead p {{ margin: 0; color: #b9c9d4; font-size: 13px; }}
+  .badge {{ display: inline-block; float: right; font-weight: 700;
+            padding: 7px 16px; border-radius: 999px; font-size: 15px; }}
+  .vgreen {{ background: #0f7a34; color: #fff; }}
+  .vamber {{ background: var(--gold); color: #2b2107; }}
+  .vgrey  {{ background: #48606f; color: #dfe8ee; }}
+  h2 {{ color: var(--navy); margin: 34px 0 10px; font-size: 19px;
+        border-bottom: 2px solid #e3e9ed; padding-bottom: 6px; }}
+  h2 .sub {{ font-weight: 400; font-size: 13px; color: var(--slate); }}
+  .lede {{ background: var(--light); border-left: 4px solid var(--gold);
+           padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 0 0 18px; }}
+  .kpis {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }}
+  .kpi {{ flex: 1 1 160px; background: var(--light); border-radius: 12px;
+          padding: 14px 18px; }}
+  .kpi b {{ display: block; font-size: 25px; color: var(--navy);
+            line-height: 1.2; }}
+  .kpi.gold b {{ color: #8a6d17; }}
+  .kpi span {{ font-size: 12px; color: var(--slate); }}
+  .rolls {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0 18px; }}
+  .roll {{ flex: 1 1 180px; border-radius: 12px; padding: 12px 16px;
+           border: 1px solid #e3e9ed; }}
+  .roll b {{ display: block; font-size: 22px; }}
+  .roll span {{ display: block; font-size: 12px; color: var(--slate); }}
+  .roll.p1 {{ background: {PRIORITY_BG[1]}; }} .roll.p1 b {{ color: {PRIORITY_COLOR[1]}; }}
+  .roll.p2 {{ background: {PRIORITY_BG[2]}; }} .roll.p2 b {{ color: #8a6d17; }}
+  .roll.p3 {{ background: {PRIORITY_BG[3]}; }} .roll.p3 b {{ color: var(--slate); }}
+  .evs {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 4px; }}
+  .ev {{ flex: 1 1 170px; border: 1px solid #e3e9ed; border-radius: 10px;
+         padding: 10px 14px; }}
+  .ev b {{ display: block; font-size: 20px; color: var(--navy); }}
+  .ev span {{ font-size: 12px; color: var(--slate); }}
   table {{ border-collapse: collapse; width: 100%; margin: 10px 0; }}
-  th {{ text-align: left; color: {SLATE}; font-weight: 600; font-size: 12px;
-        border-bottom: 2px solid #dfe6ea; padding: 6px 8px; }}
-  td {{ padding: 7px 8px; border-bottom: 1px solid #eef2f4; vertical-align: top; }}
-  td.n {{ text-align: right; font-variant-numeric: tabular-nums; width: 70px; }}
-  .finding {{ background: {LIGHT}; border-radius: 10px; padding: 12px 16px; margin: 10px 0; }}
+  th {{ text-align: left; color: var(--slate); font-weight: 600; font-size: 12px;
+        text-transform: uppercase; letter-spacing: .4px;
+        border-bottom: 2px solid #e3e9ed; padding: 8px; }}
+  td {{ padding: 12px 8px; border-bottom: 1px solid #eef2f4;
+        vertical-align: top; }}
+  td.n {{ text-align: right; font-variant-numeric: tabular-nums;
+          white-space: nowrap; width: 92px; }}
+  td.num {{ width: 30px; color: var(--slate); font-weight: 700; }}
+  .plan tr.act:hover td {{ background: #fbfcfd; }}
+  .plan .title {{ font-weight: 650; color: var(--navy); font-size: 15px;
+                  margin-bottom: 3px; }}
+  .plan .why, .plan .how {{ font-size: 13.5px; margin: 3px 0; }}
+  .plan .how {{ color: #2f4756; }}
+  .where {{ font-size: 12px; color: var(--slate); margin-top: 5px;
+            font-family: ui-monospace, Consolas, monospace; }}
+  .chip {{ display: inline-block; padding: 3px 10px; border-radius: 999px;
+           font-size: 11.5px; font-weight: 700; white-space: nowrap; }}
+  .chip.p1 {{ background: {PRIORITY_BG[1]}; color: {PRIORITY_COLOR[1]}; }}
+  .chip.p2 {{ background: {PRIORITY_BG[2]}; color: #8a6d17; }}
+  .chip.p3 {{ background: {PRIORITY_BG[3]}; color: var(--slate); }}
+  .finding {{ border-radius: 10px; padding: 12px 16px; margin: 10px 0;
+              border-left: 4px solid var(--slate); background: var(--light); }}
+  .finding.sev1 {{ border-left-color: {PRIORITY_COLOR[1]}; background: {PRIORITY_BG[1]}; }}
+  .finding.sev2 {{ border-left-color: var(--gold); background: {PRIORITY_BG[2]}; }}
   .finding ul {{ margin: 6px 0; }}
   .fix {{ margin: 6px 0 0; }}
-  .muted {{ color: {SLATE}; }}
-  code {{ background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; }}
-  details {{ margin: 8px 0; }} summary {{ cursor: pointer; color: {SLATE}; }}
-  footer {{ margin-top: 34px; color: {SLATE}; font-size: 12px;
-            border-top: 1px solid #dfe6ea; padding-top: 10px; }}
+  .muted {{ color: var(--slate); }}
+  .clean {{ background: #eaf7ee; border-left: 4px solid #0f7a34;
+            padding: 12px 16px; border-radius: 0 8px 8px 0; }}
+  code {{ background: #fff; padding: 1px 6px; border-radius: 4px;
+          font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }}
+  details {{ margin: 8px 0; }}
+  summary {{ cursor: pointer; color: var(--slate); font-size: 13px; }}
+  .ref dt {{ font-weight: 650; color: var(--navy); margin-top: 10px; }}
+  .ref dd {{ margin: 2px 0 0 0; font-size: 13.5px; }}
+  footer {{ margin-top: 40px; color: var(--slate); font-size: 12.5px;
+            border-top: 2px solid #e3e9ed; padding-top: 12px; }}
+  @media print {{
+    body {{ max-width: none; }} .masthead {{ margin: 0 0 20px; }}
+    tr.act, .finding {{ break-inside: avoid; }}
+    details[open] summary ~ * {{ display: block; }}
+  }}
 </style></head><body>
-<h1>Consultant Report — {esc(model.name)}</h1>
-<p class="muted">Generated {datetime.now():%Y-%m-%d %H:%M} · Pentaho Migration Copilot
- · SAP Crystal Reports → Pentaho Report Designer</p>
+
+<div class="masthead">
+  <span class="badge {vclass}">{verdict}</span>
+  <h1>{esc(model.name)}</h1>
+  <p>Consultant report · SAP Crystal Reports → Pentaho Report Designer ·
+     generated {datetime.now():%Y-%m-%d %H:%M}</p>
+</div>
+
+<p class="lede"><b>{verdict}.</b> {verdict_note}
+{"" if not actions else
+ f" There {'is 1 action' if len(actions) == 1 else f'are {len(actions)} actions'} "
+ f"below, {plan_hours:,.2f}h ({money(plan_hours)}) in total"
+ + (f", of which {blockers} item(s) block release." if blockers else ".")}</p>
 
 <div class="kpis">
-  <div class="kpi"><b>{verdict_html}</b><span>{verdict_note}</span></div>
-  <div class="kpi"><b>{copilot_h:,.1f}h</b><span>effort with Copilot ({money(copilot_h)})</span></div>
-  <div class="kpi"><b>{manual_h:,.1f}h</b><span>manual rebuild ({money(manual_h)})</span></div>
-  <div class="kpi gold"><b>{money(saved_h)}</b><span>saved ({saved_h / (manual_h or 1):.0%} · {saved_h:,.1f}h @ ${rate:,.0f}/h)</span></div>
+  <div class="kpi"><b>{plan_hours:,.2f}h</b><span>to finish this report
+      ({money(plan_hours)})</span></div>
+  <div class="kpi"><b>{manual_h:,.1f}h</b><span>to rebuild it by hand instead
+      ({money(manual_h)})</span></div>
+  <div class="kpi gold"><b>{money(saved_h)}</b><span>avoided —
+      {saved_h / (manual_h or 1):.0%} of a from-scratch rebuild</span></div>
 </div>
-{pages_html}
 
-<h2>Where the remaining effort goes</h2>
-<table><tr><th>Area</th><th class="n">Items</th><th>What the consultant does</th></tr>
-{areas_html}</table>
+<h2>Action plan <span class="sub">— highest priority first; within a
+    priority, the heaviest first</span></h2>
+{_rollup_html(totals, rate, esc)}
+{_plan_html(actions, rate, esc)}
 
-<h2>What converted</h2>
-<table><tr><th>Structure</th><th class="n">Count</th></tr>{structure_html}
-<tr><td>Formulas</td><td class="n">{counts['auto']}✓ {counts['review']}⚠ {counts['manual']}✋</td></tr>
-<tr><td>Data source</td><td class="n">{esc(model.jndi)}</td></tr>
-<tr><td>Embedded saved rows</td><td class="n">{data_rows:,}</td></tr></table>
+<h2>How the two renders compare <span class="sub">— the original through the
+    SAP viewer, the conversion through the Pentaho engine</span></h2>
+{pages_html or '<p class="muted">Not run — no rendered comparison available.</p>'}
 
 {findings_html}
 
-<h2>Remaining manual work — full list</h2>
-<ul>{work_html}</ul>
+<h2>What converted</h2>
+<table>{structure_html}</table>
 
-<details><summary>Handled automatically ({len(buckets[APPLIED])}) — verify, no action expected</summary>
-<ul>{applied_html or '<li>None.</li>'}</ul></details>
+{reference_html}
+
+<details><summary>Every remaining note, verbatim ({len(buckets[MANUAL])})</summary>
+<ul>{manual_html or "<li>None.</li>"}</ul></details>
+<details><summary>Handled automatically ({len(buckets[APPLIED])}) — verify only,
+  no action expected</summary><ul>{applied_html or "<li>None.</li>"}</ul></details>
 <details><summary>Provenance notes ({len(buckets[INFO])})</summary>
-<ul>{info_html or '<li>None.</li>'}</ul></details>
+<ul>{info_html or "<li>None.</li>"}</ul></details>
 
-<footer>Conversion and comparison are deterministic; LLM notes are advisory.
-Effort assumes a {rate:,.0f}/h blended rate — adjust in the app.
-Open the .prpt in Pentaho Report Designer, work the areas above, then publish
-to the Pentaho Server.</footer>
+<footer>Conversion and the render comparison are deterministic; any LLM
+resolution note is advisory and marked as such. Effort is costed at
+${rate:,.0f}/h — change the rate in the app and regenerate. Nothing in this
+report is a guess: where the pipeline could not prove a conversion it says so
+rather than emitting something that looks right.</footer>
 </body></html>"""
+
+
+_REFERENCE = [
+    ("placeholder", "Replacing a TODO placeholder",
+     "Insert &gt; Sub-Report for a nested report; Insert &gt; Image for a "
+     "picture (the bytes carved from the .rpt travel inside the bundle, so "
+     "the image is already there to point at)."),
+    ("formula-manual", "Rebuilding a Crystal formula in PRD",
+     "Data tab &gt; Functions &gt; Open Formula. Crystal's shared variables "
+     "have no direct equivalent — the PRD idiom is a report function "
+     "(ItemSumFunction and friends) that accumulates as rows advance."),
+    ("suppression", "Conditional suppression",
+     "Select the band, then Attributes &gt; style-expression &gt; visible. "
+     "PRD's sense is inverted from Crystal's: Crystal asks when to HIDE, PRD "
+     "asks when to SHOW."),
+    ("summary", "Summaries with no PRD function",
+     "Percent-of-total, Nth-largest and the ranked summaries are usually "
+     "cheaper to compute in the query as a window function, then bind the "
+     "field directly."),
+    ("group-sort", "Top-N groups and Others",
+     "PRD has no Group Sort Expert. Rank in SQL (ROW_NUMBER() OVER "
+     "(ORDER BY SUM(x) DESC)) and UNION an Others row for the tail."),
+    ("datasource", "Publishing",
+     "File &gt; Publish, or copy the .prpt into the solution repository. The "
+     "JNDI name in the bundle must exist on the server — that is the most "
+     "common cause of a report that works locally and fails published."),
+    ("findings-error", "Comparing against the original",
+     "The app's View original button opens the .rpt in the Crystal viewer "
+     "while the preview shows the conversion, so both sit side by side at the "
+     "same page."),
+]
+
+
+def _reference_html(kinds, esc):
+    """A short PRD how-to, limited to the kinds of work THIS report needs -
+    a generic cheatsheet is noise."""
+    entries = [(t, b) for k, t, b in _REFERENCE if k in kinds]
+    if not entries:
+        return ""
+    body = "".join(f"<dt>{t}</dt><dd>{b}</dd>" for t, b in entries)
+    return ("<h2>Doing the work in Report Designer <span class='sub'>— only "
+            "the steps this report needs</span></h2>"
+            f"<dl class='ref'>{body}</dl>")
 
 
 _VERDICT_LINE = {
@@ -258,6 +415,51 @@ def build_consultant_report(model, source_path, prpt_path,
         else:
             lines += ["No differences above threshold.", ""]
 
+    lines += _plan_markdown(model, check)
     lines += ["---", ""]
     lines.append(build_conversion_report(model, source_path, prpt_path))
     return "\n".join(lines)
+
+
+def _plan_markdown(model, check, rate: float = 150.0) -> list:
+    """The same prioritised plan the HTML leads with. Both are generated from
+    one function, so the downloaded .md and the .html can never disagree
+    about what the work is or what it costs."""
+    from pentaho_migration.reports.action_plan import (
+        PRIORITY_LABEL, build_action_plan, plan_totals)
+
+    actions = build_action_plan(model, check)
+    if not actions:
+        return ["## Action plan", "",
+                "Nothing outstanding - this report converts clean.", ""]
+    totals = plan_totals(actions)
+    total_h = totals["total"][1]
+    out = ["## Action plan", "",
+           f"**{len(actions)} action(s), {total_h:,.2f}h "
+           f"(${total_h * rate:,.0f}) in total.** Highest priority first; "
+           "within a priority, the heaviest first.", ""]
+    for pri in (1, 2, 3):
+        if pri in totals:
+            n, h = totals[pri]
+            out.append(f"- {PRIORITY_LABEL[pri]}: **{h:,.2f}h** "
+                       f"(${h * rate:,.0f}) across {n} item(s)")
+    out += ["", "| # | Priority | Action | Items | Effort |",
+            "|---|---|---|---|---|"]
+    for n, a in enumerate(actions, 1):
+        out.append(f"| {n} | {PRIORITY_LABEL[a.priority]} | {a.title} | "
+                   f"{a.count} | {a.hours:,.2f}h (${a.hours * rate:,.0f}) |")
+    out.append("")
+    for n, a in enumerate(actions, 1):
+        out += [f"### {n}. {a.title}", "",
+                f"*{PRIORITY_LABEL[a.priority]} · {a.count} item(s) · "
+                f"{a.hours:,.2f}h (${a.hours * rate:,.0f})*", "",
+                f"**Why it matters.** {a.why}", "",
+                f"**How.** {a.how}", ""]
+        if a.where:
+            out += ["Where: " + ", ".join(f"`{w}`" for w in a.where[:8]), ""]
+        for item in a.items[:12]:
+            out.append(f"- {item}")
+        if len(a.items) > 12:
+            out.append(f"- *… and {len(a.items) - 12} more*")
+        out.append("")
+    return out

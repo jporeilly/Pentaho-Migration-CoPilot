@@ -95,12 +95,44 @@ class TestSectionCondition:
 
     def test_untranslatable_condition_stays_manual(self, tmp_path):
         weird = SECTION_WITH_CONDITION.replace(
-            "{O.AMT} &gt; 100", "drilldowngrouplevel &lt;&gt; 0")
+            "{O.AMT} &gt; 100", "someUndeclaredVar &gt; 0")
         model = load_report_model(_dump(tmp_path, _report(weird)))
         first = next(s for s in model.sections if s.name == "DetailSection1")
         assert "visible" not in dict(first.style_expressions)
         manual = split_todos(model.issues)[MANUAL]
         assert any("not carried" in n for n in manual)
+
+    def test_drill_down_level_folds_to_zero(self, tmp_path):
+        """PRD has no drill-down, so a converted report is only ever the
+        top-level view and Crystal's drill level is constantly 0. Folding it
+        makes 'DrillDownGroupLevel <> 0' suppress exactly as Crystal's
+        undrilled view does, instead of becoming a manual TODO."""
+        drill = SECTION_WITH_CONDITION.replace(
+            "{O.AMT} &gt; 100", "drilldowngrouplevel &lt;&gt; 0")
+        model = load_report_model(_dump(tmp_path, _report(drill)))
+        first = next(s for s in model.sections if s.name == "DetailSection1")
+        assert dict(first.style_expressions)["visible"] == "=NOT(0 <> 0)"
+
+    def test_page_number_becomes_a_declared_report_function(self, tmp_path):
+        """Crystal writes special fields bare inside formulas. libformula has
+        no PAGE(), so the condition references a PRD report function - which
+        the bundle must actually declare, or the render fails."""
+        import zipfile
+
+        from pentaho_migration.reports import write_prpt
+
+        paged = SECTION_WITH_CONDITION.replace(
+            "{O.AMT} &gt; 100", "PageNumber = 1")
+        model = load_report_model(_dump(tmp_path, _report(paged)))
+        first = next(s for s in model.sections if s.name == "DetailSection1")
+        assert dict(first.style_expressions)["visible"] == \
+            "=NOT([CR_PageNumber] = 1)"
+        out = tmp_path / "paged.prpt"
+        write_prpt(model, out)
+        with zipfile.ZipFile(out) as z:
+            dd = z.read("datadefinition.xml").decode("utf-8")
+        assert 'name="CR_PageNumber"' in dd
+        assert "core.function.PageFunction" in dd
 
     def test_element_condition_is_independent_of_the_sections(self, tmp_path):
         """An element's own suppress condition stays on the element; the
@@ -217,3 +249,51 @@ class TestTranslatorUnblocked:
             "Two", 'whileprintingrecords; numbervar test=1',
             field_types={})
         assert f.status == "manual"
+
+
+class TestZeroHeightSections:
+    """A Crystal section can legitimately declare Height="0" - that is how a
+    chart report collapses its per-row detail band so the whole report is one
+    page. Forcing a 20pt floor turned 5000 invisible rows into 187 blank
+    pages against the original's one; found by the release gate."""
+
+    ZERO_DETAIL = """\
+        <Section Name="DetailSection1" Height="0">
+          <ReportObjects/>
+        </Section>"""
+
+    TALL_CONTENT = """\
+        <Section Name="DetailSection1" Height="0">
+          <ReportObjects>
+            <FieldObject Name="F1" Left="0" Top="0" Width="1440"
+                         Height="720" DataSource="{O.AMT}"/>
+          </ReportObjects>
+        </Section>"""
+
+    def test_declared_zero_height_survives(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, _report(self.ZERO_DETAIL)))
+        section = next(s for s in model.sections if s.name == "DetailSection1")
+        assert section.height == 0.0
+
+    def test_a_missing_height_still_defaults(self, tmp_path):
+        """Absent is not the same as zero - an undeclared height has no
+        Crystal intent behind it and keeps the readable default."""
+        model = load_report_model(_dump(
+            tmp_path, _report('<Section Name="DetailSection1"><ReportObjects/>'
+                              "</Section>")))
+        section = next(s for s in model.sections if s.name == "DetailSection1")
+        assert section.height == 20.0
+
+    def test_zero_height_band_still_fits_its_content(self, tmp_path):
+        """Crystal's height wins for an EMPTY band, but a band whose objects
+        reach past it must not clip them."""
+        import zipfile
+
+        from pentaho_migration.reports import write_prpt
+
+        model = load_report_model(_dump(tmp_path, _report(self.TALL_CONTENT)))
+        out = tmp_path / "tall.prpt"
+        write_prpt(model, out)
+        with zipfile.ZipFile(out) as z:
+            layout = z.read("layout.xml").decode("utf-8")
+        assert 'min-height="0"' not in layout

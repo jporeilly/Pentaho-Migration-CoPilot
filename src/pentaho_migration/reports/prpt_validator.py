@@ -87,9 +87,45 @@ def render_prpt_pdf_live(prpt_path: Path | str, timeout: float = 300.0) -> bytes
             capture_output=True, text=True, timeout=timeout,
         )
         if not out.exists() or out.stat().st_size == 0:
-            raise RuntimeError(
-                "live render failed - stderr: " + completed.stderr[-800:])
+            raise RuntimeError(_render_failure(prpt_path, completed.stderr))
         return out.read_bytes()
+
+
+def _render_failure(prpt_path, stderr: str) -> str:
+    """Turn the engine's stack trace into one sentence a consultant can act
+    on. The common case is a report the conversion got RIGHT: Crystal
+    prompted for parameters, so PRD prompts too, and a headless render has
+    nobody to ask - which arrives as a wall of Java unless it is named."""
+    stderr = stderr or ""
+    if "ReportParameterValidationException" in stderr:
+        names = _mandatory_parameters(prpt_path)
+        listed = ", ".join(names) if names else "its prompts"
+        return (f"the report prompts for {listed} - Crystal asked for these "
+                "too, so a headless render has no values to use; open it in "
+                "Report Designer and supply them, or give the parameters "
+                "default values")
+    return "live render failed - stderr: " + stderr[-800:]
+
+
+def _mandatory_parameters(prpt_path) -> list:
+    """Names of parameters the bundle marks mandatory with no default."""
+    import zipfile
+    from xml.etree import ElementTree as ET
+
+    try:
+        with zipfile.ZipFile(prpt_path) as z:
+            root = ET.fromstring(z.read("datadefinition.xml"))
+    except Exception:
+        return []
+    out = []
+    for node in root.iter():
+        if not node.tag.split("}")[-1].endswith("parameter"):
+            continue
+        if node.get("mandatory") == "true" and not node.get("default-value"):
+            name = node.get("name")
+            if name:
+                out.append(name)
+    return out
 
 
 def render_prpt_pdf(prpt_path: Path | str, timeout: float = 300.0) -> bytes:

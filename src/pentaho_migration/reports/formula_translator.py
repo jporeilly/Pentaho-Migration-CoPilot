@@ -121,6 +121,25 @@ CR_COLORS = {
     "crolive": '"#808000"', "crpurple": '"#800080"', "crlime": '"#00ff00"',
 }
 
+# Crystal special fields written BARE inside a formula (no braces) - the
+# corpus uses them mostly in suppression conditions ("PageNumber = 1",
+# "GroupNumber <> 1"). libformula has no PAGE() equivalent, so each one maps
+# to a PRD report FUNCTION that the writer declares on demand; a formula
+# refers to it by name exactly like a column. Name -> (function name, class).
+_FN = "org.pentaho.reporting.engine.classic.core.function."
+SPECIAL_FUNCTIONS = {
+    "pagenumber": ("CR_PageNumber", _FN + "PageFunction"),
+    "totalpagecount": ("CR_TotalPageCount", _FN + "PageTotalFunction"),
+    "recordnumber": ("CR_RecordNumber", _FN + "ItemCountFunction"),
+    "groupnumber": ("CR_GroupNumber", _FN + "GroupCountFunction"),
+}
+
+# PRD has no drill-down, so a converted report is never drilled into and
+# Crystal's drill-down level is constantly zero. Folding it to 0 makes the
+# common "DrillDownGroupLevel = 0" suppression resolve the way the top-level
+# Crystal view does, which is the only view PRD can show.
+DRILL_CONSTANTS = {"drilldowngrouplevel": "0"}
+
 KEYWORDS = {"if", "then", "else", "and", "or", "not", "mod", "in", "to"}
 
 TOKEN_RE = re.compile(r"""
@@ -167,13 +186,15 @@ def _string_to_openformula(raw):
 
 
 STRING_TYPES = {"StringField", "MemoField", "PersistentMemoField"}
+DATE_TYPES = {"DateField", "DateTimeField"}
 _FIELD_REF_ONLY = re.compile(r"^\[(\w+)\]$")
 
 
 class _Parser:
     """Recursive-descent translator emitting OpenFormula text."""
 
-    def __init__(self, tokens, field_types=None, allow_keep=False):
+    def __init__(self, tokens, field_types=None, allow_keep=False,
+                 const_map=None):
         self.tokens = tokens
         self.pos = 0
         self.notes = []
@@ -181,6 +202,21 @@ class _Parser:
         # style-condition context: crNoColor/DefaultAttribute allowed as the
         # "keep the static style" branch (2-arg IF)
         self.allow_keep = allow_keep
+        # identifier -> emitted text, overriding the built-ins. Used to read
+        # ONE Crystal formula twice: Crystal returns a combined crBoldItalic
+        # where PRD carries bold and italic as two independent style keys.
+        self.const_map = const_map or {}
+        self.functions_used = set()
+
+    def _is_datish(self, operand):
+        """True when an emitted operand is knowably a DATE - a bare field
+        reference whose database type is a date, or a DATE()/date-function
+        call this translator produced."""
+        s = operand.strip()
+        if s.startswith(("DATE(", "TODAY(", "DATEVALUE(")):
+            return True
+        m = _FIELD_REF_ONLY.match(s)
+        return bool(m) and self.field_types.get(m.group(1)) in DATE_TYPES
 
     def _is_stringish(self, operand):
         """True when an emitted operand is knowably a string: a literal at
@@ -264,6 +300,15 @@ class _Parser:
                 # database field types, not just literals, to decide.
                 if val == "+" and (self._is_stringish(out) or self._is_stringish(right)):
                     val = "&"
+                elif val in ("+", "-") and self._is_datish(out)                         and not self._is_datish(right):
+                    # Crystal's "date + 30" yields a DATE; OpenFormula's "+"
+                    # yields a NUMBER, which a PRD date-field cannot format -
+                    # the column rendered blank. Rebuild through DATE(), which
+                    # normalizes day overflow (day 33 -> the 3rd of next month).
+                    sign = "" if val == "+" else "-"
+                    out = (f"DATE(YEAR({out});MONTH({out});"
+                           f"DAY({out}) {'+' if not sign else '-'} {right})")
+                    continue
                 out = f"{out} {val} {right}"
             else:
                 return out
@@ -317,6 +362,16 @@ class _Parser:
                 return self.func_call(low, val)
             if low in NOARG_MAP:
                 return NOARG_MAP[low]
+            if self.const_map and low in self.const_map:
+                return self.const_map[low]
+            if low in SPECIAL_FUNCTIONS:
+                # a PRD report function the writer declares on demand; a
+                # formula references it by name exactly like a column
+                name = SPECIAL_FUNCTIONS[low][0]
+                self.functions_used.add(low)
+                return f"[{name}]"
+            if low in DRILL_CONSTANTS:
+                return DRILL_CONSTANTS[low]
             if low in CR_COLORS:
                 return CR_COLORS[low]
             if low in ("crnocolor", "defaultattribute"):
@@ -369,6 +424,8 @@ class _Parser:
             raise TranslationError(
                 f"aggregate {original}() must become a report function "
                 "(ItemSumFunction etc.), not an inline formula")
+        if low == "color":
+            return self._color(args)
         if low == "switch":
             return self._switch(args)
         if low == "datediff":
@@ -383,6 +440,26 @@ class _Parser:
         if arg_fn:
             args = arg_fn(args)
         return f"{target}({';'.join(args)})"
+
+    def _color(self, args):
+        """Crystal Color(r, g, b) -> a PRD colour literal. Only literal
+        components can be folded: libformula has no decimal-to-hex function,
+        so a colour computed from FIELDS at render time has no deterministic
+        equivalent and stays an honest note rather than a wrong colour."""
+        if len(args) != 3:
+            raise TranslationError("Color() takes three components (r, g, b)")
+        parts = []
+        for a in args:
+            a = a.strip()
+            if not re.fullmatch(r"\d+(\.0+)?", a):
+                raise TranslationError(
+                    "Color() built from values only known at render time - "
+                    "PRD has no decimal-to-hex conversion to express it")
+            n = int(float(a))
+            if not 0 <= n <= 255:
+                raise TranslationError(f"Color() component {n} out of range")
+            parts.append(f"{n:02x}")
+        return '"#' + "".join(parts) + '"'
 
     def _switch(self, args):
         """Crystal Switch(c1, v1, c2, v2, ...) -> nested IF. Crystal returns
@@ -706,25 +783,90 @@ _STYLE_KEY_MAP = {
     "backgroundcolor": ("background-color", False),
     "enablesuppress": ("visible", True),
     "suppress": ("visible", True),
+    "horizontalalignment": ("alignment", False),
+    "strikeout": ("font-strikethrough", False),
+    "underline": ("font-underline", False),
 }
+
+# Crystal alignment constants -> PRD 'alignment' values.
+CR_ALIGNMENTS = {
+    "crleftaligned": '"left"', "crrightaligned": '"right"',
+    "crcentered": '"center"', "crjustified": '"justify"',
+    "crhorizontalcentered": '"center"',
+}
+
+# Conditional attributes that describe something PAGED output cannot show.
+# They are not failures to fix - saying so keeps them out of the consultant's
+# manual backlog while still recording that Crystal had them.
+NO_PRINT_EFFECT = {
+    "tooltiptext": "tool-tips do not exist in paged output (PDF/print)",
+    "hyperlink": "hyperlinks are an interactive-viewer feature",
+}
+
+
+# Crystal's font-style constants. Crystal returns ONE combined value where
+# PRD carries bold and italic as two independent style keys, so the same
+# formula is read once per key with the constants folded to TRUE()/FALSE().
+_CR_FONT_STYLES = {
+    "crregular": (False, False), "crbold": (True, False),
+    "critalic": (False, True),
+    "crbolditalic": (True, True), "crboldanditalic": (True, True),
+}
+
+
+def _font_style_const_map(want_italic):
+    """Constant map that reads a Crystal font-style formula as a BOOLEAN for
+    one of the two PRD keys."""
+    return {name: ("TRUE()" if flags[want_italic] else "FALSE()")
+            for name, flags in _CR_FONT_STYLES.items()}
 
 
 def translate_style_condition(attr, text, field_types=None):
     """One Crystal conditional-format formula -> (prd_style_key, openformula).
+    The single-pair form, kept for attributes that map 1:1; see
+    translate_style_conditions for the general case."""
+    pairs = translate_style_conditions(attr, text, field_types)
+    return pairs[0]
+
+
+def translate_style_conditions(attr, text, field_types=None):
+    """One Crystal conditional-format formula -> a LIST of (prd_style_key,
+    openformula) pairs. Most attributes yield exactly one; a font Style
+    yields two, because Crystal's crBoldItalic is a single value that PRD
+    splits across font-bold and font-italic.
+
     Raises TranslationError for attributes with no PRD style mapping or
     formulas the deterministic translator cannot prove (variables, ...).
     crNoColor / DefaultAttribute branches ('keep the static value') become
     the omitted branch of a 2-arg IF - the engine keeps the element's static
     style when the expression yields no value (live-verified)."""
-    mapping = _STYLE_KEY_MAP.get(attr.lower())
-    if mapping is None:
-        raise TranslationError(f"no PRD style mapping for conditional {attr}")
-    style_key, invert = mapping
     stripped = scannable(text)
     for pattern, why in BLOCKER_PATTERNS:
         if re.search(pattern, stripped):
             raise TranslationError(why)
-    parser = _Parser(_tokenize(text), field_types=field_types, allow_keep=True)
+
+    if attr.lower() == "style":
+        out = []
+        for key, want_italic in (("font-bold", 0), ("font-italic", 1)):
+            out.append((key, "=" + _translate_condition_body(
+                text, field_types, _font_style_const_map(want_italic))))
+        return out
+
+    mapping = _STYLE_KEY_MAP.get(attr.lower())
+    if mapping is None:
+        raise TranslationError(f"no PRD style mapping for conditional {attr}")
+    style_key, invert = mapping
+    expr = _translate_condition_body(
+        text, field_types,
+        CR_ALIGNMENTS if style_key == "alignment" else None)
+    if invert:
+        expr = f"NOT({expr})"
+    return [(style_key, "=" + expr)]
+
+
+def _translate_condition_body(text, field_types, const_map=None):
+    parser = _Parser(_tokenize(text), field_types=field_types,
+                     allow_keep=True, const_map=const_map)
     expr = parser.parse()
     if "__KEEP__" in expr:
         # the sentinel survived outside an If branch (bare crNoColor, or a
@@ -732,9 +874,7 @@ def translate_style_condition(attr, text, field_types=None):
         raise TranslationError(
             "crNoColor/DefaultAttribute in a position with no "
             "keep-static-style equivalent")
-    if invert:
-        expr = f"NOT({expr})"
-    return style_key, "=" + expr
+    return expr
 
 
 def translate_all(model):

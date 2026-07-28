@@ -7,7 +7,57 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.39.2] - 2026-07-28
+
+### Crystal fidelity, driven by the corpus audit and the release gate
+
+- **A chart report no longer explodes into hundreds of blank pages.** A
+  Crystal section may legitimately declare `Height="0"` — that is how a
+  chart report collapses its per-row detail band. The parser forced a 20pt
+  floor on every section, so the AdventureWorks demo printed **187 pages
+  against the original's one**. Only a *missing* height defaults now; a band
+  whose objects reach past its declared height still grows so nothing clips.
+- **Saved-data recovery no longer loses whole reports.** Two defects, both
+  fatal on their own: UTF-16LE strings came back decoded big-endian
+  ("Mendoza" as a run of CJK-looking glyphs), and some `.rpt` files declare
+  *every* saved column `Int32s` while the batches plainly hold text — the
+  `java.lang.Integer` columns made the engine fail on the first cell and the
+  bundle refused to load at all. Strings are repaired by their zero-low-byte
+  signature; column types are now derived from the recovered **values**, not
+  from metadata that lies. The World Sales corpus report went from failing
+  to load to rendering.
+- **`PercentOfSum` prints a real share.** It used to be emitted as a plain
+  `Sum`, so a percent column showed the raw group total — a wrong number
+  that reads as data rather than as a gap. Now: this group's sum, the wider
+  total, and a formula dividing them. (The engine's own
+  `TotalGroupSumQuotientPercentFunction` looks like the match but divides two
+  *fields* inside one group, where Crystal divides one field across two group
+  *scopes* — wired to it, every row printed the same percentage. Caught by a
+  live render, not by reading XML.)
+- **Conditional suppression not carried: 39 → 9**, and the nine that remain
+  are genuine Crystal shared-variable state. Four classes now translate:
+  bare special fields in formulas (`PageNumber = 1`, `GroupNumber <> 1`)
+  become declared PRD report functions; `CurrentFieldValue` resolves to the
+  element's own value (including summary fields); `DrillDownGroupLevel` folds
+  to 0, because a converted report only ever *is* the top-level view;
+  conditional font `Style` fans out into PRD's separate `font-bold` and
+  `font-italic` keys. Conditional alignment, strikeout and underline map too,
+  and `Color(r, g, b)` folds when its components are literals.
+- **Tool-tips and hyperlinks stopped reading as backlog.** Paged output
+  cannot show either, so they are recorded as information rather than work
+  the consultant has to cost.
+- **A parameterised report fails legibly.** "the report prompts for
+  @SystemID, TimeZone — Crystal asked for these too, so a headless render has
+  no values to use" instead of a Java stack trace.
+- **Gate accuracy.** The month-name normaliser never fired (an escape had
+  been mangled into a control character) and, once fixed, folded `Mark` into
+  `Mar` — so unrelated lines compared equal and could hide dropped content.
+  It now matches whole month names only. Missing-content matching also
+  ignores spacing: the Crystal renderer's glyph gaps extract as spaces the
+  source text has no character for (`Objects :`, `and/ or`), which made a
+  character-faithful conversion look like it had dropped the legal footer.
+  The demo statement now reports **SHIP**.
+
 
 - **Consultant report is now a portfolio-style document** with its own
   download button (`.html`, plus `.md` beside it): KPI cards, a **"where the

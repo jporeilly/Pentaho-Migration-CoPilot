@@ -97,8 +97,13 @@ def render_original_pdf(rpt_path: Path) -> bytes:
         return out.read_bytes()
 
 
-_MONTHS = re.compile(r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
-                     r"[a-z]*")
+# whole month NAMES only - a bare 3-letter prefix rule would fold "Mark" into
+# "Mar" and "Maybe" into "May", making unrelated words compare equal and hiding
+# real dropped content.
+_MONTHS = re.compile(
+    r"\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
+    r"Jul(?:y)?|Aug(?:ust)?|Sep(?:t|tember)?|Oct(?:ober)?|Nov(?:ember)?|"
+    r"Dec(?:ember)?)\b")
 
 
 def _normalize_line(line: str) -> str:
@@ -107,7 +112,7 @@ def _normalize_line(line: str) -> str:
     amount matches itself in either engine's dialect. Short/noise lines
     normalize to '' and drop out."""
     text = re.sub(r"\s+", " ", line).strip()
-    text = _MONTHS.sub(lambda m: m.group(1), text)
+    text = _MONTHS.sub(lambda m: m.group(1)[:3], text)
     text = re.sub(r"[\d,.]+", "#", text)
     text = text.replace("$ #", "$#")
     return text if len(text) >= 6 else ""
@@ -216,12 +221,17 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
     # 3 + 4. content lines: missing entirely, or moved to another page.
     # "Missing" is judged against the WHOLE converted document, wrap- and
     # format-insensitively - line-by-line comparison flagged every paragraph
-    # that merely wrapped at a different column.
+    # that merely wrapped at a different column. The last fallback drops
+    # spaces entirely: the Crystal renderer's glyph gaps get extracted as
+    # spaces the source text does not contain ("Objects :", "and/ or"), so a
+    # character-faithful conversion looked like dropped content.
     orig_lines = _line_pages(orig_pages)
     conv_lines = _line_pages(conv_pages)
     conv_stream = _doc_stream(conv_pages)
+    conv_squeezed = conv_stream.replace(" ", "")
     missing_lines = [l for l in orig_lines
-                     if l not in conv_lines and l not in conv_stream]
+                     if l not in conv_lines and l not in conv_stream
+                     and l.replace(" ", "") not in conv_squeezed]
     if missing_lines:
         result.findings.append(Finding(
             "error", "missing-content",

@@ -18,7 +18,8 @@ import pytest
 from pentaho_migration.reports import load_report_model, write_prpt
 from pentaho_migration.reports.rpt_crosstabs import find_rpt_rs
 from pentaho_migration.reports.rpt_saved import (
-    SavedRows, _convert_cell, build_inline_ds_xml, load_saved_rows)
+    SavedRows, _convert_cell, _repair_byteswapped_utf16, build_inline_ds_xml,
+    load_saved_rows)
 
 REPO = Path(__file__).resolve().parents[1]
 DEMO = REPO / "samples" / "crystal" / "demo"
@@ -111,3 +112,38 @@ class TestEndToEnd:
         assert 'name="source-sql"' in sql            # live path one click away
         compound = z.read("datasources/compound-ds.xml").decode()
         assert "inline-ds.xml" in compound
+
+
+class TestRecoveredValuesBeatDeclaredMetadata:
+    """Some .rpt files describe their saved columns wrongly. Believing the
+    metadata over the bytes cost a whole report: the World Sales corpus
+    report declares every column Int32s while the batches hold country
+    names, so the engine failed on the first cell and the bundle would not
+    load at all."""
+
+    def test_utf16_byte_order_mixup_is_repaired(self):
+        # "Mendoza" stored little-endian, decoded big-endian: every character
+        # ends up with a zero low byte
+        assert _repair_byteswapped_utf16("䴀攀渀搀漀"
+                                         "稀愀") == "Mendoza"
+
+    def test_genuine_cjk_text_is_left_alone(self):
+        """The repair must key on the zero-low-byte signature, not on the
+        characters merely looking East Asian."""
+        for text in ("中文", "Mendoza", "", "中䴀"):
+            assert _repair_byteswapped_utf16(text) == text
+
+    def test_a_string_column_declared_integer_is_emitted_as_string(self):
+        saved = SavedRows(columns=[("Country", "Int32s"), ("Sales", "Int32s")],
+                          rows=[["Argentina", 5], ["Aruba", 7]])
+        xml = build_inline_ds_xml(saved)
+        assert '<data:column name="Country" type="java.lang.String"/>' in xml
+        assert '<data:column name="Sales" type="java.lang.Integer"/>' in xml
+        # ... and the cells must not claim Integer either, or the engine
+        # fails converting "Argentina"
+        assert "java.lang.Integer\">Argentina" not in xml
+
+    def test_a_genuine_integer_column_keeps_its_type(self):
+        saved = SavedRows(columns=[("Qty", "Int32s")], rows=[[1], [2]])
+        xml = build_inline_ds_xml(saved)
+        assert '<data:column name="Qty" type="java.lang.Integer"/>' in xml

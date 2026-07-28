@@ -114,6 +114,40 @@ class TestLlmAnnotation:
 class TestRegressionFixtures:
     """The gate's first real catches, pinned so they stay caught."""
 
+    def test_renderer_glyph_gaps_are_not_dropped_content(self, monkeypatch):
+        """The Crystal renderer's inter-glyph gaps extract as spaces the
+        source text has no character for ('Objects :', 'and/ or'). A
+        character-faithful conversion was being reported as dropping the
+        legal footer."""
+        _patch_pages(
+            monkeypatch,
+            ["licensed by Business Objects : 5,295,243; 5,339,390\n"
+             "countries of Business Objects and/ or affiliated companies"],
+            ["licensed by Business Objects: 5,295,243; 5,339,390\n"
+             "countries of Business Objects and/or affiliated companies"])
+        check = rc.compare_renders(b"ORIG", b"CONV")
+        assert not any(f.code == "missing-content" for f in check.findings)
+
+    def test_squeezed_match_still_catches_real_drops(self, monkeypatch):
+        """Space-insensitivity must not swallow genuinely absent text."""
+        _patch_pages(monkeypatch,
+                     ["Authorised signatory Mark Elroy\nBody of the letter"],
+                     ["Body of the letter"])
+        check = rc.compare_renders(b"ORIG", b"CONV")
+        missing = next(f for f in check.findings if f.code == "missing-content")
+        assert any("Mark Elroy" in e for e in missing.evidence)
+
+    def test_month_names_normalize_without_eating_ordinary_words(self):
+        """The two engines print 'July' and 'Jul' for the same date, so month
+        names fold to three letters - but only WHOLE month names. A prefix
+        rule folded 'Mark' into 'Mar' and 'Maybe' into 'May', which made
+        unrelated lines compare equal and hid dropped content."""
+        assert rc._normalize_line("as of July 27, 2026") == "as of Jul # #"
+        assert rc._normalize_line("as of Jul 28, 2026") == "as of Jul # #"
+        for intact in ("Mark Elroy signature", "Marketing summary line",
+                       "Maybe later on the invoice", "Augmented totals here"):
+            assert rc._normalize_line(intact) == intact
+
     def test_recovered_summary_refs_keep_their_braces(self, tmp_path):
         """Braceless 'ORDERS.ORDER_AMOUNT' classified as unknown and the
         emitted function summed a field the query does not have - $0.00

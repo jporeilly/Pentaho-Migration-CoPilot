@@ -198,6 +198,10 @@ class Summary:
     group_field: str = ""     # group condition column, "" = grand total
     expression_name: str = "" # generated PRD function name
     running: bool = False     # {#running total}: row-by-row Item* semantics
+    # Crystal PercentOfSum: this group's share of a WIDER total. None means
+    # an ordinary summary; "" means the share of the report's grand total,
+    # otherwise the outer group whose sum is the denominator.
+    percent_of: str | None = None
 
 
 @dataclass

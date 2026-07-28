@@ -59,6 +59,58 @@ def _needs_page_function(model):
         for s in model.sections for el in s.elements)
 
 
+_SUM_FN = "org.pentaho.reporting.engine.classic.core.function.TotalGroupSumFunction"
+
+
+def _percent_of_sum_xml(summary, column):
+    """Crystal PercentOfSum as PRD functions: this group's sum, the wider
+    total it is a share of, and a formula dividing one by the other.
+
+    The engine's own TotalGroupSumQuotientPercentFunction is NOT the
+    equivalent - it divides two different FIELDS inside one group, where
+    Crystal divides ONE field across two group SCOPES. Wired to it, every
+    row printed the same percentage. A formula over two declared sums says
+    exactly what Crystal means. Crystal's value is already scaled to
+    0-100, so the x100 keeps the numbers identical."""
+    part = summary.expression_name + "_part"
+    whole = summary.expression_name + "_whole"
+
+    def total(name, group):
+        props = [f'<property name="field">{escape(column)}</property>']
+        if group:
+            props.append(f'<property name="group">{escape(group)}</property>')
+        return (f'<expression name={quoteattr(name)} class="{_SUM_FN}">'
+                f"<properties>{''.join(props)}</properties></expression>")
+
+    formula = (f"=IF([{whole}] = 0;0;[{part}] / [{whole}] * 100)")
+    return (total(part, summary.group_field)
+            + total(whole, summary.percent_of)
+            + f'<expression name={quoteattr(summary.expression_name)} '
+              f"formula={quoteattr(formula)}/>")
+
+
+def _special_functions_used(model):
+    """Report functions the converted formulas reference by name, because
+    Crystal wrote a special field bare inside one ("PageNumber = 1"). Found
+    by scanning the emitted text rather than threaded through the translator,
+    the same way the page function is: a declaration is needed exactly when
+    some formula names it, wherever that formula ended up.
+
+    Returns (function name, java class) pairs, declaration order stable."""
+    from .formula_translator import SPECIAL_FUNCTIONS
+
+    text = []
+    for section in model.sections:
+        text.extend(f for _, f in section.style_expressions)
+        for el in section.elements:
+            text.extend(f for _, f in el.style_expressions)
+    for f in model.formulas.values():
+        text.append(getattr(f, "translation", "") or "")
+    blob = " ".join(text)
+    return [(name, cls) for name, cls in SPECIAL_FUNCTIONS.values()
+            if f"[{name}]" in blob]
+
+
 def _band_content(sections, band_type, tp="", sp="style:"):
     """One or more Crystal sections of an area as the inner XML of one PRD
     band. Each section becomes a NESTED sub-band stacked in block layout,
@@ -158,11 +210,18 @@ def _section_band(section, tp="", sp="style:", behind_elements=None):
     """One Crystal section as a nested PRD band: canvas inside (elements keep
     their absolute positions), block-stacked by the parent. `behind_elements`
     (underlay copies) render first, i.e. behind the section's own content."""
+    # The band must be at least as tall as what it holds. Crystal's declared
+    # height is authoritative for EMPTY bands (a zero-height detail band is
+    # how a chart report prints one page instead of one per row), but a band
+    # whose objects reach past it would clip them.
+    content_bottom = max((el.y + el.height for el in section.elements
+                          if getattr(el, "visible", True)), default=0.0)
+    height = max(section.height, content_bottom)
     styles = [f'<{sp}band-styles layout="canvas"'
               + (' pagebreak-after="true"' if section.new_page_after else "")
               + "/>",
               f'<{sp}spatial-styles x="0" y="0" '
-              f'min-width="100%" min-height="{_num(section.height)}"/>']
+              f'min-width="100%" min-height="{_num(height)}"/>']
     if section.bg_color:
         styles.append(f'<{sp}border-styles background-color={quoteattr(section.bg_color)}/>')
     exprs = "".join(
@@ -509,12 +568,19 @@ def build_datadefinition_xml(model, parameter_mappings=None):
             continue
         from .rpt_parser import parse_field_ref
         _, column = parse_field_ref(s.field_ref)
+        if s.percent_of is not None:
+            parts.append(_percent_of_sum_xml(s, column))
+            continue
         props = ([] if _is_fieldless(cls)
                  else [f'<property name="field">{escape(column)}</property>'])
         if s.group_field:
             props.append(f'<property name="group">{escape(s.group_field)}</property>')
         parts.append(f"<expression name={quoteattr(s.expression_name)} class=\"{cls}\">"
                      f"<properties>{''.join(props)}</properties></expression>")
+
+    for name, cls in _special_functions_used(model):
+        parts.append(f'<expression name="{name}" class="{cls}">'
+                     "<properties/></expression>")
 
     if _needs_page_function(model):
         parts.append(
