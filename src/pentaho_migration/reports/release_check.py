@@ -57,6 +57,8 @@ class ReleaseCheck:
     converted_pages: int = 0
     groups_checked: int = 0    # per-group span comparison: how many identities
     groups_matching: int = 0   # ... and how many span the SAME pages as the original
+    pages_compared: int = 0    # pages compared by APPEARANCE, not just text
+    pages_pairable: int = 0    # ... out of this many that could be paired
     findings: list = field(default_factory=list)
 
 
@@ -299,6 +301,38 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
                 f"page count differs: original {len(orig_pages)}, converted "
                 f"{len(conv_pages)} - grouping, page breaks or section "
                 "heights changed the flow"))
+
+    # 7. how the pages LOOK. Everything above reads text, which is blind to
+    # the differences a reader notices first - a background panel that
+    # vanished, a rule the original does not draw, a total box that lost its
+    # fill. All of those leave the text identical, so the gate reported SHIP
+    # through a series of real visual defects until this existed.
+    from pentaho_migration.reports.visual_diff import compare_visually
+
+    orig_line_sets = [set(filter(None, map(_normalize_line, p.splitlines())))
+                      for p in orig_pages]
+    conv_line_sets = [set(filter(None, map(_normalize_line, p.splitlines())))
+                      for p in conv_pages]
+    visual = compare_visually(original_pdf, converted_pdf,
+                              orig_line_sets, conv_line_sets)
+    result.pages_compared = visual["compared"]
+    result.pages_pairable = visual["available"]
+    if visual["pages"]:
+        worst = visual["pages"]
+        result.findings.append(Finding(
+            "warning", "appearance",
+            f"{len(worst)} of {visual['compared']} page(s) compared LOOK "
+            "different from the original beyond text - a fill, rule or box "
+            "that the text comparison cannot see",
+            evidence=[f"original p{o + 1} vs converted p{c + 1}: "
+                      f"{f:.0%} of the page - {where}"
+                      for o, c, f, where in worst[:MOVED_LINE_CAP]]))
+    elif not visual["compared"]:
+        # say so rather than let a silent skip read as a clean result
+        result.findings.append(Finding(
+            "info", "appearance",
+            "the pages were not compared visually - no pairable pages, or "
+            "Pillow is not installed"))
 
     # conservative gate: warnings and errors need a look; info findings are
     # context, not work

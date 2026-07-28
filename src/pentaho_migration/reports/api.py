@@ -537,9 +537,10 @@ def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
                    else render_prpt_pdf(prpt))
         except RuntimeError as exc:
             raise HTTPException(status_code=500, detail=str(exc))
-    # Crystal's group tree, recreated as the PDF outline panel
-    from pentaho_migration.reports.pdf_outline import add_group_outline
-    pdf = add_group_outline(pdf, model)
+    # The group tree is no longer bolted on here: every group header carries
+    # a `bookmark` band style, so the outline is INSIDE the bundle and shows
+    # up wherever the report is rendered - Report Designer, the server, this
+    # preview. Post-processing one on as well produced two of every entry.
 
     if format == "pages":
         return {"pages": _pdf_to_page_images(pdf),

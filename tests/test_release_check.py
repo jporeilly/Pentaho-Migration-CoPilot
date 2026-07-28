@@ -27,7 +27,12 @@ class TestComparison:
         pages = ["Statement for Crazy Wheels\nTotal: $43.50\nPage 1"]
         _patch_pages(monkeypatch, pages, list(pages))
         check = rc.compare_renders(b"ORIG", b"CONV")
-        assert check.verdict == "SHIP" and not check.findings
+        assert check.verdict == "SHIP"
+        # the synthetic bytes are not renderable, so the appearance check
+        # reports that it could not run - an INFO note, never a defect
+        assert not [f for f in check.findings
+                    if f.severity in ("error", "warning")]
+        assert [f.code for f in check.findings] == ["appearance"]
 
     def test_missing_number_is_an_error(self, monkeypatch):
         _patch_pages(monkeypatch,

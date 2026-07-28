@@ -67,30 +67,30 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
     try {
       const form = new FormData()
       form.append('dump', file)
-      // Pages as images: renders in ANY browser, including embedded panes
-      // with no PDF plugin. Falls back to the raw PDF when the server can't
-      // rasterize.
-      const res = await fetch(`/reports/preview?jndi=${encodeURIComponent(jndi)}&format=pages`, {
+      // The PDF itself, so the browser's own viewer gives the WHOLE report
+      // with page navigation and the outline panel - which is where the
+      // group tree recreated from Crystal actually shows up. Rasterized
+      // pages were capped at twelve and had no navigation at all.
+      const res = await fetch(`/reports/preview?jndi=${encodeURIComponent(jndi)}`, {
         method: 'POST',
         body: form,
       })
       if (res.ok) {
-        const body = await res.json()
-        setPreviewPages(body.pages)
-        setPreviewUrl(null)
+        const url = URL.createObjectURL(await res.blob())
+        setPreviewPages(null)
+        setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url })
         return
       }
-      const fallback = await fetch(`/reports/preview?jndi=${encodeURIComponent(jndi)}`, {
-        method: 'POST',
-        body: form,
-      })
+      // fallback for a pane with no PDF plugin: pages as images
+      const fallback = await fetch(
+        `/reports/preview?jndi=${encodeURIComponent(jndi)}&format=pages`,
+        { method: 'POST', body: form })
       if (!fallback.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.detail || res.statusText)
       }
-      const url = URL.createObjectURL(await fallback.blob())
-      setPreviewPages(null)
-      setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url })
+      setPreviewUrl(null)
+      setPreviewPages((await fallback.json()).pages)
     } catch (err) {
       setPreviewError(err.message)
     } finally {
@@ -323,7 +323,12 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             <header>
               <h3>Preview <span className="muted">— rendered by the Pentaho Reporting engine</span></h3>
               <div className="pdf-modal-actions">
-                {previewPages && <span className="muted">{previewPages.length} page(s)</span>}
+                {previewPages && (
+                  <span className="muted">
+                    first {previewPages.length} page(s) — this browser has no
+                    inline PDF viewer, so there is no outline panel
+                  </span>
+                )}
                 <button className="ghost" onClick={closePreview} aria-label="Close">✕ Close</button>
               </div>
             </header>
