@@ -9,6 +9,23 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Consultant report is now a portfolio-style document** with its own
+  download button (`.html`, plus `.md` beside it): KPI cards, a **"where the
+  remaining effort goes"** table (formulas to rebuild, formulas to glance at,
+  suppression not carried, cosmetic conditionals, release findings — each
+  with what the consultant actually does), a **what converted** table (bands,
+  elements, groups, parameters, summaries, sub-reports, datasource, embedded
+  rows), the findings with their LLM resolutions, the full manual-work list,
+  and folded sections for handled-automatically and provenance. Honours the
+  app's consultant rate.
+- **The gate stopped over-reporting.** Content matching is now wrap- and
+  format-insensitive (month names, `$ #` vs `$#`, paragraphs re-wrapped by
+  the other engine) — the demo's "14 missing lines" drops to 5 real ones.
+  And a page-count delta where every statement still matches the original is
+  reported as **info** ("the conversion is more compact — the original leaves
+  37 near-empty spill pages"), not a warning, so it no longer reads as a
+  defect.
+
 - **Launchers are a consultant's preflight**: `run.ps1` / `run.sh` (and
   `run.bat`) now print a version banner, check what THIS machine can demo —
   Report Designer, SAP Crystal runtime, RptToXml, the viewer — with a green

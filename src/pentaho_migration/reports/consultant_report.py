@@ -53,7 +53,7 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
     if check is not None and check.findings:
         rows = []
         for n, f in enumerate(check.findings, 1):
-            icon = "✋" if f.severity == "error" else "⚠"
+            icon = {"error": "✋", "warning": "⚠"}.get(f.severity, "ℹ")
             ev = "".join(f"<li><code>{esc(str(e))}</code></li>"
                          for e in f.evidence[:8])
             resolution = (f'<p class="fix">→ {esc(f.resolution)}</p>'
@@ -87,41 +87,124 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
                       f"<b>{check.converted_pages} pages</b> (Pentaho engine)"
                       f"{spans}</p>")
 
+    # --- where the effort goes: a breakdown the consultant can act on ---
+    from pentaho_migration.reports.todo_kinds import APPLIED, INFO
+    buckets = split_todos(notes)
+    areas = []                       # (area, count, what to do)
+    if counts["manual"]:
+        areas.append(("Formulas to rebuild by hand", counts["manual"],
+                      "Open each in PRD's formula editor - the conversion "
+                      "report lists the original Crystal text beside what it "
+                      "could prove."))
+    if counts["review"]:
+        areas.append(("Formulas translated, needing a glance", counts["review"],
+                      "Deterministic translations whose semantics are worth "
+                      "confirming against the Crystal original."))
+    suppress = [n for n in buckets[MANUAL] if "EnableSuppress" in n]
+    if suppress:
+        areas.append(("Conditional suppression not carried", len(suppress),
+                      "Crystal hides sections on a condition PRD cannot "
+                      "express; recreate as a band visibility expression or "
+                      "accept the section always printing."))
+    cosmetic = [n for n in buckets[MANUAL]
+                if "conditional" in n.lower() and "EnableSuppress" not in n]
+    if cosmetic:
+        areas.append(("Conditional formatting not carried", len(cosmetic),
+                      "Colour/tooltip/style conditions - cosmetic; apply as "
+                      "PRD style expressions where the customer cares."))
+    others = [n for n in buckets[MANUAL]
+              if n not in suppress and n not in cosmetic]
+    if others:
+        areas.append(("Other items needing judgment", len(others),
+                      "Listed in full below."))
+    if check is not None and check.findings:
+        blocking = [f for f in check.findings if f.severity in ("error", "warning")]
+        if blocking:
+            areas.append(("Release-check findings", len(blocking),
+                          "Rendered-output differences vs the original, with "
+                          "a proposed resolution each."))
+    areas_html = "".join(
+        f"<tr><td>{esc(a)}</td><td class='n'>{n}</td><td>{esc(w)}</td></tr>"
+        for a, n, w in areas) or (
+        "<tr><td colspan='3'>Nothing outstanding - this report converts clean."
+        "</td></tr>")
+
+    applied_html = "".join(f"<li>{esc(a)}</li>" for a in buckets[APPLIED][:20])
+    info_html = "".join(f"<li>{esc(i)}</li>" for i in buckets[INFO][:20])
+
+    structure = [("Bands", len(model.sections)),
+                 ("Elements", sum(len(s.elements) for s in model.sections)),
+                 ("Groups", len(model.groups)),
+                 ("Parameters", len(model.parameters)),
+                 ("Summaries", len(model.summaries)),
+                 ("Sub-reports", len(model.subreports))]
+    structure_html = "".join(f"<tr><td>{k}</td><td class='n'>{v}</td></tr>"
+                             for k, v in structure)
+    data_rows = (len(model.saved_rows.rows)
+                 if getattr(model, "saved_rows", None) else 0)
+
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>Consultant Report — {esc(model.name)}</title>
 <style>
-  body {{ font: 14px/1.5 system-ui, "Segoe UI", sans-serif; color: #17242e;
-         max-width: 900px; margin: 32px auto; padding: 0 20px; }}
-  h1 {{ color: {NAVY}; border-bottom: 3px solid {GOLD}; padding-bottom: 8px; }}
-  h2 {{ color: {NAVY}; margin-top: 28px; }}
+  body {{ font: 14px/1.55 system-ui, "Segoe UI", sans-serif; color: #17242e;
+         max-width: 920px; margin: 32px auto; padding: 0 20px; }}
+  h1 {{ color: {NAVY}; border-bottom: 3px solid {GOLD}; padding-bottom: 8px; margin-bottom: 4px; }}
+  h2 {{ color: {NAVY}; margin-top: 30px; border-bottom: 1px solid #dfe6ea; padding-bottom: 4px; }}
   .kpis {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0; }}
   .kpi {{ flex: 1 1 150px; background: {LIGHT}; border-radius: 10px; padding: 14px 18px; }}
   .kpi b {{ display: block; font-size: 24px; color: {NAVY}; }}
   .kpi.gold b {{ color: {GOLD}; }}
   .kpi span {{ font-size: 12px; color: {SLATE}; }}
+  table {{ border-collapse: collapse; width: 100%; margin: 10px 0; }}
+  th {{ text-align: left; color: {SLATE}; font-weight: 600; font-size: 12px;
+        border-bottom: 2px solid #dfe6ea; padding: 6px 8px; }}
+  td {{ padding: 7px 8px; border-bottom: 1px solid #eef2f4; vertical-align: top; }}
+  td.n {{ text-align: right; font-variant-numeric: tabular-nums; width: 70px; }}
   .finding {{ background: {LIGHT}; border-radius: 10px; padding: 12px 16px; margin: 10px 0; }}
   .finding ul {{ margin: 6px 0; }}
   .fix {{ margin: 6px 0 0; }}
   .muted {{ color: {SLATE}; }}
   code {{ background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; }}
-  footer {{ margin-top: 32px; color: {SLATE}; font-size: 12px; }}
+  details {{ margin: 8px 0; }} summary {{ cursor: pointer; color: {SLATE}; }}
+  footer {{ margin-top: 34px; color: {SLATE}; font-size: 12px;
+            border-top: 1px solid #dfe6ea; padding-top: 10px; }}
 </style></head><body>
 <h1>Consultant Report — {esc(model.name)}</h1>
-<p class="muted">Generated {datetime.now():%Y-%m-%d %H:%M} · Pentaho Migration Copilot</p>
+<p class="muted">Generated {datetime.now():%Y-%m-%d %H:%M} · Pentaho Migration Copilot
+ · SAP Crystal Reports → Pentaho Report Designer</p>
+
 <div class="kpis">
   <div class="kpi"><b>{verdict_html}</b><span>{verdict_note}</span></div>
   <div class="kpi"><b>{copilot_h:,.1f}h</b><span>effort with Copilot ({money(copilot_h)})</span></div>
   <div class="kpi"><b>{manual_h:,.1f}h</b><span>manual rebuild ({money(manual_h)})</span></div>
   <div class="kpi gold"><b>{money(saved_h)}</b><span>saved ({saved_h / (manual_h or 1):.0%} · {saved_h:,.1f}h @ ${rate:,.0f}/h)</span></div>
-  <div class="kpi"><b>{counts['auto']}✓ {counts['review']}⚠ {counts['manual']}✋</b><span>formulas auto / review / manual</span></div>
 </div>
 {pages_html}
+
+<h2>Where the remaining effort goes</h2>
+<table><tr><th>Area</th><th class="n">Items</th><th>What the consultant does</th></tr>
+{areas_html}</table>
+
+<h2>What converted</h2>
+<table><tr><th>Structure</th><th class="n">Count</th></tr>{structure_html}
+<tr><td>Formulas</td><td class="n">{counts['auto']}✓ {counts['review']}⚠ {counts['manual']}✋</td></tr>
+<tr><td>Data source</td><td class="n">{esc(model.jndi)}</td></tr>
+<tr><td>Embedded saved rows</td><td class="n">{data_rows:,}</td></tr></table>
+
 {findings_html}
-<h2>Remaining manual work</h2>
+
+<h2>Remaining manual work — full list</h2>
 <ul>{work_html}</ul>
-<footer>Deterministic conversion + comparison; LLM notes are advisory.
-Open the .prpt in Pentaho Report Designer, resolve the findings, publish to
-the Pentaho Server.</footer>
+
+<details><summary>Handled automatically ({len(buckets[APPLIED])}) — verify, no action expected</summary>
+<ul>{applied_html or '<li>None.</li>'}</ul></details>
+<details><summary>Provenance notes ({len(buckets[INFO])})</summary>
+<ul>{info_html or '<li>None.</li>'}</ul></details>
+
+<footer>Conversion and comparison are deterministic; LLM notes are advisory.
+Effort assumes a {rate:,.0f}/h blended rate — adjust in the app.
+Open the .prpt in Pentaho Report Designer, work the areas above, then publish
+to the Pentaho Server.</footer>
 </body></html>"""
 
 
@@ -162,7 +245,7 @@ def build_consultant_report(model, source_path, prpt_path,
         if check.findings:
             lines += ["### Findings", ""]
             for n, f in enumerate(check.findings, 1):
-                icon = "✋" if f.severity == "error" else "⚠"
+                icon = {"error": "✋", "warning": "⚠"}.get(f.severity, "ℹ")
                 lines.append(f"**{n}. {icon} [{f.code}] {f.message}**")
                 for ev in f.evidence[:8]:
                     lines.append(f"   - `{ev}`")

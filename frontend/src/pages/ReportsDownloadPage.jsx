@@ -16,6 +16,14 @@ function downloadBase64(b64, filename) {
   URL.revokeObjectURL(a.href)
 }
 
+function downloadHtml(html, filename) {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
 function downloadText(text, filename) {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([text], { type: 'text/markdown' }))
@@ -111,7 +119,9 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
     try {
       const form = new FormData()
       form.append('dump', file)
-      const res = await fetch(`/reports/release-check/start?jndi=${encodeURIComponent(jndi)}`, {
+      const rate = localStorage.getItem('consultantRate') || '150'
+      const res = await fetch(
+        `/reports/release-check/start?jndi=${encodeURIComponent(jndi)}&rate=${encodeURIComponent(rate)}`, {
         method: 'POST',
         body: form,
       })
@@ -254,11 +264,17 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
               </span>
             </h2>
             <div className="actions">
+              {gate.consultant_report_html && (
+                <button className="primary" onClick={() => downloadHtml(
+                  gate.consultant_report_html,
+                  report.filename.replace(/\.prpt$/, '.consultant.html'))}>
+                  ⬇ Consultant report (.html)
+                </button>
+              )}
               <button className="ghost" onClick={() => downloadText(
-                gate.consultant_report_html || gate.consultant_report_markdown,
-                report.filename.replace(/\.prpt$/,
-                  gate.consultant_report_html ? '.consultant.html' : '.consultant.md'))}>
-                ⬇ Consultant report
+                gate.consultant_report_markdown,
+                report.filename.replace(/\.prpt$/, '.consultant.md'))}>
+                ⬇ .md
               </button>
             </div>
           </header>
@@ -275,7 +291,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             <ul className="notes">
               {gate.findings.map((f, i) => (
                 <li key={i}>
-                  <b>{f.severity === 'error' ? '✋' : '⚠'} [{f.code}]</b> {f.message}
+                  <b>{f.severity === 'error' ? '✋' : f.severity === 'warning' ? '⚠' : 'ℹ'} [{f.code}]</b> {f.message}
                   {f.resolution && <div className="gate-resolution">→ {f.resolution}</div>}
                 </li>
               ))}

@@ -97,13 +97,29 @@ def render_original_pdf(rpt_path: Path) -> bytes:
         return out.read_bytes()
 
 
+_MONTHS = re.compile(r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+                     r"[a-z]*")
+
+
 def _normalize_line(line: str) -> str:
-    """Comparison form of a text line: collapsed whitespace, digits masked so
-    a date or an amount matches itself in either format. Short/noise lines
+    """Comparison form of a text line: collapsed whitespace, digits masked,
+    month names shortened, currency spacing collapsed - so a date or an
+    amount matches itself in either engine's dialect. Short/noise lines
     normalize to '' and drop out."""
     text = re.sub(r"\s+", " ", line).strip()
+    text = _MONTHS.sub(lambda m: m.group(1), text)
     text = re.sub(r"[\d,.]+", "#", text)
+    text = text.replace("$ #", "$#")
     return text if len(text) >= 6 else ""
+
+
+def _doc_stream(pages: list) -> str:
+    """The whole document as one normalized stream - matching against it is
+    WRAP-INSENSITIVE, so a paragraph that wraps at a different column (or a
+    label and its value extracted as separate lines) still counts as
+    present."""
+    return " " + " ".join(
+        _normalize_line(" ".join(page.split())) or "" for page in pages) + " "
 
 
 def _line_pages(pages: list) -> dict:
@@ -163,14 +179,10 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
     result.original_pages = len(orig_pages)
     result.converted_pages = len(conv_pages)
 
-    # 1. page count
+    # 1. page count - deferred: whether a delta is a DEFECT depends on the
+    # group-span comparison below (a compacter render whose statements all
+    # match the original is a difference to mention, not a problem to fix)
     delta = abs(len(orig_pages) - len(conv_pages))
-    if delta and delta / max(len(orig_pages), 1) > PAGE_DELTA_WARN:
-        result.findings.append(Finding(
-            "warning", "pages",
-            f"page count differs: original {len(orig_pages)}, converted "
-            f"{len(conv_pages)} - grouping, page breaks or section heights "
-            "changed the flow"))
 
     # 2. numbers as a multiset. Dates are stripped first: the two engines
     # format them differently ("2002/04/3" vs "2002-04-03"), which tokenizes
@@ -201,10 +213,15 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
             "original - check formats and edge rows",
             evidence=[f"{v} (x{n})" for v, n in missing.most_common(8)]))
 
-    # 3 + 4. content lines: missing entirely, or moved to another page
+    # 3 + 4. content lines: missing entirely, or moved to another page.
+    # "Missing" is judged against the WHOLE converted document, wrap- and
+    # format-insensitively - line-by-line comparison flagged every paragraph
+    # that merely wrapped at a different column.
     orig_lines = _line_pages(orig_pages)
     conv_lines = _line_pages(conv_pages)
-    missing_lines = [l for l in orig_lines if l not in conv_lines]
+    conv_stream = _doc_stream(conv_pages)
+    missing_lines = [l for l in orig_lines
+                     if l not in conv_lines and l not in conv_stream]
     if missing_lines:
         result.findings.append(Finding(
             "error", "missing-content",
@@ -255,8 +272,29 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
                 evidence=[f"{v[:40]}: original {o} page(s) -> converted {c}"
                           for v, o, c in drifted[:8]]))
 
-    # conservative gate: anything worth a sentence is worth a look
-    result.verdict = "SHIP" if not result.findings else "REVIEW"
+    if delta and delta / max(len(orig_pages), 1) > PAGE_DELTA_WARN:
+        if (result.groups_checked
+                and result.groups_matching == result.groups_checked
+                and len(conv_pages) < len(orig_pages)):
+            result.findings.append(Finding(
+                "info", "pages",
+                f"the conversion is more compact: {len(conv_pages)} pages vs "
+                f"{len(orig_pages)} - the original leaves near-empty spill "
+                f"pages ({len(_sparse_pages(orig_pages))} of them) that the "
+                "conversion consolidates; every statement still spans the "
+                "same pages as the original"))
+        else:
+            result.findings.append(Finding(
+                "warning", "pages",
+                f"page count differs: original {len(orig_pages)}, converted "
+                f"{len(conv_pages)} - grouping, page breaks or section "
+                "heights changed the flow"))
+
+    # conservative gate: warnings and errors need a look; info findings are
+    # context, not work
+    result.verdict = ("SHIP" if not any(f.severity in ("error", "warning")
+                                        for f in result.findings)
+                      else "REVIEW")
     return result
 
 

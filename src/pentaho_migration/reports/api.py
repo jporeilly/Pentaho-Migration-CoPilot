@@ -354,7 +354,7 @@ _GATE_STAGES = ["extracting", "rendering original", "rendering conversion",
 
 @router.post("/release-check/start", dependencies=[Depends(require_api_key)])
 def release_check_start(dump: UploadFile, jndi: str = "",
-                              llm: bool = True) -> dict:
+                              llm: bool = True, rate: float = 150.0) -> dict:
     """Start the release gate in the background: two full renders plus
     optional LLM annotation take minutes; poll /release-check/status for the
     staged progress the UI shows as a bar."""
@@ -422,7 +422,7 @@ def release_check_start(dump: UploadFile, jndi: str = "",
                 "llm_annotated": annotated,
                 "consultant_report_markdown": markdown,
                 "consultant_report_html": build_consultant_report_html(
-                    model, check),
+                    model, check, rate=rate),
             }
             job["stage"] = "done"
             job["status"] = "done"
