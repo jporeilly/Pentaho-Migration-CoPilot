@@ -99,8 +99,14 @@ Every conversion can be verified mechanically:
   multiset, lines of the original that never appear (wrap- and
   spacing-insensitive, so a paragraph that re-wraps is not a defect), content
   that moved pages, near-empty widowed pages, and whether each group spans
-  the same pages as the original. Verdict **SHIP** or **REVIEW**, with the
-  evidence. Every comparison is deterministic; the LLM only ever *annotates*
+  the same pages as the original, and - page by page, pairing them by
+  content because the two renders have different page counts - how they
+  **LOOK**. That last one is what catches a fill, rule or box the text
+  comparison is blind to; a difference that appears on most compared pages
+  is reported once as **report-wide**, because it lives in a band that
+  repeats and takes one fix, not one per page. Verdict **SHIP** or
+  **REVIEW**, with the evidence, and the gate always says how many pages it
+  compared so a sampled check cannot read as a whole one. Every comparison is deterministic; the LLM only ever *annotates*
   a finding with a resolution, it never decides the verdict.
 - **Consultant report** (HTML, PDF and markdown, all from one function so
   they cannot disagree): a **prioritised, costed action plan** — P1 blocks
@@ -147,7 +153,15 @@ where conversion stops being mechanical:
    grand-total summary in report footers.
 6. Multi-link subreports (two `Pm-` fields) convert and filter correctly —
    verified live.
-7. **Sub-reports reach past the saved data.** Crystal caches rows for the
+7. **A fill Crystal paints at render time is not in the dump.** The demo
+   statement prints its letter on a pale beige panel; nothing exports it.
+   Ruled out conclusively: the dump holds nine distinct RGB values and none
+   is beige, there is no box but the grey Total, no section background, and
+   the DIB carved from the `.rpt` is white-backed. Same family as
+   `PictureData` returning null and cross-tab grids behind reserved COM
+   slots - the free SDK does not expose it. The **appearance check reports
+   it** rather than letting it pass silently, which is the point.
+8. **Sub-reports reach past the saved data.** Crystal caches rows for the
    MASTER report only, so a report whose sub-reports carry their own queries
    renders its own bands from the embedded rows and then asks the database
    for the rest. Reported in one sentence, like the prompts above. Across the

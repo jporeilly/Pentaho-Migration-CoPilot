@@ -113,3 +113,46 @@ class TestItReportsWhatItDid:
         out = vd.compare_visually(pdf, pdf, [{"alpha"}], [{"unrelated"}])
         assert out["compared"] == 0
         assert out["pages"] == []
+
+
+class TestGlobalDifferencesAreSaidOnce:
+    """A fill missing from a band that REPEATS is one defect with one fix,
+    not one per page. Listing it page by page reads as N problems and gets
+    costed N times."""
+
+    def _finding(self, pages, compared):
+        from pentaho_migration.reports.release_check import _appearance_finding
+        return _appearance_finding({"compared": compared,
+                                    "available": compared, "pages": pages})
+
+    def test_a_difference_on_every_page_is_reported_as_report_wide(self):
+        pages = [(i, i, 0.2, "middle of the page - content differs")
+                 for i in range(12)]
+        f = self._finding(pages, 12)
+        assert "REPORT-WIDE" in f.message
+        assert "one difference in a band that repeats" in f.message
+        # two evidence lines, not twelve
+        assert len(f.evidence) <= 3
+
+    def test_wording_may_vary_while_the_place_does_not(self):
+        """The same missing fill reads as "missing something" where it
+        dominates and "content differs" where text moved too."""
+        pages = [(0, 0, 0.3, "middle of the page - the conversion is missing "
+                             "something the original prints")]
+        pages += [(i, i, 0.2, "middle of the page - content differs")
+                  for i in range(1, 12)]
+        assert "REPORT-WIDE" in self._finding(pages, 12).message
+
+    def test_a_one_page_difference_is_still_listed_per_page(self):
+        """Not everything is global - a single odd page must stay visible."""
+        f = self._finding([(3, 3, 0.2, "top of the page - content differs")], 12)
+        assert "REPORT-WIDE" not in f.message
+        assert "1 of 12" in f.message
+
+    def test_pages_differing_elsewhere_are_still_counted(self):
+        pages = [(i, i, 0.2, "middle of the page - content differs")
+                 for i in range(10)]
+        pages += [(11, 11, 0.3, "bottom of the page - content differs")]
+        f = self._finding(pages, 11)
+        assert "REPORT-WIDE" in f.message
+        assert any("further page(s) differ elsewhere" in e for e in f.evidence)

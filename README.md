@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (IBM DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.39.3** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
+Version **1.40.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -51,8 +51,11 @@ showing real data with no database anywhere in the chain. Before anything can
 be downloaded, the **release gate** renders the original through the SAP
 Crystal viewer and the conversion through the real Pentaho engine, then diffs
 the two PDFs — page counts, every number, dropped lines, content that moved,
-and whether each group still spans the same pages — returning **SHIP** or
-**REVIEW** with the evidence. What comes out is one **consultant report**
+whether each group still spans the same pages, and — page by page — how the
+two renders **look**, which is what catches a fill or box the text comparison
+cannot see. It returns **SHIP** or **REVIEW** with the evidence and says how
+many pages it compared: a clean result is evidence, not a proof of
+equivalence. What comes out is one **consultant report**
 (`.html`, `.pdf`, `.md`, all generated from one function so they cannot
 disagree) leading with a prioritised, costed action plan: what to do first,
 what it costs, what the customer sees if it is skipped, and the Report

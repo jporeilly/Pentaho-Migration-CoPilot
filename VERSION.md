@@ -1,6 +1,29 @@
 # Version
 
-**1.39.3** - 2026-07-28
+**1.40.0** - 2026-07-28
+
+**The release gate can see.** It compared extracted text and nothing else, so
+a background panel that vanished, a rule the original never draws, or a total
+box that lost its fill all left the text identical and it reported SHIP. It
+now renders both reports, pairs the pages by content - 74 original against 58
+converted, so page N is not page N - and compares how each pair LOOKS. A
+difference that appears on most pages is reported once as report-wide,
+because it lives in a band that repeats and takes one fix, not one per page.
+
+**Three real layout defects it exists to catch, found and fixed.** Crystal
+does not draw a zero-thickness line; white is its "no fill", not an opaque
+white; and a picture scales to fill its box. The first put a stray dot and a
+trailing underline on every detail row, the second hid the grey Total box
+behind the labels in front of it, the third letterboxed the watermark into
+two thirds of its width.
+
+**The preview shows the whole report with its navigation** - the PDF itself,
+so the browser's own viewer gives every page and the outline panel, instead
+of twelve images with no way to reach page 40.
+
+The demo statement now reports **REVIEW**, not SHIP - correctly. Its letter
+sits on a beige panel that Crystal paints at render time and RptToXml never
+exports, and the gate says so instead of letting it pass.
 
 **The consultant report is now the deliverable.** It leads with a
 prioritised, costed action plan - P1 blocks release, P2 correctness, P3

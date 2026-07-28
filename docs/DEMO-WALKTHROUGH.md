@@ -57,14 +57,24 @@ Walk the stepper:
   data rows recovered from the .rpt and embedded."*
 - **Release check** — the download buttons stay locked until it finishes, and
   the progress bar names each stage. It renders the **original through the
-  SAP viewer** and the **conversion through the Pentaho engine**, then diffs
-  the two PDFs. This report comes back **✅ SHIP**, with *36 of 36 statements
-  spanning the same pages as the original*. Talk track: *"Nobody is asking
-  you to trust the conversion. It renders both and compares them."*
+  SAP viewer** and the **conversion through the Pentaho engine**, then
+  compares the two PDFs four ways: the numbers as a set, the lines of text,
+  where each statement breaks across pages, and — page by page — how they
+  **look**. This report comes back **⚠ REVIEW**: *36 of 36 statements span
+  the same pages as the original*, and the appearance check flags a fill the
+  conversion is missing (see the rough edges below).
+
+  Talk track: *"It renders both and compares them, and it is telling you
+  about a difference I would otherwise have to hope you didn't notice."*
+  Be precise about what it does and does not establish — it checks the data,
+  the pagination and the appearance of the pages it compared, and it says how
+  many that was. It is not a proof of equivalence, and a clean result is
+  evidence rather than a guarantee. Overselling this is the one thing that
+  will cost you the room, because the customer will find the exception.
 - **Consultant report** (`.html`, `.pdf`, `.md`) — open the HTML. It leads
   with a **prioritised, costed action plan**: what to do first, what it
   costs, what the customer sees if it is skipped, and the Report Designer
-  steps to do it. This report: **3 actions, 0.36h**, no P1 blockers. Talk
+  steps to do it. This report: **4 actions, 0.61h**, no P1 blockers. Talk
   track: *"This is what you'd hand a consultant on Monday morning."*
 
 ## Act 3 — "And this is it in Pentaho, with your data" (3 min)
@@ -92,11 +102,21 @@ letterhead, same watermark and signature, same $43.50.
 
 ## Known rough edges (say them before they're noticed)
 
-- **The conversion is 62 pages against the original's 74** — and that is the
-  conversion being *better*, not worse. The release gate proves it: all 36
-  statements span the same pages as the original, and the original leaves 37
-  near-empty spill pages that the conversion consolidates. The gate reports
-  the delta as information rather than a defect, and says so on the page.
+- **The letter's beige background panel is missing**, and the gate says so —
+  this is the honest centrepiece, so lead with it rather than hope. Crystal
+  paints the letter block on a pale panel; the conversion does not. It is not
+  recoverable from what the extractor gives us: there is no beige anywhere in
+  the dump, no box, no section background, and the image inside the `.rpt` is
+  white-backed. Crystal applies it at render time and RptToXml never exports
+  it — the same family as the picture bytes and the cross-tab grids the free
+  SAP SDK will not open. Talk track: *"That is the boundary of what the free
+  SDK exposes, and the tool tells you where the boundary is instead of
+  quietly rendering something close."*
+- **The conversion is 58 pages against the original's 74** — and that is the
+  conversion being *better*, not worse: all 36 statements span the same pages
+  as the original, and the original leaves 37 near-empty spill pages that the
+  conversion consolidates. The gate reports the delta as information rather
+  than a defect, and says so on the page.
 - **Rich text inside one text object loses its runs.** A Crystal text object
   with mixed bold/regular formatting converts with the first run's font
   throughout. The extractor flattens the object to one string and one font,

@@ -39,6 +39,42 @@ deliberately — not one per work session.
   walkthrough's "known rough edges" no longer lists things that have since
   been fixed.
 
+## [1.40.0] - 2026-07-28
+
+### The gate can see
+
+- **The release gate compares how the two renders LOOK**, not only what they
+  say. Page counts, numbers, lines and group spans are all text; a background
+  panel that vanished, a rule the original never draws, a total box that lost
+  its fill all leave the text identical, and the gate reported SHIP through
+  every one of them. It now pairs pages by content (74 original against 58
+  converted, so page N is not page N) and compares each pair as a coarse
+  ink-density grid. The tolerance is set from the two cases that must be
+  separated rather than by taste: a pale panel is ~0.06 of ink density
+  greyscaled, a shape shifting two points moves an edge cell ~0.026.
+- **A difference on most pages is reported once, as report-wide.** A fill
+  missing from a band that repeats is one defect with one fix, not one per
+  page - listing it page by page reads as N problems and gets costed N times.
+- Three real layout defects the check exists to catch, all fixed and all
+  general: a **zero-thickness line is not drawn by Crystal** (we drew it, and
+  it showed through the detail band as a stray dot and a trailing underline
+  on every row - 10 corpus reports carry these); **white is Crystal's "no
+  fill"**, not an opaque white, and painting it made every label a tile that
+  hid the grey Total box behind it; and **a picture scales to fill its box**,
+  where preserving the aspect letterboxed the watermark into two thirds of
+  its width.
+- **An underlay is clamped to its band top.** A spacer section between the
+  underlay and what it underlays made the offset negative, and the engine
+  answered by rendering the watermark below the letter instead of behind it.
+- **The preview shows the whole report with its navigation** - the PDF
+  itself, so the browser's viewer gives every page and the outline panel,
+  instead of twelve rasterized images with no nav. That also removed a
+  duplicate: the bundle now carries bookmarks natively and the endpoint was
+  bolting a second outline on top, so every entry appeared twice.
+- Docs say what the gate establishes and no more: it checks data, pagination
+  and the appearance of the pages it compared, and reports how many that was.
+  A clean result is evidence, not a proof of equivalence.
+
 ## [1.39.3] - 2026-07-28
 
 - **The consultant report downloads as a PDF** as well as HTML and markdown.

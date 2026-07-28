@@ -38,6 +38,10 @@ RENDER_TIMEOUT = 300.0
 # ignore trivial page drift; a statement report reflows a little by design
 PAGE_DELTA_WARN = 0.1          # >10% page-count drift is a finding
 MOVED_LINE_CAP = 12            # report the first N moved/missing lines
+# A difference on this share of the compared pages is REPORT-WIDE - it lives
+# in a band that repeats, so it is one defect with one fix. Listing it page
+# by page reads as N problems and gets costed N times.
+GLOBAL_SHARE = 0.7
 
 
 @dataclass
@@ -60,6 +64,48 @@ class ReleaseCheck:
     pages_compared: int = 0    # pages compared by APPEARANCE, not just text
     pages_pairable: int = 0    # ... out of this many that could be paired
     findings: list = field(default_factory=list)
+
+
+def _appearance_finding(visual: dict) -> Finding:
+    """One finding for a visual difference, said once.
+
+    A fill missing from a band that repeats on every statement is ONE defect
+    with one fix, not twelve. Listing it page by page buries that and reads
+    as twelve problems, which is how a consultant ends up costing the same
+    work over and over. Where every compared page differs the same way, the
+    finding says so and quotes a single page as the example."""
+    worst = visual["pages"]
+    compared = visual["compared"]
+    lo = min(f for _o, _c, f, _w in worst)
+    hi = max(f for _o, _c, f, _w in worst)
+    # Group by WHERE on the page, not by the exact wording: the same missing
+    # fill reads as "missing something" on a page where it dominates and
+    # "content differs" where text moved too, and those are one defect.
+    places: dict = {}
+    for o, c, f, where in worst:
+        places.setdefault(where.split(" - ")[0], []).append((o, c, f))
+    place, hits = max(places.items(), key=lambda kv: len(kv[1]))
+    if compared > 1 and len(hits) >= max(2, int(compared * GLOBAL_SHARE)):
+        o, c, f = hits[0]
+        return Finding(
+            "warning", "appearance",
+            f"REPORT-WIDE: the {place} differs on {len(hits)} of the "
+            f"{compared} page(s) compared. It is one difference in a band "
+            "that repeats, not one per page - a single fix covers every "
+            "statement",
+            evidence=[f"{lo:.0%}-{hi:.0%} of each page affected",
+                      f"e.g. original p{o + 1} vs converted p{c + 1} "
+                      f"({f:.0%} of the page)"]
+            + ([f"{len(worst) - len(hits)} further page(s) differ elsewhere"]
+               if len(worst) > len(hits) else []))
+    return Finding(
+        "warning", "appearance",
+        f"{len(worst)} of {compared} page(s) compared LOOK different from "
+        "the original beyond text - a fill, rule or box that the text "
+        "comparison cannot see",
+        evidence=[f"original p{o + 1} vs converted p{c + 1}: "
+                  f"{f:.0%} of the page - {where}"
+                  for o, c, f, where in worst[:MOVED_LINE_CAP]])
 
 
 def _pdf_pages_text(pdf_bytes: bytes) -> list:
@@ -318,15 +364,7 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
     result.pages_compared = visual["compared"]
     result.pages_pairable = visual["available"]
     if visual["pages"]:
-        worst = visual["pages"]
-        result.findings.append(Finding(
-            "warning", "appearance",
-            f"{len(worst)} of {visual['compared']} page(s) compared LOOK "
-            "different from the original beyond text - a fill, rule or box "
-            "that the text comparison cannot see",
-            evidence=[f"original p{o + 1} vs converted p{c + 1}: "
-                      f"{f:.0%} of the page - {where}"
-                      for o, c, f, where in worst[:MOVED_LINE_CAP]]))
+        result.findings.append(_appearance_finding(visual))
     elif not visual["compared"]:
         # say so rather than let a silent skip read as a clean result
         result.findings.append(Finding(
