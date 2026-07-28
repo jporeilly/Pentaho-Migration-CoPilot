@@ -9,6 +9,19 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Every LLM button now appears only when there is something for it to do.**
+  `✨ Translate` and `✨ AI-assist` were already gated on a real count;
+  `🤖 Suggest a solution` was not, and offered itself on steps that convert
+  cleanly. It is now limited to high- and medium-impact entries — the same
+  cut the PDF migration report already used.
+- Documentation sweep: the Crystal coverage matrix, demo walkthrough,
+  install guide and extractor notes now describe saved-data recovery, the
+  release gate, the consultant report and the action plan, and the
+  walkthrough's "known rough edges" no longer lists things that have since
+  been fixed.
+
+## [1.39.3] - 2026-07-28
+
 - **The consultant report downloads as a PDF** as well as HTML and markdown.
   All three render the same action plan from one function, so the document a
   customer receives and the numbers quoted in the app cannot drift apart.

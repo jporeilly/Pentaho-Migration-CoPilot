@@ -1,6 +1,32 @@
 # Version
 
-**1.39.2** — 2026-07-28
+**1.39.3** - 2026-07-28
+
+**The consultant report is now the deliverable.** It leads with a
+prioritised, costed action plan - P1 blocks release, P2 correctness, P3
+cosmetic - and every action carries why it matters, the concrete Report
+Designer steps, where the work lands, and its hours and cost. It downloads as
+HTML, **PDF** or markdown, all rendered from one function so the document a
+customer receives and the numbers quoted in the app cannot drift apart. The
+portfolio report gets the same treatment one level up: actions rolled up by
+kind of work, and every row of the focus list opens into that report's own
+plan.
+
+**A chart report converts to one page again.** A Crystal section can
+legitimately declare a height of zero - that is how a chart report collapses
+its per-row detail band - and the parser was raising every section to a 20pt
+floor. The AdventureWorks demo printed 187 pages against the original's one.
+
+**Saved-data recovery stopped losing whole reports**: strings decoded with
+the wrong byte order, and column types taken from metadata that lied about
+holding text. Types now come from the recovered values.
+
+**Conditional suppression not carried is down from 39 to 9** across the
+corpus, and the nine that remain are genuine Crystal shared-variable state.
+`PercentOfSum` prints a real share instead of the raw total, and generated
+SQL quotes the identifiers that need it. The demo statement passes the
+release gate: **SHIP**, with 36 of 36 statements spanning the same pages as
+the original.
 
 **A chart report converts to one page again.** A Crystal section can
 legitimately declare a height of zero — that is how a chart report collapses

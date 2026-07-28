@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (IBM DataStage next);**
 **SAP Crystal Reports → Pentaho Report Designer (.prpt).**
 
-Version **1.39.2** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
+Version **1.39.3** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -44,6 +44,20 @@ live data. The Inspect page carries the **schema-aware SQL agent**: the report
 SQL is `EXPLAIN`-validated against the live JNDI target automatically, and a
 schema-grounded chat answers join/column questions and proposes corrected SQL
 as a reviewable diff — applied only on click, recorded as a review item.
+
+Drop the customer's `.rpt` itself and the **saved rows cached inside it are
+recovered and embedded**, so the converted report opens in Report Designer
+showing real data with no database anywhere in the chain. Before anything can
+be downloaded, the **release gate** renders the original through the SAP
+Crystal viewer and the conversion through the real Pentaho engine, then diffs
+the two PDFs — page counts, every number, dropped lines, content that moved,
+and whether each group still spans the same pages — returning **SHIP** or
+**REVIEW** with the evidence. What comes out is one **consultant report**
+(`.html`, `.pdf`, `.md`, all generated from one function so they cannot
+disagree) leading with a prioritised, costed action plan: what to do first,
+what it costs, what the customer sees if it is skipped, and the Report
+Designer steps to do it.
+
 A **connection panel** picks (or saves/edits/deletes) the JNDI connection —
 persisted to the engine's own simple-jndi config — with a **schema browser**
 (PK/FK badges), a **live dataset preview** (first 50 rows), and dialect
@@ -77,7 +91,10 @@ mapping to walk through its conversion; track review status per mapping; **run t
 batch-triage agent over every stored Crystal report** for persistent
 READY/REVIEW/BLOCKED chips with click-through reasons — layout lint, TODO counts,
 and optional live-database SQL validation — plus **per-report output parity**:
-upload the customer's Crystal export and get a PASS/NEAR/FAIL chip), multi-mapping
+upload the customer's Crystal export and get a PASS/NEAR/FAIL chip, and a
+**portfolio consultant report** that leads with the engagement plan — the same
+actions rolled up by *kind* of work, so you staff against the rows — where
+clicking any report in the focus list opens its own full plan), multi-mapping
 selector (real exports hold up to 32 mappings per file), four color themes, a version
 badge that pops up the changelog, and a **⚙ Settings** page that auto-detects your
 hardware (RAM, NVIDIA GPUs — multi-GPU VRAM aggregates), `OLLAMA_*` environment, and
@@ -355,6 +372,17 @@ Completed sources — Informatica PowerCenter and SAP Crystal Reports:
   (geometry lint + render verification), batch triage agent
   (per-report READY/REVIEW/BLOCKED verdicts over a whole corpus)
 
+- [x] Crystal, production pass (v1.21 → 1.39): sub-reports as nested PRD
+  bundles, cross-tabs recovered from the `.rpt` binary, images carved and
+  matched to their picture boxes, sections as collapsing sub-bands so
+  suppression paginates like Crystal, **saved rows recovered and embedded**
+  (the report opens in PRD with real data and no database), the **release
+  gate** (original through the SAP viewer vs conversion through the Pentaho
+  engine, diffed deterministically, SHIP/REVIEW with evidence), and the
+  **consultant report** — a prioritised, costed action plan in HTML, PDF and
+  markdown, with a portfolio version that rolls the same actions up across a
+  corpus
+
 - [x] Informatica mapplets — instances expand inline into the parent pipeline
   (prefixed steps, graph rewired through the input/output boundaries)
 - [x] Informatica workflow tasks beyond sessions — Email → Mail entry,
@@ -367,8 +395,10 @@ Completed sources — Informatica PowerCenter and SAP Crystal Reports:
   schema-SQL chat, triage briefs, and per-step AI suggestions
 
 - [x] Talend — production-complete: .item parser (TABLE params as structured
-  rows), **rules v3** (95 components; the remaining 28 manual corpus steps
-  are service hosts with no PDI equivalent — honestly flagged), real .ktr
+  rows), **rules v4** (217 components, harvested from a 150-job corpus; the
+  manual entries are documented-manual — Talend ESB / Apache Camel route
+  components and service endpoints, which Pentaho has no engine for, so the
+  review list explains *why* rather than printing a bare no-rule), real .ktr
   configs for CSV input / text output / filter / sort / aggregate carried
   from the .item, and **tRunJob orchestration → .kjb** with TRANS entries
   wired to the called jobs' .ktr files (12 orchestration jobs in the corpus

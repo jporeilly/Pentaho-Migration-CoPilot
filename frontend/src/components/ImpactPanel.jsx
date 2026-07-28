@@ -8,6 +8,12 @@ const LEVELS = {
   none:   { color: 'var(--text-muted)', icon: '·' },
 }
 
+// Every other LLM button in the app appears only when there is something for
+// it to do — ✨ Translate counts untranslated expressions, ✨ AI-assist counts
+// manual formulas. Offering to "suggest a solution" on a step that converts
+// cleanly invites spend on a problem nobody has.
+const NEEDS_HELP = new Set(['high', 'medium'])
+
 export function scrollToStepRow(name) {
   const row = document.getElementById(`step-row-${name}`)
   if (!row) return
@@ -117,7 +123,9 @@ export default function ImpactPanel({ impact, pipeline }) {
                   <ul>{e.actions.map((a, i) => <li key={i}>{a}</li>)}</ul>
                 </>
               )}
-              <SuggestButton pipeline={pipeline} entry={e} />
+              {NEEDS_HELP.has(e.impact) && (
+                <SuggestButton pipeline={pipeline} entry={e} />
+              )}
             </div>
           </details>
         )

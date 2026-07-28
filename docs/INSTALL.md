@@ -103,10 +103,19 @@ pentaho-migrate report C:\customer\xml\Foo.xml --jndi MyDS -t --validate
 
 ### Optional: cross-tab recovery (rpt-rs)
 
-`report-crosstabs` recovers cross-tab grids the SAP SDK cannot export, by
-reading the `.rpt` binary with [rpt-rs](https://github.com/MrSrsen/rpt-rs)
-(MPL-2.0, no SAP runtime needed). It is **optional** — without it, cross-tabs
-keep their hand-add TODO and nothing else changes.
+rpt-rs reads the `.rpt` binary directly (MPL-2.0, no SAP runtime needed) and
+does two jobs the SAP SDK cannot:
+
+- **Cross-tab recovery** (`report-crosstabs`) — the grid definitions sit
+  behind reserved COM slots the free SDK will not open.
+- **Saved-data recovery** — the rows Crystal cached inside the `.rpt` become
+  the converted report's embedded dataset, which is what lets a converted
+  report open in Report Designer showing real data with **no database at
+  all**. Without rpt-rs the conversion still works; it just has nothing to
+  render until you point it at a live connection.
+
+Both are **optional** — without it, cross-tabs keep their hand-add TODO,
+reports convert without embedded rows, and nothing else changes.
 
 Put the binary at `tools/rpt-rs/rpt.exe` (or set `RPT_RS_PATH`). Note that
 release v0.2.0 decodes nothing on Windows; the one-line fix is
@@ -121,10 +130,13 @@ copy target\release\rpt.exe <repo>\tools\rpt-rs\
 Check it with `python scripts/demo_crosstab_recovery.py`, which walks the
 before/after on a real corpus report.
 
-### Optional: viewing the ORIGINAL .rpt (designer / viewer)
+### Viewing the ORIGINAL .rpt — and the release gate
 
-Nothing in the conversion pipeline needs this — it is only for showing a
-customer their original report beside the converted `.prpt`.
+Conversion itself does not need this, but **the release gate does**: it
+renders the original through the SAP viewer and the conversion through the
+Pentaho engine and diffs the two PDFs, so without the viewer built the gate
+reports UNAVAILABLE and the download buttons never unlock. It is also what
+puts the customer's original on screen beside the converted `.prpt`.
 
 - **The runtime alone is enough to *view*** — and this repo ships the host:
 

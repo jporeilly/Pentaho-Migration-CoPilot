@@ -45,15 +45,27 @@ Walk the stepper:
   row: the original Crystal formula and the OpenFormula translation sit side
   by side. Talk track: *"Deterministic where accuracy matters; the LLM only
   gets what rules can't prove, and everything it touches is flagged."*
-- **Other manual work** — three items, all the same root cause (Crystal
-  suppresses sections conditionally; PRD merges sections into one band).
-  Expand "fixed automatically" to show the folded repairs. Talk track:
-  *"The honesty contract: what didn't convert says so, with the reason.
-  Estimates come from this list, so it can't be allowed to lie."*
+- **Other manual work** — one item on this report. Expand "fixed
+  automatically" to show the repairs the pipeline applied and is merely
+  telling you about. Talk track: *"The honesty contract: what didn't convert
+  says so, with the reason. Estimates come from this list, so it can't be
+  allowed to lie — and notice how short it is BECAUSE the list is honest,
+  not despite it."*
 - **Download** — the effort panel (hours and $ vs a manual rebuild), then
   **👁 PDF preview**: the bundle renders through the real Pentaho engine in a
   popup, WITH the embedded data. Note the conversion-report line: *"53 saved
   data rows recovered from the .rpt and embedded."*
+- **Release check** — the download buttons stay locked until it finishes, and
+  the progress bar names each stage. It renders the **original through the
+  SAP viewer** and the **conversion through the Pentaho engine**, then diffs
+  the two PDFs. This report comes back **✅ SHIP**, with *36 of 36 statements
+  spanning the same pages as the original*. Talk track: *"Nobody is asking
+  you to trust the conversion. It renders both and compares them."*
+- **Consultant report** (`.html`, `.pdf`, `.md`) — open the HTML. It leads
+  with a **prioritised, costed action plan**: what to do first, what it
+  costs, what the customer sees if it is skipped, and the Report Designer
+  steps to do it. This report: **3 actions, 0.36h**, no P1 blockers. Talk
+  track: *"This is what you'd hand a consultant on Monday morning."*
 
 ## Act 3 — "And this is it in Pentaho, with your data" (3 min)
 
@@ -74,17 +86,23 @@ letterhead, same watermark and signature, same $43.50.
 | They ask for... | Do this |
 | --- | --- |
 | "Something recent, not a 2002 report" | Same flow with `demo/ljokhan_AdventureWorks-TotalSalesByYear` — saved May 2026, AdventureWorks, converts with zero manual work. |
-| "Show me a hard one" | `demo/workcontrolgit_WorldSalesReport` — pie chart, three nested groups, and **sixteen honest TODOs**, because it is a drill-down report and drill-down has no PRD equivalent. The honesty demo. |
-| "What about our 3,000 reports?" | **📁 Project** page: 150-report corpus with triage verdicts (filter to ⚠ REVIEW, show reasons), then **📊 Consultant report** — the portfolio effort/cost document, printable. |
+| "Show me a hard one" | `demo/workcontrolgit_WorldSalesReport` — pie chart, three nested groups, a drill-down design, and Crystal's Top-5-plus-Others group selection, which PRD has no equivalent for. Comes back **⚠ REVIEW** — 6 actions, 2.27h, of which 2 items block release, each naming its fix. The honesty demo. |
+| "What about our 3,000 reports?" | **📁 Project** page: 150-report corpus with triage verdicts (filter to ⚠ REVIEW, show reasons), then **📊 Consultant report** — the portfolio document. It leads with the engagement plan (the same actions rolled up by *kind* of work, so you staff against the rows), and **clicking any report in the focus list opens its full plan**. Printable. |
 | A specific feature (sub-reports, cross-tabs, images...) | `samples/crystal/by-feature/` — every corpus report filed by what it demonstrates; the README marks the 111 that carry their own data. |
 
 ## Known rough edges (say them before they're noticed)
 
-- The PRD preview's page count differs slightly from Crystal's (83 vs 74):
-  band heights and the page-1 header order are not identical, by design —
-  Crystal prints page 1 as ReportHeader-then-PageHeader; PRD tops every page
-  with the page header.
-- Message-field amounts print unformatted ("43.5", not "$43.50") — number
-  formatting inside interpolated prose is a known gap.
-- Crystal's *collapse* of a suppressed section leaves blank space in PRD (the
-  elements hide; the band keeps its height). It's in the manual-work list.
+- **The conversion is 62 pages against the original's 74** — and that is the
+  conversion being *better*, not worse. The release gate proves it: all 36
+  statements span the same pages as the original, and the original leaves 37
+  near-empty spill pages that the conversion consolidates. The gate reports
+  the delta as information rather than a defect, and says so on the page.
+- **Rich text inside one text object loses its runs.** A Crystal text object
+  with mixed bold/regular formatting converts with the first run's font
+  throughout. The extractor flattens the object to one string and one font,
+  so the pipeline cannot currently even *see* the runs — worth saying plainly
+  rather than being caught by it.
+- **Top-N group selection has no PRD equivalent.** If they ask for the World
+  Sales report, its "Top 5 countries + Others" prints as every country. It is
+  in the action plan with the SQL recipe (rank in the query, UNION an Others
+  row) — a good moment for the honesty contract.

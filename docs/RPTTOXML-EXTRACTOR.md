@@ -12,9 +12,9 @@ Measured against the 150-report real corpus this session:
 
 | Gap | Evidence | Impact |
 |---|---|---|
-| **Per-field number/date/currency format** (decimal places, currency symbol, thousands separator, negative style, date pattern) | FieldObjects carry only `<ObjectFormat>` (alignment/suppress/can-grow); no `NumericFieldFormat`/`DateFieldFormat` | We fall back to sensible type-based defaults; a `$#,##0.00` vs `#,##0.000` mismatch is visible to customers |
+| **Per-field number/date/currency format** (decimal places, currency symbol, thousands separator, negative style, date pattern) | FieldObjects carry only `<ObjectFormat>` (alignment/suppress/can-grow); no `NumericFieldFormat`/`DateFieldFormat` | **Resolved by the fork** (see below), down to date part order and separators — detail rows now match the original character for character. Without the fork, type-based defaults, and a `$#,##0.00` vs `#,##0.000` mismatch is visible to customers |
 | **Embedded image bytes** | `<PictureObject>` has position/size only; no raster (SDK can't read `PictureData` — see below) | Solved converter-side: `report-images` carves the raster from the .rpt binary |
-| **Group sort direction / specified order** | `<Group>` has only `ConditionField` | Group ordering may differ from the original |
+| **Group sort direction / specified order** | `<Group>` has only `ConditionField` | Direction is recovered from the `SortField` list and becomes `ORDER BY ... DESC`; Crystal's *specified order* (a hand-picked group sequence) has no PRD equivalent and stays an honest note |
 | **Cross-platform / no-license extraction** | .NET Framework tool; needs the SAP Crystal runtime MSI (Windows only) | Extraction is a Windows + SAP-runtime step |
 
 The Crystal SDK **has** all of this — RptToXml simply does not walk it. That
@@ -125,6 +125,24 @@ RAS `NumericFieldFormat.CurrencySymbol` string IS populated in the embedded
 RAS. The fork reads it per FieldObject and bakes the real symbol into the
 computed `FormatString` ("$" only as the enabled-but-unnamed fallback), plus
 emits `CurrencySymbol`/`CurrencyPosition` attributes.
+
+**Date and number format PARTS — RESOLVED (2026-07-28):** the computed
+`FormatString` used to assume `MM/dd/yy` ordering and default separators,
+which is wrong for any report not saved in a US locale. The fork now reads
+the RAS `DateFieldFormat.DateOrder` plus both separators and orders the parts
+from them, and reads `NumericFieldFormat.ThousandsSeparator` and
+`CurrencyPosition` so the symbol abuts the number the way Crystal prints it.
+A grouped format with zero decimal places drops the grouping, matching
+Crystal's own rendering. With this, the demo statement's detail row is
+**character-identical** to the original (`2002/04/3 | 2886 | 5503 |
+2002/05/3 | $43.50`).
+
+Two converter-side fixes ride with it, both in `rpt_parser`: Crystal writes
+value types as `crFieldValueTypeStringField`, and the un-normalized prefix
+meant **no** database field ever matched the date/numeric type sets, so every
+date rendered ISO and every amount unformatted; and a currency format is only
+synthesized when a symbol is actually in play, because Crystal stamps
+`DecimalPlaces="2"` on every field including invoice numbers.
 
 **Running totals — RESOLVED (2026-07-25):** the ENGINE
 `DataDefinition.RunningTotalFields` walk loses the reset group (rtf.Group is
