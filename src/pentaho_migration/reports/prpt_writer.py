@@ -194,7 +194,14 @@ def _band_content(sections, band_type, tp="", sp="style:"):
                        if cover >= best - 1.0]
             for j, start in targets:
                 el2 = _copy.copy(el)
-                el2.y = el.y - start
+                # Clamped at the band top. Crystal can paint an underlay from
+                # ABOVE the section it underlays - an empty spacer section
+                # between the two makes the offset negative - but a PRD band
+                # has no space above its origin, and a negative y made the
+                # engine push the watermark BELOW the letter instead of
+                # behind it. Starting it at the top keeps it behind the text,
+                # which is the point of an underlay.
+                el2.y = max(el.y - start, 0.0)
                 behind.setdefault(j, []).append(el2)
 
     inner, total, bg = [], 0.0, ""

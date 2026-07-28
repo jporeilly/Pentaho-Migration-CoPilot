@@ -221,10 +221,17 @@ def _parse_object(obj):
         el.kind = "field"
         el.field_ref = _attr(obj, "DataSource", "DataSourceName", "FieldSource",
                              "FieldName", default="")
-    elif tag == "LineObject":
-        el.kind = "line"
-    elif tag == "BoxObject":
-        el.kind = "box"
+    elif tag in ("LineObject", "BoxObject"):
+        el.kind = "line" if tag == "LineObject" else "box"
+        # Crystal does not draw a zero-thickness line - it is how a designer
+        # leaves a guide in place without printing it, NOT a hairline. Drawn
+        # anyway, the demo statement's detail band grew a rule under every
+        # row, showing through as a stray dot between two columns and a
+        # trailing underline past the last one. Verified against the
+        # original: the two zero-thickness objects render nowhere, the
+        # thickness-20 and -30 ones render exactly where Crystal shows them.
+        if _attr(obj, "LineThickness", default="").strip() == "0":
+            el.visible = False
     elif tag == "PictureObject":
         el.kind = "image"
         # richer RptToXml forks export the raster as base64 (ImageData child or
@@ -793,7 +800,14 @@ def _parse_areas(root, model):
             objects = sec.find("ReportObjects")
             if objects is not None:
                 for obj in objects:
-                    section.elements.append(_parse_object(obj))
+                    element = _parse_object(obj)
+                    # A zero-thickness rule is not drawn by Crystal at all, so
+                    # it must not reach the bundle. Marking it invisible was
+                    # not enough - the engine drew it anyway, which is how the
+                    # detail band kept its stray dot and trailing underline.
+                    if element.kind in ("line", "box") and not element.visible:
+                        continue
+                    section.elements.append(element)
             model.sections.append(section)
 
     # Crystal nests bands, so the physical area order is GH1..GHn, Detail,
