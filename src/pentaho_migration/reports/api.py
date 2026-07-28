@@ -376,6 +376,9 @@ async def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
                    else render_prpt_pdf(prpt))
         except RuntimeError as exc:
             raise HTTPException(status_code=500, detail=str(exc))
+    # Crystal's group tree, recreated as the PDF outline panel
+    from pentaho_migration.reports.pdf_outline import add_group_outline
+    pdf = add_group_outline(pdf, model)
 
     if format == "pages":
         return {"pages": _pdf_to_page_images(pdf),

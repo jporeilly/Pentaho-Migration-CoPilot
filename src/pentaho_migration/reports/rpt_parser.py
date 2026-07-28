@@ -621,7 +621,8 @@ def _parse_running_totals(dd, model):
         expr_name = re.sub(r"\W+", "_", f"RT_{name}")
         model.summaries.append(Summary(
             name=name, operation=op, field_ref=fref,
-            group_field=group_col, expression_name=expr_name))
+            group_field=group_col, expression_name=expr_name,
+            running=True))
 
 
 def _parse_print_options(root, model):
@@ -662,11 +663,28 @@ def _parse_areas(root, model):
         if kind in group_counters:
             group_index = group_counters[kind]
             group_counters[kind] += 1
+        # Crystal suppresses at the AREA level too - the Statement demo hides
+        # its whole country-group header there, and a drill-down report's
+        # detail areas are hidden until drilled (which a static PRD report
+        # never is, so hide-for-drill-down means suppressed here).
+        area_fmt = area.find("AreaFormat")
+        area_hidden = drill_hidden = False
+        if area_fmt is not None:
+            area_hidden = _attr(area_fmt, "EnableSuppress",
+                                default="false").lower() in ("true", "1")
+            drill_hidden = _attr(area_fmt, "EnableHideForDrillDown",
+                                 default="false").lower() in ("true", "1")
+        if drill_hidden:
+            model.issues.append(
+                f"{kind} area is hidden-for-drill-down in Crystal - PRD has "
+                "no drill-down, so it stays hidden; delete it in PRD if the "
+                "top-level view is all you need")
         for sec in area.iter("Section"):
             # suppression: real RptToXml puts it on a <SectionFormat> child
             # (EnableSuppress); tolerate a Suppress attribute on Section too
             fmt = sec.find("SectionFormat")
-            suppressed = _attr(sec, "Suppress", default="false").lower() in ("true", "1")
+            suppressed = (area_hidden or drill_hidden
+                          or _attr(sec, "Suppress", default="false").lower() in ("true", "1"))
             if fmt is not None:
                 suppressed = suppressed or \
                     _attr(fmt, "EnableSuppress", default="false").lower() in ("true", "1")
@@ -1290,11 +1308,23 @@ def apply_template_formats(model):
     fmt_of = {}
     for name, formula in model.formulas.items():
         fmt = model.field_formats.get(formula.rewrite_field or "")
+        if not fmt:
+            # a formula computing over a currency column inherits its format:
+            # {@Late Invoices} = IF(... ; [ORDER_AMOUNT] ; 0) is money
+            for ref in re.findall(r"\{(\w+)\.(\w+)\}", formula.text or ""):
+                fmt = model.field_formats.get(ref[1], "")
+                if fmt:
+                    break
         if fmt:
             fmt_of[name] = fmt
     for summary in model.summaries:
-        _, column = parse_field_ref(summary.field_ref)
-        fmt = model.field_formats.get(column, "")
+        kind, column = parse_field_ref(summary.field_ref)
+        if kind == "formula":
+            # a sum over {@Late Invoices} is as much money as the formula is -
+            # reuse the format the formula itself resolved to above
+            fmt = fmt_of.get(column, "")
+        else:
+            fmt = model.field_formats.get(column, "")
         if fmt:
             fmt_of.setdefault(summary.expression_name, fmt)
 

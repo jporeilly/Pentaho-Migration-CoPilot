@@ -7,6 +7,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.38.1] — 2026-07-28
+
+### Added
+
+- **The Crystal group tree lives on as PDF bookmarks.** Preview PDFs carry a
+  nested outline (country → customer) built from the embedded saved rows,
+  each entry pointing at its first page — the viewer's left-hand navigation,
+  recreated (`reports/pdf_outline.py`).
+
+### Fixed
+
+- **Area-level suppression is honored.** Crystal suppresses whole AREAS too;
+  reading only section-level flags let a suppressed country-group header
+  print a phantom "Canada" line on every statement. Hidden-for-drill-down
+  areas are likewise suppressed (PRD has no drill-down) with an explanatory
+  note — that was most of the World Sales TODO pile.
+- **Summary fields read correctly in group HEADERS**: they now map to the
+  engine's precomputed Total* function family, so a letter variant choosing
+  itself by "Sum(...) <> 0" picks the right letter before any detail row has
+  printed. Running totals ({#name}) keep their row-by-row Item* classes.
+- **Boxes and lines paint BEHIND report objects** (Crystal's order) — the
+  grey total box no longer covers the "Total: $ 43.50" printed on it.
+- Underlay copies now go to every section tied for best span-coverage, so
+  the watermark rides whichever mutually-exclusive letter variant renders.
+- Currency formats now follow the whole reference chain: a formula computing
+  over a currency column inherits its format, and a summary over that
+  formula inherits it too — "invoices totalling $ 43.50" prints with its
+  symbol inside prose.
+- Corpus sweep after all of the above: 150/150 convert with zero crashes;
+  READY 93 / REVIEW 57; the statement demo's page 1 is structurally
+  identical to the SAP viewer's (address, correct letter variant, watermark,
+  table, Total, Remit — one page).
+
 ## [1.38.0] — 2026-07-28
 
 ### Changed

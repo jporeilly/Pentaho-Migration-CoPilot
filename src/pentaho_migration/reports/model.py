@@ -13,7 +13,21 @@ TWIPS_PER_POINT = 20.0
 # Crystal summary operation -> PRD report function. Lives here (not in the
 # writer) so the parser can flag unsupported operations at load time instead
 # of the writer silently dropping them.
+# Crystal summary FIELDS are group totals: they read correctly in the group
+# HEADER too (a letter variant chooses itself by "Sum(...) <> 0" before any
+# detail row has printed), so they map to the Total* family, which the engine
+# precomputes per group. Running totals ({#name}) genuinely accumulate row by
+# row and use the Item* family instead - see RUNNING_CLASS_MAP.
 SUMMARY_CLASS_MAP = {
+    "Sum": "org.pentaho.reporting.engine.classic.core.function.TotalGroupSumFunction",
+    "Count": "org.pentaho.reporting.engine.classic.core.function.TotalGroupCountFunction",
+    "Average": "org.pentaho.reporting.engine.classic.core.function.ItemAvgFunction",
+    "Maximum": "org.pentaho.reporting.engine.classic.core.function.TotalItemMaxFunction",
+    "Minimum": "org.pentaho.reporting.engine.classic.core.function.TotalItemMinFunction",
+    "DistinctCount": "org.pentaho.reporting.engine.classic.core.function.CountDistinctFunction",
+}
+
+RUNNING_CLASS_MAP = {
     "Sum": "org.pentaho.reporting.engine.classic.core.function.ItemSumFunction",
     "Count": "org.pentaho.reporting.engine.classic.core.function.ItemCountFunction",
     "Average": "org.pentaho.reporting.engine.classic.core.function.ItemAvgFunction",
@@ -183,6 +197,7 @@ class Summary:
     field_ref: str = ""       # {Table.Field}
     group_field: str = ""     # group condition column, "" = grand total
     expression_name: str = "" # generated PRD function name
+    running: bool = False     # {#running total}: row-by-row Item* semantics
 
 
 @dataclass

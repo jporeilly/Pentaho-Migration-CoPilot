@@ -42,7 +42,8 @@ PARAM_TYPE_MAP = {
     "BooleanField": "java.lang.Boolean",
 }
 
-from pentaho_migration.reports.model import CROSSTAB_AGG_MAP, SUMMARY_CLASS_MAP
+from pentaho_migration.reports.model import (
+    CROSSTAB_AGG_MAP, RUNNING_CLASS_MAP, SUMMARY_CLASS_MAP)
 from pentaho_migration.reports.prpt_render import _num, render_element
 
 NS_CROSSTAB = "http://reporting.pentaho.org/namespaces/engine/attributes/crosstab"
@@ -110,9 +111,14 @@ def _band_content(sections, band_type, tp="", sp="style:"):
                 overlaps.append((max(hi - lo, 0.0), j, start))
             if not overlaps:
                 continue
-            full = [(j, start) for cover, j, start in overlaps
-                    if cover >= 0.9 * el.height]
-            targets = full or [max(overlaps)[1:]]
+            best = max(cover for cover, _j, _s in overlaps)
+            if best <= 0:
+                continue
+            # every section tied for best coverage gets the copy - Crystal's
+            # mutually-exclusive letter variants share one geometry, and the
+            # element must ride whichever of them renders
+            targets = [(j, start) for cover, j, start in overlaps
+                       if cover >= best - 1.0]
             for j, start in targets:
                 el2 = _copy.copy(el)
                 el2.y = el.y - start
@@ -145,8 +151,13 @@ def _section_band(section, tp="", sp="style:", behind_elements=None):
     exprs = "".join(
         f"<style-expression style-key={quoteattr(key)} formula={quoteattr(formula)}/>"
         for key, formula in section.style_expressions)
+    # Crystal's paint order: drawing objects (boxes, lines) sit BEHIND report
+    # objects - a grey total box must not cover the "Total:" printed on it.
+    # Underlay copies go first of all (they underlay everything).
+    decor = [el for el in section.elements if el.kind in ("box", "line")]
+    front = [el for el in section.elements if el.kind not in ("box", "line")]
     content = "".join(render_element(el, tp, sp)
-                      for el in (behind_elements or []) + section.elements)
+                      for el in (behind_elements or []) + decor + front)
     return (f'<{tp}band core:element-type="band">'
             f"<{sp}element-style>{''.join(styles)}</{sp}element-style>"
             f"{exprs}{content}</{tp}band>")
@@ -476,7 +487,7 @@ def build_datadefinition_xml(model, parameter_mappings=None):
             parts.append(f"<expression name={quoteattr(f.name)} formula={quoteattr(f.translation)}/>")
 
     for s in model.summaries:
-        cls = SUMMARY_CLASS_MAP.get(s.operation)
+        cls = (RUNNING_CLASS_MAP if s.running else SUMMARY_CLASS_MAP).get(s.operation)
         if not cls:
             continue
         from .rpt_parser import parse_field_ref
