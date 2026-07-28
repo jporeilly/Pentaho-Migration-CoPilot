@@ -7,6 +7,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.39.1] — 2026-07-28
+
+### Fixed
+
+- **The blank-screen ("scrollbar wiping the screen") glitch.** Twelve
+  endpoints were `async def` while doing BLOCKING work — engine renders,
+  viewer exports, RptToXml extraction, PDF rasterization — which froze the
+  server's event loop for the whole operation: no static assets, no polls,
+  no anything, so the page went white mid-preview. They are synchronous
+  endpoints now, served from the threadpool, and the loop keeps serving.
+  Measured during a live engine render: worst request latency dropped from
+  a full freeze to ~2s, and the page stays painted throughout.
+- The release-check verdict card headlines "N of M groups match the
+  original exactly" (per-statement pagination), and near-empty-page counts
+  are compared against the ORIGINAL's own — Crystal statements legitimately
+  put Total/Remit on a sparse second page, and the gate no longer lets that
+  read as a conversion defect.
+
 ## [1.39.0] — 2026-07-28
 
 ### Added

@@ -308,7 +308,7 @@ def _load_upload(data: bytes, filename: str, jndi: str):
 
 
 @router.post("/open-prd", dependencies=[Depends(require_api_key)])
-async def open_in_report_designer(dump: UploadFile, request: Request,
+def open_in_report_designer(dump: UploadFile, request: Request,
                                   jndi: str = "") -> dict:
     """Convert and open the result straight in the local Pentaho Report
     Designer - the demo's closing beat, one click instead of download +
@@ -328,7 +328,7 @@ async def open_in_report_designer(dump: UploadFile, request: Request,
     reason = prd_available()
     if reason:
         raise HTTPException(status_code=503, detail=reason)
-    data = await dump.read()
+    data = dump.file.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
     buf = _io.BytesIO()
@@ -353,7 +353,7 @@ _GATE_STAGES = ["extracting", "rendering original", "rendering conversion",
 
 
 @router.post("/release-check/start", dependencies=[Depends(require_api_key)])
-async def release_check_start(dump: UploadFile, jndi: str = "",
+def release_check_start(dump: UploadFile, jndi: str = "",
                               llm: bool = True) -> dict:
     """Start the release gate in the background: two full renders plus
     optional LLM annotation take minutes; poll /release-check/status for the
@@ -369,7 +369,7 @@ async def release_check_start(dump: UploadFile, jndi: str = "",
     if not validator_available():
         raise HTTPException(status_code=503,
                             detail="no local PRD install to render the .prpt")
-    data = await dump.read()
+    data = dump.file.read()
     source_name = dump.filename or "upload.xml"
     original = find_original(source_name)
     if original is None:
@@ -444,7 +444,7 @@ def release_check_status(job: str) -> dict:
 
 
 @router.post("/release-check", dependencies=[Depends(require_api_key)])
-async def release_check(dump: UploadFile, jndi: str = "",
+def release_check(dump: UploadFile, jndi: str = "",
                         llm: bool = True) -> dict:
     """The release gate: render the ORIGINAL .rpt (viewer, saved data) and
     the CONVERTED .prpt (engine, embedded data), compare deterministically,
@@ -457,7 +457,7 @@ async def release_check(dump: UploadFile, jndi: str = "",
         annotate_findings_with_llm, run_release_check)
     from pentaho_migration.reports.rpt_viewer import find_original
 
-    data = await dump.read()
+    data = dump.file.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
     original = find_original(source_name)
@@ -487,7 +487,7 @@ async def release_check(dump: UploadFile, jndi: str = "",
 
 
 @router.post("/preview", dependencies=[Depends(require_api_key)])
-async def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
+def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
     """Preview through the real Pentaho Reporting engine. With embedded saved
     data the render is LIVE (real rows, no database); otherwise design-time
     (layout only). `format=pages` returns the pages as PNG images in JSON -
@@ -503,7 +503,7 @@ async def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
             status_code=503,
             detail="PDF preview needs a local Pentaho Report Designer + Java - "
                    "see `pentaho-migrate report-env`")
-    data = await dump.read()
+    data = dump.file.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
     safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
@@ -568,9 +568,9 @@ def sample() -> FileResponse:
 
 @router.post("/inspect", response_model=ReportSummary,
              dependencies=[Depends(require_api_key)])
-async def inspect(dump: UploadFile, jndi: str = "") -> ReportSummary:
+def inspect(dump: UploadFile, jndi: str = "") -> ReportSummary:
     """Parse an RptToXml dump and translate its formulas, without converting."""
-    model = _load_upload(await dump.read(), dump.filename or "upload.xml", jndi)
+    model = _load_upload(dump.file.read(), dump.filename or "upload.xml", jndi)
     return _summarize(model, dump.filename or "upload.xml")
 
 
@@ -591,14 +591,14 @@ def _build_response(model, source_name: str) -> ReportConversionResponse:
 
 @router.post("/convert", response_model=ReportConversionResponse,
              dependencies=[Depends(require_api_key)])
-async def convert(dump: UploadFile, jndi: str = "",
+def convert(dump: UploadFile, jndi: str = "",
                   sql_override: str = Form("")) -> ReportConversionResponse:
     """Full conversion: parse -> translate -> .prpt bundle + conversion report.
 
     `sql_override` replaces the report SQL (used by the schema assistant's
     reviewed proposals); the substitution is recorded as a review item."""
     started = time.monotonic()
-    data = await dump.read()
+    data = dump.file.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
     if sql_override.strip():
@@ -747,7 +747,7 @@ def sql_chat(req: SqlChatRequest) -> dict:
 
 
 @router.post("/parity", dependencies=[Depends(require_api_key)])
-async def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dict:
+def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dict:
     """Measured output parity: convert the dump, render it against the live
     JNDI database, and diff its numbers against the customer's Crystal export
     (PDF or CSV). 503 when the environment cannot render."""
@@ -759,8 +759,8 @@ async def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dic
     if not validator_available():
         raise HTTPException(status_code=503,
                             detail="parity needs a local PRD install + Java")
-    model = _load_upload(await dump.read(), dump.filename or "upload.xml", jndi)
-    ref_data = await reference.read()
+    model = _load_upload(dump.file.read(), dump.filename or "upload.xml", jndi)
+    ref_data = reference.file.read()
     ref_name = (reference.filename or "").lower()
     try:
         ref_numbers = (numbers_from_csv(ref_data) if ref_name.endswith(".csv")
@@ -794,7 +794,7 @@ def _evict_old_jobs(jobs: dict) -> None:
 
 
 @router.post("/translate/start", dependencies=[Depends(require_api_key)])
-async def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
+def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
     """LLM-assist the formulas the deterministic translator flagged manual.
 
     Runs in the background (local models can take minutes); poll
@@ -806,7 +806,7 @@ async def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
     except TranslationError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-    data = await dump.read()
+    data = dump.file.read()
     source_name = dump.filename or "upload.xml"
     model = _load_upload(data, source_name, jndi)
 

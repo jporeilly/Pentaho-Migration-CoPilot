@@ -159,18 +159,18 @@ def technical_brief() -> FileResponse:
 
 
 @app.post("/parse", response_model=list[Pipeline], dependencies=[Depends(require_api_key)])
-async def parse(export: UploadFile) -> list[Pipeline]:
+def parse(export: UploadFile) -> list[Pipeline]:
     """Parse a PowerCenter XML export into the normalized IR."""
-    pipelines, _ = _parse_upload(await export.read(), export.filename)
+    pipelines, _ = _parse_upload(export.file.read(), export.filename)
     return pipelines
 
 
 @app.post("/convert", response_model=ConversionResponse, dependencies=[Depends(require_api_key)])
-async def convert(export: UploadFile) -> ConversionResponse:
+def convert(export: UploadFile) -> ConversionResponse:
     """Full conversion: source analysis + parse -> map -> generate per mapping."""
     started = time.monotonic()
     generator = KtrGenerator()
-    data = await export.read()
+    data = export.file.read()
     pipelines, source = _parse_upload(data, export.filename)
     results = []
     for pipeline in pipelines:
@@ -238,15 +238,15 @@ def sandbox(pipeline: Pipeline) -> SandboxKit:
 
 
 @app.post("/diff", response_model=DiffReport, dependencies=[Depends(require_api_key)])
-async def diff(
+def diff(
     expected: UploadFile, actual: UploadFile, key: str | None = None
 ) -> DiffReport:
     """Measured output parity: diff the original pipeline's CSV output against
     the converted pipeline's CSV output (optionally matching rows by KEY column)."""
     try:
         return compare_csv(
-            (await expected.read()).decode("utf-8-sig"),
-            (await actual.read()).decode("utf-8-sig"),
+            expected.file.read().decode("utf-8-sig"),
+            actual.file.read().decode("utf-8-sig"),
             key=key or None,
         )
     except DiffError as exc:
@@ -421,7 +421,7 @@ def project_reports_portfolio(jndi: str = "", rate: float = 150.0):
 
 
 @app.post("/project/report-parity", dependencies=[Depends(require_api_key)])
-async def project_report_parity(
+def project_report_parity(
     file: str, reference: UploadFile, jndi: str = ""
 ) -> dict:
     """Measured output parity for one stored report: convert its source dump,
@@ -444,7 +444,7 @@ async def project_report_parity(
     if not validator_available():
         raise HTTPException(status_code=503,
                             detail="parity needs a local PRD install + Java")
-    ref_data = await reference.read()
+    ref_data = reference.file.read()
     ref_name = (reference.filename or "").lower()
     try:
         model = load_report_model(source, jndi or None)

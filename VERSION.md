@@ -1,6 +1,6 @@
 # Version
 
-**1.39.0** — 2026-07-28
+**1.39.1** — 2026-07-28
 
 **Conditional suppression now survives conversion** — the corpus's largest
 fidelity gap (93 dropped conditions) is down to 39, all genuinely manual.
