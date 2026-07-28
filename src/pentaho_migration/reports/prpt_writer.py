@@ -59,52 +59,109 @@ def _needs_page_function(model):
 
 
 def _band_content(sections, band_type, tp="", sp="style:"):
-    """Merge one or more Crystal sections of an area into a single PRD band.
-    Returns (inner_xml, height, bg_color) — the first styled section supplies
-    the band background."""
-    inner, y_offset, bg = [], 0.0, ""
-    for section in sections:
-        if section.suppressed:
+    """One or more Crystal sections of an area as the inner XML of one PRD
+    band. Each section becomes a NESTED sub-band stacked in block layout,
+    carrying its own height, background, suppress condition and page-break -
+    so a conditionally suppressed section COLLAPSES exactly like Crystal
+    (three letter variants take one section's height, not three), instead of
+    hiding its elements inside a band that keeps its full height.
+
+    An UNDERLAY section (Crystal "Underlay Following Sections") takes no
+    vertical space of its own: its elements are painted BEHIND the sections
+    that follow it. Reproduced by copying its elements - shifted into each
+    following section's coordinate space - to the FRONT of that section's
+    band (PRD paints in document order, first = behind), and dropping the
+    underlay band itself. This is what lets a watermark sit behind a letter
+    instead of pushing it half a page down.
+
+    Returns (inner_xml, height, bg_color) - bg is the first styled section's,
+    kept for the callers that paint a whole-band background (page bands)."""
+    import copy as _copy
+
+    visible = [s for s in sections
+               if not s.suppressed
+               and not (s.suppress_if_blank and not s.elements)]
+
+    # Underlay element placement: each element goes to the following
+    # section(s) that can hold it - every section covering >=90% of its span
+    # (Crystal's mutually-exclusive letter variants share one geometry, and
+    # exactly one of them renders), or failing that the single best-overlap
+    # section. Copying into every intersecting section instead duplicates the
+    # watermark AND grows small bands to the raster's height, pushing
+    # everything below onto the next page.
+    behind: dict = {}
+    offset_after = 0.0
+    for i, section in enumerate(visible):
+        if not section.underlay:
+            offset_after += section.height
+            continue
+        gap = 0.0
+        spans = []
+        for j in range(i + 1, len(visible)):
+            target = visible[j]
+            if not target.underlay:
+                spans.append((j, gap, target.height))
+                gap += target.height
+        for el in section.elements:
+            overlaps = []
+            for j, start, t_height in spans:
+                lo = max(el.y - start, 0.0)
+                hi = min(el.y - start + el.height, t_height)
+                overlaps.append((max(hi - lo, 0.0), j, start))
+            if not overlaps:
+                continue
+            full = [(j, start) for cover, j, start in overlaps
+                    if cover >= 0.9 * el.height]
+            targets = full or [max(overlaps)[1:]]
+            for j, start in targets:
+                el2 = _copy.copy(el)
+                el2.y = el.y - start
+                behind.setdefault(j, []).append(el2)
+
+    inner, total, bg = [], 0.0, ""
+    for i, section in enumerate(visible):
+        if section.underlay:
             continue
         if section.bg_color and not bg:
             bg = section.bg_color
-        for el in section.elements:
-            if y_offset:
-                el = _shifted(el, y_offset)
-            inner.append(render_element(el, tp, sp))
-        y_offset += section.height
-    height = max(y_offset, 20.0)
+        inner.append(_section_band(section, tp, sp,
+                                   behind_elements=behind.get(i, [])))
+        total += section.height
+    height = max(total, 20.0)
     return "".join(inner), height, bg
 
 
-def _shifted(el, dy):
-    import copy
-    el2 = copy.copy(el)
-    el2.y = el.y + dy
-    return el2
-
-
-def _band_style_expressions(sections):
-    """Section-level conditional formatting (suppress condition, background)
-    as band style-expressions. The parser only converts these when the
-    section is alone in its band, so emitting them all here is safe."""
-    return "".join(
+def _section_band(section, tp="", sp="style:", behind_elements=None):
+    """One Crystal section as a nested PRD band: canvas inside (elements keep
+    their absolute positions), block-stacked by the parent. `behind_elements`
+    (underlay copies) render first, i.e. behind the section's own content."""
+    styles = [f'<{sp}band-styles layout="canvas"'
+              + (' pagebreak-after="true"' if section.new_page_after else "")
+              + "/>",
+              f'<{sp}spatial-styles x="0" y="0" '
+              f'min-width="100%" min-height="{_num(section.height)}"/>']
+    if section.bg_color:
+        styles.append(f'<{sp}border-styles background-color={quoteattr(section.bg_color)}/>')
+    exprs = "".join(
         f"<style-expression style-key={quoteattr(key)} formula={quoteattr(formula)}/>"
-        for section in sections
         for key, formula in section.style_expressions)
+    content = "".join(render_element(el, tp, sp)
+                      for el in (behind_elements or []) + section.elements)
+    return (f'<{tp}band core:element-type="band">'
+            f"<{sp}element-style>{''.join(styles)}</{sp}element-style>"
+            f"{exprs}{content}</{tp}band>")
 
 
 def _root_band(sections, element_type):
-    content, height, bg = _band_content(sections, element_type)
-    style = ""
-    if bg:
-        style = ("<style:element-style>"
-                 f'<style:border-styles background-color={quoteattr(bg)}/>'
-                 "</style:element-style>")
+    content, height, _bg = _band_content(sections, element_type)
+    # The parent stacks its section sub-bands; each sub-band paints its own
+    # background and carries its own suppress condition.
+    style = ('<style:element-style><style:band-styles layout="block"/>'
+             "</style:element-style>")
     return (f'<root-level-content core:element-type="{element_type}" '
             f'xmlns:report-designer="http://reporting.pentaho.org/namespaces/report-designer/2.0" '
             f'report-designer:visual-height="{_num(height)}">'
-            f"{style}{_band_style_expressions(sections)}{content}</root-level-content>")
+            f"{style}{content}</root-level-content>")
 
 
 # ---------------------------------------------------------------- layout.xml
@@ -312,8 +369,12 @@ def build_styles_xml(model):
         f'margin-left="{_num(p.margin_left)}" margin-bottom="{_num(p.margin_bottom)}" '
         f'margin-right="{_num(p.margin_right)}"/>'
         '<layout:watermark core:element-type="watermark"></layout:watermark>'
-        f'<layout:page-header core:element-type="page-header">{_page_band_bg(ph_bg)}{ph_content}</layout:page-header>'
-        f'<layout:page-footer core:element-type="page-footer">{_page_band_bg(pf_bg)}{pf_content}</layout:page-footer>'
+        f'<layout:page-header core:element-type="page-header">'
+        f'<element-style><band-styles layout="block"/></element-style>'
+        f'{_page_band_bg(ph_bg)}{ph_content}</layout:page-header>'
+        f'<layout:page-footer core:element-type="page-footer">'
+        f'<element-style><band-styles layout="block"/></element-style>'
+        f'{_page_band_bg(pf_bg)}{pf_content}</layout:page-footer>'
         "</style>")
 
 

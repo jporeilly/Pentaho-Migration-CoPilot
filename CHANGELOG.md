@@ -7,6 +7,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.38.0] — 2026-07-28
+
+### Changed
+
+- **Every Crystal section is now a collapsing PRD sub-band** (nested `<band>`
+  elements, block-stacked inside each report band). A conditionally
+  suppressed section takes NO height when hidden — Crystal's three
+  mutually-exclusive letter variants render as one letter, not one letter
+  and two blanks. This replaces the push-down-of-conditions-to-elements
+  approach, which hid the ink but kept the space.
+- **Crystal "Underlay Following Sections" is reproduced**: the underlay
+  section's elements paint BEHIND the following section (placed by best
+  span-overlap; geometry-sharing conditional variants each get a copy), and
+  the underlay's own height disappears — a watermark sits behind the letter
+  instead of pushing it half a page down.
+- **Group footers un-swapped.** Crystal nests bands, so footer areas arrive
+  innermost-first; assigning them in encounter order handed the per-customer
+  "Total + Remit + new page" footer to the outermost group (it rendered once
+  per COUNTRY). Reversed when the full footer set is present.
+- **EnableNewPageAfter → `pagebreak-after`** on the section's sub-band, and
+  **"Suppress Blank Section"** is honored: empty spacer sections drop, and
+  data-bound ones get a provable `NOT(ISBLANK(...))` visibility so a blank
+  ADDRESS2 line collapses like Crystal.
+- **Currency formats survive**: Crystal often stores number formats as parts
+  (DecimalPlaces + CurrencySymbol) with no FormatString — now assembled
+  (symbol-bearing only, so invoice ids don't grow ".00"), applied to detail
+  fields and INSIDE message prose ("The total amount due is $ 43.50").
+- Statement demo now renders each customer's address, letter, watermark and
+  invoice table on ONE page like the original (68 pages vs 74; the customer
+  footer still slips on tight pages — known).
+- UI: JNDI field stays inside its card (action rows wrap), the page reserves
+  its scrollbar gutter, and the PDF preview modal shows engine-rendered page
+  images with the embedded data.
+
 ## [1.37.0] — 2026-07-28
 
 ### Changed

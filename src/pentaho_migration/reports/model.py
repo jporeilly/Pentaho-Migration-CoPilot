@@ -130,6 +130,9 @@ class Section:
     bg_color: str = ""        # #rrggbb band background
     condition_formulas: list = field(default_factory=list)  # raw (attr, crystal_text)
     style_expressions: list = field(default_factory=list)   # converted (style_key, openformula)
+    new_page_after: bool = False  # Crystal EnableNewPageAfter -> PRD pagebreak-after
+    underlay: bool = False    # Crystal EnableUnderlaySection: paints BEHIND following sections
+    suppress_if_blank: bool = False  # Crystal EnableSuppressIfBlank: collapse when nothing prints
 
 
 @dataclass
@@ -210,6 +213,7 @@ class ReportModel:
     record_selection_folded: bool = False  # True when folded into the SQL WHERE
     tables: dict = field(default_factory=dict)       # table name -> {field name -> ValueType}
     field_types: dict = field(default_factory=dict)  # bare column name -> ValueType
+    field_formats: dict = field(default_factory=dict)  # bare column -> numeric format ("$#,##0.00")
     sections: list = field(default_factory=list)
     formulas: dict = field(default_factory=dict)     # name -> Formula
     parameters: list = field(default_factory=list)

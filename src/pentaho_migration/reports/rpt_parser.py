@@ -119,6 +119,25 @@ def _convert_condition_formulas(target, field_types, context=""):
     return notes
 
 
+def _numeric_format_from_parts(node):
+    """Crystal frequently stores a CURRENCY format as PARTS - DecimalPlaces,
+    CurrencySymbol, CurrencySymbolFormat - with no assembled FormatString.
+    Left alone, a $1,139.55 renders as "1139.55". Assemble the format the
+    parts describe - but only when a symbol is actually in play: Crystal
+    stamps DecimalPlaces="2" on EVERY field (invoice numbers included), so
+    synthesizing for plain numbers would print id 2886 as "2,886.00"."""
+    symbol = _attr(node, "CurrencySymbol", default="")
+    symbol_mode = _attr(node, "CurrencySymbolFormat", default="")
+    if not symbol or "NoSymbol" in symbol_mode:
+        return ""
+    try:
+        decimals = int(_attr(node, "DecimalPlaces", default="2"))
+    except ValueError:
+        decimals = 2
+    decimals = max(0, min(decimals, 10))
+    return symbol + "#,##0" + ("." + "0" * decimals if decimals else "")
+
+
 def _parse_object(obj):
     tag = obj.tag
     el = Element(
@@ -151,7 +170,8 @@ def _parse_object(obj):
     for node in obj.iter():
         fmt_tag = _local(node.tag)
         if fmt_tag == "NumericFieldFormat" and not el.format_numeric:
-            el.format_numeric = _attr(node, "FormatString", default="")
+            el.format_numeric = (_attr(node, "FormatString", default="")
+                                 or _numeric_format_from_parts(node))
         elif fmt_tag in ("DateFieldFormat", "DateTimeFieldFormat") and not el.format_date:
             el.format_date = _attr(node, "FormatString", default="")
 
@@ -658,6 +678,12 @@ def _parse_areas(root, model):
                     if _local(child.tag) == "BackgroundColor":
                         band_bg = _argb_to_hex(child)
                         break
+            new_page_after = fmt is not None and _attr(
+                fmt, "EnableNewPageAfter", default="false").lower() in ("true", "1")
+            underlay = fmt is not None and _attr(
+                fmt, "EnableUnderlaySection", default="false").lower() in ("true", "1")
+            suppress_blank = fmt is not None and _attr(
+                fmt, "EnableSuppressIfBlank", default="false").lower() in ("true", "1")
             section = Section(
                 area_kind=kind,
                 name=_attr(sec, "Name", default=""),
@@ -665,6 +691,9 @@ def _parse_areas(root, model):
                 group_index=group_index,
                 suppressed=suppressed,
                 bg_color=band_bg if band_bg not in ("#ffffff",) else "",
+                new_page_after=new_page_after,
+                underlay=underlay,
+                suppress_if_blank=suppress_blank,
             )
             if fmt is not None:
                 section.condition_formulas = _condition_formula_pairs(fmt)
@@ -674,13 +703,18 @@ def _parse_areas(root, model):
                     section.elements.append(_parse_object(obj))
             model.sections.append(section)
 
-    # Crystal group footers are listed innermost-first in some SDK versions;
-    # normalize so index i always matches group i.
+    # Crystal nests bands, so the physical area order is GH1..GHn, Detail,
+    # GFn..GF1 - group FOOTERS arrive innermost-first. Assigning them in
+    # encounter order handed the innermost footer to the OUTERMOST group: the
+    # Statement demo's per-customer "Total + Remit-to + new page" footer
+    # rendered once per COUNTRY instead of once per customer. Reverse the
+    # footer indices when the full set is present; with fewer footer areas
+    # than groups the mapping is ambiguous, so encounter order stands.
     n_groups = len(model.groups)
-    if n_groups and group_counters["GroupFooter"] == n_groups:
-        footers = [s for s in model.sections if s.area_kind == "GroupFooter"]
-        if len(footers) == n_groups:
-            pass  # index order already matches area order; nothing to do
+    if n_groups > 1 and group_counters["GroupFooter"] == n_groups:
+        for section in model.sections:
+            if section.area_kind == "GroupFooter":
+                section.group_index = n_groups - 1 - section.group_index
 
 
 def _chart_column(ref, model):
@@ -885,17 +919,25 @@ def _resolve_embedded_text(el, model, summary_by_name):
         return
     unresolved = []
 
+    def fmt_suffix(column):
+        """Currency-formatted columns keep their symbol inside prose too:
+        "The total amount due is $(X, number, $#,##0.00)"."""
+        fmt = model.field_formats.get(column, "")
+        return f", number, {fmt}" if fmt else ""
+
     def substitute(match):
         raw = match.group(0)
         # A summary is spelled by its display name: "Sum ({@x}, {Cust.Name})".
         # Those markers are consumed by the outer expression, not on their own.
         kind, name = parse_field_ref(raw)
         if kind == "db":
-            return f"$({name})"
+            return f"$({name}{fmt_suffix(name)})"
         if kind == "formula":
             # The same reference a standalone formula field uses: the writer
             # emits a PRD expression named after the formula. prd_target() is
-            # a description for humans, not something $() can resolve.
+            # a description for humans, not something $() can resolve. A
+            # formula rewritten as an aggregate over a currency column keeps
+            # that column's currency format.
             if name in model.formulas:
                 return f"$({name})"
         if kind == "parameter":
@@ -1002,53 +1044,19 @@ def _bind_condition_aggregates(pairs, model):
     return [(attr, _AGG_IN_CONDITION.sub(bind, body)) for attr, body in pairs]
 
 
-def _combine_visibility(existing, extra):
-    """Both conditions must hold for the element to show. The translator emits
-    OpenFormula with a leading '=', so strip and re-wrap."""
-    left, right = existing.lstrip("="), extra.lstrip("=")
-    return f"=AND({left};{right})"
-
-
-def _push_section_condition_to_elements(section, model, context):
-    """Crystal lets a band area hold several sections, each with its own
-    suppression condition; PRD has one band per area, so the writer merges
-    them and the per-section condition has nowhere to live. Rather than drop
-    it, put it on the elements that came from that section: the same condition
-    over the same rows, evaluated per element.
-
-    What this does not reproduce is the collapse. Crystal removes a suppressed
-    section's height; hidden elements leave their band as tall as it was, so
-    the space shows as blank. That is a layout difference, not a data one, and
-    the note says so."""
-    notes = _convert_condition_formulas(section, model.field_types, context)
-    pushed = [(key, formula) for key, formula in section.style_expressions
-              if key == "visible"]
-    if not pushed:
-        return notes                     # nothing translated - notes explain why
-    section.style_expressions = [(k, f) for k, f in section.style_expressions
-                                 if k != "visible"]
-    for el in section.elements:
-        own = next((f for k, f in el.style_expressions if k == "visible"), "")
-        combined = pushed[0][1]
-        for _key, formula in pushed[1:]:
-            combined = _combine_visibility(combined, formula)
-        if own:
-            combined = _combine_visibility(own, combined)
-            el.style_expressions = [(k, f) for k, f in el.style_expressions
-                                    if k != "visible"]
-        el.style_expressions.append(("visible", combined))
-    notes.append(
-        f"conditional suppression{context} applied to the section's "
-        f"{len(section.elements)} element(s) instead of the band - Crystal "
-        "merges several sections into one PRD band. The elements hide exactly "
-        "as before; the band keeps its height, so verify the blank space where "
-        "Crystal would have collapsed the section")
-    return notes
-
-
 def _resolve_references(model):
     """Resolve element field refs to PRD column/expression names."""
     summary_by_name = {s.name: s for s in model.summaries}
+
+    # Currency formats first: a text template mentioning {ORDERS.ORDER_AMOUNT}
+    # may resolve BEFORE the field element that carries the format, so the
+    # map has to exist up front.
+    for section in model.sections:
+        for el in section.elements:
+            if el.kind == "field" and el.format_numeric:
+                kind, name = parse_field_ref(el.field_ref)
+                if kind == "db" and name not in model.field_formats:
+                    model.field_formats[name] = el.format_numeric
     for section in model.sections:
         for el in section.elements:
             if el.kind == "label":
@@ -1067,6 +1075,9 @@ def _resolve_references(model):
             if kind == "db":
                 el.column = name
                 el.value_type = model.field_types.get(name, "StringField")
+                if not el.format_numeric:
+                    el.format_numeric = model.field_formats.get(name, "")
+
             elif kind in ("formula", "parameter"):
                 el.column = name
                 if kind == "formula" and not el.value_type:
@@ -1150,12 +1161,36 @@ def _resolve_references(model):
         section.condition_formulas = _bind_condition_aggregates(
             section.condition_formulas, model)
         context = f" (section {section.name or section.area_kind})"
-        if band_counts[(section.area_kind, section.group_index)] == 1:
-            model.issues.extend(_convert_condition_formulas(
-                section, model.field_types, context))
-        else:
-            model.issues.extend(
-                _push_section_condition_to_elements(section, model, context))
+        # Every Crystal section becomes its own collapsing sub-band in the
+        # writer, so a translated suppress condition simply rides the section
+        # - whether the area has one section or nine.
+        model.issues.extend(_convert_condition_formulas(
+            section, model.field_types, context))
+
+    # Crystal's "Suppress Blank Section": the section (and its height)
+    # disappears when its fields print nothing. For a section whose data-bound
+    # content is db columns, that is a provable visibility expression.
+    for section in model.sections:
+        if not section.suppress_if_blank or not section.elements:
+            continue
+        columns = []
+        provable = True
+        for el in section.elements:
+            refs = ([el.field_ref] if el.kind == "field" else
+                    re.findall(r"\{[^{}]+\}", el.text or "") if el.kind == "label"
+                    else [])
+            for ref in refs:
+                kind, name = parse_field_ref(ref)
+                if kind == "db":
+                    columns.append(name)
+                else:
+                    provable = False
+            if el.kind not in ("field", "label"):
+                provable = False
+        if provable and columns:
+            checks = ";".join(f"NOT(ISBLANK([{c}]))" for c in dict.fromkeys(columns))
+            formula = f"=OR({checks})" if ";" in checks else f"={checks}"
+            section.style_expressions.append(("visible", formula))
 
 
 def generate_sql(model):
@@ -1244,3 +1279,32 @@ def generate_sql(model):
     if order:
         sql += "\nORDER BY " + ", ".join(order)
     return sql
+
+
+def apply_template_formats(model):
+    """Second pass over message templates, run AFTER formula translation:
+    a $(ref) whose formula was rewritten as an aggregate over a currency
+    column - or that names a summary over one - picks up that column's
+    currency format ("$(statement amount, number, $#,##0.00)"). At resolve
+    time the rewrite target is not known yet, so this cannot happen earlier."""
+    fmt_of = {}
+    for name, formula in model.formulas.items():
+        fmt = model.field_formats.get(formula.rewrite_field or "")
+        if fmt:
+            fmt_of[name] = fmt
+    for summary in model.summaries:
+        _, column = parse_field_ref(summary.field_ref)
+        fmt = model.field_formats.get(column, "")
+        if fmt:
+            fmt_of.setdefault(summary.expression_name, fmt)
+
+    def upgrade(match):
+        name = match.group(1)
+        fmt = fmt_of.get(name)
+        return f"$({name}, number, {fmt})" if fmt else match.group(0)
+
+    pattern = re.compile(r"\$\(([^),$]+)\)")
+    for section in model.sections:
+        for el in section.elements:
+            if getattr(el, "text_template", ""):
+                el.text_template = pattern.sub(upgrade, el.text_template)

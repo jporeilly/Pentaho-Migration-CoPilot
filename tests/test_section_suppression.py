@@ -2,10 +2,9 @@
 one PRD band — the single biggest fidelity gap in the corpus (52 of 93
 EnableSuppress conditions used to be dropped with a note).
 
-The condition cannot live on the merged band, so it moves to the section's own
-elements: same condition, same rows, evaluated per element. The band keeps its
-height where Crystal would have collapsed the section — that difference stays
-called out in a note.
+Each Crystal section is now a COLLAPSING sub-band in the PRD layout, so the
+suppress condition simply rides the section: a hidden section takes no height,
+exactly like Crystal.
 """
 
 import textwrap
@@ -57,16 +56,29 @@ SECTION_WITH_CONDITION = """\
     </Section>"""
 
 
-class TestPushDown:
-    def test_condition_moves_to_the_sections_elements(self, tmp_path):
+class TestSectionCondition:
+    def test_condition_rides_the_section_for_its_sub_band(self, tmp_path):
+        """Each Crystal section becomes a COLLAPSING PRD sub-band; the
+        suppress condition belongs to the section, so the band takes no
+        height when hidden - the collapse push-down-to-elements could not
+        reproduce."""
         model = load_report_model(_dump(tmp_path, _report(SECTION_WITH_CONDITION)))
         first = next(s for s in model.sections if s.name == "DetailSection1")
-        for el in first.elements:
-            keys = [k for k, _ in el.style_expressions]
-            assert "visible" in keys, f"{el.name} lost the suppression condition"
+        formula = dict(first.style_expressions)["visible"]
         # Crystal suppresses when TRUE; PRD's visible shows when TRUE — inverted
-        formula = dict(first.elements[0].style_expressions)["visible"]
         assert "NOT" in formula.upper() and "[AMT]" in formula
+
+    def test_the_sub_band_carries_the_condition_into_the_bundle(self, tmp_path):
+        import zipfile
+
+        from pentaho_migration.reports import write_prpt
+        model = load_report_model(_dump(tmp_path, _report(SECTION_WITH_CONDITION)))
+        out = tmp_path / "b.prpt"
+        write_prpt(model, out)
+        layout = zipfile.ZipFile(out).read("layout.xml").decode()
+        assert 'band-styles layout="block"' in layout        # stacking parent
+        band = layout.split('core:element-type="band"')[1]
+        assert 'style-key="visible"' in layout
 
     def test_other_sections_elements_are_untouched(self, tmp_path):
         model = load_report_model(_dump(tmp_path, _report(SECTION_WITH_CONDITION)))
@@ -75,10 +87,10 @@ class TestPushDown:
                    for el in second.elements)
 
     def test_the_note_is_applied_not_manual(self, tmp_path):
-        """The whole point: this is work the pipeline DID, and the height
-        caveat is a verify — it must not land in the consultant's backlog."""
+        """This is work the pipeline DID - it must not land in the
+        consultant's backlog."""
         model = load_report_model(_dump(tmp_path, _report(SECTION_WITH_CONDITION)))
-        note = next(i for i in model.issues if "applied to the section's" in i)
+        note = next(i for i in model.issues if "converted to a 'visible'" in i)
         assert split_todos([note])[APPLIED] == [note]
 
     def test_untranslatable_condition_stays_manual(self, tmp_path):
@@ -86,12 +98,13 @@ class TestPushDown:
             "{O.AMT} &gt; 100", "drilldowngrouplevel &lt;&gt; 0")
         model = load_report_model(_dump(tmp_path, _report(weird)))
         first = next(s for s in model.sections if s.name == "DetailSection1")
-        assert all("visible" not in dict(el.style_expressions)
-                   for el in first.elements)
+        assert "visible" not in dict(first.style_expressions)
         manual = split_todos(model.issues)[MANUAL]
         assert any("not carried" in n for n in manual)
 
-    def test_element_keeps_its_own_condition_too(self, tmp_path):
+    def test_element_condition_is_independent_of_the_sections(self, tmp_path):
+        """An element's own suppress condition stays on the element; the
+        section's stays on the sub-band. Both apply at render - no merging."""
         both = SECTION_WITH_CONDITION.replace(
             '<TextObject Name="T1" Left="0" Top="0" Width="1440" Height="220">'
             "<Text>past due</Text></TextObject>",
@@ -101,8 +114,8 @@ class TestPushDown:
             "</TextObject>")
         model = load_report_model(_dump(tmp_path, _report(both)))
         first = next(s for s in model.sections if s.name == "DetailSection1")
-        formula = dict(first.elements[0].style_expressions)["visible"]
-        assert formula.count("NOT") >= 2 and formula.startswith("=AND(")
+        assert "visible" in dict(first.style_expressions)
+        assert "visible" in dict(first.elements[0].style_expressions)
 
 
 AGG_CONDITION = SECTION_WITH_CONDITION.replace(
@@ -122,7 +135,7 @@ class TestAggregateSynthesis:
         assert synth is not None
         assert synth.operation == "Sum" and synth.group_field == "TYPE"
         first = next(s for s in model.sections if s.name == "DetailSection1")
-        formula = dict(first.elements[0].style_expressions)["visible"]
+        formula = dict(first.style_expressions)["visible"]
         assert "[Sum_AMT_TYPE]" in formula
 
     def test_equivalent_aggregates_share_one_function(self, tmp_path):

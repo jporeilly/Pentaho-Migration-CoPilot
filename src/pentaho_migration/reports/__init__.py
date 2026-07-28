@@ -33,6 +33,8 @@ def _finish_model(model: ReportModel, jndi: str | None) -> None:
     if jndi:
         model.jndi = jndi
     translate_all(model)
+    from pentaho_migration.reports.rpt_parser import apply_template_formats
+    apply_template_formats(model)
     if not model.sql:
         model.sql = generate_sql(model)
         model.sql_generated = True

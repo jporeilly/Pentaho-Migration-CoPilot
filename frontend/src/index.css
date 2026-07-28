@@ -71,6 +71,10 @@
 
 * { box-sizing: border-box; margin: 0; }
 
+/* Reserve the scrollbar gutter permanently: content stops shifting and the
+   bar stops sitting ON TOP of the right edge of the layout. */
+html { scrollbar-gutter: stable; }
+
 body {
   background: var(--page);
   color: var(--text-primary);
@@ -342,7 +346,7 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
 .settings .warn { color: var(--status-warning); }
 .rec-model { font-size: 1.45rem; font-weight: 650; color: var(--accent); }
 .rec-reason { color: var(--text-secondary); font-size: .88rem; margin-top: .3rem; }
-.actions { display: flex; gap: .75rem; align-items: center; margin-top: 1.1rem; }
+.actions { display: flex; gap: .75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap; }
 .pull-status { margin-top: .7rem; font-size: .85rem; color: var(--text-secondary); }
 .pull-status.error { color: var(--status-serious); }
 .pull-status.done { color: var(--status-good); }
@@ -616,7 +620,8 @@ tr.flash td { background: rgba(57, 135, 229, 0.16); }
 }
 .llm-chip.conf-high { color: var(--status-good); background: rgba(12, 163, 12, 0.14); }
 .llm-chip.conf-low { color: var(--status-serious); background: rgba(236, 131, 90, 0.14); }
-.jndi-field { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--text-secondary); }
+.jndi-field { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--text-secondary); white-space: nowrap; }
+.jndi-field input { max-width: 160px; }
 .jndi-field input {
   background: var(--surface-2); border: none; border-radius: 8px; color: var(--text-primary);
   padding: .45rem .7rem; font-size: .88rem; outline: none; width: 11rem;
