@@ -90,15 +90,15 @@
   <span class="badge vamber">REVIEW</span>
   <h1>Statement_of_Account</h1>
   <p>Consultant report · SAP Crystal Reports → Pentaho Report Designer ·
-     generated 2026-07-28 20:16</p>
+     generated 2026-07-28 20:32</p>
 </div>
 
-<p class="lede"><b>REVIEW.</b> 2 difference(s) between the rendered conversion and the rendered original. Each is listed with its evidence below.
- There are 4 actions below, 0.61h ($92) in total.</p>
+<p class="lede"><b>REVIEW.</b> 3 difference(s) between the rendered conversion and the rendered original. Each is listed with its evidence below.
+ There are 5 actions below, 1.11h ($167) in total, of which 1 item(s) block release.</p>
 
 <div class="kpis">
-  <div class="kpi"><b>0.61h</b><span>to finish this report
-      ($92)</span></div>
+  <div class="kpi"><b>1.11h</b><span>to finish this report
+      ($167)</span></div>
   <div class="kpi"><b>4.5h</b><span>to rebuild it by hand instead
       ($675)</span></div>
   <div class="kpi gold"><b>$525</b><span>avoided —
@@ -107,10 +107,22 @@
 
 <h2>Action plan <span class="sub">— highest priority first; within a
     priority, the heaviest first</span></h2>
-<div class="rolls"><div class="roll p1"><b>0.00h</b><span>P1 · blocks release</span><span class="muted">0 item(s) · $0</span></div><div class="roll p2"><b>0.51h</b><span>P2 · correctness</span><span class="muted">4 item(s) · $76</span></div><div class="roll p3"><b>0.10h</b><span>P3 · cosmetic</span><span class="muted">1 item(s) · $15</span></div></div>
+<div class="rolls"><div class="roll p1"><b>0.50h</b><span>P1 · blocks release</span><span class="muted">1 item(s) · $75</span></div><div class="roll p2"><b>0.51h</b><span>P2 · correctness</span><span class="muted">4 item(s) · $76</span></div><div class="roll p3"><b>0.10h</b><span>P3 · cosmetic</span><span class="muted">1 item(s) · $15</span></div></div>
 <table class='plan'><tr><th></th><th>Priority</th><th>Action</th><th class='n'>Items</th><th class='n'>Effort</th></tr>
 <tr class="act">
   <td class="num">1</td>
+  <td><span class="chip p1">P1 · blocks release</span></td>
+  <td>
+    <div class="title">Reconcile the rendered output against the original</div>
+    <div class="why"><b>Why it matters.</b> The release gate rendered both reports and found differences the customer would see on the page - missing values, dropped lines or content that moved. Until these are closed the conversion is not equivalent to the Crystal original.</div>
+    <div class="how"><b>How.</b> Open the .prpt in Report Designer and preview it beside the original in the Crystal viewer (the app&#x27;s View original button opens both). Work the evidence lines below one at a time; each names the exact value or line that differs.</div>
+    <div class="where">orphaned-total</div><details><summary>1 item(s)</summary><ul><li>21 statement(s) print their total on a page of its own, away from the statement it belongs to - the original keeps them together</li></ul></details>
+  </td>
+  <td class="n">1</td>
+  <td class="n">0.50h<div class="muted">$75</div></td>
+</tr>
+<tr class="act">
+  <td class="num">2</td>
   <td><span class="chip p2">P2 · correctness</span></td>
   <td>
     <div class="title">Review the flagged layout differences</div>
@@ -122,7 +134,7 @@
   <td class="n">0.25h<div class="muted">$38</div></td>
 </tr>
 <tr class="act">
-  <td class="num">2</td>
+  <td class="num">3</td>
   <td><span class="chip p2">P2 · correctness</span></td>
   <td>
     <div class="title">Wire up the data source</div>
@@ -134,7 +146,7 @@
   <td class="n">0.20h<div class="muted">$30</div></td>
 </tr>
 <tr class="act">
-  <td class="num">3</td>
+  <td class="num">4</td>
   <td><span class="chip p2">P2 · correctness</span></td>
   <td>
     <div class="title">Glance over the formulas that translated with a caveat</div>
@@ -146,7 +158,7 @@
   <td class="n">0.06h<div class="muted">$9</div></td>
 </tr>
 <tr class="act">
-  <td class="num">4</td>
+  <td class="num">5</td>
   <td><span class="chip p3">P3 · cosmetic</span></td>
   <td>
     <div class="title">Work through the remaining notes</div>
@@ -162,12 +174,12 @@
     SAP viewer, the conversion through the Pentaho engine</span></h2>
 <div class="evs"><div class="ev"><b>74</b><span>pages, original (SAP Crystal viewer)</span></div><div class="ev"><b>58</b><span>pages, converted (Pentaho engine)</span></div><div class="ev"><b>36 of 36</b><span>group(s) take the same <b>number</b> of pages as the original</span></div></div>
 
-<h2>Evidence — where the renders differ</h2><div class="finding sev3"><b>1. ℹ [pages]</b> the conversion is more compact: 58 pages vs 74 - the original leaves near-empty spill pages (43 of them) that the conversion consolidates; every statement still spans the same pages as the original<p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div><div class="finding sev2"><b>2. ⚠ [appearance]</b> REPORT-WIDE: the middle of the page differs on 58 of the 58 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement<ul><li><code>15%-29% of each page affected</code></li><li><code>e.g. original p47 vs converted p39 (29% of the page)</code></li></ul><p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div>
+<h2>Evidence — where the renders differ</h2><div class="finding sev1"><b>1. ✋ [orphaned-total]</b> 21 statement(s) print their total on a page of its own, away from the statement it belongs to - the original keeps them together<ul><li><code>Cycles and Sports: total alone on converted p3</code></li><li><code>Magazzini: total alone on converted p7</code></li><li><code>Canal City Cycle: total alone on converted p9</code></li><li><code>Alley Cat Cycles: total alone on converted p14</code></li><li><code>Benny - The Spokes Person: total alone on converted p16</code></li><li><code>Blazing Saddles: total alone on converted p19</code></li><li><code>C-Gate Cycle Shoppe: total alone on converted p21</code></li><li><code>City Cyclists: total alone on converted p23</code></li></ul><p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div><div class="finding sev3"><b>2. ℹ [pages]</b> the conversion is more compact: 58 pages vs 74 - the original leaves near-empty spill pages (43 of them) that the conversion consolidates; every statement still spans the same pages as the original<p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div><div class="finding sev2"><b>3. ⚠ [appearance]</b> REPORT-WIDE: the middle of the page differs on 58 of the 58 page(s) compared. It is one difference in a band that repeats, not one per page - a single fix covers every statement<ul><li><code>15%-29% of each page affected</code></li><li><code>e.g. original p47 vs converted p39 (29% of the page)</code></li></ul><p class="fix muted">No automatic resolution — this one needs a consultant's judgement.</p></div>
 
 <h2>What converted</h2>
 <table><tr><td>Bands</td><td>21</td></tr><tr><td>Elements</td><td>41</td></tr><tr><td>Groups</td><td>2</td></tr><tr><td>Parameters</td><td>0</td></tr><tr><td>Summaries</td><td>3</td></tr><tr><td>Sub-reports</td><td>0</td></tr><tr><td>Formulas</td><td>3 translated · 2 to check · 0 to rebuild</td></tr><tr><td>Data source</td><td>SampleData</td></tr><tr><td>Embedded rows</td><td>53</td></tr></table>
 
-<h2>Doing the work in Report Designer <span class='sub'>— only the steps this report needs</span></h2><dl class='ref'><dt>Publishing</dt><dd>File &gt; Publish, or copy the .prpt into the solution repository. The JNDI name in the bundle must exist on the server — that is the most common cause of a report that works locally and fails published.</dd></dl>
+<h2>Doing the work in Report Designer <span class='sub'>— only the steps this report needs</span></h2><dl class='ref'><dt>Publishing</dt><dd>File &gt; Publish, or copy the .prpt into the solution repository. The JNDI name in the bundle must exist on the server — that is the most common cause of a report that works locally and fails published.</dd><dt>Comparing against the original</dt><dd>The app's View original button opens the .rpt in the Crystal viewer while the preview shows the conversion, so both sit side by side at the same page.</dd></dl>
 
 <details><summary>Every remaining note, verbatim (1)</summary>
 <ul><li>special field in text rendered as &quot;page n / m&quot; ($(PageofPages)) - adjust the format in PRD if the report showed only the bare number</li></ul></details>

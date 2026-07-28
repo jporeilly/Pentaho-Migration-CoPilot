@@ -245,6 +245,136 @@ class TestFurnitureIsFoundOnPopulatedPages:
         assert not any("unique to this page" in f for f in furniture)
 
 
+def _statement(customer, *body):
+    return "\n".join([customer, *body, "legal footer here", "Business Objects"])
+
+
+def _total_page():
+    return "\n".join(["Remit Payment to:", "Total 43.50",
+                      "legal footer here", "Business Objects"])
+
+
+class TestAnOrphanedTotalIsAttributedToItsCustomer:
+    """A total pushed past the page break sits alone, and no other check in
+    the gate sees it: the page count can be right, every number present,
+    and each statement still spanning the pages it should.
+
+    The near-empty-page count cannot catch it either, because the original
+    leaves 43 spill pages of its own - "more near-empty pages than the
+    original" stays false while a total is stranded."""
+
+    def _check(self, monkeypatch, orig, conv, values):
+        _patch_pages(monkeypatch, orig, conv)
+        return rc.compare_renders(b"ORIG", b"CONV", group_values=values)
+
+    def test_a_total_alone_on_the_next_page_names_its_customer(self, monkeypatch):
+        orig = [_statement("Wheels Inc.", "8 Harbour Road", "Total 43.50")]
+        conv = [_statement("Wheels Inc.", "8 Harbour Road"), _total_page()]
+        check = self._check(monkeypatch, orig, conv, ["Wheels Inc."])
+        f = next(f for f in check.findings if f.code == "orphaned-total")
+        assert f.severity == "error"
+        assert any("Wheels Inc." in e for e in f.evidence)
+        assert any("p2" in e for e in f.evidence)
+        assert check.verdict == "REVIEW"
+
+    def test_a_total_on_the_statement_page_is_not_orphaned(self, monkeypatch):
+        pages = [_statement("Wheels Inc.", "8 Harbour Road", "Total 43.50")]
+        check = self._check(monkeypatch, pages, list(pages), ["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "orphaned-total"]
+
+    def test_a_total_two_pages_from_the_statement_is_not_attributed(self, monkeypatch):
+        """The customer's name is on the page BEFORE the total, which is the
+        only reason attribution works at all. Two pages away it could be
+        anyone's, and guessing would invent a defect."""
+        orig = [_statement("Wheels Inc.", "8 Harbour Road", "Total 43.50")]
+        conv = [_statement("Wheels Inc.", "8 Harbour Road"),
+                _statement("Filler Co.", "unrelated content", "more content",
+                           "and more", "and more still", "yet more",
+                           "still more", "and more again", "final line"),
+                _total_page()]
+        check = self._check(monkeypatch, orig, conv, ["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "orphaned-total"]
+
+    def test_a_split_the_original_also_makes_is_faithful(self, monkeypatch):
+        """Crystal orphaning the total too means the conversion is right.
+        The gate compares - it does not have an opinion about layout."""
+        pages = [_statement("Wheels Inc.", "8 Harbour Road"), _total_page()]
+        check = self._check(monkeypatch, pages, list(pages), ["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "orphaned-total"]
+
+    def test_the_letters_stated_total_proves_whose_total_it_is(self, monkeypatch):
+        """The statement says its own total in prose. A stranded total
+        carrying that amount is that customer's - proven, not guessed."""
+        orig = [_statement("Wheels Inc.", "8 Harbour Road",
+                           "invoices totalling $43.50.", "Total: $43.50")]
+        conv = [_statement("Wheels Inc.", "8 Harbour Road",
+                           "invoices totalling $43.50."),
+                _total_page()]
+        check = self._check(monkeypatch, orig, conv, ["Wheels Inc."])
+        f = next(f for f in check.findings if f.code == "orphaned-total")
+        assert any("Wheels Inc." in e for e in f.evidence)
+
+    def test_a_total_for_a_different_amount_is_not_this_customers(self, monkeypatch):
+        """The letter said $43.50 and the stranded total says $912.00, so it
+        belongs to the next statement - naming this customer would be a lie."""
+        orig = [_statement("Wheels Inc.", "8 Harbour Road",
+                           "invoices totalling $43.50.", "Total: $43.50")]
+        conv = [_statement("Wheels Inc.", "8 Harbour Road",
+                           "invoices totalling $43.50."),
+                "\n".join(["Remit Payment to:", "Total 912.00",
+                           "legal footer here", "Business Objects"])]
+        check = self._check(monkeypatch, orig, conv, ["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "orphaned-total"]
+
+    def test_a_declared_total_must_print_on_the_page_that_declares_it(self, monkeypatch):
+        """The demo's real defect, and the one nothing else caught: the
+        total is not stranded on an EMPTY page, it is carried over with
+        the invoice table onto a busy one. 21 of 36 statements did this
+        while the original split none of them."""
+        letter = _statement("Wheels Inc.", "8 Harbour Road",
+                            "invoices totalling $758.13.")
+        orig = [letter + "\nTotal: $758.13"]
+        conv = [letter,
+                _statement("", *[f"invoice line {n}" for n in range(9)],
+                           "Total: $758.13")]
+        check = self._check(monkeypatch, orig, conv, ["Wheels Inc."])
+        f = next(f for f in check.findings if f.code == "orphaned-total")
+        assert any("Wheels Inc." in e for e in f.evidence)
+        assert any("p2" in e for e in f.evidence)
+
+    def test_a_declared_total_on_its_own_page_is_fine(self, monkeypatch):
+        pages = [_statement("Wheels Inc.", "invoices totalling $758.13.",
+                            "Total: $758.13")]
+        check = self._check(monkeypatch, pages, list(pages), ["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "orphaned-total"]
+
+    def test_a_street_number_is_not_an_amount(self):
+        """Matching bare integers as money made "8 Harbour Road" the
+        statement's total, which then disagreed with the real one and
+        suppressed the finding. Money has a currency symbol or cents."""
+        found = rc._amounts(rc._ANY_MONEY, "8 Harbour Road\nInvoice 2886")
+        assert found == set()
+        assert rc._amounts(rc._ANY_MONEY, "$43.50 and 912.00") == {"43.50",
+                                                                   "912.00"}
+
+    def test_either_spelling_of_totalling_is_read(self, monkeypatch):
+        """Crystal's own sample text uses "totalling"; other reports use the
+        US "totaling". Reading only one would silently drop the evidence."""
+        for word in ("totalling", "totaling"):
+            page = f"Wheels Inc.\ninvoices {word} $43.50. Please pay"
+            assert rc._amounts(rc._STATED_TOTAL, page) == {"43.50"}
+
+    def test_a_full_page_of_content_is_not_a_total_page(self, monkeypatch):
+        """A page that happens to carry a running total mid-table is a real
+        page, not a stranded footer."""
+        orig = [_statement("Wheels Inc.", "8 Harbour Road", "Total 43.50")]
+        conv = [_statement("Wheels Inc.", "8 Harbour Road"),
+                _statement("", *[f"invoice line {n}" for n in range(9)],
+                           "Total 43.50")]
+        check = self._check(monkeypatch, orig, conv, ["Wheels Inc."])
+        assert not [f for f in check.findings if f.code == "orphaned-total"]
+
+
 class TestGroupPageMatching:
     """Two traps that both invented findings on the demo."""
 

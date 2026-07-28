@@ -240,8 +240,11 @@ def _sparse_pages(pages: list) -> list:
     furniture = _boilerplate(pages)
     sparse = []
     for i, page in enumerate(pages):
-        content = {l for l in map(_normalize_line, page.splitlines()) if l}
-        if len(content - furniture) <= 3:
+        # counted as a LIST: normalization masks digits, so a page of forty
+        # invoice rows has one DISTINCT line and would read as near-empty
+        content = [l for l in map(_normalize_line, page.splitlines())
+                   if l and l not in furniture]
+        if len(content) <= 3:
             sparse.append(i)
     return sparse
 
@@ -277,6 +280,128 @@ def _pages_of(pages: list, value: str, values: list) -> list:
 def _group_spans(pages: list, values: list) -> dict:
     """value -> number of consecutive pages it occupies."""
     return {value: len(_pages_of(pages, value, values)) for value in values}
+
+
+_TOTAL_MARKER = re.compile(r"\btotals?\b", re.I)
+# Not a tuning threshold. A page break puts what overflowed on the VERY NEXT
+# page, so that is the only place a split record's other half can be. A total
+# two pages from a statement did not break off it - it belongs to something
+# else, and raising this would start attributing totals to the wrong customer.
+ORPHAN_GAP = 1
+ORPHAN_MAX_CONTENT = 8  # lines of real content before a page is a real page
+
+# Attribution is by AMOUNT, not by wording. A stranded "Total: $43.50" is
+# the statement that owes $43.50 - the money is the evidence and it survives
+# any phrasing, any language, any report. The prose form is only the
+# strongest place to FIND that amount when a report happens to state it:
+# "...outstanding invoices totalling $43.50." Both spellings, because
+# Crystal's own sample text uses "totalling" and others use "totaling".
+_MONEY = r"[$£€]?\s?\d[\d,]*(?:\.\d{1,2})?"
+# Unanchored, this has to be strict about what money looks like - a currency
+# symbol or cents. A bare integer is a street number, an invoice number or a
+# page number far more often than it is a total, and one of those matching by
+# accident attributes a stranded total to the wrong customer.
+_ANY_MONEY = re.compile(r"([$£€]\s?\d[\d,]*(?:\.\d{1,2})?|\d[\d,]*\.\d{2}\b)")
+_STATED_TOTAL = re.compile(r"total(?:l)?ing\D{0,4}(" + _MONEY + ")", re.I)
+_TOTAL_AMOUNT = re.compile(r"\btotals?\b\D{0,4}(" + _MONEY + ")", re.I)
+
+
+def _amounts(pattern, text: str) -> set:
+    """Amounts a pattern finds, as bare numeric strings - so "$43.50" and
+    "43.50" are the same money however the two engines formatted it."""
+    return {re.sub(r"[^\d.]", "", m) for m in pattern.findall(text)} - {""}
+
+
+def _link_values(page: str) -> set:
+    """What this page could be recognised by if part of it broke away.
+
+    The general rule for catching a split: a fragment is only PROVEN to
+    belong to a record when the two share a value. Position cannot do it -
+    a stranded footer sits next to whatever follows it - and neither can
+    layout, because a fragment looks the same wherever it came from.
+
+    For a statement that shared value is the money. The total the letter
+    states is the strongest form, being the statement's own figure rather
+    than one of its rows; failing that, any amount the statement prints.
+    Anything looser is a coincidence waiting to name the wrong customer."""
+    return _amounts(_STATED_TOTAL, page) or _amounts(_ANY_MONEY, page)
+
+
+def _orphan_totals(pages: list, values: list) -> list:
+    """(group value, page index) for totals stranded on a page of their own.
+
+    Nothing else in the gate sees this. The page count can be right, every
+    number present, and each statement still spanning the pages it should -
+    and the report is still visibly wrong, because the last thing on the
+    statement was pushed past the break and prints alone.
+
+    Attribution is the whole difficulty: a page holding a total and nothing
+    else does not say whose total it is, because the customer's name is on
+    the page BEFORE it. Two things establish it, strongest first:
+
+    A SHARED VALUE. A stranded "Total: $43.50" belongs to the statement
+    that owes $43.50 - see _link_values for why a value common to both
+    halves is the only thing that proves a fragment's parent.
+
+    THE DISTANCE. The total must also be within ORPHAN_GAP pages of the
+    statement. A shared amount alone is not enough across a whole report,
+    where round figures repeat and would name the wrong customer.
+
+    The strongest case needs no near-empty page at all, which is why the
+    first pass below exists: a statement that DECLARES its own total in
+    prose must print that total on the same page, and if the figure turns
+    up on the next one the statement is split - whatever else got carried
+    over with it. On the demo that is 21 of 36 statements, none of which
+    lands on a page empty enough for the second pass to notice."""
+    furniture = _boilerplate(pages)
+    owners: dict = {}
+    for value in values:
+        for i in _pages_of(pages, value, values):
+            owners[i] = value
+    claims = [_link_values(p) for p in pages]
+    orphans = []
+    seen_pages = set()
+
+    # pass 1: the statement says what it is owed, so the total belongs here
+    for i, page in enumerate(pages):
+        stated = _amounts(_STATED_TOTAL, page)
+        if not stated or stated & _amounts(_TOTAL_AMOUNT, page):
+            continue
+        for fwd in range(1, ORPHAN_GAP + 1):
+            if i + fwd >= len(pages):
+                break
+            if stated & _amounts(_TOTAL_AMOUNT, pages[i + fwd]):
+                orphans.append((owners.get(i, sorted(stated)[0]), i + fwd))
+                seen_pages.add(i + fwd)
+                break
+
+    # pass 2: no declared figure to go on - a near-empty page carrying a
+    # total, claimed by the statement before it if their amounts agree
+    for i, page in enumerate(pages):
+        if i in seen_pages:
+            continue
+        # a LIST, not a set: normalization masks digits, so forty invoice
+        # rows collapse to one distinct line and a full page of detail
+        # would look as empty as a stranded footer
+        body = [l for l in map(_normalize_line, page.splitlines())
+                if l and l not in furniture]
+        if not body or len(body) > ORPHAN_MAX_CONTENT:
+            continue
+        if not any(_TOTAL_MARKER.search(l) for l in body):
+            continue
+        if i in owners:     # the statement is on this page too - not orphaned
+            continue
+        here = _amounts(_TOTAL_AMOUNT, page)
+        for back in range(1, ORPHAN_GAP + 1):
+            owner = owners.get(i - back)
+            if not owner:
+                continue
+            # the amounts disagree: this total is not that statement's
+            if here and claims[i - back] and not (claims[i - back] & here):
+                continue
+            orphans.append((owner, i))
+            break
+    return sorted(orphans, key=lambda o: o[1])
 
 
 def _group_breaks(pages: list, values: list) -> dict:
@@ -413,6 +538,24 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
                 "different number of pages than the original",
                 evidence=[f"{v[:40]}: original {o} page(s) -> converted {c}"
                           for v, o, c in drifted[:8]]))
+
+        # 6a. a statement's TOTAL stranded on a page of its own. The widowed-
+        # page count above cannot see this one: the original leaves 43 spill
+        # pages of its own, so "more near-empty pages than the original" stays
+        # false while a total sits alone. Naming the customer is what makes it
+        # actionable - and comparing against the original is what keeps it
+        # honest, because a split Crystal also makes is faithful, not a defect.
+        orig_orphans = {v for v, _p in _orphan_totals(orig_pages, group_values)}
+        conv_orphans = _orphan_totals(conv_pages, group_values)
+        new_orphans = [(v, p) for v, p in conv_orphans if v not in orig_orphans]
+        if new_orphans:
+            result.findings.append(Finding(
+                "error", "orphaned-total",
+                f"{len(new_orphans)} statement(s) print their total on a "
+                "later page than the statement it belongs to - the original "
+                "keeps each total with its own statement",
+                evidence=[f"{v[:44]}: total carried over to converted p{p + 1}"
+                          for v, p in new_orphans[:8]]))
 
         # 6b. WHERE each statement breaks, not just how many pages it takes.
         # A statement that runs 1-2 in both renders still reads wrong if the
