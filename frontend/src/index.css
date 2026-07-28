@@ -792,6 +792,22 @@ span.triage-chip { cursor: default; }
 .pdf-modal > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
 .pdf-modal-actions { display: flex; align-items: center; gap: .5rem; }
 
+/* Rendering runs through the real engine and takes a few seconds. The panel
+   opens straight away with a spinner in it, so there is somewhere to look
+   while it works instead of a button that appears not to have responded. */
+.pdf-rendering { flex: 1; min-height: 40vh; display: flex; flex-direction: column;
+                 align-items: center; justify-content: center; gap: .6rem;
+                 text-align: center; padding: 2rem; }
+.pdf-rendering p { margin: 0; }
+.spinner { width: 34px; height: 34px; border-radius: 50%;
+           border: 3px solid var(--border);
+           border-top-color: var(--accent);
+           animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 2.4s; }
+}
+
 /* Action rows: buttons keep their label on one line; the ROW wraps instead. */
 .actions button, .actions a { white-space: nowrap; }
 

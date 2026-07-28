@@ -2,7 +2,7 @@
 // The bundle travels base64 in the conversion response; a Blob turns it into
 // a real file download client-side.
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Markdown from '../components/Markdown.jsx'
 import EffortPanel from '../components/EffortPanel.jsx'
 import Explain from '../components/Explain.jsx'
@@ -47,6 +47,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
   const [previewError, setPreviewError] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const [previewPages, setPreviewPages] = useState(null)
+  const previewToken = useRef(0)
   const [prdBusy, setPrdBusy] = useState(false)
   const [prdNote, setPrdNote] = useState(null)
   const [gateBusy, setGateBusy] = useState(false)
@@ -59,9 +60,14 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setPreviewUrl(null)
     setPreviewPages(null)
+    // a render already in flight must not pop the panel back open behind the
+    // consultant after they have dismissed it
+    previewToken.current += 1
+    setPreviewBusy(false)
   }
 
   async function openPdfPreview() {
+    const token = ++previewToken.current
     setPreviewBusy(true)
     setPreviewError(null)
     try {
@@ -77,6 +83,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
       })
       if (res.ok) {
         const url = URL.createObjectURL(await res.blob())
+        if (token !== previewToken.current) { URL.revokeObjectURL(url); return }
         setPreviewPages(null)
         setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url })
         return
@@ -316,7 +323,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
         </div>
       )}
 
-      {(previewPages || previewUrl) && (
+      {(previewBusy || previewPages || previewUrl) && (
         <div className="modal-overlay" onClick={closePreview}>
           <div className="modal pdf-modal" role="dialog" aria-modal="true"
             aria-label="PDF preview" onClick={(e) => e.stopPropagation()}>
@@ -332,7 +339,15 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
                 <button className="ghost" onClick={closePreview} aria-label="Close">✕ Close</button>
               </div>
             </header>
-            {previewPages ? (
+            {previewBusy && !previewUrl && !previewPages ? (
+              <div className="pdf-rendering">
+                <span className="spinner" aria-hidden="true" />
+                <p>Rendering through the Pentaho Reporting engine…</p>
+                <p className="muted">
+                  The whole report, with its data — a few seconds.
+                </p>
+              </div>
+            ) : previewPages ? (
               <div className="pdf-pages">
                 {previewPages.map((src, i) => (
                   <img key={i} src={src} alt={`page ${i + 1}`} loading="lazy" />
