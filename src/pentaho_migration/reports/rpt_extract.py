@@ -16,6 +16,8 @@ the caller gets one actionable sentence, not a stack trace.
 
 import os
 import subprocess
+
+from pentaho_migration.reports.proc import run_nice
 from pathlib import Path
 
 from pentaho_migration.reports.environment import find_rpttoxml
@@ -53,7 +55,7 @@ def extract_rpt(rpt_path: Path, out_xml: Path) -> Path:
 
     env = dict(os.environ, RPTTOXML_REDACT="1")
     try:
-        proc = subprocess.run(
+        proc = run_nice(
             [str(exe), str(rpt_path), str(out_xml)],
             capture_output=True, text=True, timeout=EXTRACT_TIMEOUT, env=env)
     except subprocess.TimeoutExpired:

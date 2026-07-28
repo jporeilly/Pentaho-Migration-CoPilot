@@ -22,6 +22,8 @@ and the report keeps its existing TODO.
 import re
 import shutil
 import subprocess
+
+from pentaho_migration.reports.proc import run_nice
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -71,7 +73,7 @@ def extract_definitions(rpt_path: Path, exe: Path | None = None) -> dict:
     if exe is None or not rpt_path.is_file():
         return {}
     try:
-        proc = subprocess.run(
+        proc = run_nice(
             [str(exe), "xml-dump", str(rpt_path)],
             capture_output=True, timeout=TIMEOUT,
         )

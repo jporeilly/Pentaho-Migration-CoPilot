@@ -7,6 +7,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [1.39.0] — 2026-07-28
+
+### Added
+
+- **🛡 Release gate: the review agent** (`reports/release_check.py`, CLI
+  `report-release-check`, button on the Download step). Renders the ORIGINAL
+  .rpt through the SAP viewer and the CONVERTED .prpt through the Pentaho
+  engine, then compares deterministically: page-count delta, numbers as a
+  multiset (date-format tolerant), lines of the original that never appear,
+  and lines that moved pages. Verdict **SHIP / REVIEW** — the LLM never
+  decides it, but each finding gets an LLM **resolution-or-guidance note**
+  via the shared provider dispatch (works with Ollama through Azure).
+  Its first three catches were real: a signature block lost to design-space
+  underlay offsets, $0.00 totals from braceless recovered summary refs, and
+  the page-flow drift — the first two are fixed in this release, with
+  regression tests named after the gate.
+- **ONE consultant report per migration** (`reports/consultant_report.py`):
+  release verdict + annotated findings + the full conversion detail + effort
+  and $ — downloadable from the Download step.
+- **Staged progress bar** for the release check: it runs as a background job
+  (extracting → rendering original → rendering conversion → comparing →
+  annotating) with polled stage chips. **Downloads stay locked until the
+  check completes** — and unlock with an explanation when the check cannot
+  run on the machine (no original, no viewer).
+- Heavy external renders (Java engine, SAP viewer, RptToXml, rpt-rs) now run
+  at **below-normal process priority** — at normal priority they starved the
+  browser compositor into blank-screen territory on a single demo machine.
+
+### Fixed
+
+- Underlay copies now target sections by RUNTIME offsets: consecutive
+  conditional sections (mutually-exclusive letter variants) share one slot,
+  so the watermark/signature ride whichever variant renders.
+- Recovered summary refs keep their braces — the emitted total function
+  summed a field the query did not have.
+
 ## [1.38.1] — 2026-07-28
 
 ### Added

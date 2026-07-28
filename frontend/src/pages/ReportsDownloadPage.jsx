@@ -32,6 +32,10 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
   const [previewPages, setPreviewPages] = useState(null)
   const [prdBusy, setPrdBusy] = useState(false)
   const [prdNote, setPrdNote] = useState(null)
+  const [gateBusy, setGateBusy] = useState(false)
+  const [gateStage, setGateStage] = useState(null)   // {stage, stages}
+  const [gate, setGate] = useState(null)
+  const [gateError, setGateError] = useState(null)
   const mdName = report.filename.replace(/\.prpt$/, '.conversion.md')
 
   function closePreview() {
@@ -100,6 +104,47 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
     }
   }
 
+  async function runReleaseCheck() {
+    setGateBusy(true)
+    setGate(null)
+    setPreviewError(null)
+    try {
+      const form = new FormData()
+      form.append('dump', file)
+      const res = await fetch(`/reports/release-check/start?jndi=${encodeURIComponent(jndi)}`, {
+        method: 'POST',
+        body: form,
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      // staged background job - poll for the progress bar
+      for (;;) {
+        await new Promise((r) => setTimeout(r, 2000))
+        const s = await fetch(`/reports/release-check/status?job=${body.job}`)
+        const state = await s.json()
+        if (!s.ok) throw new Error(state.detail || s.statusText)
+        setGateStage({ stage: state.stage, stages: state.stages })
+        if (state.status === 'done') { setGate(state.result); break }
+        if (state.status === 'error') throw new Error(state.detail || 'release check failed')
+      }
+    } catch (err) {
+      // the check could not run (no original / no viewer on this machine) -
+      // say so and UNLOCK the downloads rather than deadlock the user
+      setGateError(err.message)
+    } finally {
+      setGateBusy(false)
+      setGateStage(null)
+    }
+  }
+
+  // Downloads unlock once the release check has COMPLETED - or provably
+  // cannot run on this machine (no original / no viewer), in which case
+  // blocking forever would just strand the consultant.
+  const downloadsLocked = Boolean(file) && !gate && !gateError
+  const lockHint = downloadsLocked
+    ? 'Run the 🛡 Release check first - downloads unlock when it completes'
+    : undefined
+
   return (
     <>
       <EffortPanel effort={report.summary.effort} />
@@ -118,16 +163,24 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
           re-converts in place.
         </Explain>
         <div className="actions">
-          <button className="primary" onClick={() => downloadBase64(report.prpt_base64, report.filename)}>
+          <button className="primary" disabled={downloadsLocked} title={lockHint}
+            onClick={() => downloadBase64(report.prpt_base64, report.filename)}>
             ⬇ {report.filename}
           </button>
-          <button className="ghost" onClick={() => downloadText(report.report_markdown, mdName)}>
+          <button className="ghost" disabled={downloadsLocked} title={lockHint}
+            onClick={() => downloadText(report.report_markdown, mdName)}>
             ⬇ Conversion report (.md)
           </button>
           {file && (
             <button className="ghost" onClick={openPdfPreview} disabled={previewBusy}
               title="Render the .prpt through the real Pentaho Reporting engine with an empty dataset — needs a local Report Designer install">
               {previewBusy ? 'Rendering…' : '🔍 PDF preview'}
+            </button>
+          )}
+          {file && (
+            <button className="ghost" onClick={runReleaseCheck} disabled={gateBusy}
+              title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
+              {gateBusy ? 'Comparing…' : '🛡 Release check'}
             </button>
           )}
           {file && (
@@ -154,12 +207,80 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
           </button>
         </div>
         {previewError && <div className="error">{previewError}</div>}
+        {gateError && <div className="error">Release check could not run: {gateError} — downloads are unlocked.</div>}
         {prdNote && <p className="muted">{prdNote}</p>}
+        {downloadsLocked && (
+          <p className="muted">
+            🛡 Run the <b>Release check</b> to unlock the downloads — it compares
+            the rendered conversion against the original and produces the
+            consultant report.
+          </p>
+        )}
         <p className="muted">
           Open the .prpt in Pentaho Report Designer, work through the conversion report
           below, then publish to the Pentaho Server.
         </p>
       </div>
+
+      {gateStage && (
+        <div className="card">
+          <header><h2>Release check <span>comparing renders…</span></h2></header>
+          <div className="gate-progress">
+            {gateStage.stages.filter((s) => s !== 'done').map((s) => {
+              const idx = gateStage.stages.indexOf(gateStage.stage)
+              const mine = gateStage.stages.indexOf(s)
+              return (
+                <div key={s}
+                  className={'gate-step' + (mine < idx ? ' done' : mine === idx ? ' active' : '')}>
+                  {mine < idx ? '✓ ' : ''}{s}
+                </div>
+              )
+            })}
+          </div>
+          <p className="muted">
+            Rendering the original through the SAP viewer and the conversion
+            through the Pentaho engine — a minute or two for a long report.
+          </p>
+        </div>
+      )}
+
+      {gate && (
+        <div className="card">
+          <header>
+            <h2>
+              Release check{' '}
+              <span className={gate.verdict === 'SHIP' ? 'gate-ship' : 'gate-review'}>
+                {gate.verdict === 'SHIP' ? '✅ SHIP' : '⚠ REVIEW'}
+              </span>
+            </h2>
+            <div className="actions">
+              <button className="ghost" onClick={() => downloadText(
+                gate.consultant_report_html || gate.consultant_report_markdown,
+                report.filename.replace(/\.prpt$/,
+                  gate.consultant_report_html ? '.consultant.html' : '.consultant.md'))}>
+                ⬇ Consultant report
+              </button>
+            </div>
+          </header>
+          <p className="muted">
+            Rendered original ({gate.original_pages} pages, SAP viewer) vs
+            converted ({gate.converted_pages} pages, Pentaho engine).
+            {gate.llm_annotated > 0 && ` ${gate.llm_annotated} finding(s) annotated by the LLM.`}
+          </p>
+          {gate.findings.length === 0 ? (
+            <p className="muted">No differences above threshold.</p>
+          ) : (
+            <ul className="notes">
+              {gate.findings.map((f, i) => (
+                <li key={i}>
+                  <b>{f.severity === 'error' ? '✋' : '⚠'} [{f.code}]</b> {f.message}
+                  {f.resolution && <div className="gate-resolution">→ {f.resolution}</div>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {(previewPages || previewUrl) && (
         <div className="modal-overlay" onClick={closePreview}>

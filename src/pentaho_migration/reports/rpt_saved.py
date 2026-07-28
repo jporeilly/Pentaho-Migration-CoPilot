@@ -26,6 +26,8 @@ exactly as before (JNDI datasource, no rows).
 
 import json
 import subprocess
+
+from pentaho_migration.reports.proc import run_nice
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
@@ -97,7 +99,7 @@ def load_saved_rows(rpt_path: Path) -> SavedRows | None:
     if exe is None or not Path(rpt_path).is_file():
         return None
     try:
-        proc = subprocess.run(
+        proc = run_nice(
             [str(exe), "saved", str(rpt_path), "--limit", "all", "--json"],
             capture_output=True, text=True, encoding="utf-8", errors="replace",
             timeout=_SAVED_TIMEOUT)

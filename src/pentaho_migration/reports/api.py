@@ -345,6 +345,141 @@ async def open_in_report_designer(dump: UploadFile, request: Request,
             "embedded_rows": len(model.saved_rows.rows) if model.saved_rows else 0}
 
 
+_gate_jobs: dict[str, dict] = {}
+
+# the gate's stages, in order - the UI turns these into a progress bar
+_GATE_STAGES = ["extracting", "rendering original", "rendering conversion",
+                "comparing", "annotating", "done"]
+
+
+@router.post("/release-check/start", dependencies=[Depends(require_api_key)])
+async def release_check_start(dump: UploadFile, jndi: str = "",
+                              llm: bool = True) -> dict:
+    """Start the release gate in the background: two full renders plus
+    optional LLM annotation take minutes; poll /release-check/status for the
+    staged progress the UI shows as a bar."""
+    from pentaho_migration.reports.consultant_report import (
+        build_consultant_report, build_consultant_report_html)
+    from pentaho_migration.reports.release_check import (
+        annotate_findings_with_llm, compare_renders, render_original_pdf)
+    from pentaho_migration.reports.prpt_validator import (
+        render_prpt_pdf, render_prpt_pdf_live, validator_available)
+    from pentaho_migration.reports.rpt_viewer import find_original
+
+    if not validator_available():
+        raise HTTPException(status_code=503,
+                            detail="no local PRD install to render the .prpt")
+    data = await dump.read()
+    source_name = dump.filename or "upload.xml"
+    original = find_original(source_name)
+    if original is None:
+        raise HTTPException(
+            status_code=404,
+            detail="no original .rpt known for this report - drop the .rpt "
+                   "itself (or keep it beside the dump) so the release check "
+                   "has something to compare against")
+
+    job_id = uuid.uuid4().hex[:12]
+    job: dict = {"status": "running", "stage": "extracting",
+                 "stages": _GATE_STAGES, "detail": "", "result": None}
+    _gate_jobs[job_id] = job
+    _evict_old_jobs(_gate_jobs)
+
+    def run() -> None:
+        try:
+            model = _load_upload(data, source_name, jndi)
+            job["stage"] = "rendering original"
+            original_pdf = render_original_pdf(original)
+            job["stage"] = "rendering conversion"
+            with tempfile.TemporaryDirectory() as td:
+                prpt = Path(td) / "converted.prpt"
+                write_prpt(model, prpt, saved_rows=model.saved_rows)
+                converted_pdf = (render_prpt_pdf_live(prpt)
+                                 if model.saved_rows is not None
+                                 else render_prpt_pdf(prpt))
+            job["stage"] = "comparing"
+            check = compare_renders(original_pdf, converted_pdf)
+            annotated = 0
+            if llm and check.findings:
+                job["stage"] = "annotating"
+                annotated = annotate_findings_with_llm(check, model)
+            markdown = build_consultant_report(
+                model, source_name, f"{model.name}.prpt", check)
+            job["result"] = {
+                "verdict": check.verdict,
+                "original_pages": check.original_pages,
+                "converted_pages": check.converted_pages,
+                "findings": [{"severity": f.severity, "code": f.code,
+                              "message": f.message, "evidence": f.evidence,
+                              "resolution": f.resolution}
+                             for f in check.findings],
+                "llm_annotated": annotated,
+                "consultant_report_markdown": markdown,
+                "consultant_report_html": build_consultant_report_html(
+                    model, check),
+            }
+            job["stage"] = "done"
+            job["status"] = "done"
+        except Exception as exc:
+            job["status"] = "error"
+            job["detail"] = str(exc)
+            logger.exception("release-check job %s failed", job_id)
+
+    threading.Thread(target=run, daemon=True).start()
+    return {"job": job_id}
+
+
+@router.get("/release-check/status")
+def release_check_status(job: str) -> dict:
+    state = _gate_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown job")
+    return state
+
+
+@router.post("/release-check", dependencies=[Depends(require_api_key)])
+async def release_check(dump: UploadFile, jndi: str = "",
+                        llm: bool = True) -> dict:
+    """The release gate: render the ORIGINAL .rpt (viewer, saved data) and
+    the CONVERTED .prpt (engine, embedded data), compare deterministically,
+    and annotate each finding with an LLM resolution-or-guidance note. The
+    response carries the verdict, the findings, and the full consultant
+    report (one document per migration). 503 when either side cannot render
+    on this machine."""
+    from pentaho_migration.reports.consultant_report import build_consultant_report
+    from pentaho_migration.reports.release_check import (
+        annotate_findings_with_llm, run_release_check)
+    from pentaho_migration.reports.rpt_viewer import find_original
+
+    data = await dump.read()
+    source_name = dump.filename or "upload.xml"
+    model = _load_upload(data, source_name, jndi)
+    original = find_original(source_name)
+    if original is None:
+        raise HTTPException(
+            status_code=404,
+            detail="no original .rpt known for this report - drop the .rpt "
+                   "itself (or keep it beside the dump) so the release check "
+                   "has something to compare against")
+    check = run_release_check(model, original)
+    if check.verdict == "UNAVAILABLE":
+        raise HTTPException(status_code=503, detail=check.reason)
+    annotated = annotate_findings_with_llm(check, model) if llm else 0
+    markdown = build_consultant_report(
+        model, source_name, f"{model.name}.prpt", check)
+    return {
+        "verdict": check.verdict,
+        "original_pages": check.original_pages,
+        "converted_pages": check.converted_pages,
+        "findings": [{"severity": f.severity, "code": f.code,
+                      "message": f.message, "evidence": f.evidence,
+                      "resolution": f.resolution}
+                     for f in check.findings],
+        "llm_annotated": annotated,
+        "consultant_report_markdown": markdown,
+    }
+
+
 @router.post("/preview", dependencies=[Depends(require_api_key)])
 async def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
     """Preview through the real Pentaho Reporting engine. With embedded saved
@@ -407,6 +542,8 @@ def _pdf_to_page_images(pdf: bytes) -> list:
     try:
         total = len(doc)
         for i in range(min(total, MAX_PREVIEW_PAGES)):
+            import time as _time
+            _time.sleep(0)   # yield the GIL between pages - keep the app painting
             bitmap = doc[i].render(scale=1.4)
             buf = _io.BytesIO()
             bitmap.to_pil().save(buf, format="PNG")

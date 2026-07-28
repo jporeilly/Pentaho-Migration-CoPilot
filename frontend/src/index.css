@@ -813,3 +813,18 @@ span.triage-chip { cursor: default; }
   max-width: 100%; box-shadow: 0 1px 8px rgba(0,0,0,.25);
   background: #fff;
 }
+
+/* Release gate verdict + LLM resolution notes */
+.gate-ship { color: var(--status-good); font-size: .95rem; margin-left: .5rem; }
+.gate-review { color: var(--status-warning); font-size: .95rem; margin-left: .5rem; }
+.gate-resolution { color: var(--text-secondary); margin: .2rem 0 .4rem 1.2rem; }
+
+/* Release-gate staged progress */
+.gate-progress { display: flex; gap: .5rem; flex-wrap: wrap; margin: .4rem 0 .6rem; }
+.gate-step {
+  padding: .3rem .8rem; border-radius: 99px; font-size: .8rem;
+  background: var(--surface-2); color: var(--text-muted);
+}
+.gate-step.active { background: var(--accent); color: var(--accent-ink); animation: gate-pulse 1.2s ease-in-out infinite; }
+.gate-step.done { color: var(--status-good); }
+@keyframes gate-pulse { 50% { opacity: .55; } }

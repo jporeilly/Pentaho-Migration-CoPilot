@@ -578,6 +578,50 @@ def report_parity(
         raise typer.Exit(code=1)
 
 
+@app.command("report-release-check")
+def report_release_check(
+    dump: Path = typer.Argument(..., help="RptToXml dump (the .rpt must sit beside it)"),
+    jndi: str = typer.Option("", help="JNDI name for the converted bundle"),
+    llm: bool = typer.Option(True, help="annotate findings with LLM resolution notes"),
+    out: Path = typer.Option(None, "-o", help="write the consultant report here"),
+) -> None:
+    """Release gate: render the ORIGINAL .rpt and the CONVERTED .prpt,
+    compare them, and write ONE consultant report - verdict, findings, and a
+    resolution-or-guidance note per finding. Exit 1 on REVIEW, 2 when the
+    environment cannot run the check."""
+    from pentaho_migration.reports import load_report_model
+    from pentaho_migration.reports.consultant_report import build_consultant_report
+    from pentaho_migration.reports.release_check import (
+        annotate_findings_with_llm, run_release_check)
+    from pentaho_migration.reports.rpt_saved import load_saved_rows
+
+    rpt = dump.with_suffix(".rpt")
+    if not rpt.is_file():
+        typer.echo(f"no {rpt.name} beside the dump - nothing to compare against", err=True)
+        raise typer.Exit(code=2)
+    model = load_report_model(dump, jndi or None)
+    model.saved_rows = load_saved_rows(rpt)
+    check = run_release_check(model, rpt)
+    if check.verdict == "UNAVAILABLE":
+        typer.echo(f"release check unavailable: {check.reason}", err=True)
+        raise typer.Exit(code=2)
+    if llm:
+        n = annotate_findings_with_llm(check, model)
+        if n:
+            typer.echo(f"  LLM annotated {n} finding(s)")
+    markdown = build_consultant_report(model, dump, dump.with_suffix(".prpt"), check)
+    target = out or dump.with_suffix(".consultant.md")
+    target.write_text(markdown, encoding="utf-8")
+    from pentaho_migration.reports.consultant_report import build_consultant_report_html
+    target.with_suffix(".html").write_text(
+        build_consultant_report_html(model, check), encoding="utf-8")
+    typer.echo(f"{check.verdict}: original {check.original_pages}pp vs "
+               f"converted {check.converted_pages}pp, "
+               f"{len(check.findings)} finding(s)")
+    typer.echo(f"consultant report: {target}")
+    raise typer.Exit(code=0 if check.verdict == "SHIP" else 1)
+
+
 @app.command("report-classify")
 def report_classify(
     src: Path = typer.Argument(Path("samples/crystal/corpus")),

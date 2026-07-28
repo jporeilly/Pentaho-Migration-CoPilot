@@ -96,12 +96,29 @@ def _band_content(sections, band_type, tp="", sp="style:"):
         if not section.underlay:
             offset_after += section.height
             continue
+        # Span offsets in RUNTIME terms, not design terms: consecutive
+        # sections that carry visibility CONDITIONS are mutually-exclusive
+        # alternatives (Crystal's letter variants) - at runtime exactly one
+        # occupies the slot, so they all share ONE start offset and the
+        # stack advances once, by the tallest of the run. Computing offsets
+        # from the design stack instead put the underlay copy in variant 1
+        # only, and the customer whose statement shows variant 2 lost the
+        # signature block - found by the release gate.
         gap = 0.0
         spans = []
+        run_height = 0.0
         for j in range(i + 1, len(visible)):
             target = visible[j]
-            if not target.underlay:
-                spans.append((j, gap, target.height))
+            if target.underlay:
+                continue
+            conditional = any(k == "visible" for k, _ in target.style_expressions)
+            spans.append((j, gap, target.height))
+            if conditional:
+                run_height = max(run_height, target.height)
+            else:
+                if run_height:
+                    gap += run_height        # the alternatives' shared slot
+                    run_height = 0.0
                 gap += target.height
         for el in section.elements:
             overlaps = []

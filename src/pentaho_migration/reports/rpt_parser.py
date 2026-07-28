@@ -531,10 +531,14 @@ def _recover_summary_refs(name, fref, gref):
     args = re.findall(r"\{([^{}]+)\}", name or "")
     if not args:
         return fref, gref
+    # keep the braces: parse_field_ref only recognizes a db column as
+    # "{Table.Field}" - a bare "ORDERS.ORDER_AMOUNT" classifies as unknown and
+    # the emitted function then sums a field the query does not have ($0.00
+    # totals, found by the release gate)
     if _DOTNET_TYPE.match(fref or ""):
-        fref = args[0]
+        fref = "{" + args[0] + "}"
     if _DOTNET_TYPE.match(gref or "") and len(args) > 1:
-        gref = args[1]      # PercentOfSum(field, group, outerGroup) - own group first
+        gref = "{" + args[1] + "}"  # PercentOfSum(field, group, outer) - own group first
     return fref, gref
 
 
