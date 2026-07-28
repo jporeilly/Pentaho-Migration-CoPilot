@@ -181,10 +181,14 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
           in PRD, or publish it to the Pentaho Server once its JNDI connection
           exists there. The <b>conversion report</b> is the work list: every
           formula that needs review, every TODO placeholder, and the datasource
-          steps. <b>🔍 PDF preview</b> renders the bundle through the real
-          Pentaho Reporting engine in a popup — with the <b>embedded saved
-          data</b> when the original .rpt carried its rows, otherwise with an
-          empty dataset (layout only). <b>🔍 Open in Report Designer</b>
+          steps. Run <b>🛡 Release check</b> first: it renders the original
+          and the conversion, compares them, unlocks these downloads and
+          produces the consultant report — so you look at output that has
+          already been checked rather than the other way round.
+          <b>🔍 PDF preview</b> then renders the bundle through the real
+          Pentaho Reporting engine — with the <b>embedded saved data</b> when
+          the original .rpt carried its rows, otherwise with an empty dataset
+          (layout only). <b>🔍 Open in Report Designer</b>
           launches the converted report straight into PRD on this machine. Changing the <b>JNDI name</b>
           re-converts in place.
         </Explain>
@@ -198,15 +202,15 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             ⬇ Conversion report (.md)
           </button>
           {file && (
-            <button className="ghost" onClick={openPdfPreview} disabled={previewBusy}
-              title="Render the .prpt through the real Pentaho Reporting engine with an empty dataset — needs a local Report Designer install">
-              {previewBusy ? 'Rendering…' : '🔍 PDF preview'}
+            <button className="primary" onClick={runReleaseCheck} disabled={gateBusy}
+              title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
+              {gateBusy ? 'Comparing…' : '🛡 Release check'}
             </button>
           )}
           {file && (
-            <button className="ghost" onClick={runReleaseCheck} disabled={gateBusy}
-              title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
-              {gateBusy ? 'Comparing…' : '🛡 Release check'}
+            <button className="ghost" onClick={openPdfPreview} disabled={previewBusy}
+              title="Render the .prpt through the real Pentaho Reporting engine with an empty dataset — needs a local Report Designer install">
+              {previewBusy ? 'Rendering…' : '🔍 PDF preview'}
             </button>
           )}
           {file && (

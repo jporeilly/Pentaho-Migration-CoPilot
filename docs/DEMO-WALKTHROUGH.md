@@ -51,18 +51,14 @@ Walk the stepper:
   says so, with the reason. Estimates come from this list, so it can't be
   allowed to lie — and notice how short it is BECAUSE the list is honest,
   not despite it."*
-- **Download** — the effort panel (hours and $ vs a manual rebuild), then
-  **👁 PDF preview**: the bundle renders through the real Pentaho engine in a
-  popup, WITH the embedded data. Note the conversion-report line: *"53 saved
-  data rows recovered from the .rpt and embedded."*
 - **Release check** — the download buttons stay locked until it finishes, and
   the progress bar names each stage. It renders the **original through the
   SAP viewer** and the **conversion through the Pentaho engine**, then
   compares the two PDFs four ways: the numbers as a set, the lines of text,
   where each statement breaks across pages, and — page by page — how they
-  **look**. This report comes back **⚠ REVIEW**: *36 of 36 statements span
-  the same pages as the original*, and the appearance check flags a fill the
-  conversion is missing (see the rough edges below).
+  **look**. This report comes back **⚠ REVIEW**: *36 of 36 statements take
+  the same number of pages as the original*, and the appearance check flags a
+  fill the conversion is missing (see the rough edges below).
 
   Talk track: *"It renders both and compares them, and it is telling you
   about a difference I would otherwise have to hope you didn't notice."*
@@ -71,6 +67,12 @@ Walk the stepper:
   many that was. It is not a proof of equivalence, and a clean result is
   evidence rather than a guarantee. Overselling this is the one thing that
   will cost you the room, because the customer will find the exception.
+- **Download** — the effort panel (hours and $ vs a manual rebuild), then
+  **🔍 PDF preview**: the bundle renders through the real Pentaho engine, WITH
+  the embedded data. It is the PDF itself, so you get the **whole report and
+  its outline panel** — the group tree recreated from Crystal, countries then
+  customers. Note the conversion-report line: *"53 saved data rows recovered
+  from the .rpt and embedded."*
 - **Consultant report** (`.html`, `.pdf`, `.md`) — open the HTML. It leads
   with a **prioritised, costed action plan**: what to do first, what it
   costs, what the customer sees if it is skipped, and the Report Designer
@@ -113,9 +115,9 @@ letterhead, same watermark and signature, same $43.50.
   SDK exposes, and the tool tells you where the boundary is instead of
   quietly rendering something close."*
 - **The conversion is 58 pages against the original's 74** — and that is the
-  conversion being *better*, not worse: all 36 statements span the same pages
-  as the original, and the original leaves 37 near-empty spill pages that the
-  conversion consolidates. The gate reports the delta as information rather
+  conversion being *better*, not worse: all 36 statements take the same
+  number of pages as the original, and the original leaves 37 near-empty
+  spill pages that the conversion consolidates. The gate reports the delta as information rather
   than a defect, and says so on the page.
 - **Rich text inside one text object loses its runs.** A Crystal text object
   with mixed bold/regular formatting converts with the first run's font
