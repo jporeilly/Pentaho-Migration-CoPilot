@@ -9,6 +9,22 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Crystal Top-N / Group Sort Expert → a working Top-N + "Others" in SQL.**
+  A report set to "Top 5 countries" (Group Sort Expert) used to convert with
+  every country shown — PRD has no Top-N group, and the converter only logged
+  it. It now *solves* it: the ranking measure and direction are read from the
+  export, and the query keeps the top (or bottom) N groups by that measure and
+  rolls the rest into a single **Others** group, ordered so the kept groups
+  lead and Others sits last (a per-group total → `DENSE_RANK` → `CASE` relabel,
+  proven to run on the live Xtreme MySQL). RptToXml omits the N count, so it is
+  assumed (5) and the note asks to confirm it — the one thing the export can't
+  give. This is the migration's whole point: **suggest and apply a solution,
+  output the one open question for review — don't just log the gap.**
+- **Consultant report and PDF preview render inline, not in a blank tab.**
+  New browser tabs never surface inside embedded webviews, and a `window.open`'d
+  tab can't paint a `blob:` URL from its opener — so both opened blank. They now
+  render inline (the report in an `<iframe srcDoc>`; the PDF in the in-app modal,
+  with a **Pages as images** fallback where the embedded PDF viewer paints black).
 - **Settings › Database drivers.** A converted report reaches a live database
   only if Report Designer has the JDBC driver and a JNDI connection wired to
   it — both invisible until something fails. Settings now lists the installed

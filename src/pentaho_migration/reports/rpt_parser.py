@@ -1048,15 +1048,36 @@ def apply_window_columns(model):
                  + (f"\nORDER BY {order}" if order else ""))
 
 
-def apply_topn(model):
-    """Crystal's Group Sort Expert / Top-N has no PRD equivalent, so realize it
-    in the report SQL. First step (here): order the groups by their ranking
-    measure so the top (or bottom) groups lead - PRD then bands them in that
-    order. The "Others" rollup that collapses the tail is layered on top of
-    this. Runs after model.sql is final, like apply_window_columns.
+def _select_output_names(sql):
+    """The output column names of a simple generated SELECT, in order:
+    'SELECT Customer.Country, Customer.Sales FROM ...' -> ['Country', 'Sales'].
+    Only used on our own generated SQL (plain qualified columns, no expressions
+    with commas), so a comma split is safe."""
+    m = re.search(r"^\s*SELECT\s+(.*?)\s+FROM\b", sql, flags=re.I | re.S)
+    if not m:
+        return []
+    names = []
+    for item in m.group(1).split(","):
+        seg = item.strip().split(".")[-1].strip().strip('"')
+        if re.fullmatch(r"[A-Za-z_]\w*", seg):
+            names.append(seg)
+    return names
 
-    Handles the outermost Top-N group; any inner Top-N groups are ordered
-    within it and flagged for review (Crystal ranks them per parent)."""
+
+def apply_topn(model):
+    """Crystal's Group Sort Expert / Top-N has no PRD group, so realize it in
+    the report SQL: keep the N groups with the largest (Top-N) or smallest
+    (Bottom-N) ranking measure and roll the rest into a single "Others" group,
+    ordered so the kept groups lead and Others sits last. PRD then bands the
+    result exactly like the original. Runs after model.sql is final, like
+    apply_window_columns.
+
+    The full rollup needs the SELECT column list (to relabel the key), so it
+    runs on generated SQL without window columns - where we own the SELECT.
+    Otherwise we still deliver the ordering. RptToXml omits N, so it is assumed
+    and the note asks to confirm it - the one thing the export cannot give us.
+    Handles the outermost Top-N group; inner Top-N groups are ordered within it
+    and flagged (Crystal ranks them per parent)."""
     topns = [g for g in model.groups if getattr(g, "topn", None)]
     if not topns or not model.sql:
         return
@@ -1081,27 +1102,60 @@ def apply_topn(model):
 
     outer = rankable[0]
     agg = _TOPN_AGG_SQL.get(outer.topn.op, "SUM")
-    rank_term = (f"{agg}(q.{ref(outer.topn.measure)}) "
-                 f"OVER (PARTITION BY q.{ref(outer.column)}) "
-                 + ("DESC" if outer.topn.descending else "ASC"))
+    n = outer.topn.n
+    direction = "DESC" if outer.topn.descending else "ASC"
+    kind = "top" if outer.topn.descending else "bottom"
+    inner = re.sub(r"\s+ORDER\s+BY\b.*$", "", model.sql, flags=re.I | re.S)
 
     order_cols = [(g.column, g.descending) for g in model.groups]
     order_cols += [(c, d) for c, d in model.record_sorts
                    if c not in {g.column for g in model.groups}]
-    tail = [f"q.{ref(c)}" + (" DESC" if d else "")
-            for c, d in order_cols if known(c)]
-    order = ", ".join([rank_term] + tail)
 
-    inner = re.sub(r"\s+ORDER\s+BY\b.*$", "", model.sql, flags=re.I | re.S)
-    model.sql = f"SELECT q.*\nFROM (\n{inner}\n) q\nORDER BY {order}"
+    cols = _select_output_names(inner) if model.sql_generated else []
+    can_bucket = (outer.topn.others and outer.column in cols
+                  and not model.window_columns)
 
-    kind = "top" if outer.topn.descending else "bottom"
-    model.issues.append(
-        f"Crystal Top-N (Group Sort Expert) on '{outer.column}' has no PRD "
-        f"group equivalent - the query now orders the groups by "
-        f"{outer.topn.op}({outer.topn.measure}) so the {kind} groups lead. The "
-        f"'Others' rollup and the N count (RptToXml omits it; assumed "
-        f"{outer.topn.n}) still need confirming.")
+    if can_bucket:
+        # Rank the groups by their total measure, then keep N and relabel the
+        # rest 'Others'. Two nested wraps: total per group, then DENSE_RANK of
+        # those totals (rows of one group share a total, so share a rank).
+        total = (f"{agg}(b.{ref(outer.topn.measure)}) "
+                 f"OVER (PARTITION BY b.{ref(outer.column)})")
+        totalled = f"SELECT b.*, {total} AS _grp_total\nFROM (\n{inner}\n) b"
+        ranked = (f"SELECT t.*, DENSE_RANK() OVER (ORDER BY t._grp_total "
+                  f"{direction}) AS _grp_rank\nFROM (\n{totalled}\n) t")
+        others = outer.topn.others_label.replace("'", "''")
+        proj = [
+            (f"CASE WHEN r._grp_rank <= {n} THEN r.{ref(c)} ELSE '{others}' "
+             f"END AS {ref(c)}") if c == outer.column else f"r.{ref(c)}"
+            for c in cols]
+        # Others last; kept groups by rank (measure order); then the normal
+        # within-group order, but not by the now-relabelled key.
+        tail = [f"r.{ref(c)}" + (" DESC" if d else "")
+                for c, d in order_cols if known(c) and c != outer.column]
+        order = ", ".join([f"(r._grp_rank > {n})", "r._grp_rank"] + tail)
+        model.sql = ("SELECT\n  " + ",\n  ".join(proj)
+                     + f"\nFROM (\n{ranked}\n) r\nORDER BY {order}")
+        model.issues.append(
+            f"Crystal Top-N / Group Sort on '{outer.column}': PRD has no Top-N "
+            f"group, so the query keeps the {kind} {n} by "
+            f"{outer.topn.op}({outer.topn.measure}) and rolls the rest into "
+            f"'{outer.topn.others_label}'. RptToXml omits N - confirm {n} is right.")
+    else:
+        # Command SQL / window columns: still deliver the ordering (kept groups
+        # lead); the Others rollup needs a CASE-on-rank column added by hand.
+        rank_term = (f"{agg}(q.{ref(outer.topn.measure)}) "
+                     f"OVER (PARTITION BY q.{ref(outer.column)}) {direction}")
+        tail = [f"q.{ref(c)}" + (" DESC" if d else "")
+                for c, d in order_cols if known(c)]
+        order = ", ".join([rank_term] + tail)
+        model.sql = f"SELECT q.*\nFROM (\n{inner}\n) q\nORDER BY {order}"
+        model.issues.append(
+            f"Crystal Top-N / Group Sort on '{outer.column}': the query orders "
+            f"the groups by {outer.topn.op}({outer.topn.measure}) so the {kind} "
+            f"groups lead. To collapse the rest into 'Others', add a "
+            f"CASE-on-rank column in the query (N assumed {n}).")
+
     for g in rankable[1:]:
         model.issues.append(
             f"nested Top-N on '{g.column}' is ordered within '{outer.column}' "

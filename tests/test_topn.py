@@ -79,29 +79,36 @@ class TestTopNIsParsed:
         assert g.topn.n_assumed is True
 
 
-class TestTopNBecomesQueryOrdering:
-    def test_groups_are_ordered_by_the_ranking_measure(self, tmp_path):
+class TestTopNBucketsIntoOthers:
+    def test_groups_are_ranked_by_the_measure(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, TOP_N))
+        # the per-group total, then a dense rank of those totals, largest first
+        assert "SUM(b.Sales_Amount) OVER (PARTITION BY b.Country)" in model.sql
+        assert "DENSE_RANK() OVER (ORDER BY t._grp_total DESC)" in model.sql
+
+    def test_the_tail_is_relabelled_others(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, TOP_N))
+        assert ("CASE WHEN r._grp_rank <= 5 THEN r.Country ELSE 'Others' "
+                "END AS Country") in model.sql
+
+    def test_others_sorts_last(self, tmp_path):
         model = load_report_model(_dump(tmp_path, TOP_N))
         order = model.sql.split("ORDER BY")[-1]
-        assert "SUM(q.Sales_Amount) OVER (PARTITION BY q.Country)" in order
-        assert "DESC" in order
-
-    def test_the_measure_column_is_in_the_query(self, tmp_path):
-        # apply_topn can only rank by a column the SELECT actually carries
-        model = load_report_model(_dump(tmp_path, TOP_N))
-        assert "Sales_Amount" in model.sql.split("ORDER BY")[0]
+        assert "(r._grp_rank > 5)" in order   # kept groups first, Others last
 
     def test_a_plain_group_sort_is_not_wrapped(self, tmp_path):
         model = load_report_model(_dump(tmp_path, PLAIN_GROUP))
-        assert "PARTITION BY" not in model.sql
+        assert "_grp_rank" not in model.sql and "PARTITION BY" not in model.sql
 
 
 class TestTopNSuggestsAPrdSolution:
-    def test_the_note_explains_the_workaround_not_just_an_error(self, tmp_path):
+    def test_the_note_states_the_solution_not_an_error(self, tmp_path):
         model = load_report_model(_dump(tmp_path, TOP_N))
         topn_notes = [i for i in model.issues if "Top-N" in i or "Group Sort" in i]
         assert topn_notes, "expected a Top-N conversion note"
         note = " ".join(topn_notes)
-        # names the PRD-native workaround and the assumption to confirm
-        assert "order" in note.lower() and "Others" in note
-        assert "not carried" not in note   # the old bare-error phrasing is gone
+        # states what was DONE (kept top N, rolled the rest into Others) and the
+        # one thing the export can't give - N - to confirm; not a bare error
+        assert "Others" in note and "keeps the top" in note
+        assert "confirm" in note.lower()
+        assert "not carried" not in note
