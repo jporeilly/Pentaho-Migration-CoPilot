@@ -9,6 +9,33 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The generated SQL can be run, not just read.** `report-sample-db` rebuilds
+  a queryable database from the reports themselves: schema from the field
+  metadata every `.rpt` declares, data from the rows Crystal saved inside them,
+  split back into base tables by the qualified name. That answers the question
+  a customer always asks of a generated query - *does it run?* - during a PoC
+  where there is no database to point at because the DBA is away or the schema
+  is confidential. Loaded and verified against MySQL 9.5 through PRD's own
+  Java: the demo statement's SELECT returns its rows joined correctly. See
+  [docs/SAMPLE-DATABASES.md](docs/SAMPLE-DATABASES.md).
+- **A join with no saved key still joins.** A report printing a customer's
+  name and its order amounts does not select `CUSTOMER_ID`, so Crystal never
+  saved it - the rebuilt tables loaded perfectly and joined to nothing, and the
+  generated SELECT returned zero rows, which reads as a broken conversion when
+  it is thin data. Every saved row *is* the join, so each distinct customer
+  gets a number and the orders that arrived beside it get the same one: no row
+  is joined to a customer it did not arrive with. A real key always wins. The
+  number is not the customer's and the manifest refuses to let it pass as one.
+- **Recovered text survives a non-Latin character.** The UTF-16 byte-order
+  repair required *every* character to carry the zero-low-byte signature, so
+  one curly quote, em-dash or euro sign left the whole string mojibake -
+  "Provence-Alpes-Cote d'Azur" among them, because U+2019 swaps to U+1920. The
+  signature is now a majority test and the repair swaps bytes rather than
+  shifting them, which could not represent that apostrophe at all.
+- **Rebuilt columns are never narrower than their data.** Widths came from
+  Crystal's declared length, which is a UTF-16 byte count on some builds and
+  the driver's guess on others: a server in strict mode aborted the load, and
+  one without it would have truncated a customer's name silently.
 - **An empty cell prints empty.** PRD skips an element whose value is null -
   background included - so a field sitting over one of Crystal'''s full-width
   row rules stopped masking it, and every row with no purchase-order number

@@ -100,6 +100,16 @@ as the report's dataset. Point at the Data tab: the original SQL is right
 there as the **`source-sql`** query. Talk track: *"Going live is picking that
 query and giving it a JNDI connection — the layout doesn't change."*
 
+**If they ask "but does that query actually run?"** — switch the Data tab to
+`source-sql` against `jdbc:mysql://localhost:3306/xtreme` and run it. That
+database was rebuilt from the reports themselves, so no customer data and no
+download was involved; see
+[SAMPLE-DATABASES.md](SAMPLE-DATABASES.md). Be straight about what it is: the
+schema is real (the reports declare it), the data is a *result set* rather
+than a table dump, and `CUSTOMER_ID` is synthesized because no report ever
+selected it — the relationship is real, the number is not. Said plainly this
+lands as rigour; glossed over, it is the thing that costs you the room.
+
 Close by putting the Crystal viewer and PRD side by side on screen: same
 letterhead, same watermark and signature, same $43.50.
 
