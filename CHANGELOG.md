@@ -29,6 +29,14 @@ deliberately — not one per work session.
     on success or its own error message on failure — the JNDI entry can name a
     driver that is not installed or a URL that does not resolve, and nothing
     said so until a render failed deep in the engine.
+- **Security: frontend dev toolchain to vite 6.4.3.** Cleared four Dependabot
+  alerts (1 high, 3 moderate) in the dev build tools — `vite`'s
+  `server.fs.deny` bypass and path-traversal issues, launch-editor's NTLMv2
+  hash disclosure, and esbuild's dev-server request leak. All are dev-server
+  only (vite/esbuild are `devDependencies`; the shipped bundle in
+  `frontend/dist` contains neither), and vite 5.x receives no backport, so the
+  fix is the vite 6 bump (esbuild 0.25.x follows transitively). The build
+  config is unchanged; `npm audit` reports zero vulnerabilities.
 
 ## [1.41.0] - 2026-07-29
 
