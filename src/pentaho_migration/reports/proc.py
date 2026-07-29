@@ -35,3 +35,18 @@ def popen_detached(cmd, **kwargs):
         return subprocess.Popen(cmd, creationflags=DETACH | BREAKAWAY, **kwargs)
     except OSError:
         return subprocess.Popen(cmd, creationflags=DETACH, **kwargs)
+
+
+# A GUI app fronted by a .bat that uses `start` (Report Designer) needs a
+# DIFFERENT flag. DETACHED_PROCESS gives cmd NO console, and `start` cannot
+# spawn its window without one - so the batch ran, wrote nothing, and Report
+# Designer never opened. CREATE_NO_WINDOW gives cmd a HIDDEN console: `start`
+# works, launches javaw as its own independent GUI process (which outlives
+# the server on its own), and no console flashes on screen.
+NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+
+
+def popen_gui_via_batch(cmd, **kwargs):
+    """Popen a GUI app launched through a `start`-using .bat. See NO_WINDOW."""
+    kwargs.setdefault("close_fds", True)
+    return subprocess.Popen(cmd, creationflags=NO_WINDOW, **kwargs)

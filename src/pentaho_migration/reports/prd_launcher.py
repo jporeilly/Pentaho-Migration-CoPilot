@@ -40,10 +40,12 @@ def open_in_prd(prpt_bytes: bytes, name: str) -> Path:
     safe = re.sub(r"[^\w.\- ]+", "_", Path(name).stem).strip() or "converted"
     target = OPEN_DIR / f"{safe}.prpt"
     target.write_bytes(prpt_bytes)
-    # .bat needs the shell host; the command list stays fixed - only the
-    # bundle path (which we just wrote) varies.
-    from pentaho_migration.reports.proc import popen_detached
-    popen_detached(
+    # report-designer.bat launches PRD through `start`, which needs a console.
+    # popen_gui_via_batch gives cmd a hidden one; the old detached launch left
+    # it with none, so `start` silently no-op'd and PRD never opened. The
+    # command list stays fixed - only the bundle path we just wrote varies.
+    from pentaho_migration.reports.proc import popen_gui_via_batch
+    popen_gui_via_batch(
         ["cmd.exe", "/c", str(prd / "report-designer.bat"), str(target)],
         cwd=str(prd), shell=False)
     return target

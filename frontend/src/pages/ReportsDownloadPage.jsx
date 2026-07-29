@@ -24,6 +24,16 @@ function downloadHtml(html, filename) {
   URL.revokeObjectURL(a.href)
 }
 
+function openHtmlInTab(html) {
+  // the report HTML is already in hand, so this runs inside the click - no
+  // async gap for a pop-up blocker to catch
+  const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+  const tab = window.open(url, '_blank')
+  if (!tab) { URL.revokeObjectURL(url); return false }
+  setTimeout(() => URL.revokeObjectURL(url), 60000)
+  return true
+}
+
 function downloadPdf(base64, filename) {
   const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
   const a = document.createElement('a')
@@ -67,28 +77,38 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
   }
 
   async function openPdfPreview() {
+    // Reserve the tab NOW, inside the click, or the render finishing later
+    // counts as a scripted pop-up and the browser blocks it.
+    const tab = window.open('', '_blank')
     const token = ++previewToken.current
     setPreviewBusy(true)
     setPreviewError(null)
     try {
       const form = new FormData()
       form.append('dump', file)
-      // The PDF itself, so the browser's own viewer gives the WHOLE report
-      // with page navigation and the outline panel - which is where the
-      // group tree recreated from Crystal actually shows up. Rasterized
-      // pages were capped at twelve and had no navigation at all.
+      // The PDF itself, in a real browser tab - the browser's own viewer
+      // gives the WHOLE report with page navigation and the outline panel,
+      // which is where the group tree recreated from Crystal shows up.
       const res = await fetch(`/reports/preview?jndi=${encodeURIComponent(jndi)}`, {
         method: 'POST',
         body: form,
       })
       if (res.ok) {
         const url = URL.createObjectURL(await res.blob())
-        if (token !== previewToken.current) { URL.revokeObjectURL(url); return }
-        setPreviewPages(null)
-        setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url })
+        if (token !== previewToken.current) { URL.revokeObjectURL(url); if (tab) tab.close(); return }
+        if (tab) {
+          tab.location = url                 // native PDF viewer, own tab
+          // keep the blob alive long enough for the tab to load it
+          setTimeout(() => URL.revokeObjectURL(url), 60000)
+        } else {
+          // pop-up blocked - fall back to the in-app modal
+          setPreviewPages(null)
+          setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url })
+        }
         return
       }
-      // fallback for a pane with no PDF plugin: pages as images
+      if (tab) tab.close()
+      // fallback for a pane with no PDF plugin: pages as images, in the modal
       const fallback = await fetch(
         `/reports/preview?jndi=${encodeURIComponent(jndi)}&format=pages`,
         { method: 'POST', body: form })
@@ -99,6 +119,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
       setPreviewUrl(null)
       setPreviewPages((await fallback.json()).pages)
     } catch (err) {
+      if (tab) tab.close()
       setPreviewError(err.message)
     } finally {
       setPreviewBusy(false)
@@ -285,10 +306,20 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             </h2>
             <div className="actions">
               {gate.consultant_report_html && (
-                <button className="primary" onClick={() => downloadHtml(
+                <button className="primary" onClick={() => {
+                  if (!openHtmlInTab(gate.consultant_report_html)) {
+                    downloadHtml(gate.consultant_report_html,
+                      report.filename.replace(/\.prpt$/, '.consultant.html'))
+                  }
+                }}>
+                  🔍 Consultant report
+                </button>
+              )}
+              {gate.consultant_report_html && (
+                <button className="ghost" onClick={() => downloadHtml(
                   gate.consultant_report_html,
                   report.filename.replace(/\.prpt$/, '.consultant.html'))}>
-                  ⬇ Consultant report (.html)
+                  ⬇ .html
                 </button>
               )}
               {gate.consultant_report_pdf && (
