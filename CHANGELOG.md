@@ -21,6 +21,18 @@ deliberately — not one per work session.
   PowerCenter-appropriate handoff (rebuild via a User Defined Java Class), not
   the Talend message. The suggestions surface in the impact/review output, so
   the reviewer sees the recommended step. Talend handoff behaviour unchanged.
+- **Try Informatica is a demo picker, and the ETL consultant report suggests
+  solutions.** "Try Informatica" now opens a curated menu like the Crystal one —
+  six exports **selected by measuring the corpus** (steps / auto / manual /
+  which suggestion fires), not hand-picked: the walkthrough, the cleanest big
+  mapping (HHS EHRP→BIIS, 15 of 18 auto), Top-5 customers via Rank (the ETL twin
+  of the Crystal Top-N demo), the suggested-solutions demo (Transaction Control
+  + Custom transformation), a full workflow with 7 mappings → .kjb, and the
+  16-mapping CPM payroll honesty demo. The Informatica **consultant portfolio
+  report** gains a "Suggested PDI approach per component" table — each unmapped
+  component in the estate with the closest PDI solution from the rules library —
+  and the project batch was re-run so triage grades and the focus list reflect
+  the new rules.
 - **Crystal Top-N / Group Sort Expert → a working Top-N + "Others" in SQL.**
   A report set to "Top 5 countries" (Group Sort Expert) used to convert with
   every country shown — PRD has no Top-N group, and the converter only logged

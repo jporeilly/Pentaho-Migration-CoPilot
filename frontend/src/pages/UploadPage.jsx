@@ -2,17 +2,17 @@ import { useState } from 'react'
 import DropZone from '../components/DropZone.jsx'
 import SourceCard from '../components/SourceCard.jsx'
 
-// "Try Crystal Reports" opens a menu of the demo reports rather than loading
-// one fixed sample. With nothing to pick from it stays a plain button.
-function CrystalSamplePicker({ samples, onPick }) {
+// A "Try ..." button that opens a menu of curated demo files rather than
+// loading one fixed sample. With nothing to pick from it stays a plain button.
+function SamplePicker({ title, samples, onPick }) {
   const [open, setOpen] = useState(false)
   if (!samples || samples.length <= 1) {
-    return <button className="ghost" onClick={() => onPick(samples?.[0])}>Try Crystal Reports</button>
+    return <button className="ghost" onClick={() => onPick(samples?.[0])}>{title}</button>
   }
   return (
     <span className="sample-picker">
       <button className="ghost" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        Try Crystal Reports ▾
+        {title} ▾
       </button>
       {open && (
         <>
@@ -65,7 +65,7 @@ const PHASES = [
   { name: 'Phase 2 — Multi-source', text: 'Informatica, Crystal Reports and Talend complete; DataStage next.' },
 ]
 
-export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, error, loading, source, onShowPractices, family }) {
+export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, infaSamples, error, loading, source, onShowPractices, family }) {
   const stages = family === 'reports' ? REPORTS : family === 'etl' ? ETL : GENERIC
 
   return (
@@ -81,12 +81,12 @@ export default function UploadPage({ onFile, onSample, onTalendSample, onCrystal
       <div className="practices-cta">
         <button className="ghost" onClick={onShowPractices}>📘 Migration best practices</button>
         <span className="sample-row">
-          <button className="ghost" onClick={onSample}>Try Informatica</button>
+          <SamplePicker title="Try Informatica" samples={infaSamples} onPick={onSample} />
           {onTalendSample && (
             <button className="ghost" onClick={onTalendSample}>Try Talend</button>
           )}
           {onCrystalSample && (
-            <CrystalSamplePicker samples={crystalSamples} onPick={onCrystalSample} />
+            <SamplePicker title="Try Crystal Reports" samples={crystalSamples} onPick={onCrystalSample} />
           )}
         </span>
       </div>

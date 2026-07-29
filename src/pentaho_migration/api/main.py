@@ -110,9 +110,67 @@ class ConversionResponse(BaseModel):
     results: list[ConversionResult]
 
 
+# The exports the "Try Informatica" picker offers, in demo order. Selected by
+# MEASURING the corpus (steps / auto / manual / which suggestion notes fire),
+# not by hand-picking names - each earns its slot by what it demonstrates.
+_INFA_DEMO_META = {
+    "m_load_sales.xml": {
+        "label": "Sales load — the walkthrough",
+        "description": "The original guided demo: source→lookup→aggregate→"
+                       "target, small enough to read every step.",
+    },
+    "hhs_ehrp2biis_update.xml": {
+        "label": "Federal HR update — cleanest big mapping",
+        "description": "18 steps, 15 auto-mapped, zero manual. A real HHS "
+                       "EHRP→BIIS load that converts nearly hands-free.",
+    },
+    "sherif_wf_m_top5cust.xml": {
+        "label": "Top-5 customers — Rank",
+        "description": "A Rank transformation keeps the top 5 by revenue — "
+                       "the ETL twin of the Crystal Top-N report demo.",
+    },
+    "ssvd_m_create_paramfile.xml": {
+        "label": "Param-file writer — suggested solutions",
+        "description": "Transaction Control and a Custom transformation have "
+                       "no 1:1 PDI step — watch the converter suggest the "
+                       "closest PDI approach for each instead of just failing.",
+    },
+    "hhs_fda_leave.xml": {
+        "label": "FDA leave — workflow orchestration",
+        "description": "A full workflow with 7 mappings and an email step: "
+                       "converts to a PDI job (.kjb) plus its transformations.",
+    },
+    "hhs_cpm.xml": {
+        "label": "CPM payroll — the honesty demo at scale",
+        "description": "16 mappings with mapplets; the biggest lands ⚠ with "
+                       "named manual work. Shows the estate-scale truth, not "
+                       "a cherry-picked sample.",
+    },
+}
+_INFA_DIR = REPO_ROOT / "samples" / "informatica"
+
+
+@app.get("/samples/informatica", include_in_schema=False)
+def informatica_samples() -> list[dict]:
+    """The demo exports available to the Try-Informatica picker: curated ones
+    that exist on disk, in demo order."""
+    out = []
+    for name, meta in _INFA_DEMO_META.items():
+        path = SAMPLE_FILE if name == "m_load_sales.xml" else _INFA_DIR / name
+        if path.is_file():
+            out.append({"name": name, **meta})
+    return out
+
+
 @app.get("/sample", include_in_schema=False)
-def sample() -> FileResponse:
-    """The bundled demo export, used by the UI's 'Try Informatica' button."""
+def sample(name: str = "") -> FileResponse:
+    """A demo export for the UI's 'Try Informatica' picker. Only names on the
+    curated list are honoured (the corpus is not a public file server);
+    anything else falls back to the bundled walkthrough sample."""
+    if name and name in _INFA_DEMO_META:
+        path = SAMPLE_FILE if name == "m_load_sales.xml" else _INFA_DIR / name
+        if path.is_file():
+            return FileResponse(path, media_type="text/xml")
     return FileResponse(SAMPLE_FILE, media_type="text/xml")
 
 

@@ -83,6 +83,25 @@ def build_etl_portfolio_report_html(records, family="informatica", rate=150.0):
         ((f"{stype}  ({len(unmapped_files[stype])} export(s))", count, GOLD)
          for stype, count in unmapped.items()), key=lambda t: -t[1])[:12]
     unmapped_chart = _hbar_chart(unmapped_items)
+
+    # Each unmapped component with a known category gets its SUGGESTED PDI
+    # approach from the rules library - the consultant report proposes the
+    # solution, it does not just chart the gap.
+    from pentaho_migration.ir import SourceTool
+    from pentaho_migration.mapper import RulesMapper
+    tool = SourceTool.TALEND if family == "talend" else SourceTool.POWERCENTER
+    suggestions = RulesMapper.for_tool(tool).suggestions
+    suggestion_rows = "".join(
+        f"<tr><td>{escape(stype)}</td><td>{escape(suggestions[stype])}</td></tr>"
+        for stype, _count in sorted(unmapped.items(), key=lambda t: -t[1])
+        if stype in suggestions)
+    suggestions_html = (
+        "<h2>Suggested PDI approach per component</h2>"
+        "<p class=\"muted\">The closest PDI solution for each component with no "
+        "1:1 step — apply and verify, rather than rebuilding from scratch.</p>"
+        "<table><thead><tr><th>Component</th><th>Suggested approach</th></tr>"
+        f"</thead><tbody>{suggestion_rows}</tbody></table>"
+        if suggestion_rows else "")
     load_chart = _hbar_chart([(f"{k} manual step(s)", v, SLATE)
                               for k, v in load_bins.items()])
 
@@ -156,6 +175,7 @@ review carries a note, manual has no rules mapping.</p>
 list. {expr_todo} expression(s) also await translation (✨ one click per
 mapping in the app).</p>
 {unmapped_chart}
+{suggestions_html}
 
 <h2>Review load per mapping</h2>
 <p class="muted">How many manual steps each mapping carries — the tail is where

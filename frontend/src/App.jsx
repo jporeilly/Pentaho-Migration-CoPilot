@@ -29,6 +29,7 @@ export default function App() {
   const [report, setReport] = useState(null)    // reports family: /reports/convert response
   const [reportFile, setReportFile] = useState(null)
   const [crystalSamples, setCrystalSamples] = useState([])
+  const [infaSamples, setInfaSamples] = useState([])
 
   useEffect(() => {
     fetch('/health')
@@ -38,6 +39,10 @@ export default function App() {
     fetch('/reports/samples')
       .then((r) => r.json())
       .then((s) => setCrystalSamples(Array.isArray(s) ? s : []))
+      .catch(() => {})
+    fetch('/samples/informatica')
+      .then((r) => r.json())
+      .then((s) => setInfaSamples(Array.isArray(s) ? s : []))
       .catch(() => {})
   }, [])
 
@@ -107,10 +112,13 @@ export default function App() {
     }
   }
 
-  async function loadSample() {
-    const res = await fetch('/sample', { cache: 'no-store' })
+  async function loadSample(sample) {
+    // the picker passes a curated demo export; nothing = the walkthrough
+    const name = sample?.name || 'm_load_sales.xml'
+    const res = await fetch(`/sample?name=${encodeURIComponent(name)}`,
+                            { cache: 'no-store' })
     const blob = await res.blob()
-    convert(new File([blob], 'm_load_sales.xml', { type: 'text/xml' }))
+    convert(new File([blob], name, { type: 'text/xml' }))
   }
 
   async function loadTalendSample() {
@@ -283,6 +291,7 @@ export default function App() {
               onTalendSample={loadTalendSample}
               onCrystalSample={loadCrystalSample}
               crystalSamples={crystalSamples}
+              infaSamples={infaSamples}
               error={error}
               loading={loading}
               source={results.length === 0 ? source : null}
