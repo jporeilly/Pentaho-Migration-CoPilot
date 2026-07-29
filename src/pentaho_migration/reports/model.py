@@ -233,6 +233,10 @@ class ReportModel:
     sql: str = ""             # command SQL if the report used one, else generated
     sql_generated: bool = False
     jndi: str = "SampleData"
+    # Target SQL dialect for the few places a formula must become a query
+    # column (a cross-tab dimension computed in the report). Defaults to the
+    # sample databases' engine; see reports/formula_sql.py.
+    sql_dialect: str = "mysql"
     record_selection: str = ""
     record_selection_folded: bool = False  # True when folded into the SQL WHERE
     # Keyed by the table's ALIAS - the name every field reference, formula

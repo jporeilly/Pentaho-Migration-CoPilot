@@ -105,46 +105,87 @@ class TestGeneratedOrderByDropsUnresolvableTerms:
                    for i in model.issues)
 
 
-class TestTheCrosstabDimensionFormulaIsHonest:
-    """The cross-tab pivots its columns on that same formula. It cannot come
-    out of the query, so the column axis has nothing to spread over and the
-    body is empty. That is a real manual step - and it must SAY so, not ship
-    a report that renders blank and looks converted.
+class TestFormulaToSql:
+    """The narrow Crystal-formula -> SQL translation. Only the date-from-parts
+    family, because that is what cross-tab dimensions use and a wrong guess
+    ships a query that RUNS and returns the wrong columns."""
 
-    Pinned against the real report: the CrossTabObject XML shape is what
-    made this fragile in the first place, so a synthetic fixture would be
-    testing my guess at it rather than the parser."""
+    from pentaho_migration.reports import formula_sql
+
+    TABLES = {"variance_xtab": {"Year": "NumberField", "Month": "NumberField"}}
+
+    def test_cdate_from_parts_becomes_a_mysql_date(self):
+        out = self.formula_sql.formula_to_sql(
+            "cdate({variance_xtab.Year}, {variance_xtab.Month}, 1)",
+            self.TABLES)
+        assert out == ("STR_TO_DATE(CONCAT_WS('-', variance_xtab.Year, "
+                       "variance_xtab.Month, 1), '%Y-%c-%e')")
+
+    def test_fields_are_qualified_by_their_owning_table(self):
+        out = self.formula_sql.formula_to_sql(
+            "date({variance_xtab.Year}, {variance_xtab.Month}, 1)",
+            self.TABLES)
+        assert "variance_xtab.Year" in out and "variance_xtab.Month" in out
+
+    def test_a_single_argument_parse_is_not_a_construction(self):
+        # CDate("2016-01") parses a string - not the 3-arg from-parts form
+        assert self.formula_sql.formula_to_sql(
+            "cdate({variance_xtab.Year})", self.TABLES) is None
+
+    def test_a_formula_outside_the_family_returns_none(self):
+        assert self.formula_sql.formula_to_sql(
+            "left({x}, 3)", self.TABLES) is None
+
+    def test_an_unknown_dialect_returns_none(self):
+        # never a silent wrong guess for a database we cannot write for
+        assert self.formula_sql.formula_to_sql(
+            "cdate({variance_xtab.Year}, {variance_xtab.Month}, 1)",
+            self.TABLES, dialect="oracle") is None
+
+
+class TestTheCrosstabDimensionBecomesASqlColumn:
+    """A cross-tab pivots over query columns, so a dimension computed in the
+    report (the BOE family's {@date} = cdate(Year, Month, 1)) must become a
+    real column or the body renders empty. The whole point of #63: compute
+    it in the sub-report's SQL so the pivot has something to spread over.
+
+    Pinned against the real report - the CrossTabObject shape is what made
+    this fragile, so a synthetic fixture would test my guess at it, not the
+    parser."""
 
     REPORT = (Path(__file__).resolve().parents[1] / "samples" / "crystal" /
               "corpus" / "ComparativeIncomeStatement.xml")
 
-    def _convert(self, tmp_path):
+    def _sub_sql(self, tmp_path):
+        import zipfile
         model = load_report_model(self.REPORT)
         write_prpt(model, tmp_path / "r.prpt")
-        return model
-
-    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
-    def test_it_is_flagged_as_manual_work(self, tmp_path):
-        model = self._convert(tmp_path)
-        hits = [i for i in model.issues
-                if "pivots on the formula" in i and "date" in i]
-        assert hits, "a crosstab pivoting on a formula must be flagged"
-        assert "MANUAL" in hits[0]
-
-    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
-    def test_the_note_names_the_crystal_formula_and_a_recipe(self, tmp_path):
-        model = self._convert(tmp_path)
-        note = next(i for i in model.issues if "pivots on the formula" in i)
-        assert "cdate(" in note              # the actual Crystal source
-        assert "SELECT" in note              # what to do about it
-
-    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
-    def test_the_child_query_does_not_order_by_the_formula(self, tmp_path):
-        """The sub-report's own SQL must not carry the term that fails the
-        render - that was the 'Unknown column date in order clause' crash."""
-        import zipfile
-        self._convert(tmp_path)
         sub = zipfile.ZipFile(tmp_path / "r.prpt").read(
             "subreport/datasources/sql-ds.xml").decode()
-        order = sub.split("ORDER BY")[-1] if "ORDER BY" in sub else ""
-        assert "date" not in order
+        # the XML-escaped SQL, unescaped enough for substring checks
+        sql = sub.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+        return model, sql
+
+    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
+    def test_the_formula_dimension_is_selected_as_a_column(self, tmp_path):
+        _model, sql = self._sub_sql(tmp_path)
+        assert "STR_TO_DATE(" in sql
+        assert "AS `date`" in sql             # aliased to the dimension name
+
+    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
+    def test_the_crosstab_sorts_by_the_computed_expression(self, tmp_path):
+        """PRD cross-tabs need rows pre-sorted by their dimensions, and the
+        query cannot order by a bare name the database lacks - so it orders
+        by the expression itself, which is what fixed the render."""
+        _model, sql = self._sub_sql(tmp_path)
+        order = sql.split("ORDER BY")[-1]
+        assert "STR_TO_DATE(" in order
+
+    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
+    def test_the_dialect_assumption_is_flagged_for_review(self, tmp_path):
+        model, _sql = self._sub_sql(tmp_path)
+        note = next((i for i in model.issues
+                     if "is computed in the sub-report" in i), None)
+        assert note is not None
+        assert "mysql" in note                # names the dialect assumed
+        assert "cdate(" in note               # and the Crystal source

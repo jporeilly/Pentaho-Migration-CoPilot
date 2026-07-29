@@ -485,38 +485,58 @@ def _crosstab_child_model(model, el):
         return next((f"{t}.{column}" for t, fs in model.tables.items()
                      if column in fs), None)
 
-    dims = el.crosstab_rows + el.crosstab_columns
-    resolved = [(c, _order_expr(c)) for c in dims]
-    usable = [expr for _c, expr in resolved if expr]
     # A dimension can be a FORMULA rather than a stored column - the whole BOE
     # income-statement family pivots its columns on {@date}, a date built from
-    # the Year and Month columns. Two things follow, and the honesty contract
-    # means saying both rather than rendering something that looks converted:
+    # the Year and Month columns. The cross-tab pivots over query columns, so
+    # unless that value is IN the result set the column axis has nothing to
+    # spread over and the body renders empty; and the query cannot ORDER BY a
+    # name the database lacks without failing the entire render ("Unknown
+    # column 'date' in 'order clause'").
     #
-    #   - the query cannot ORDER BY a name the database does not have, and
-    #     doing so fails the ENTIRE render ("Unknown column 'date' in 'order
-    #     clause'") - so it is left out here;
-    #   - the crosstab pivots its columns on that same value, so WITHOUT it
-    #     in the result set the column axis has nothing to spread over and
-    #     the body comes out empty.
-    #
-    # The fix is one computed column, but its SQL is database-specific (MySQL
-    # STR_TO_DATE vs others), so emitting it silently would ship a query that
-    # only runs on one engine. It is called out as manual work with the recipe
-    # instead - a deterministic wrong guess is worse than an honest TODO.
-    dropped = [c for c, expr in resolved
-               if not expr and c in model.formulas]
-    for c in dropped:
-        model.issues.append(
-            f"cross-tab '{child.name}' pivots on the formula {{@{c}}} "
-            f"(Crystal: {model.formulas[c].text}), which is computed in the "
-            "report rather than selected. PRD cross-tabs pivot over query "
-            "columns, so the column axis stays empty until this is a real "
-            f"column: add it to the sub-report's SELECT as a database "
-            f"expression aliased `{c}` (e.g. MySQL STR_TO_DATE over the "
-            "underlying fields), then it also sorts. "
-            "MANUAL: cross-tab computed dimension")
+    # So a formula dimension is COMPUTED in the query where its SQL is known -
+    # `<expr> AS date` in the SELECT, ordered by the same expression. That is
+    # database-specific, so it carries a review note about the dialect it
+    # assumes; a formula outside the translatable family stays an honest
+    # manual TODO rather than a wrong guess.
+    from pentaho_migration.reports.formula_sql import formula_to_sql
+
+    dialect = getattr(model, "sql_dialect", "mysql")
+    dims = el.crosstab_rows + el.crosstab_columns
+    usable, computed = [], []
+    for c in dims:
+        expr = _order_expr(c)
+        if expr:
+            usable.append(expr)
+            continue
+        if not (model.sql_generated and c in model.formulas):
+            continue
+        sql_expr = formula_to_sql(model.formulas[c].text, model.tables, dialect)
+        if sql_expr:
+            computed.append((c, sql_expr))
+            usable.append(sql_expr)          # order by the expression itself
+            model.issues.append(
+                f"cross-tab '{child.name}' column {{@{c}}} "
+                f"(Crystal: {model.formulas[c].text}) is computed in the "
+                f"sub-report's query as a {dialect} expression "
+                f"({sql_expr}) - verify it if the datasource is not "
+                f"{dialect}")
+        else:
+            model.issues.append(
+                f"cross-tab '{child.name}' pivots on the formula {{@{c}}} "
+                f"(Crystal: {model.formulas[c].text}), which is computed in "
+                "the report rather than selected. PRD cross-tabs pivot over "
+                "query columns, so the column axis stays empty until this is "
+                f"a real column: add it to the sub-report's SELECT aliased "
+                f"`{c}`, then it also sorts. "
+                "MANUAL: cross-tab computed dimension")
+
     base = re.sub(r"\s+ORDER\s+BY\b.*$", "", child.sql, flags=re.I | re.S)
+    if computed:
+        # inject the computed columns into the SELECT list, before FROM. The
+        # alias is quoted because a dimension name like `date` is reserved.
+        cols = ",\n  ".join(f"{expr} AS `{alias}`" for alias, expr in computed)
+        base = re.sub(r"\n(FROM\b)", f",\n  {cols}\n\\1", base,
+                      count=1, flags=re.I)
     child.sql = base + ("\nORDER BY " + ", ".join(usable) if usable else "")
     return child
 
