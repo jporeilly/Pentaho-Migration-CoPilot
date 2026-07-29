@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import ThemeSelect from './ThemeSelect.jsx'
+import DatabaseDriversCard from './DatabaseDriversCard.jsx'
 
 // Mirrors CLOUD_PROVIDERS in llm/translate.py (labels + env var + model hint).
 const CLOUD_PROVIDERS = {
@@ -250,6 +251,8 @@ export default function SettingsPage({ onBack }) {
           {saved && <span className="ok">✓ saved</span>}
         </div>
       </section>
+
+      <DatabaseDriversCard />
 
       <section className="card">
         <h2>Appearance</h2>

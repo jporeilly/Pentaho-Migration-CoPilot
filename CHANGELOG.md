@@ -9,6 +9,15 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Settings › Database drivers.** A converted report reaches a live database
+  only if Report Designer has the JDBC driver and a JNDI connection wired to
+  it — both invisible until something fails. Settings now lists the installed
+  drivers (recognised by jar, with the database named) and the JNDI
+  connections; selecting one loads its details into a form, and **Save & use**
+  writes it to the simple-jndi config PRD reads. The mainstream drivers ship
+  installed: Oracle, MySQL, SQL Server, PostgreSQL, MariaDB, IBM DB2 (and
+  HSQLDB), each downloaded from Maven Central and SHA-1-verified.
+
 ## [1.41.0] - 2026-07-29
 
 - **A Crystal gauge converts to a working chart, not a red TODO.** PRD has no

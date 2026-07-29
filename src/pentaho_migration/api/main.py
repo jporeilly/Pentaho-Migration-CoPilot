@@ -580,6 +580,15 @@ def pull_status() -> dict[str, str]:
     return _pull_state
 
 
+@app.get("/settings/db-drivers")
+def db_drivers() -> dict:
+    """JDBC drivers installed in Report Designer and the JNDI datasources
+    wired on this machine - what databases a converted report can reach."""
+    from pentaho_migration.reports.db_drivers import scan_db_drivers
+
+    return scan_db_drivers()
+
+
 def _parse_upload(data: bytes, filename: str | None = None) -> tuple[list[Pipeline], SourceInfo]:
     if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(
