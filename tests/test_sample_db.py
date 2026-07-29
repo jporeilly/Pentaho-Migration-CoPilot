@@ -172,6 +172,82 @@ class TestTheGapsSurvive:
         assert "CUSTOMER / Customer" in md
 
 
+LINKED = CUSTOMER_AND_ORDERS.replace(
+    "<Database><Tables>",
+    """<Database><TableLinks><TableLink JoinType="Equal">
+        <SourceFields><Field FormulaName="{CUSTOMER.CUSTOMER_ID}"
+                             Name="CUSTOMER_ID"/></SourceFields>
+        <DestinationFields><Field FormulaName="{ORDERS.CUSTOMER_ID}"
+                             Name="CUSTOMER_ID"/></DestinationFields>
+      </TableLink></TableLinks><Tables>""")
+
+
+class TestAJoinWithNoKeySaved:
+    """A report that prints a customer's name and its order amounts does
+    not select CUSTOMER_ID, so Crystal never saved it. The tables then load
+    perfectly and join to NOTHING - the generated SELECT runs and returns
+    zero rows, which reads as a broken conversion when it is thin data.
+
+    Every saved row is one line of a joined result set, so the
+    relationship is present even when the key is not."""
+
+    def _built(self, tmp_path, columns, rows):
+        dump = _dump(tmp_path, "r", LINKED)
+        (tmp_path / "r.rpt").write_bytes(b"stub")
+        tables = sample_db.collect_schema([dump])
+        sample_db.collect_rows([dump], tables,
+                               _loader({"r": _Saved(columns, rows)}),
+                               links=sample_db.collect_links([dump]))
+        return tables
+
+    def test_the_declared_join_is_read_from_the_dump(self, tmp_path):
+        links = sample_db.collect_links([_dump(tmp_path, "r", LINKED)])
+        assert links == {(("CUSTOMER", "CUSTOMER_ID"),
+                          ("ORDERS", "CUSTOMER_ID"))}
+
+    def test_orders_key_to_the_customer_they_arrived_with(self, tmp_path):
+        tables = self._built(
+            tmp_path,
+            [("CUSTOMER_NAME", "StringField"), ("ORDER_AMOUNT", "NumberField")],
+            [["Crazy Wheels", 10.0], ["Crazy Wheels", 20.0],
+             ["Alley Cat", 30.0]])
+        by_name = {r["CUSTOMER_NAME"]: r["CUSTOMER_ID"]
+                   for r in tables["CUSTOMER"].rows}
+        assert len(by_name) == 2 and len(set(by_name.values())) == 2
+        for row in tables["ORDERS"].rows:
+            expected = by_name["Crazy Wheels"] if row["ORDER_AMOUNT"] < 30 \
+                else by_name["Alley Cat"]
+            assert row["CUSTOMER_ID"] == expected
+
+    def test_a_row_carrying_only_one_side_keys_nothing(self, tmp_path):
+        """No order arrived on this line, so there is no relationship to
+        record - assigning a key here would be inventing one."""
+        tables = self._built(
+            tmp_path, [("CUSTOMER_NAME", "StringField")], [["Crazy Wheels"]])
+        assert tables["CUSTOMER"].rows == [{"CUSTOMER_NAME": "Crazy Wheels"}]
+        assert not tables["CUSTOMER"].columns["CUSTOMER_ID"].synthesized
+
+    def test_a_real_key_is_never_overwritten(self, tmp_path):
+        """When the report DID select the key, that is the customer's own
+        identifier and always wins over anything assigned here."""
+        tables = self._built(
+            tmp_path,
+            [("CUSTOMER_ID", "Int32sField"), ("ORDER_AMOUNT", "NumberField")],
+            [[4071, 10.0]])
+        assert tables["CUSTOMER"].rows == [{"CUSTOMER_ID": 4071}]
+        assert not tables["CUSTOMER"].columns["CUSTOMER_ID"].synthesized
+
+    def test_the_manifest_refuses_to_let_the_numbers_pass_as_real(self, tmp_path):
+        tables = self._built(
+            tmp_path,
+            [("CUSTOMER_NAME", "StringField"), ("ORDER_AMOUNT", "NumberField")],
+            [["Crazy Wheels", 10.0]])
+        md = sample_db.manifest(tables, [])
+        assert "Join keys that were synthesized" in md
+        assert "`CUSTOMER`.`CUSTOMER_ID`" in md
+        assert "NOT the" in md and "The NUMBER is not real." in md
+
+
 class TestLiteralsSurviveTheRoundTrip:
     def test_a_quote_in_a_customer_name_does_not_break_the_insert(self):
         assert sample_db._literal("O'Brien Cycles", "mysql") \

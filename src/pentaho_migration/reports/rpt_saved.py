@@ -59,6 +59,12 @@ def _jdn_to_date(serial: int) -> date:
     return date(1970, 1, 1) + timedelta(days=serial - _JDN_EPOCH)
 
 
+# How much of a string must carry the swapped-Latin signature before the
+# repair runs. Genuine CJK scores near zero here, a swapped Latin string
+# near one, so anything in the middle would be a coincidence either way.
+_SWAP_SHARE = 0.6
+
+
 def _repair_byteswapped_utf16(text: str) -> str:
     """Undo a UTF-16 byte-order mix-up in a recovered string.
 
@@ -67,10 +73,30 @@ def _repair_byteswapped_utf16(text: str) -> str:
     characters whose low byte is always zero (M = 0x4D reads as U+4D00).
     That signature is what makes the repair safe to apply automatically -
     genuine CJK text has non-zero low bytes almost immediately, so it is
-    never mistaken for a swapped Latin string."""
-    if not text or not all(ord(c) > 0xFF and not ord(c) & 0xFF for c in text):
+    never mistaken for a swapped Latin string.
+
+    The signature is a MAJORITY test, not a unanimous one, and the repair
+    swaps bytes rather than shifting them. Requiring every character to
+    carry a zero low byte meant one non-Latin character defeated the whole
+    string: "Provence-Alpes-Cote d'Azur" with a typographic apostrophe
+    (U+2019 swaps to U+1920, low byte 0x20) stayed mojibake, and shifting
+    right by 8 would have dropped that apostrophe even if it had run. Any
+    string carrying a curly quote, an em-dash or a euro sign hit this."""
+    if not text:
         return text
-    return "".join(chr(ord(c) >> 8) for c in text)
+    looks_swapped = sum(1 for c in text if ord(c) > 0xFF and not ord(c) & 0xFF)
+    if looks_swapped < len(text) * _SWAP_SHARE:
+        return text
+    try:
+        repaired = text.encode("utf-16-be", "surrogatepass").decode("utf-16-le")
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        return text
+    # A swap that did not produce ordinary text was not the right reading -
+    # genuine CJK put through this comes out as noise, and returning noise
+    # would be worse than returning what was stored.
+    if sum(1 for c in repaired if ord(c) < 0x0500) < len(repaired) * _SWAP_SHARE:
+        return text
+    return repaired
 
 
 def _convert_cell(raw: str | None, value_type: str):

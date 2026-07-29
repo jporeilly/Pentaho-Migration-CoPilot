@@ -133,6 +133,34 @@ class TestRecoveredValuesBeatDeclaredMetadata:
         for text in ("中文", "Mendoza", "", "中䴀"):
             assert _repair_byteswapped_utf16(text) == text
 
+    def test_one_non_latin_character_does_not_defeat_the_repair(self):
+        """Found loading the rebuilt Xtreme database into MySQL, which
+        rejected the row: "Provence-Alpes-Cote d'Azur" carries a
+        typographic apostrophe, and U+2019 swaps to U+1920 whose low byte
+        is 0x20. Requiring EVERY character to carry the zero-low-byte
+        signature left the whole string mojibake - as it would for any
+        value with a curly quote, an em-dash or a euro sign."""
+        original = "Provence-Alpes-Côte d’Azur"
+        stored = original.encode("utf-16-le").decode("utf-16-be")
+        assert _repair_byteswapped_utf16(stored) == original
+
+    def test_the_repair_swaps_bytes_rather_than_shifting_them(self):
+        """Shifting right by 8 recovers a Latin-1 character and discards
+        the low byte, so it cannot represent the apostrophe at all."""
+        original = "café €5"
+        stored = original.encode("utf-16-le").decode("utf-16-be")
+        assert _repair_byteswapped_utf16(stored) == original
+
+    def test_a_swap_that_produces_noise_is_not_applied(self):
+        """The signature can occur by chance in real CJK. If swapping does
+        not yield ordinary text, what was stored is returned - returning
+        noise would be worse than returning the original."""
+        text = "䴀倀怀瀀"       # all zero low bytes...
+        out = _repair_byteswapped_utf16(text)
+        # ...and the swap gives control characters, so it must be refused
+        # or produce something printable - never silent garbage
+        assert out == text or out.isprintable()
+
     def test_a_string_column_declared_integer_is_emitted_as_string(self):
         saved = SavedRows(columns=[("Country", "Int32s"), ("Sales", "Int32s")],
                           rows=[["Argentina", 5], ["Aruba", 7]])

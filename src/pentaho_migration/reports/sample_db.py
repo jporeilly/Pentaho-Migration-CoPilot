@@ -66,6 +66,15 @@ class Column:
     value_type: str = "StringField"
     length: int = 0
     populated: bool = False   # did any saved result set carry this column?
+    # The longest value actually recovered. Crystal's declared length is a
+    # starting point, not the truth: it is a byte count for UTF-16 on some
+    # builds and the ODBC driver's guess on others, and a server in strict
+    # mode rejects the whole load when a column comes out too narrow
+    # ("Data too long for column 'Region'"). The data is authoritative
+    # about its own width, so it gets the final say.
+    widest: int = 0
+    # Values assigned here rather than recovered - see _apply_links.
+    synthesized: bool = False
 
 
 @dataclass
@@ -121,6 +130,70 @@ def collect_schema(dumps: list) -> dict:
     return tables
 
 
+def collect_links(dumps: list) -> set:
+    """((src table, src column), (dest table, dest column)) for every join
+    the reports declare, from the dumps' own TableLinks."""
+    links = set()
+    for dump in dumps:
+        try:
+            tree = ET.parse(dump)
+        except ET.ParseError:
+            continue
+        for link in tree.iter("TableLink"):
+            ends = []
+            for side in ("SourceFields", "DestinationFields"):
+                holder = link.find(side)
+                field_el = None if holder is None else holder.find("Field")
+                if field_el is None:
+                    break
+                ref = _text(field_el, "FormulaName").strip("{}")
+                if "." not in ref:
+                    break
+                table, col = ref.rsplit(".", 1)
+                ends.append((table.rsplit(".", 1)[-1], col))
+            if len(ends) == 2:
+                links.add((ends[0], ends[1]))
+    return links
+
+
+def _apply_links(links: set, per_table: dict, tables: dict,
+                 surrogates: dict) -> None:
+    """Give a join its key back when the reports never selected one.
+
+    A report that prints a customer's name and its order amounts does not
+    select CUSTOMER_ID, so Crystal never saved it - and the rebuilt tables
+    load perfectly and join to nothing. The generated SELECT runs and
+    returns zero rows, which is the worst possible outcome: it looks like
+    the conversion is wrong when it is the data that is thin.
+
+    The relationship is not missing, though, only the key is. Every saved
+    row IS the join - it says this customer, this order, on one line. So
+    each distinct customer tuple gets a number, and the order rows that
+    arrived on the same line get the same number.
+
+    That preserves a fact the data already carries rather than inventing
+    one: no row is joined to a customer it did not arrive with. The NUMBER
+    is not the customer's real ID and never claims to be - the column is
+    marked synthesized and the manifest says so."""
+    for (src_table, src_col), (dst_table, dst_col) in links:
+        src, dst = per_table.get(src_table), per_table.get(dst_table)
+        if src is None or dst is None:
+            continue
+        if src_col not in tables[src_table].columns:
+            continue
+        if dst_col not in tables[dst_table].columns:
+            continue
+        # a real key came through - always prefer the customer's own data
+        if src.get(src_col) is not None or dst.get(dst_col) is not None:
+            continue
+        identity = tuple(sorted((k, _hashable(v)) for k, v in src.items()))
+        issued = surrogates.setdefault((src_table, src_col), {})
+        value = issued.setdefault(identity, len(issued) + 1)
+        src[src_col] = dst[dst_col] = value
+        tables[src_table].columns[src_col].synthesized = True
+        tables[dst_table].columns[dst_col].synthesized = True
+
+
 def _owners(tables: dict) -> dict:
     """short column name -> the tables that declare it. A name owned by
     several tables is a join key and belongs in all of them."""
@@ -131,13 +204,16 @@ def _owners(tables: dict) -> dict:
     return owners
 
 
-def collect_rows(dumps: list, tables: dict, load_saved_rows) -> list:
+def collect_rows(dumps: list, tables: dict, load_saved_rows,
+                 links: set | None = None) -> list:
     """Fill `tables` from each report's saved rows. Returns per-report notes.
 
     Rows are deduped per table on their full tuple: thirty invoices for one
     customer are thirty ORDERS rows and one CUSTOMER row, which is exactly
     the decomposition a result set needs to survive."""
     owners = _owners(tables)
+    links = links if links is not None else set()
+    surrogates: dict = {}
     seen: dict = defaultdict(set)
     notes = []
     for dump in dumps:
@@ -155,17 +231,27 @@ def collect_rows(dumps: list, tables: dict, load_saved_rows) -> list:
         placed = 0
         for row in saved.rows:
             record = dict(zip(names, row))
+            # every table this row touches is built FIRST, so the join keys
+            # can be filled in before the dedupe decides what a row is
+            per_table = {}
             for table_name in {t for n in names for t in owners.get(n, ())}:
                 table = tables[table_name]
                 cells = {n: v for n, v in record.items() if n in table.columns}
-                if not cells or all(v is None for v in cells.values()):
-                    continue
+                if cells and any(v is not None for v in cells.values()):
+                    per_table[table_name] = cells
+            _apply_links(links, per_table, tables, surrogates)
+            for table_name, cells in per_table.items():
+                table = tables[table_name]
                 key = tuple(sorted((k, _hashable(v)) for k, v in cells.items()))
                 if key in seen[table_name]:
                     continue
                 seen[table_name].add(key)
                 table.rows.append(cells)
                 placed += 1
+                for col_name, value in cells.items():
+                    if isinstance(value, str):
+                        col = table.columns[col_name]
+                        col.widest = max(col.widest, len(value))
         for n in names:
             for table_name in owners.get(n, ()):
                 tables[table_name].columns[n].populated = True
@@ -195,7 +281,13 @@ def _column_type(col: Column, dialect: str) -> str:
         return _DEFAULT_TYPE[dialect]
     if "{n}" not in spec:
         return spec
-    width = max(1, min(col.length // _STRING_DIVISOR or 255, _MAX_VARCHAR))
+    declared = col.length // _STRING_DIVISOR or 255
+    # never narrower than the data: a server in strict mode aborts the whole
+    # load on the first value that does not fit, and a server without it
+    # would truncate a customer's name silently, which is worse
+    width = max(1, min(max(declared, col.widest), _MAX_VARCHAR))
+    if col.widest > _MAX_VARCHAR:
+        return "TEXT"
     return spec.format(n=width)
 
 
@@ -290,6 +382,22 @@ def manifest(tables: dict, notes: list) -> str:
                   "collide and one will be lost - run this on Linux or in the",
                   "container, where table names are case-sensitive.", ""]
         lines += [f"- {' / '.join(sorted(v))}" for v in clashes.values()]
+    made_up = [(n, c.name) for n in sorted(tables)
+               for c in tables[n].columns.values() if c.synthesized]
+    if made_up:
+        lines += ["", "## Join keys that were synthesized", "",
+                  "These columns hold numbers this tool assigned, NOT the",
+                  "customer's own identifiers. The reports never selected",
+                  "them, so Crystal never saved them - and without a key the",
+                  "generated SELECT joins to nothing and returns zero rows,",
+                  "which reads as a broken conversion when it is thin data.",
+                  "",
+                  "The RELATIONSHIP is real: every saved row is one line of a",
+                  "joined result set, so an order is only ever keyed to the",
+                  "customer it actually arrived with. The NUMBER is not real.",
+                  "Do not present these values as the customer's IDs, and do",
+                  "not carry them into anything downstream.", ""]
+        lines += [f"- `{t}`.`{c}`" for t, c in made_up]
     empty = [n for n in sorted(tables) if not tables[n].rows]
     if empty:
         lines += ["", "## Tables created with no rows", "",
@@ -310,7 +418,8 @@ def build(dump_dir: Path, database: str = "xtreme", dialect: str = "mysql",
 
     dumps = _unique_dumps(dump_dir, only)
     tables = collect_schema(dumps)
-    notes = collect_rows(dumps, tables, load_saved_rows)
+    notes = collect_rows(dumps, tables, load_saved_rows,
+                         links=collect_links(dumps))
     return emit_sql(tables, database, dialect), manifest(tables, notes), tables
 
 
