@@ -1048,6 +1048,32 @@ def apply_window_columns(model):
                  + (f"\nORDER BY {order}" if order else ""))
 
 
+def flag_underlay_layout(model):
+    """Crystal's "Underlay Following Sections" cascades a section (often a
+    chart) UNDER every section that follows until content clears its height, so
+    a group-summary table prints BESIDE the chart. PRD reproduces the underlay
+    for the immediately following band only - later group bands stack below it.
+    So a summary whose header sits by the chart can have its rows flow beneath
+    it. Flag it up front (with the fix) rather than leave it to the release
+    gate's after-the-fact visual diff - the converter should name the gap."""
+    has_group_summary = any(
+        s.area_kind in ("GroupFooter", "GroupHeader") and s.group_index >= 0
+        and any(e.kind == "field" for e in s.elements)
+        for s in model.sections)
+    if not has_group_summary:
+        return
+    for s in model.sections:
+        if s.underlay and any(e.kind == "chart" for e in s.elements):
+            model.issues.append(
+                f"Crystal underlays the chart in the {s.area_kind} over the "
+                "sections that follow, so a group-summary table prints beside "
+                "it. PRD reproduces the underlay for the next band only, so the "
+                "summary rows may render BELOW the chart instead of beside it - "
+                "verify placement, or move the summary next to the chart / "
+                "shorten the chart band.")
+            return
+
+
 def _select_output_names(sql):
     """The output column names of a simple generated SELECT, in order:
     'SELECT Customer.Country, Customer.Sales FROM ...' -> ['Country', 'Sales'].

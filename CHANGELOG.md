@@ -29,6 +29,14 @@ deliberately — not one per work session.
   rollup, so the offline demo opens on the top N + Others too — on
   WorldSalesReport the sample buckets to Crystal's exact top 5 (USA, Germany,
   England, Switzerland, Italy) + Others.
+- **Underlay-over-following-sections is flagged up front, not left to the
+  release gate.** Crystal's "Underlay Following Sections" cascades a chart under
+  every section that follows, so a group-summary table prints beside it; PRD
+  only underlays the immediately following band, so the summary rows can flow
+  below the chart. The converter now names this at conversion time — what
+  Crystal did, why PRD differs, and the fix (move the summary beside the chart
+  or shorten the chart band) — rather than relying on the gate's after-the-fact
+  visual diff to notice a moved table.
 - **Consultant report and PDF preview render inline, not in a blank tab.**
   New browser tabs never surface inside embedded webviews, and a `window.open`'d
   tab can't paint a `blob:` URL from its opener — so both opened blank. They now
