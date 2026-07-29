@@ -20,6 +20,7 @@ onto the drop zone:
 | `AdventureWorks-TotalSalesByYear` | "something recent" — 2026 save, zero manual work, a clean bar chart |
 | `ComparativeIncomeStatement` | "something recent, and substantial" — a 2016 SAP income statement whose cross-tab renders a fully populated pivot against `boe_samples` |
 | `WorldSalesReport` | "show me a hard one" — the honesty demo, comes back ⚠ REVIEW with named blockers |
+| `Customer_Profile_Report` | sub-report **and** drill-down in one report (Xtreme, 292 saved rows). Show the nested PRD sub-report and the link filter in the wireframe; it renders in Report Designer, not the headless preview, because the sub-report link is a parameter |
 
 ## Before the audience arrives
 

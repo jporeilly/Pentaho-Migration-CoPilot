@@ -77,6 +77,14 @@ _DEMO_META = {
                        "comes back ⚠ REVIEW with named blockers.",
         "jndi": "BOE_Samples",
     },
+    "Customer_Profile_Report": {
+        "label": "Customer profile — sub-report + drill-down",
+        "description": "Exercises both: a nested PRD sub-report and Crystal "
+                       "drill-down, on Xtreme with 292 saved rows. The "
+                       "sub-report link is a parameter, so it renders in "
+                       "Report Designer rather than the headless preview.",
+        "jndi": "Xtreme",
+    },
 }
 
 
