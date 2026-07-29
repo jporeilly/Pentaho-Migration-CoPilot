@@ -189,3 +189,20 @@ class TestTheCrosstabDimensionBecomesASqlColumn:
         assert note is not None
         assert "mysql" in note                # names the dialect assumed
         assert "cdate(" in note               # and the Crystal source
+
+    @pytest.mark.skipif(not REPORT.is_file(), reason="corpus report absent")
+    def test_the_date_column_header_prints_its_month_not_the_iso_value(self, tmp_path):
+        """The computed date is a real java.sql.Date, so a text-field header
+        prints the raw 2015-01-01. It renders through a date-field formatted
+        MMMM yyyy instead - the month the column stands for, as Crystal shows
+        it. The date is always the first of a month, so the format is exact."""
+        import zipfile
+        model = load_report_model(self.REPORT)
+        write_prpt(model, tmp_path / "r.prpt")
+        layout = zipfile.ZipFile(tmp_path / "r.prpt").read(
+            "subreport/layout.xml").decode()
+        # the date dimension's header is a date-field with a month format...
+        assert 'core:element-type="date-field"' in layout
+        assert 'core:format-string="MMMM yyyy"' in layout
+        # ...while the Type dimension stays a plain text-field
+        assert "text-field" in layout

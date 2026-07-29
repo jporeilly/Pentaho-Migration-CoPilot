@@ -370,14 +370,35 @@ _CT_FULL = ('<style:element-style><style:spatial-styles min-height="100%"/>'
             "</style:element-style>")
 
 
-def _ct_group_headers(column):
+# A crosstab dimension that is a DATE - the BOE family's month/year column,
+# now a real STR_TO_DATE column - renders through a text-field as the raw ISO
+# value (2015-01-01). Crystal prints it as the month it stands for; the
+# computed date is always the first of a month, so "MMMM yyyy" is exact.
+_CT_DATE_FORMAT = "MMMM yyyy"
+
+
+def _ct_header_field(column, col_type=""):
+    """The field that prints a dimension's value in its column/row header.
+
+    A date dimension needs a date-field with a format or it prints the raw
+    timestamp; everything else is a plain text-field, exactly as the engine's
+    own crosstab writer produces."""
+    if col_type in ("DateField", "DateTimeField", "TimeField"):
+        fmt = "yyyy-MM-dd HH:mm" if col_type == "DateTimeField" else _CT_DATE_FORMAT
+        return (f'<date-field core:element-type="date-field" '
+                f"core:format-string={quoteattr(fmt)} "
+                f"core:field={quoteattr(column)}>{_CT_CELL}</date-field>")
+    return f"<text-field core:field={quoteattr(column)}>{_CT_CELL}</text-field>"
+
+
+def _ct_group_headers(column, col_type=""):
     """title-header / header / summary-header triple every crosstab group carries."""
     return (
         f"<crosstab-title-header>{_CT_FULL}"
         f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(column)}>'
         f"{_CT_CELL}<core:value>{escape(column)}</core:value></label></crosstab-title-header>"
         f"<crosstab-header>{_CT_FULL}"
-        f"<text-field core:field={quoteattr(column)}>{_CT_CELL}</text-field></crosstab-header>"
+        f"{_ct_header_field(column, col_type)}</crosstab-header>"
         f"<crosstab-summary-header>{_CT_FULL}"
         f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(column)}>'
         f"{_CT_CELL}<core:value>Summary</core:value></label></crosstab-summary-header>")
@@ -406,26 +427,30 @@ def _ct_cell_body(summaries):
         f"</style:element-style>{fields}</crosstab-cell></crosstab-cell-body>")
 
 
-def _ct_column_chain(columns, summaries):
+def _ct_column_chain(columns, summaries, col_types=None):
+    col_types = col_types or {}
     inner = _ct_cell_body(summaries)
     for column in reversed(columns):
         inner = (
             f'<crosstab-column-group-body><crosstab-column-group '
             f"core:name={quoteattr(column)} core:field={quoteattr(column)} "
             f'crosstab:print-summary="false">'
-            f"<field>{escape(column)}</field>{_ct_group_headers(column)}{inner}"
+            f"<field>{escape(column)}</field>"
+            f"{_ct_group_headers(column, col_types.get(column, ''))}{inner}"
             "</crosstab-column-group></crosstab-column-group-body>")
     return inner
 
 
-def _ct_row_chain(rows, columns, summaries):
-    inner = _ct_column_chain(columns, summaries)
+def _ct_row_chain(rows, columns, summaries, col_types=None):
+    col_types = col_types or {}
+    inner = _ct_column_chain(columns, summaries, col_types)
     for column in reversed(rows):
         inner = (
             f'<crosstab-row-group-body><crosstab-row-group '
             f"core:name={quoteattr(column)} core:field={quoteattr(column)} "
             f'crosstab:print-summary="false">'
-            f"<field>{escape(column)}</field>{_ct_group_headers(column)}{inner}"
+            f"<field>{escape(column)}</field>"
+            f"{_ct_group_headers(column, col_types.get(column, ''))}{inner}"
             "</crosstab-row-group></crosstab-row-group-body>")
     return inner
 
@@ -434,6 +459,11 @@ def build_crosstab_layout_xml(child, el, root_type="sub-report"):
     """layout.xml for a bundle whose ROOT GROUP is the crosstab - PRD pivots
     are a group structure, not a band element, so each Crystal cross-tab
     becomes a nested sub-report carrying this layout."""
+    # dimension name -> Crystal type, so a date dimension's header prints the
+    # month it stands for rather than a raw timestamp. A computed dimension
+    # (the STR_TO_DATE date) records its type on the child in _crosstab_child_model.
+    col_types = {c: child.field_types.get(c, "")
+                 for c in el.crosstab_rows + el.crosstab_columns}
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<layout xmlns="{NS_LAYOUT}" xmlns:style="{NS_STYLE}" xmlns:core="{NS_CORE}" '
@@ -444,7 +474,7 @@ def build_crosstab_layout_xml(child, el, root_type="sub-report"):
         "<crosstab>"
         '<group-header><root-level-content core:element-type="group-header"/></group-header>'
         '<no-data><root-level-content core:element-type="no-data-band"/></no-data>'
-        f"{_ct_row_chain(el.crosstab_rows, el.crosstab_columns, el.crosstab_summaries)}"
+        f"{_ct_row_chain(el.crosstab_rows, el.crosstab_columns, el.crosstab_summaries, col_types)}"
         '<group-footer><root-level-content core:element-type="group-footer"/></group-footer>'
         "</crosstab>"
         '<report-footer><root-level-content core:element-type="report-footer"/></report-footer>'
@@ -514,6 +544,10 @@ def _crosstab_child_model(model, el):
         if sql_expr:
             computed.append((c, sql_expr))
             usable.append(sql_expr)          # order by the expression itself
+            # the computed column is now a real field of the child - record
+            # its type so the crosstab header formats it (a date as its month,
+            # not a raw timestamp) rather than printing it as text
+            child.field_types[c] = model.formulas[c].value_type or "DateField"
             model.issues.append(
                 f"cross-tab '{child.name}' column {{@{c}}} "
                 f"(Crystal: {model.formulas[c].text}) is computed in the "
