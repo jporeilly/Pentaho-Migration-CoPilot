@@ -83,19 +83,29 @@ Then in Report Designer switch the Data tab from the inline table to the
 **`source-sql`** query. That is the original Crystal SQL, and running it is
 the whole point.
 
-### Only Xtreme is wired end to end
+Both `Xtreme` and `BOE_Samples` are wired end to end: each report's generated
+SELECT runs against its schema and returns rows joined correctly.
 
-`--jndi Xtreme` works: the demo statement's generated SELECT runs against the
-`xtreme` schema and returns its rows joined correctly.
+### A note on table names
 
-**`--jndi BOE_Samples` resolves but its reports' SQL will not run.** A BOE
-report emits `FROM "dataroot/Customer_Query", "dataroot/Orders_Query"` while
-the rebuilt schema has `Customer` and `Orders` — `generate_sql` names tables
-from `Table/@Name`, the rebuild from the qualified-name prefix, and the two
-agree for Xtreme but not for XML datasources. The `/` also forces ANSI double
-quotes, which MySQL rejects without `ANSI_QUOTES`, and the query carries no
-join condition. Until that is reconciled, treat `boe_samples` as **data
-only** and do not demo a Data-tab switch on a BOE report.
+A Crystal `<Table>` carries a **Name** and an **Alias**, and the alias is the
+one that matters — every field's `LongName`, every formula and both ends of
+every table link are written against it. Across the corpus 83 tables have an
+alias that differs from the name, and not one qualifies its fields by the
+name. The rebuilt schema and the generated SQL therefore both key on the
+alias, so they cannot disagree about what a table is called.
+
+`Table/@Name` is where the data physically sat: a real table for a database,
+an XPath like `dataroot/Customer_Query` for an XML file. Where it is a usable
+identifier the query declares it (`FROM PV_Customer PV_Customer1`); where it is
+a path there is nothing a database can select from, so the alias stands alone
+and the consultant points it at a real table.
+
+One consequence worth expecting: the same data can appear under two names,
+because reports alias independently — `variance_xtab` in five BOE reports and
+`dataroot_variance_xtab` in a sixth, `CUSTOMER` and `Customer` in Xtreme. All
+are created, because each report's SQL binds to the alias *that report* used.
+The manifest lists them under "The same data under more than one name".
 
 ## Rebuilding and reloading
 

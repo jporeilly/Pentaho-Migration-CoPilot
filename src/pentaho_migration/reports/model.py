@@ -235,7 +235,12 @@ class ReportModel:
     jndi: str = "SampleData"
     record_selection: str = ""
     record_selection_folded: bool = False  # True when folded into the SQL WHERE
-    tables: dict = field(default_factory=dict)       # table name -> {field name -> ValueType}
+    # Keyed by the table's ALIAS - the name every field reference, formula
+    # and table link is written against. See _parse_database.
+    tables: dict = field(default_factory=dict)       # table alias -> {field name -> ValueType}
+    # alias -> where the data physically came from, when it differs: a real
+    # table name for a database, an XPath for an XML file
+    table_sources: dict = field(default_factory=dict)
     field_types: dict = field(default_factory=dict)  # bare column name -> ValueType
     field_formats: dict = field(default_factory=dict)  # bare column -> numeric format ("$#,##0.00")
     sections: list = field(default_factory=list)

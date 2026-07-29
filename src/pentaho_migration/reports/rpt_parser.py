@@ -434,9 +434,36 @@ def _normalize_value_type(raw: str) -> str:
     return value or "StringField"
 
 
+def _decode_name(raw: str) -> str:
+    """Undo the XML name-escape convention Crystal uses for characters that
+    are illegal in an identifier: `_x0020_` is a space, `_x005F_` an
+    underscore. Left encoded, the same table arrives under two spellings -
+    `variance_xtab` and `variance_x005F_xtab` - and joins between them
+    silently fail to resolve."""
+    return re.sub(r"_x([0-9A-Fa-f]{4})_",
+                  lambda m: chr(int(m.group(1), 16)), raw or "")
+
+
 def _parse_database(root, model):
     for table in root.iter("Table"):
-        tname = _attr(table, "Name", "Alias", default="TABLE")
+        # The ALIAS is the report's name for the table, and the only one
+        # anything else uses: every Field LongName, every FormulaForm and
+        # both ends of every TableLink are written against it. Across the
+        # corpus 83 tables have an alias that differs from the name and
+        # NOT ONE of them qualifies its fields by the name.
+        #
+        # Keying by Name broke exactly that: an XML datasource names its
+        # table `dataroot/Customer_Query` while its links say
+        # `{Customer.Customer_ID}`, so no link matched a table, the join
+        # was silently dropped, and the generated SELECT became a
+        # cartesian product with a path where a table name should be.
+        tname = _decode_name(_attr(table, "Alias", "Name", default="TABLE"))
+        # Where the data physically came from. A real table name for a
+        # database, an XPath for an XML file - which is why it can only be
+        # emitted into SQL when it looks like an identifier.
+        source = _decode_name(_attr(table, "Name", "Alias", default=""))
+        if source and source != tname:
+            model.table_sources[tname] = source
         fields = {}
         for f in table.iter("Field"):
             fname = _attr(f, "Name", "ShortName", default="")
@@ -462,7 +489,8 @@ def _parse_database(root, model):
         if "." in s and "." in d:
             st, sc = s.rsplit(".", 1)
             dt, dc = d.rsplit(".", 1)
-            model.table_links.append(((st, sc), (dt, dc)))
+            model.table_links.append(((_decode_name(st), sc),
+                                      (_decode_name(dt), dc)))
 
 
 def _parse_data_definition(root, model):
@@ -1374,7 +1402,21 @@ def generate_sql(model):
     if not used:
         used = ["*"]
 
-    # FROM clause: honor the Database Expert's visual links as JOIN ... ON
+    # FROM clause: honor the Database Expert's visual links as JOIN ... ON.
+    # Tables are named by their alias throughout, because that is what every
+    # column reference above is qualified with. Where the report also
+    # records a different physical source, it is declared once here as
+    # `SOURCE alias` so the query still reads against the real table.
+    def _from_item(alias):
+        source = model.table_sources.get(alias, "")
+        # An XML datasource's "table" is an XPath (`dataroot/Customer_Query`),
+        # not something a database can select from. Only a plain identifier
+        # is worth emitting; anything else leaves the alias standing alone
+        # for the consultant to point at a real table.
+        if source and re.fullmatch(r"[A-Za-z_][\w$]*", source):
+            return f"{qualify_ident(source)} {qualify_ident(alias)}"
+        return qualify_ident(alias)
+
     table_names = list(model.tables) or ["TABLE"]
     if model.table_links and len(table_names) > 1:
         placed = [table_names[0]]
@@ -1385,12 +1427,12 @@ def generate_sql(model):
             for link in list(remaining_links):
                 (st, sc), (dt, dc) = link
                 if st in placed and dt not in placed and dt in table_names:
-                    joins.append(f"JOIN {qualify_ident(dt)} ON "
+                    joins.append(f"JOIN {_from_item(dt)} ON "
                                  f"{qualify_ident(st, sc)} = "
                                  f"{qualify_ident(dt, dc)}")
                     placed.append(dt)
                 elif dt in placed and st not in placed and st in table_names:
-                    joins.append(f"JOIN {qualify_ident(st)} ON "
+                    joins.append(f"JOIN {_from_item(st)} ON "
                                  f"{qualify_ident(dt, dc)} = "
                                  f"{qualify_ident(st, sc)}")
                     placed.append(st)
@@ -1398,13 +1440,13 @@ def generate_sql(model):
                     continue
                 remaining_links.remove(link)
                 progress = True
-        leftovers = [qualify_ident(t) for t in table_names if t not in placed]
-        from_clause = (qualify_ident(placed[0])
+        leftovers = [_from_item(t) for t in table_names if t not in placed]
+        from_clause = (_from_item(placed[0])
                        + ("\n" + "\n".join(joins) if joins else ""))
         if leftovers:
             from_clause = ", ".join([from_clause] + leftovers)
     else:
-        from_clause = ", ".join(qualify_ident(t) for t in table_names)
+        from_clause = ", ".join(_from_item(t) for t in table_names)
     sql = "SELECT\n  " + ",\n  ".join(used) + f"\nFROM {from_clause}"
 
     # PRD relational groups need pre-sorted data: order by the group columns

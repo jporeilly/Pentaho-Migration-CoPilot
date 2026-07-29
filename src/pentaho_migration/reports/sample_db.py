@@ -83,10 +83,24 @@ class Table:
     columns: dict = field(default_factory=dict)     # name -> Column
     rows: list = field(default_factory=list)        # [dict]
     sources: set = field(default_factory=set)       # reports it came from
+    # Where the data physically came from (Table/@Name). Two aliases over
+    # one source are the same data under two names - see manifest().
+    origins: set = field(default_factory=set)
 
 
 def _text(el, attr: str) -> str:
     return (el.get(attr) or "").strip()
+
+
+def _decode_name(raw: str) -> str:
+    """The parser's identifier decode, reused rather than reimplemented.
+
+    Both sides have to agree on what a table is called or the rebuilt
+    database and the generated SELECT bind to different names - which is
+    exactly what shipped: `variance_xtab` in the query, both that and
+    `variance_x005F_xtab` in the database."""
+    from pentaho_migration.reports.rpt_parser import _decode_name as decode
+    return decode(raw)
 
 
 def collect_schema(dumps: list) -> dict:
@@ -111,8 +125,14 @@ def collect_schema(dumps: list) -> dict:
                 # a schema-qualified name keeps only its last part: the
                 # database being rebuilt has one schema
                 owner = owner.rsplit(".", 1)[-1]
+                # the same decode the parser applies, or the generated SQL
+                # and this schema disagree about what a table is called
+                owner = _decode_name(owner)
                 table = tables.setdefault(owner, Table(owner))
                 table.sources.add(dump.stem)
+                origin = _decode_name(_text(tbl, "Name"))
+                if origin and origin != owner:
+                    table.origins.add(origin)
                 col = table.columns.get(short)
                 if col is None:
                     col = table.columns[short] = Column(short)
@@ -150,7 +170,7 @@ def collect_links(dumps: list) -> set:
                 if "." not in ref:
                     break
                 table, col = ref.rsplit(".", 1)
-                ends.append((table.rsplit(".", 1)[-1], col))
+                ends.append((_decode_name(table.rsplit(".", 1)[-1]), col))
             if len(ends) == 2:
                 links.add((ends[0], ends[1]))
     return links
@@ -363,25 +383,31 @@ def manifest(tables: dict, notes: list) -> str:
         filled = sum(1 for c in t.columns.values() if c.populated)
         lines.append(f"| `{name}` | {len(t.columns)} | {filled} | "
                      f"{len(t.rows)} | {', '.join(sorted(t.sources)[:3])} |")
-    # The same logical table often appears twice because the corpus was
-    # harvested from several Crystal front ends: the Derby build of Xtreme
-    # calls it CUSTOMER.CUSTOMER_NAME, the Access build Customer."Customer
-    # Name". Both are kept - each report binds to the one it names - but a
-    # consultant has to know, and on a case-insensitive server they collide.
-    clashes = defaultdict(list)
-    for name in tables:
-        clashes[name.lower()].append(name)
-    clashes = {k: v for k, v in clashes.items() if len(v) > 1}
-    if clashes:
-        lines += ["", "## Tables that differ only by case", "",
-                  "The corpus was harvested from more than one Crystal front",
-                  "end, so the same logical table arrives under two spellings",
-                  "with different column naming. Both are created, and each",
-                  "report binds to the one it names. On a case-insensitive",
-                  "server (MySQL on Windows, `lower_case_table_names=1`) they",
-                  "collide and one will be lost - run this on Linux or in the",
-                  "container, where table names are case-sensitive.", ""]
-        lines += [f"- {' / '.join(sorted(v))}" for v in clashes.values()]
+    # The same data can arrive under two names: reports alias tables
+    # independently, and the corpus was harvested from several Crystal front
+    # ends. Both are kept - each report's SQL binds to the alias IT used, so
+    # dropping either would break a report - but a consultant has to know
+    # they are looking at one table twice.
+    twins = defaultdict(list)
+    for name, t in tables.items():
+        twins[name.lower()].append(name)         # differ only by case
+        for origin in t.origins:
+            twins[f"origin:{origin.lower()}"].append(name)
+    twins = {k: sorted(set(v)) for k, v in twins.items() if len(set(v)) > 1}
+    if twins:
+        lines += ["", "## The same data under more than one name", "",
+                  "Reports alias their tables independently, so one physical",
+                  "source can arrive under two names - and the corpus was",
+                  "harvested from several Crystal front ends, which also name",
+                  "columns differently (`CUSTOMER_NAME` vs `Customer Name`).",
+                  "Every one is created, because each report's generated SQL",
+                  "binds to the alias that report used and dropping either",
+                  "would break a report.", "",
+                  "Where these differ only by case, a case-insensitive server",
+                  "(MySQL with `lower_case_table_names=1`) merges them and one",
+                  "is lost - run on Linux or in the container.", ""]
+        lines += [f"- {' / '.join(v)}" for v in
+                  sorted(twins.values(), key=lambda v: v[0])]
     made_up = [(n, c.name) for n in sorted(tables)
                for c in tables[n].columns.values() if c.synthesized]
     if made_up:
