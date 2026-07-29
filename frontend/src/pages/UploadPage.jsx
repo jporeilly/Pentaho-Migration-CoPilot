@@ -1,5 +1,40 @@
+import { useState } from 'react'
 import DropZone from '../components/DropZone.jsx'
 import SourceCard from '../components/SourceCard.jsx'
+
+// "Try Crystal Reports" opens a menu of the demo reports rather than loading
+// one fixed sample. With nothing to pick from it stays a plain button.
+function CrystalSamplePicker({ samples, onPick }) {
+  const [open, setOpen] = useState(false)
+  if (!samples || samples.length <= 1) {
+    return <button className="ghost" onClick={() => onPick(samples?.[0])}>Try Crystal Reports</button>
+  }
+  return (
+    <span className="sample-picker">
+      <button className="ghost" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        Try Crystal Reports ▾
+      </button>
+      {open && (
+        <>
+          <div className="sample-picker-backdrop" onClick={() => setOpen(false)} />
+          <div className="sample-menu" role="menu">
+            {samples.map((s) => (
+              <button
+                key={s.name}
+                className="sample-menu-item"
+                role="menuitem"
+                onClick={() => { setOpen(false); onPick(s) }}
+              >
+                <span className="sample-menu-label">{s.label}</span>
+                {s.description && <span className="sample-menu-desc">{s.description}</span>}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </span>
+  )
+}
 
 // Generic stages shown when no file is loaded; once a file is selected the
 // stages reflect its family (driven by the `family` prop, not a toggle).
@@ -30,7 +65,7 @@ const PHASES = [
   { name: 'Phase 2 — Multi-source', text: 'Informatica, Crystal Reports and Talend complete; DataStage next.' },
 ]
 
-export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, error, loading, source, onShowPractices, family }) {
+export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, error, loading, source, onShowPractices, family }) {
   const stages = family === 'reports' ? REPORTS : family === 'etl' ? ETL : GENERIC
 
   return (
@@ -51,7 +86,7 @@ export default function UploadPage({ onFile, onSample, onTalendSample, onCrystal
             <button className="ghost" onClick={onTalendSample}>Try Talend</button>
           )}
           {onCrystalSample && (
-            <button className="ghost" onClick={onCrystalSample}>Try Crystal Reports</button>
+            <CrystalSamplePicker samples={crystalSamples} onPick={onCrystalSample} />
           )}
         </span>
       </div>

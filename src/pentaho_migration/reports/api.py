@@ -43,8 +43,70 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 # densest report in the corpus is a drill-down report, and drill-down has no
 # PRD equivalent, so it arrives with a page of TODOs. True, and a bad opening.
 SAMPLE_NAME = "Statement_of_Account.xml"
-SAMPLE_FILE = REPO_ROOT / "samples" / "crystal" / "demo" / SAMPLE_NAME
+DEMO_DIR = REPO_ROOT / "samples" / "crystal" / "demo"
+SAMPLE_FILE = DEMO_DIR / SAMPLE_NAME
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+
+# The reports the "Try Crystal Reports" picker offers, in demo order. `jndi`
+# is the datasource each one's generated SQL binds to. A dump in the demo
+# folder without an entry here still appears, labelled by its stem and bound
+# to the default datasource - the list is the folder, not this table.
+_DEMO_META = {
+    "Statement_of_Account": {
+        "label": "Account statement",
+        "description": "Letterhead, watermark, scanned signature, 74 pages of "
+                       "saved data — the main flow.",
+        "jndi": "Xtreme",
+    },
+    "AdventureWorks-TotalSalesByYear": {
+        "label": "AdventureWorks — total sales by year",
+        "description": "Saved 2026, converts with zero manual work, a clean "
+                       "bar chart. Renders from its own embedded data.",
+        "jndi": "AdventureWorks",
+    },
+    "ComparativeIncomeStatement": {
+        "label": "Comparative income statement",
+        "description": "A 2016 SAP income statement whose cross-tab renders a "
+                       "populated pivot against boe_samples — start that "
+                       "MySQL database first.",
+        "jndi": "BOE_Samples",
+    },
+    "WorldSalesReport": {
+        "label": "World sales report",
+        "description": "The honesty demo — a drill-down / Top-N design that "
+                       "comes back ⚠ REVIEW with named blockers.",
+        "jndi": "BOE_Samples",
+    },
+}
+
+
+def _demo_dumps() -> list:
+    """The demo reports available to the Try picker: every .xml in the demo
+    folder that has its .rpt beside it, curated ones first in demo order."""
+    have = {p.stem for p in DEMO_DIR.glob("*.xml")
+            if p.with_suffix(".rpt").is_file()}
+    ordered = [s for s in _DEMO_META if s in have]
+    ordered += sorted(have - set(_DEMO_META))
+    out = []
+    for stem in ordered:
+        meta = _DEMO_META.get(stem, {})
+        out.append({"name": stem,
+                    "label": meta.get("label", stem.replace("_", " ")),
+                    "description": meta.get("description", ""),
+                    "jndi": meta.get("jndi", "SampleData")})
+    return out
+
+
+def _demo_file(name: str) -> Path:
+    """The demo dump for a requested name, or the default. Guards against
+    path traversal: only a plain stem that resolves to a real pair inside
+    the demo folder is honoured, anything else falls back to the sample."""
+    stem = (name or "").strip()
+    if stem and "/" not in stem and "\\" not in stem and ".." not in stem:
+        target = DEMO_DIR / f"{stem}.xml"
+        if target.is_file() and target.with_suffix(".rpt").is_file():
+            return target
+    return SAMPLE_FILE
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
@@ -581,10 +643,18 @@ def _pdf_to_page_images(pdf: bytes) -> list:
     return pages
 
 
+@router.get("/samples", include_in_schema=False)
+def samples() -> list:
+    """The demo reports the Try picker offers - name, label, description and
+    the datasource each binds to."""
+    return _demo_dumps()
+
+
 @router.get("/sample", include_in_schema=False)
-def sample() -> FileResponse:
-    """The bundled Crystal demo dump, used by the UI's 'Try the sample' button."""
-    return FileResponse(SAMPLE_FILE, media_type="text/xml")
+def sample(name: str = "") -> FileResponse:
+    """A Crystal demo dump for the Try button. `name` selects one of the demo
+    reports (see /samples); omitted or unknown, it returns the default."""
+    return FileResponse(_demo_file(name), media_type="text/xml")
 
 
 @router.post("/inspect", response_model=ReportSummary,

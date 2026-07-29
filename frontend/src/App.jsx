@@ -28,11 +28,16 @@ export default function App() {
   const [view, setView] = useState('workflow')  // workflow | project | settings
   const [report, setReport] = useState(null)    // reports family: /reports/convert response
   const [reportFile, setReportFile] = useState(null)
+  const [crystalSamples, setCrystalSamples] = useState([])
 
   useEffect(() => {
     fetch('/health')
       .then((r) => r.json())
       .then((h) => setVersion(h.version))
+      .catch(() => {})
+    fetch('/reports/samples')
+      .then((r) => r.json())
+      .then((s) => setCrystalSamples(Array.isArray(s) ? s : []))
       .catch(() => {})
   }, [])
 
@@ -114,13 +119,17 @@ export default function App() {
     convert(new File([blob], 'branch_balances_0.1.item', { type: 'text/xml' }))
   }
 
-  async function loadCrystalSample() {
-    const res = await fetch('/reports/sample', { cache: 'no-store' })
+  async function loadCrystalSample(sample) {
+    // default to the account statement when the picker passed nothing
+    const name = sample?.name || 'Statement_of_Account'
+    const jndi = sample?.jndi || 'Xtreme'
+    const res = await fetch(`/reports/sample?name=${encodeURIComponent(name)}`,
+                            { cache: 'no-store' })
     const blob = await res.blob()
     // A real harvested report, not an authored dump - its .rpt ships beside it
-    // so the same report can be opened in the Crystal viewer first.
-    convertReport(new File([blob], 'Statement_of_Account.xml', { type: 'text/xml' }),
-                  'Xtreme')
+    // (the filename stem finds it), so the same report opens in the Crystal
+    // viewer first, and its generated SQL binds to the datasource it names.
+    convertReport(new File([blob], `${name}.xml`, { type: 'text/xml' }), jndi)
   }
 
   async function openFromProject(row) {
@@ -273,6 +282,7 @@ export default function App() {
               onSample={loadSample}
               onTalendSample={loadTalendSample}
               onCrystalSample={loadCrystalSample}
+              crystalSamples={crystalSamples}
               error={error}
               loading={loading}
               source={results.length === 0 ? source : null}

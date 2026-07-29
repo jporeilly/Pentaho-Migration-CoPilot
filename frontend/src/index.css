@@ -758,6 +758,25 @@ span.triage-chip { cursor: default; }
 .family-stats { font-size: .85rem; color: var(--text-secondary); margin: .2rem 0 .6rem; }
 .family-stats b { color: var(--text-primary); }
 .sample-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+/* Try Crystal Reports picker: a borderless dropdown of the demo reports */
+.sample-picker { position: relative; display: inline-block; }
+.sample-picker-backdrop { position: fixed; inset: 0; z-index: 30; }
+.sample-menu {
+  position: absolute; z-index: 31; top: calc(100% + .35rem); right: 0;
+  min-width: 20rem; max-width: min(24rem, 90vw);
+  background: var(--surface-1); border-radius: 10px; padding: .35rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: flex; flex-direction: column; gap: .15rem;
+}
+.sample-menu-item {
+  border: none; background: transparent; cursor: pointer; text-align: left;
+  border-radius: 7px; padding: .5rem .6rem;
+  display: flex; flex-direction: column; gap: .15rem;
+}
+.sample-menu-item:hover { background: var(--surface-2); }
+.sample-menu-label { color: var(--text-primary); font: 600 .9rem system-ui, "Segoe UI", sans-serif; }
+.sample-menu-desc { color: var(--text-secondary); font-size: .78rem; line-height: 1.35; }
 .inline-btn { padding: .1rem .5rem; font-size: .8rem; }
 .subhead-row { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
 
