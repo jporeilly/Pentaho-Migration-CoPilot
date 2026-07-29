@@ -84,24 +84,55 @@ def build_etl_portfolio_report_html(records, family="informatica", rate=150.0):
          for stype, count in unmapped.items()), key=lambda t: -t[1])[:12]
     unmapped_chart = _hbar_chart(unmapped_items)
 
-    # Each unmapped component with a known category gets its SUGGESTED PDI
-    # approach from the rules library - the consultant report proposes the
-    # solution, it does not just chart the gap.
+    # Priority actions - the SAME rolled-up engagement plan the Crystal
+    # portfolio report leads with (one row per kind of work, priority chip,
+    # what it costs), so both consultant reports read identically. Each
+    # unmapped component's row carries its SUGGESTED PDI approach from the
+    # rules library - the report proposes the solution, not just the gap.
     from pentaho_migration.ir import SourceTool
     from pentaho_migration.mapper import RulesMapper
+    from pentaho_migration.reports.action_plan import PRIORITY_LABEL
+    from pentaho_migration.reports.portfolio_report import (
+        PRIORITY_BG, PRIORITY_INK)
+    from pentaho_migration.validator.effort import (
+        COPILOT_MANUAL_STEP, COPILOT_UNTRANSLATED, _vol)
+
     tool = SourceTool.TALEND if family == "talend" else SourceTool.POWERCENTER
     suggestions = RulesMapper.for_tool(tool).suggestions
-    suggestion_rows = "".join(
-        f"<tr><td>{escape(stype)}</td><td>{escape(suggestions[stype])}</td></tr>"
-        for stype, _count in sorted(unmapped.items(), key=lambda t: -t[1])
-        if stype in suggestions)
-    suggestions_html = (
-        "<h2>Suggested PDI approach per component</h2>"
-        "<p class=\"muted\">The closest PDI solution for each component with no "
-        "1:1 step — apply and verify, rather than rebuilding from scratch.</p>"
-        "<table><thead><tr><th>Component</th><th>Suggested approach</th></tr>"
-        f"</thead><tbody>{suggestion_rows}</tbody></table>"
-        if suggestion_rows else "")
+    generic_how = ("no rules mapping - inspect the component in the source "
+                   "tool and rebuild its behaviour with PDI steps")
+    actions = []  # (priority, title, how, exports, items, hours)
+    for stype, count in sorted(unmapped.items(), key=lambda t: -t[1]):
+        actions.append((1, f"Hand-convert {stype}",
+                        suggestions.get(stype, generic_how),
+                        len(unmapped_files[stype]), count,
+                        _vol(count) * COPILOT_MANUAL_STEP))
+    if expr_todo:
+        actions.append((2, "Translate the remaining expressions",
+                        "✨ one click per mapping in the app; verify "
+                        "NULL handling - Informatica and JavaScript differ",
+                        len(records), expr_todo,
+                        _vol(expr_todo) * COPILOT_UNTRANSLATED))
+    plan_total = sum(a[5] for a in actions)
+    plan_rows = "".join(
+        f'<tr><td><span class="pchip" style="background:{PRIORITY_BG[p]};'
+        f'color:{PRIORITY_INK[p]}">{escape(PRIORITY_LABEL[p])}</span></td>'
+        f'<td><b>{escape(title)}</b><div class="muted">{escape(how)}</div></td>'
+        f'<td class="num">{exports}</td><td class="num">{items}</td>'
+        f'<td class="num">{hours:,.1f}h<div class="muted">'
+        f"{_money(hours, rate)}</div></td></tr>"
+        for p, title, how, exports, items, hours in actions)
+    plan_html = (
+        "<h2>Priority actions across the portfolio</h2>"
+        '<p class="muted">The engagement plan rolled up by kind of work — '
+        f"{plan_total:,.1f}h ({_money(plan_total, rate)}) in total. Staff by "
+        "the rows here; the focus list below tells you where each row lands. "
+        "Each row names the suggested PDI approach.</p>"
+        "<table><thead><tr><th>Priority</th><th>Work</th>"
+        "<th class='num'>Exports</th><th class='num'>Items</th>"
+        "<th class='num'>Effort</th></tr></thead>"
+        f"<tbody>{plan_rows}</tbody></table>"
+        if plan_rows else "")
     load_chart = _hbar_chart([(f"{k} manual step(s)", v, SLATE)
                               for k, v in load_bins.items()])
 
@@ -143,6 +174,8 @@ def build_etl_portfolio_report_html(records, family="informatica", rate=150.0):
   td {{ padding: 6px 9px; border-bottom: 1px solid #dfe5ea; vertical-align: top; }}
   td.num {{ text-align: right; white-space: nowrap; }}
   .chip {{ font-weight: bold; }}
+  .pchip {{ display: inline-block; padding: 2px 9px; border-radius: 999px;
+            font-size: 11px; font-weight: bold; white-space: nowrap; }}
   .muted {{ color: {SLATE}; }}
   footer {{ margin-top: 44px; font-size: 11.5px; color: {SLATE};
             border-top: 1px solid #dfe5ea; padding-top: 10px; }}
@@ -175,12 +208,12 @@ review carries a note, manual has no rules mapping.</p>
 list. {expr_todo} expression(s) also await translation (✨ one click per
 mapping in the app).</p>
 {unmapped_chart}
-{suggestions_html}
 
 <h2>Review load per mapping</h2>
 <p class="muted">How many manual steps each mapping carries — the tail is where
 the engagement hours live.</p>
 {load_chart}
+{plan_html}
 
 <h2>Focus list — the 10 heaviest mappings</h2>
 <table><thead><tr><th>Mapping</th><th>Export</th><th>Score</th><th>Manual steps</th><th>Est. hours</th><th>Est. cost</th></tr></thead>
