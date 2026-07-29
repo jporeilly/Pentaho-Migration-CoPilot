@@ -83,22 +83,79 @@ class TestTopNBucketsIntoOthers:
     def test_groups_are_ranked_by_the_measure(self, tmp_path):
         model = load_report_model(_dump(tmp_path, TOP_N))
         # the per-group total, then a dense rank of those totals, largest first
-        assert "SUM(b.Sales_Amount) OVER (PARTITION BY b.Country)" in model.sql
-        assert "DENSE_RANK() OVER (ORDER BY t._grp_total DESC)" in model.sql
+        assert "SUM(w.Sales_Amount) OVER (PARTITION BY w.Country)" in model.sql
+        assert "DENSE_RANK() OVER (ORDER BY x._t DESC)" in model.sql
 
     def test_the_tail_is_relabelled_others(self, tmp_path):
         model = load_report_model(_dump(tmp_path, TOP_N))
-        assert ("CASE WHEN r._grp_rank <= 5 THEN r.Country ELSE 'Others' "
+        assert ("CASE WHEN r._rk <= 5 THEN r.Country ELSE 'Others' "
                 "END AS Country") in model.sql
 
     def test_others_sorts_last(self, tmp_path):
         model = load_report_model(_dump(tmp_path, TOP_N))
-        order = model.sql.split("ORDER BY")[-1]
-        assert "(r._grp_rank > 5)" in order   # kept groups first, Others last
+        # kept groups keep their rank; Others gets a sentinel that sorts last
+        assert "2147483647" in model.sql
+        assert "f._ord_0" in model.sql.split("ORDER BY")[-1]
 
     def test_a_plain_group_sort_is_not_wrapped(self, tmp_path):
         model = load_report_model(_dump(tmp_path, PLAIN_GROUP))
-        assert "_grp_rank" not in model.sql and "PARTITION BY" not in model.sql
+        assert "_rk" not in model.sql and "PARTITION BY" not in model.sql
+
+
+# Two Top-N groups nested: countries, then regions WITHIN each country.
+NESTED = """\
+<Report Name="Nested" FileName="n.rpt">
+  <Database><Tables>
+    <Table Name="Sales" Alias="Sales"><Fields>
+      <Field Name="Country" LongName="Sales.Country"
+             Type="crFieldValueTypeStringField"/>
+      <Field Name="Region" LongName="Sales.Region"
+             Type="crFieldValueTypeStringField"/>
+      <Field Name="Sales_Amount" LongName="Sales.Sales_Amount"
+             Type="crFieldValueTypeNumberField"/>
+    </Fields></Table>
+  </Tables></Database>
+  <DataDefinition>
+    <RecordSelectionFormula/>
+    <Groups>
+      <Group Name="G0" ConditionField="{Sales.Country}"/>
+      <Group Name="G1" ConditionField="{Sales.Region}"/>
+    </Groups>
+    <SortFields>
+      <SortField Field="Sum ({Sales.Sales_Amount}, {Sales.Country})"
+                 SortDirection="TopNOrder" SortType="GroupSortField"/>
+      <SortField Field="Sum ({Sales.Sales_Amount}, {Sales.Region})"
+                 SortDirection="TopNOrder" SortType="GroupSortField"/>
+    </SortFields>
+  </DataDefinition>
+  <ReportDefinition><Areas>
+    <Area Kind="Detail"><Sections><Section Name="D" Height="20">
+      <ReportObjects>
+        <FieldObject Name="a" Kind="FieldObject" Left="0" Top="0"
+            Width="500" Height="20" DataSource="{Sales.Region}"/>
+      </ReportObjects>
+    </Section></Sections></Area>
+  </Areas></ReportDefinition>
+</Report>"""
+
+
+class TestNestedTopNRanksPerParent:
+    def test_the_inner_group_ranks_within_its_parent(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, NESTED))
+        # Region is ranked partitioned by the (relabelled) parent Country
+        assert ("DENSE_RANK() OVER (PARTITION BY x.Country ORDER BY x._t DESC)"
+                in model.sql)
+        # and its total is the per (Country, Region) total
+        assert "SUM(w.Sales_Amount) OVER (PARTITION BY w.Country, w.Region)" in model.sql
+
+    def test_both_groups_are_bucketed(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, NESTED))
+        assert "ELSE 'Others' END AS Country" in model.sql
+        assert "ELSE 'Others' END AS Region" in model.sql
+
+    def test_the_note_scopes_the_nested_group_to_its_parent(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, NESTED))
+        assert any("on 'Region' within 'Country'" in i for i in model.issues)
 
 
 # A Top-5 pie: its category is the Top-N group, so it must follow the same
@@ -160,7 +217,7 @@ class TestTopNReachesTheChart:
         # the pie's category column is the very column the SQL relabels, so the
         # pie shows the same top-N + Others the table does
         assert chart.chart_category == "Country"
-        assert ("CASE WHEN r._grp_rank <= 5 THEN r.Country ELSE 'Others' "
+        assert ("CASE WHEN r._rk <= 5 THEN r.Country ELSE 'Others' "
                 "END AS Country") in model.sql
 
     def test_the_chart_is_annotated_for_review(self, tmp_path):

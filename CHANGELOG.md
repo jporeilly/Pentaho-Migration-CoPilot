@@ -21,8 +21,10 @@ deliberately — not one per work session.
   give. This is the migration's whole point: **suggest and apply a solution,
   output the one open question for review — don't just log the gap.** The
   report's Top-N pie is wired the same way: its category is the bucketed
-  column, so the chart shows the top N + Others like the original (a chart on a
-  nested Top-N group is flagged as not-yet-bucketed).
+  column, so the chart shows the top N + Others like the original. **Nested
+  Top-N** (e.g. the top regions within each country) is handled too — each
+  Top-N group is ranked *within its parent* and its tail rolled into a
+  per-parent Others, proven on the live Xtreme data.
 - **Consultant report and PDF preview render inline, not in a blank tab.**
   New browser tabs never surface inside embedded webviews, and a `window.open`'d
   tab can't paint a `blob:` URL from its opener — so both opened blank. They now

@@ -1100,92 +1100,118 @@ def apply_topn(model):
                 "PRD group sorting")
         return
 
-    outer = rankable[0]
-    agg = _TOPN_AGG_SQL.get(outer.topn.op, "SUM")
-    n = outer.topn.n
-    direction = "DESC" if outer.topn.descending else "ASC"
-    kind = "top" if outer.topn.descending else "bottom"
     inner = re.sub(r"\s+ORDER\s+BY\b.*$", "", model.sql, flags=re.I | re.S)
-
-    order_cols = [(g.column, g.descending) for g in model.groups]
-    order_cols += [(c, d) for c, d in model.record_sorts
-                   if c not in {g.column for g in model.groups}]
-
     cols = _select_output_names(inner) if model.sql_generated else []
-    can_bucket = (outer.topn.others and outer.column in cols
-                  and not model.window_columns)
+    group_cols = [g.column for g in model.groups]
+    topn_set = {g.column for g in rankable}
 
-    if can_bucket:
-        # Rank the groups by their total measure, then keep N and relabel the
-        # rest 'Others'. Two nested wraps: total per group, then DENSE_RANK of
-        # those totals (rows of one group share a total, so share a rank).
-        total = (f"{agg}(b.{ref(outer.topn.measure)}) "
-                 f"OVER (PARTITION BY b.{ref(outer.column)})")
-        totalled = f"SELECT b.*, {total} AS _grp_total\nFROM (\n{inner}\n) b"
-        ranked = (f"SELECT t.*, DENSE_RANK() OVER (ORDER BY t._grp_total "
-                  f"{direction}) AS _grp_rank\nFROM (\n{totalled}\n) t")
-        others = outer.topn.others_label.replace("'", "''")
-        proj = [
-            (f"CASE WHEN r._grp_rank <= {n} THEN r.{ref(c)} ELSE '{others}' "
-             f"END AS {ref(c)}") if c == outer.column else f"r.{ref(c)}"
-            for c in cols]
-        # Others last; kept groups by rank (measure order); then the normal
-        # within-group order, but not by the now-relabelled key.
-        tail = [f"r.{ref(c)}" + (" DESC" if d else "")
-                for c, d in order_cols if known(c) and c != outer.column]
-        order = ", ".join([f"(r._grp_rank > {n})", "r._grp_rank"] + tail)
-        model.sql = ("SELECT\n  " + ",\n  ".join(proj)
-                     + f"\nFROM (\n{ranked}\n) r\nORDER BY {order}")
-        model.issues.append(
-            f"Crystal Top-N / Group Sort on '{outer.column}': PRD has no Top-N "
-            f"group, so the query keeps the {kind} {n} by "
-            f"{outer.topn.op}({outer.topn.measure}) and rolls the rest into "
-            f"'{outer.topn.others_label}'. RptToXml omits N - confirm {n} is right.")
+    # ordering that follows the ranked groups: the non-Top-N group columns then
+    # the record sorts, in their normal order
+    tail_cols = [(g.column, g.descending) for g in model.groups
+                 if g.column not in topn_set]
+    tail_cols += [(c, d) for c, d in model.record_sorts
+                  if c not in set(group_cols)]
+
+    bucketable = (model.sql_generated and cols and not model.window_columns
+                  and all(g.column in cols for g in rankable)
+                  and all(g.topn.others for g in rankable))
+
+    if bucketable:
+        # Bucket EACH Top-N group, outer -> inner. For a group, rank its key
+        # WITHIN its parent groups (already relabelled by the outer passes) by
+        # the group's total measure, keep N, and relabel the rest 'Others'. A
+        # per-level ordering column (Others forced last) is carried out so the
+        # final sort nests correctly - a nested Top-N is Crystal's rank-per-
+        # parent, e.g. the top regions within each country.
+        sql = inner
+        ord_terms = []
+        for i, g in enumerate(rankable):
+            gcol, n = g.column, g.topn.n
+            d = "DESC" if g.topn.descending else "ASC"
+            aggf = _TOPN_AGG_SQL.get(g.topn.op, "SUM")
+            parents = [ref(c) for c in group_cols[:group_cols.index(gcol)]
+                       if known(c)]
+            part_total = ", ".join([f"w.{p}" for p in parents] + [f"w.{ref(gcol)}"])
+            part_rank = ", ".join(f"x.{p}" for p in parents)
+            total = f"{aggf}(w.{ref(g.topn.measure)}) OVER (PARTITION BY {part_total})"
+            rankf = ("DENSE_RANK() OVER ("
+                     + (f"PARTITION BY {part_rank} " if part_rank else "")
+                     + f"ORDER BY x._t {d})")
+            others = g.topn.others_label.replace("'", "''")
+            ord_col = f"_ord_{i}"
+            proj = [
+                (f"CASE WHEN r._rk <= {n} THEN r.{ref(c)} ELSE '{others}' "
+                 f"END AS {ref(c)}") if c == gcol else f"r.{ref(c)}"
+                for c in cols]
+            proj += [f"r.{oc}" for oc in ord_terms]
+            proj.append(f"CASE WHEN r._rk <= {n} THEN r._rk ELSE 2147483647 "
+                        f"END AS {ord_col}")
+            sql = ("SELECT\n  " + ",\n  ".join(proj)
+                   + f"\nFROM (\nSELECT x.*, {rankf} AS _rk"
+                   + f"\nFROM (\nSELECT w.*, {total} AS _t"
+                   + f"\nFROM (\n{sql}\n) w\n) x\n) r")
+            ord_terms.append(ord_col)
+        # strip the ordering columns from the output; sort by them + the tail
+        tail = [f"f.{ref(c)}" + (" DESC" if d else "")
+                for c, d in tail_cols if known(c)]
+        order = ", ".join([f"f.{oc}" for oc in ord_terms] + tail)
+        model.sql = ("SELECT\n  " + ",\n  ".join(f"f.{ref(c)}" for c in cols)
+                     + f"\nFROM (\n{sql}\n) f\nORDER BY {order}")
+        for g in rankable:
+            k = "top" if g.topn.descending else "bottom"
+            idx = group_cols.index(g.column)
+            within = next((c for c in reversed(group_cols[:idx]) if known(c)), None)
+            scope = f" within '{within}'" if within else ""
+            model.issues.append(
+                f"Crystal Top-N / Group Sort on '{g.column}'{scope}: PRD has no "
+                f"Top-N group, so the query keeps the {k} {g.topn.n} by "
+                f"{g.topn.op}({g.topn.measure}) and rolls the rest into "
+                f"'{g.topn.others_label}'. RptToXml omits N - confirm {g.topn.n}.")
     else:
-        # Command SQL / window columns: still deliver the ordering (kept groups
+        # Command SQL / window columns: deliver the ordering only (kept groups
         # lead); the Others rollup needs a CASE-on-rank column added by hand.
-        rank_term = (f"{agg}(q.{ref(outer.topn.measure)}) "
-                     f"OVER (PARTITION BY q.{ref(outer.column)}) {direction}")
-        tail = [f"q.{ref(c)}" + (" DESC" if d else "")
-                for c, d in order_cols if known(c)]
-        order = ", ".join([rank_term] + tail)
-        model.sql = f"SELECT q.*\nFROM (\n{inner}\n) q\nORDER BY {order}"
+        outer = rankable[0]
+        aggf = _TOPN_AGG_SQL.get(outer.topn.op, "SUM")
+        d = "DESC" if outer.topn.descending else "ASC"
+        rank_term = (f"{aggf}(q.{ref(outer.topn.measure)}) "
+                     f"OVER (PARTITION BY q.{ref(outer.column)}) {d}")
+        otail = [f"q.{ref(c)}" + (" DESC" if desc else "")
+                 for c, desc in ([(g.column, g.descending) for g in model.groups]
+                 + [(c, dd) for c, dd in model.record_sorts
+                    if c not in set(group_cols)]) if known(c)]
+        model.sql = (f"SELECT q.*\nFROM (\n{inner}\n) q\nORDER BY "
+                     + ", ".join([rank_term] + otail))
+        k = "top" if outer.topn.descending else "bottom"
         model.issues.append(
             f"Crystal Top-N / Group Sort on '{outer.column}': the query orders "
-            f"the groups by {outer.topn.op}({outer.topn.measure}) so the {kind} "
+            f"the groups by {outer.topn.op}({outer.topn.measure}) so the {k} "
             f"groups lead. To collapse the rest into 'Others', add a "
-            f"CASE-on-rank column in the query (N assumed {n}).")
+            f"CASE-on-rank column in the query (N assumed {outer.topn.n}).")
+        for g in rankable[1:]:
+            model.issues.append(
+                f"nested Top-N on '{g.column}' could not be bucketed here - order "
+                "the query by it and add a CASE-on-rank column to roll up 'Others'")
 
-    # A pie/bar chart bound to a Top-N group's key follows the same relabelling
-    # for free: its category is that column, and PRD's collector aggregates the
-    # measure by it, so the chart shows the kept groups + Others without a
-    # separate datasource. Wire it explicitly by noting it on the element (and
-    # flag a chart on a nested Top-N group, which is not bucketed yet).
-    topn_cols = {g.column for g in rankable}
+    # A chart bound to a Top-N group's key follows the same relabelling: its
+    # category IS that column, and PRD's collector aggregates the measure by it,
+    # so a bucketed column makes the chart show the kept groups + Others with no
+    # separate datasource. Surface it on the element for review.
+    bucketed_cols = topn_set if bucketable else set()
     for s in model.sections:
         for el in s.elements:
             if el.kind != "chart" or not getattr(el, "chart_category", ""):
                 continue
             cat = el.chart_category
-            if cat == outer.column and can_bucket:
+            if cat in bucketed_cols:
                 el.notes.append(
                     f"Top-N chart: category '{cat}' reads the bucketed column, so "
-                    f"the pie shows the {kind} {n} + '{outer.topn.others_label}' "
-                    "like the original (verify the slice totals)")
-            elif cat == outer.column:
+                    "the chart shows the kept N + 'Others' like the original "
+                    "(verify the slice totals)")
+            elif cat in topn_set:
                 el.notes.append(
-                    f"chart category '{cat}' is ordered by the Top-N measure; add "
-                    "the CASE-on-rank column to the query to bucket the tail into "
+                    f"chart category '{cat}' is a Top-N group ordered by its "
+                    "measure; add the CASE-on-rank column to roll the tail into "
                     "'Others'")
-            elif cat in topn_cols:
-                el.notes.append(
-                    f"chart category '{cat}' is a nested Top-N group - it still "
-                    "charts every group; bucket it in the query to match the original")
-
-    for g in rankable[1:]:
-        model.issues.append(
-            f"nested Top-N on '{g.column}' is ordered within '{outer.column}' "
-            "but not ranked per parent - verify against the original")
 
 
 def _resolve_format(el):
