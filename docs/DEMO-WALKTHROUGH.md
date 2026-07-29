@@ -9,6 +9,18 @@ The demo report is a real harvested account statement
 letterhead, watermark, a scanned signature, two nested groups, a running
 total, 74 pages of data saved inside the `.rpt`.
 
+**`samples/crystal/demo/` holds every report this script uses**, so you can run
+the whole walkthrough from one folder — the **Try Crystal Reports** button loads
+`Statement_of_Account`, and the alternates below are run by dragging their `.rpt`
+onto the drop zone:
+
+| File | Role in the demo |
+| --- | --- |
+| `Statement_of_Account` | the main flow — letterhead, watermark, saved data, the beige-panel honesty moment |
+| `AdventureWorks-TotalSalesByYear` | "something recent" — 2026 save, zero manual work, a clean bar chart |
+| `ComparativeIncomeStatement` | "something recent, and substantial" — a 2016 SAP income statement whose cross-tab renders a fully populated pivot against `boe_samples` |
+| `WorldSalesReport` | "show me a hard one" — the honesty demo, comes back ⚠ REVIEW with named blockers |
+
 ## Before the audience arrives
 
 ```bash
@@ -117,7 +129,7 @@ letterhead, same watermark and signature, same $43.50.
 
 | They ask for... | Do this |
 | --- | --- |
-| "Something recent, not a 2002 report" | Two options. `demo/AdventureWorks-TotalSalesByYear` — saved May 2026, converts with zero manual work, a clean single bar chart. Or, for a real business document, `corpus/ComparativeIncomeStatement` — a 2016 SAP income statement (gradient header, actuals-vs-budget cross-tab) that renders a **fully populated pivot** against the rebuilt `boe_samples` MySQL database. Say the two honest gaps first: the month columns show the ISO date rather than "January 2016", and without its column-selector parameters every month prints, not just the two compared. |
+| "Something recent, not a 2002 report" | Two options. `demo/AdventureWorks-TotalSalesByYear` — saved May 2026, converts with zero manual work, a clean single bar chart. Or, for a real business document, `demo/ComparativeIncomeStatement` — a 2016 SAP income statement (gradient header, actuals-vs-budget cross-tab) that renders a **fully populated pivot** against the rebuilt `boe_samples` MySQL database. Say the two honest gaps first: the month columns show the ISO date rather than "January 2016", and without its column-selector parameters every month prints, not just the two compared. |
 | "Show me a hard one" | `demo/WorldSalesReport` — pie chart, three nested groups, a drill-down design, and Crystal's Top-5-plus-Others group selection, which PRD has no equivalent for. Comes back **⚠ REVIEW** — 6 actions, 2.27h, of which 2 items block release, each naming its fix. The honesty demo. |
 | "What about our 3,000 reports?" | **📁 Project** page: 150-report corpus with triage verdicts (filter to ⚠ REVIEW, show reasons), then **📊 Consultant report** — the portfolio document. It leads with the engagement plan (the same actions rolled up by *kind* of work, so you staff against the rows), and **clicking any report in the focus list opens its full plan**. Printable. |
 | A specific feature (sub-reports, cross-tabs, images...) | `samples/crystal/by-feature/` — every corpus report filed by what it demonstrates; the README marks the 111 that carry their own data. |
