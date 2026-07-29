@@ -117,7 +117,7 @@ letterhead, same watermark and signature, same $43.50.
 
 | They ask for... | Do this |
 | --- | --- |
-| "Something recent, not a 2002 report" | Same flow with `demo/AdventureWorks-TotalSalesByYear` — saved May 2026, AdventureWorks, converts with zero manual work. |
+| "Something recent, not a 2002 report" | Two options. `demo/AdventureWorks-TotalSalesByYear` — saved May 2026, converts with zero manual work, a clean single bar chart. Or, for a real business document, `corpus/ComparativeIncomeStatement` — a 2016 SAP income statement (gradient header, actuals-vs-budget cross-tab) that renders a **fully populated pivot** against the rebuilt `boe_samples` MySQL database. Say the two honest gaps first: the month columns show the ISO date rather than "January 2016", and without its column-selector parameters every month prints, not just the two compared. |
 | "Show me a hard one" | `demo/WorldSalesReport` — pie chart, three nested groups, a drill-down design, and Crystal's Top-5-plus-Others group selection, which PRD has no equivalent for. Comes back **⚠ REVIEW** — 6 actions, 2.27h, of which 2 items block release, each naming its fix. The honesty demo. |
 | "What about our 3,000 reports?" | **📁 Project** page: 150-report corpus with triage verdicts (filter to ⚠ REVIEW, show reasons), then **📊 Consultant report** — the portfolio document. It leads with the engagement plan (the same actions rolled up by *kind* of work, so you staff against the rows), and **clicking any report in the focus list opens its full plan**. Printable. |
 | A specific feature (sub-reports, cross-tabs, images...) | `samples/crystal/by-feature/` — every corpus report filed by what it demonstrates; the README marks the 111 that carry their own data. |

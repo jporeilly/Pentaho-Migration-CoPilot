@@ -9,6 +9,24 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **A modern cross-tab report renders its pivot with real data.** The SAP BOE
+  income-statement family (Comparative, Consolidated, Monthly Variance, Rolling
+  Quarter) pivots its columns on a date COMPUTED from Year and Month, which PRD
+  cross-tabs cannot spread over because they pivot on query columns - so the
+  body came out empty. That dimension is now computed in the sub-report's SQL
+  (`STR_TO_DATE(...) AS date`), and ComparativeIncomeStatement renders a fully
+  populated pivot against the rebuilt `boe_samples` database. The translation
+  is the narrow date-from-parts family only; anything else, or a dialect with
+  no known-correct expression, stays an honest manual note. A 2016-era report
+  with a gradient header and a working cross-tab - the modern demo the 2002
+  statement could not be.
+- **Three crashes on that same report family, found by rendering not reading.**
+  `CDate`/`DateValue` is arity-aware: three arguments construct a date
+  (`DATE(y;m;d)`), one parses a string - the blind `DATEVALUE(y;m;d)` failed
+  libformula. A group, sort or cross-tab dimension on a formula is dropped from
+  the generated `ORDER BY` (ordering by a name the database lacks failed the
+  whole query). And a cross-tab sub-report carries no report expressions - one
+  evaluated during the column-axis pass dereferenced a null itemband.
 - **The generated SQL can be run, not just read.** `report-sample-db` rebuilds
   a queryable database from the reports themselves: schema from the field
   metadata every `.rpt` declares, data from the rows Crystal saved inside them,
