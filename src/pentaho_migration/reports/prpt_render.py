@@ -107,6 +107,17 @@ def _number_format(value_type):
     return "#,##0.00"
 
 
+def _java_number_format(fmt):
+    """Crystal treats '%' (and per-mille) in a format as LITERAL text; Java's
+    DecimalFormat, which PRD uses, treats them as multiply-by-100/1000
+    operators. So a PercentOfSum that already yields 36.16 with a "% #,##0.0"
+    format printed 3,616. Quote the literal so the value is not scaled again -
+    "36.16" stays "36.16". Formats that already use quoting are left as-is."""
+    if not fmt or "'" in fmt:
+        return fmt
+    return fmt.replace("%", "'%'").replace("‰", "'‰'")
+
+
 def _style_expr_block(el):
     """Converted conditional formatting: PRD style expressions on the element
     (paint / background-color / visible), evaluated per row by the engine."""
@@ -154,7 +165,7 @@ def render_element(el, tp="", sp="style:"):
         if not el.column:
             return render_element(_todo_label(el, f"[TODO unresolved: {el.field_ref}]"), tp, sp)
         if el.value_type in NUMERIC_TYPES:
-            fmt = el.format_string or _number_format(el.value_type)
+            fmt = _java_number_format(el.format_string or _number_format(el.value_type))
             return (f'<{tp}number-field core:element-type="number-field" '
                     f"core:format-string={quoteattr(fmt)} core:field={quoteattr(el.column)}"
                     f"{NULL_BLANK}>"

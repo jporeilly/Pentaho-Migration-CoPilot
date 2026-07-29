@@ -29,14 +29,23 @@ deliberately — not one per work session.
   rollup, so the offline demo opens on the top N + Others too — on
   WorldSalesReport the sample buckets to Crystal's exact top 5 (USA, Germany,
   England, Switzerland, Italy) + Others.
-- **Underlay-over-following-sections is flagged up front, not left to the
-  release gate.** Crystal's "Underlay Following Sections" cascades a chart under
-  every section that follows, so a group-summary table prints beside it; PRD
-  only underlays the immediately following band, so the summary rows can flow
-  below the chart. The converter now names this at conversion time — what
-  Crystal did, why PRD differs, and the fix (move the summary beside the chart
-  or shorten the chart band) — rather than relying on the gate's after-the-fact
-  visual diff to notice a moved table.
+- **Underlay-over-following-sections: the summary table is made compact instead
+  of disjointed.** Crystal's "Underlay Following Sections" cascades a chart
+  under every section that follows, so a group-summary table prints beside it;
+  PRD can only underlay the immediately following band, which left the summary's
+  header beside the chart and its rows dangling below — a split table. The
+  converter now **stacks** the chart (drops its underlay) so the header falls
+  onto the rows as one compact block, and trims the dead top-whitespace those
+  bands carried for the old overlay so the table rises onto the chart's page.
+  On WorldSalesReport the pie + the Top-5 table (USA … Others, exact figures)
+  now render together on one page. Noted for review, since it's a placement the
+  original had beside the chart, not below it.
+- **A literal `%` in a number format is quoted so PRD doesn't scale the value.**
+  Crystal treats `%` in a format string as literal text; Java's `DecimalFormat`,
+  which PRD uses, treats it as a multiply-by-100 operator. A PercentOfSum that
+  already yields `36.16` with a `% #,##0.0` format therefore printed `3,616`.
+  The emitter now quotes the literal (`'%'`), so the Top-5 table's Percent-of-
+  Total column reads 36.2 / 9.5 / 8.2 … exactly as Crystal does.
 - **Consultant report and PDF preview render inline, not in a blank tab.**
   New browser tabs never surface inside embedded webviews, and a `window.open`'d
   tab can't paint a `blob:` URL from its opener — so both opened blank. They now

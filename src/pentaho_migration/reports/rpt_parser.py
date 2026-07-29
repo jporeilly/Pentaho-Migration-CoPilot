@@ -1048,30 +1048,55 @@ def apply_window_columns(model):
                  + (f"\nORDER BY {order}" if order else ""))
 
 
-def flag_underlay_layout(model):
+def resolve_underlay_summary(model):
     """Crystal's "Underlay Following Sections" cascades a section (often a
     chart) UNDER every section that follows until content clears its height, so
     a group-summary table prints BESIDE the chart. PRD reproduces the underlay
     for the immediately following band only - later group bands stack below it.
-    So a summary whose header sits by the chart can have its rows flow beneath
-    it. Flag it up front (with the fix) rather than leave it to the release
-    gate's after-the-fact visual diff - the converter should name the gap."""
+    That left the summary's HEADER beside the chart (in the next band) but its
+    ROWS dangling below it (a later group band) - a disjointed table.
+
+    PRD can't underlay across group bands, so we can't put the summary beside
+    the chart. Instead we STACK the chart (drop its underlay): the header band
+    then falls below the chart, right onto the group-summary rows, so the table
+    reads as one compact block. Noted for review - the solution applied, plus
+    the one thing that differs from the original."""
     has_group_summary = any(
         s.area_kind in ("GroupFooter", "GroupHeader") and s.group_index >= 0
         and any(e.kind == "field" for e in s.elements)
         for s in model.sections)
     if not has_group_summary:
         return
+    fixed = False
     for s in model.sections:
         if s.underlay and any(e.kind == "chart" for e in s.elements):
-            model.issues.append(
-                f"Crystal underlays the chart in the {s.area_kind} over the "
-                "sections that follow, so a group-summary table prints beside "
-                "it. PRD reproduces the underlay for the next band only, so the "
-                "summary rows may render BELOW the chart instead of beside it - "
-                "verify placement, or move the summary next to the chart / "
-                "shorten the chart band.")
-            return
+            s.underlay = False        # stack it, so the summary below stays compact
+            fixed = True
+    if fixed:
+        # The header band that used to overlay the chart carries a big top
+        # offset (it sat low to line up beside the chart). Stacked, that offset
+        # is dead whitespace that pushes the table onto the next page. Pull the
+        # leading gap out of the report-header bands after the chart so the
+        # summary rises onto the chart's page.
+        seen_chart = False
+        for s in model.sections:
+            if s.area_kind != "ReportHeader":
+                continue
+            if any(e.kind == "chart" for e in s.elements):
+                seen_chart = True
+                continue
+            if seen_chart and s.elements:
+                top = min(e.y for e in s.elements)
+                if top > 6.0:
+                    for e in s.elements:
+                        e.y -= top - 3.0
+                    s.height = max(e.y + e.height for e in s.elements) + 3.0
+        model.issues.append(
+            "Crystal underlays a report chart over the following sections so a "
+            "group-summary table prints beside it. PRD can't underlay across "
+            "group bands, so the chart is STACKED instead and the summary prints "
+            "as a compact block below it - verify; to match the original "
+            "exactly, place the summary beside the chart by hand.")
 
 
 def _select_output_names(sql):

@@ -16,8 +16,8 @@ from pentaho_migration.reports.formula_translator import translate_all, translat
 from pentaho_migration.reports.model import ReportModel
 from pentaho_migration.reports.prpt_writer import write_prpt
 from pentaho_migration.reports.rpt_parser import (
-    apply_topn, apply_window_columns, flag_underlay_layout, generate_sql,
-    parse_rpttoxml)
+    apply_topn, apply_window_columns, generate_sql, parse_rpttoxml,
+    resolve_underlay_summary)
 
 __all__ = [
     "ReportModel",
@@ -47,8 +47,9 @@ def _finish_model(model: ReportModel, jndi: str | None) -> None:
     # Crystal Group Sort Expert / Top-N -> query ordering (and Others rollup),
     # last so it wraps the final SQL (WHERE and window columns already inside)
     apply_topn(model)
-    # flag band-model limitations the render can't fully reproduce, up front
-    flag_underlay_layout(model)
+    # a chart that Crystal underlays over a group summary can't underlay across
+    # PRD group bands - stack it so the summary reads as one compact block
+    resolve_underlay_summary(model)
 
 
 def load_report_model(source: str | Path, jndi: str | None = None) -> ReportModel:
