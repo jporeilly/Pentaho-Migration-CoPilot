@@ -31,6 +31,18 @@ All four checks green (PRD, Java, SAP Crystal runtime, RptToXml). Start the
 app (`run.ps1` or the "copilot-web" launch entry) and open
 <http://127.0.0.1:8321>. Have Pentaho Report Designer closed but ready.
 
+**If you plan to show `ComparativeIncomeStatement`, start the MySQL container
+first** — its cross-tab pivots against the rebuilt `boe_samples` database, and
+renders empty without it:
+
+```bash
+docker start mysql-database-1
+```
+
+The other three demo reports carry their own saved data and need no database.
+See [SAMPLE-DATABASES.md](SAMPLE-DATABASES.md) for what `boe_samples` is and how
+it was built.
+
 ## Act 1 — "This is what you have today" (2 min)
 
 Click **Try Crystal Reports**. On the Inspect page, click
