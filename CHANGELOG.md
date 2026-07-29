@@ -9,6 +9,18 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Informatica: an unmapped transformation gets a SUGGESTED PDI approach, not
+  a bare error.** The same principle now driving Crystal→PRD applied to the ETL
+  workflow. A PowerCenter transformation type with no 1:1 rule used to land as
+  "manual conversion required"; the rules library now carries a versioned
+  `_suggestions` section (v4) that names the closest PDI approach for each
+  category — Web Services Consumer → *Web services lookup / REST client*, SQL →
+  *Execute row SQL / Dynamic SQL row*, Transaction Control → *commit size / job
+  DB transaction*, Data Masking → *mask in SQL or script*, Mapplet → *PDI
+  mapping (sub-transformation)*, and more. An unknown type still gets a
+  PowerCenter-appropriate handoff (rebuild via a User Defined Java Class), not
+  the Talend message. The suggestions surface in the impact/review output, so
+  the reviewer sees the recommended step. Talend handoff behaviour unchanged.
 - **Crystal Top-N / Group Sort Expert → a working Top-N + "Others" in SQL.**
   A report set to "Top 5 countries" (Group Sort Expert) used to convert with
   every country shown — PRD has no Top-N group, and the converter only logged

@@ -306,8 +306,14 @@ def build_impact_analysis(pipeline: Pipeline) -> ImpactAnalysis:
             impact=knowledge.impact,
             converts=_converts(step),
             differences=knowledge.differences,
+            # Surface the handoff guidance in the review actions. For an
+            # unmapped step every note is handoff guidance (including the
+            # suggested PDI approach); for a mapped step, only a manual-
+            # conversion flag is worth escalating.
             actions=knowledge.actions + [
-                f"note: {n}" for n in step.notes if "manual conversion required" in n
+                f"note: {n}" for n in (
+                    step.notes if step.pdi_type is None
+                    else [n for n in step.notes if "manual conversion required" in n])
             ],
         ))
 

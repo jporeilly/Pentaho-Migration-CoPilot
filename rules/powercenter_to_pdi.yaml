@@ -8,12 +8,34 @@
 # added or changed — the rules library is the product's accumulated knowledge.
 
 _meta:
-  version: 3
-  updated: "2026-07-17"
+  version: 4
+  updated: "2026-07-29"
   provenance:
     - "v1 (2026-07-17): initial 16 rules from PowerCenter documentation and PDI step inventory."
     - "v2 (2026-07-17): added 'Sequence' alias — real 10.x exports use TYPE=\"Sequence\", found by gap analysis on the HHS corpus."
     - "v3 (2026-07-17): added 'Stored Procedure' -> Call DB Procedure — 12 occurrences in the real corpus were unmapped."
+    - "v4 (2026-07-29): added _suggestions — a transformation with no 1:1 rule now gets a SUGGESTED PDI approach, not a bare 'manual conversion required'. Same principle as Crystal->PRD: suggest a solution, flag for review, never just log the gap."
+
+# A transformation TYPE with no rule above has no clean 1:1 PDI step - but it
+# is NOT a dead end. Each entry here is the closest PDI approach, emitted as a
+# suggestion the reviewer confirms (the step stays MANUAL). Keyed on the
+# Informatica TRANSFORMATION TYPE exactly as it appears in the export.
+_suggestions:
+  "Custom Transformation": "a CUSTOM/in-house transformation - no rules library can cover it. Open it in the Designer to see what it does, then rebuild that behaviour with PDI steps (arbitrary logic fits a 'User Defined Java Class'; a reusable block fits a mapping/sub-transformation)."
+  "Java Transformation": "a 'User Defined Java Class' step - port the Java in; simple per-row logic can instead go in a 'Modified Java Script Value'."
+  "SQL": "an 'Execute row SQL script' step (one SQL per row) or 'Dynamic SQL row'; a query-mode SQL transformation often folds into the 'Table input' SQL."
+  "Transaction Control": "PDI commits per transformation, not per row - set the commit size on the target step, or wrap the load in a job with a DB transaction. Review where the transaction boundaries must fall."
+  "XML Parser": "a 'Get data from XML' step - XPath the incoming XML into fields."
+  "XML Generator": "an 'Add XML' step - build the XML document from the incoming fields."
+  "XML Source Qualifier": "a 'Get data from XML' step reading the source document."
+  "Web Services Consumer": "a 'Web services lookup' step (SOAP) or a 'REST client' step (HTTP/JSON)."
+  "HTTP": "an 'HTTP client' or 'REST client' step."
+  "Data Masking": "no PDI data-masking step - mask in the source SQL, or with 'Modified Java Script Value' / 'Replace in string'. Review against the compliance rules."
+  "Unstructured Data": "no direct PDI equivalent - parse the source with the step that matches its format ('Get data from XML', 'Regex evaluation', 'JSON input', or a script)."
+  "Association": "an Informatica Data Quality step - approximate with 'Fuzzy match' + 'Group by'; review the association keys."
+  "Match": "an Informatica Data Quality dedupe - approximate with 'Fuzzy match' then 'Unique rows', or 'Merge rows (diff)'. Review the match thresholds."
+  "Address Validator": "an Informatica Data Quality step with no PDI equivalent - call an external address-validation service via 'REST client', or drop it if the estate does not need it."
+  "Mapplet": "a reusable Informatica mapplet - convert it to a PDI mapping (sub-transformation) and call it with a 'Mapping (sub-transformation)' step so the reuse is preserved."
 
 "Source Qualifier":
   pdi_type: TableInput
