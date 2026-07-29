@@ -210,11 +210,31 @@ class Summary:
 
 
 @dataclass
+class TopN:
+    """Crystal's Group Sort Expert / Top-N on a group: keep the N groups with
+    the largest (Top-N) or smallest (Bottom-N) ranking measure and roll the
+    rest into a single "Others" bucket.
+
+    PRD has no Top-N group, so this is realized in the report SQL. RptToXml
+    exposes only the direction (TopNOrder/BottomNOrder) and the ranking measure
+    - NOT the N count or the "Others" options - so `n`/`others` are assumed and
+    flagged for the consultant to confirm (n_assumed)."""
+    op: str = "Sum"           # ranking aggregate: Sum, Average, Count, Max, Min
+    measure: str = ""         # bare column the measure aggregates
+    descending: bool = True   # Top-N = largest first; Bottom-N = smallest
+    n: int = 5                # groups kept before "Others"; ASSUMED, not exported
+    n_assumed: bool = True
+    others: bool = True       # roll the rest into one "Others" bucket
+    others_label: str = "Others"
+
+
+@dataclass
 class Group:
     condition_field: str      # raw {Table.Field}
     column: str = ""          # resolved column name
     name: str = ""
     descending: bool = False  # group direction from the SortField list
+    topn: object = None       # TopN spec when Group Sort Expert / Top-N is used
 
 
 @dataclass

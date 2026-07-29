@@ -16,7 +16,7 @@ from pentaho_migration.reports.formula_translator import translate_all, translat
 from pentaho_migration.reports.model import ReportModel
 from pentaho_migration.reports.prpt_writer import write_prpt
 from pentaho_migration.reports.rpt_parser import (
-    apply_window_columns, generate_sql, parse_rpttoxml)
+    apply_topn, apply_window_columns, generate_sql, parse_rpttoxml)
 
 __all__ = [
     "ReportModel",
@@ -43,6 +43,9 @@ def _finish_model(model: ReportModel, jndi: str | None) -> None:
     # StdDev/Variance-family summaries become windowed SQL columns - fold
     # them in AFTER the record selection so the WHERE lands inside the wrap
     apply_window_columns(model)
+    # Crystal Group Sort Expert / Top-N -> query ordering (and Others rollup),
+    # last so it wraps the final SQL (WHERE and window columns already inside)
+    apply_topn(model)
 
 
 def load_report_model(source: str | Path, jndi: str | None = None) -> ReportModel:

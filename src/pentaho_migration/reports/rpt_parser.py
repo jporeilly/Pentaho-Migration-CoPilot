@@ -31,8 +31,14 @@ import xml.etree.ElementTree as ET
 
 from .model import (
     SUMMARY_CLASS_MAP, WINDOW_AGG_MAP, Element, Formula, Group,
-    PageSetup, Parameter, ReportModel, Section, Summary,
+    PageSetup, Parameter, ReportModel, Section, Summary, TopN,
 )
+
+# Crystal ranking operation -> SQL aggregate, for a Top-N group's measure.
+_TOPN_AGG_SQL = {
+    "Sum": "SUM", "Average": "AVG", "Count": "COUNT",
+    "Maximum": "MAX", "Minimum": "MIN",
+}
 from .rpt_xml import (
     ALIGN_MAP, _argb_to_hex, _attr, _find_color, _local, _parse_border,
     _parse_font, _text_of, _twips,
@@ -538,14 +544,20 @@ def _parse_data_definition(root, model):
         descending = direction.startswith("Descending")
         stype = _attr(sf, "SortType", default="RecordSortField")
         if stype == "GroupSortField":
-            matched = next((g for g in model.groups if g.condition_field == raw), None)
-            if matched is not None and not direction.startswith(("TopN", "BottomN")):
-                matched.descending = descending
+            if direction.startswith(("TopN", "BottomN")):
+                # Crystal Group Sort Expert / Top-N. Realized in SQL later
+                # (apply_topn); here we only attach the spec to its group.
+                _attach_topn(model, raw, direction)
             else:
-                # Group Sort Expert: groups ordered by a summary value / Top N
-                model.issues.append(
-                    f"group sort '{raw}' ({direction}) not carried - order the "
-                    "groups in the query or rebuild with PRD group sorting")
+                matched = next((g for g in model.groups if g.condition_field == raw), None)
+                if matched is not None:
+                    matched.descending = descending
+                else:
+                    # groups ordered by a summary value (not their own key):
+                    # order the query by that measure or rebuild in PRD
+                    model.issues.append(
+                        f"group sort '{raw}' ({direction}) not carried - order the "
+                        "groups in the query or rebuild with PRD group sorting")
         else:
             skind, column = parse_field_ref(raw)
             if skind == "db":
@@ -646,6 +658,26 @@ def _recover_summary_refs(name, fref, gref):
     if _DOTNET_TYPE.match(gref or "") and len(args) > 1:
         gref = "{" + args[1] + "}"  # PercentOfSum(field, group, outer) - own group first
     return fref, gref
+
+
+def _attach_topn(model, field_expr, direction):
+    """A GroupSortField with TopNOrder/BottomNOrder is Crystal's Group Sort
+    Expert. `field_expr` is the ranking measure, e.g.
+    "Sum ({Customer.Last_Years_Sales}, {Customer.Country})" - its second
+    argument names the group. Attach a TopN spec to that group; apply_topn
+    turns it into query ordering (and, with the Others rollup, bucketing)."""
+    op = _summary_label(field_expr) or "Sum"
+    args = re.findall(r"\{([^{}]+)\}", field_expr)
+    measure = parse_field_ref("{" + args[0] + "}")[1] if args else ""
+    gcol = parse_field_ref("{" + args[1] + "}")[1] if len(args) > 1 else ""
+    matched = next((g for g in model.groups if gcol and g.column == gcol), None)
+    if matched is None:
+        model.issues.append(
+            f"Top-N group sort '{field_expr}' ({direction}) - could not match a "
+            "group; order the groups in the query or rebuild with PRD group sorting")
+        return
+    matched.topn = TopN(op=op, measure=measure,
+                        descending=direction.startswith("TopN"))
 
 
 def _parse_summaries(dd, model):
@@ -1014,6 +1046,66 @@ def apply_window_columns(model):
              if order_cols else "")
     model.sql = (f"SELECT q.*, {extras}\nFROM (\n{inner}\n) q"
                  + (f"\nORDER BY {order}" if order else ""))
+
+
+def apply_topn(model):
+    """Crystal's Group Sort Expert / Top-N has no PRD equivalent, so realize it
+    in the report SQL. First step (here): order the groups by their ranking
+    measure so the top (or bottom) groups lead - PRD then bands them in that
+    order. The "Others" rollup that collapses the tail is layered on top of
+    this. Runs after model.sql is final, like apply_window_columns.
+
+    Handles the outermost Top-N group; any inner Top-N groups are ordered
+    within it and flagged for review (Crystal ranks them per parent)."""
+    topns = [g for g in model.groups if getattr(g, "topn", None)]
+    if not topns or not model.sql:
+        return
+
+    def ref(column):
+        # Command SQL exposes quoted SELECT aliases; generated SQL exposes the
+        # bare column names of the qualified SELECT list (see apply_window_columns).
+        return column if model.sql_generated else f'"{column}"'
+
+    def known(col):
+        return bool(col) and (not model.sql_generated or col in model.field_types)
+
+    rankable = [g for g in topns if known(g.column) and known(g.topn.measure)]
+    if not rankable:
+        for g in topns:
+            model.issues.append(
+                f"Crystal Top-N on group '{g.column or g.condition_field}' - the "
+                "ranking measure is not a query column, so it could not be "
+                "ordered in SQL; sort the groups in the query or rebuild with "
+                "PRD group sorting")
+        return
+
+    outer = rankable[0]
+    agg = _TOPN_AGG_SQL.get(outer.topn.op, "SUM")
+    rank_term = (f"{agg}(q.{ref(outer.topn.measure)}) "
+                 f"OVER (PARTITION BY q.{ref(outer.column)}) "
+                 + ("DESC" if outer.topn.descending else "ASC"))
+
+    order_cols = [(g.column, g.descending) for g in model.groups]
+    order_cols += [(c, d) for c, d in model.record_sorts
+                   if c not in {g.column for g in model.groups}]
+    tail = [f"q.{ref(c)}" + (" DESC" if d else "")
+            for c, d in order_cols if known(c)]
+    order = ", ".join([rank_term] + tail)
+
+    inner = re.sub(r"\s+ORDER\s+BY\b.*$", "", model.sql, flags=re.I | re.S)
+    model.sql = f"SELECT q.*\nFROM (\n{inner}\n) q\nORDER BY {order}"
+
+    kind = "top" if outer.topn.descending else "bottom"
+    model.issues.append(
+        f"Crystal Top-N (Group Sort Expert) on '{outer.column}' has no PRD "
+        f"group equivalent - the query now orders the groups by "
+        f"{outer.topn.op}({outer.topn.measure}) so the {kind} groups lead. The "
+        f"'Others' rollup and the N count (RptToXml omits it; assumed "
+        f"{outer.topn.n}) still need confirming.")
+    for g in rankable[1:]:
+        model.issues.append(
+            f"nested Top-N on '{g.column}' is ordered within '{outer.column}' "
+            "but not ranked per parent - verify against the original")
 
 
 def _resolve_format(el):
@@ -1422,6 +1514,11 @@ def generate_sql(model):
                 q = qualify_ident(tname, g.column)
                 if q not in used:
                     used.insert(0, q)
+    # A Top-N group ranks by a measure that the layout may not otherwise
+    # select; apply_topn needs it in the query to order (and bucket) by.
+    for g in model.groups:
+        if getattr(g, "topn", None):
+            _add(g.topn.measure)
     if not used:
         used = ["*"]
 
