@@ -6,6 +6,7 @@ import { useRef, useState } from 'react'
 import Markdown from '../components/Markdown.jsx'
 import EffortPanel from '../components/EffortPanel.jsx'
 import Explain from '../components/Explain.jsx'
+import ReportOverlay from '../components/ReportOverlay.jsx'
 
 function downloadBase64(b64, filename) {
   const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
@@ -22,16 +23,6 @@ function downloadHtml(html, filename) {
   a.download = filename
   a.click()
   URL.revokeObjectURL(a.href)
-}
-
-function openHtmlInTab(html) {
-  // the report HTML is already in hand, so this runs inside the click - no
-  // async gap for a pop-up blocker to catch
-  const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
-  const tab = window.open(url, '_blank')
-  if (!tab) { URL.revokeObjectURL(url); return false }
-  setTimeout(() => URL.revokeObjectURL(url), 60000)
-  return true
 }
 
 function downloadPdf(base64, filename) {
@@ -64,6 +55,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
   const [gateStage, setGateStage] = useState(null)   // {stage, stages}
   const [gate, setGate] = useState(null)
   const [gateError, setGateError] = useState(null)
+  const [overlayHtml, setOverlayHtml] = useState(null)  // consultant report, inline
   const mdName = report.filename.replace(/\.prpt$/, '.conversion.md')
 
   function closePreview() {
@@ -77,52 +69,61 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
   }
 
   async function openPdfPreview() {
-    // Reserve the tab NOW, inside the click, or the render finishing later
-    // counts as a scripted pop-up and the browser blocks it.
-    const tab = window.open('', '_blank')
+    // Render INLINE, never a new tab. A window.open'd tab is a separate
+    // browsing context: a blob: URL created here shows blank in it (the
+    // "blank tab" bug). An <object> in THIS document resolves the same blob
+    // and shows the whole PDF with the browser's outline panel — the group
+    // tree recreated from Crystal.
     const token = ++previewToken.current
     setPreviewBusy(true)
     setPreviewError(null)
+    setPreviewPages(null)
+    setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return null })
     try {
       const form = new FormData()
       form.append('dump', file)
-      // The PDF itself, in a real browser tab - the browser's own viewer
-      // gives the WHOLE report with page navigation and the outline panel,
-      // which is where the group tree recreated from Crystal shows up.
       const res = await fetch(`/reports/preview?jndi=${encodeURIComponent(jndi)}`, {
         method: 'POST',
         body: form,
       })
-      if (res.ok) {
-        const url = URL.createObjectURL(await res.blob())
-        if (token !== previewToken.current) { URL.revokeObjectURL(url); if (tab) tab.close(); return }
-        if (tab) {
-          tab.location = url                 // native PDF viewer, own tab
-          // keep the blob alive long enough for the tab to load it
-          setTimeout(() => URL.revokeObjectURL(url), 60000)
-        } else {
-          // pop-up blocked - fall back to the in-app modal
-          setPreviewPages(null)
-          setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url })
-        }
-        return
-      }
-      if (tab) tab.close()
-      // fallback for a pane with no PDF plugin: pages as images, in the modal
-      const fallback = await fetch(
-        `/reports/preview?jndi=${encodeURIComponent(jndi)}&format=pages`,
-        { method: 'POST', body: form })
-      if (!fallback.ok) {
+      if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.detail || res.statusText)
       }
-      setPreviewUrl(null)
-      setPreviewPages((await fallback.json()).pages)
+      const url = URL.createObjectURL(await res.blob())
+      if (token !== previewToken.current) { URL.revokeObjectURL(url); return }
+      setPreviewUrl(url)
     } catch (err) {
-      if (tab) tab.close()
-      setPreviewError(err.message)
+      if (token === previewToken.current) setPreviewError(err.message)
     } finally {
-      setPreviewBusy(false)
+      if (token === previewToken.current) setPreviewBusy(false)
+    }
+  }
+
+  // Safety net for any environment whose inline PDF viewer renders blank:
+  // the same render as flat page images, which display everywhere.
+  async function loadPreviewPages() {
+    const token = ++previewToken.current
+    setPreviewBusy(true)
+    setPreviewError(null)
+    setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return null })
+    setPreviewPages(null)
+    try {
+      const form = new FormData()
+      form.append('dump', file)
+      const res = await fetch(
+        `/reports/preview?jndi=${encodeURIComponent(jndi)}&format=pages`,
+        { method: 'POST', body: form })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.detail || res.statusText)
+      }
+      if (token !== previewToken.current) return
+      setPreviewPages((await res.json()).pages)
+    } catch (err) {
+      if (token === previewToken.current) setPreviewError(err.message)
+    } finally {
+      if (token === previewToken.current) setPreviewBusy(false)
     }
   }
 
@@ -306,12 +307,8 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             </h2>
             <div className="actions">
               {gate.consultant_report_html && (
-                <button className="primary" onClick={() => {
-                  if (!openHtmlInTab(gate.consultant_report_html)) {
-                    downloadHtml(gate.consultant_report_html,
-                      report.filename.replace(/\.prpt$/, '.consultant.html'))
-                  }
-                }}>
+                <button className="primary"
+                  onClick={() => setOverlayHtml(gate.consultant_report_html)}>
                   🔍 Consultant report
                 </button>
               )}
@@ -370,9 +367,15 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
               <div className="pdf-modal-actions">
                 {previewPages && (
                   <span className="muted">
-                    first {previewPages.length} page(s) — this browser has no
-                    inline PDF viewer, so there is no outline panel
+                    first {previewPages.length} page(s) — flat images, so there
+                    is no outline panel
                   </span>
+                )}
+                {previewUrl && !previewPages && (
+                  <button className="ghost" onClick={loadPreviewPages}
+                    title="If the PDF above is blank, render the pages as flat images instead">
+                    ⤢ Pages as images
+                  </button>
                 )}
                 <button className="ghost" onClick={closePreview} aria-label="Close">✕ Close</button>
               </div>
@@ -397,9 +400,9 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
                 <div className="pdf-fallback">
                   <p>This browser can't display PDFs inline.</p>
                   <p>
-                    <a className="pdf-open-tab" href={previewUrl} target="_blank" rel="noreferrer">
-                      ↗ Open the PDF in a tab
-                    </a>
+                    <button className="ghost" onClick={loadPreviewPages}>
+                      ⤢ Show the pages as images
+                    </button>
                   </p>
                 </div>
               </object>
@@ -412,6 +415,15 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
         <header><h2>Conversion report</h2></header>
         <Markdown text={report.report_markdown} />
       </div>
+
+      {overlayHtml && (
+        <ReportOverlay
+          html={overlayHtml}
+          title="Consultant report"
+          filename={report.filename.replace(/\.prpt$/, '.consultant.html')}
+          onClose={() => setOverlayHtml(null)}
+        />
+      )}
     </>
   )
 }
