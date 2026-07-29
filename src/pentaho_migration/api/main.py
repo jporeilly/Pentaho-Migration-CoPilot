@@ -137,12 +137,12 @@ _INFA_DEMO_META = {
     },
     "hhs_fda_leave.xml": {
         "label": "FDA leave — workflow orchestration",
-        "description": "A full workflow with 7 mappings and an email step: "
+        "description": "A full workflow with 10 mappings and an email step: "
                        "converts to a PDI job (.kjb) plus its transformations.",
     },
     "hhs_cpm.xml": {
         "label": "CPM payroll — the honesty demo at scale",
-        "description": "16 mappings with mapplets; the biggest lands ⚠ with "
+        "description": "15 mappings with mapplets; the biggest lands ⚠ with "
                        "named manual work. Shows the estate-scale truth, not "
                        "a cherry-picked sample.",
     },
