@@ -9,6 +9,8 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+## [1.41.0] - 2026-07-29
+
 - **A Crystal gauge converts to a working chart, not a red TODO.** PRD has no
   dial gauge, but its legacy-charts plugin ships a Thermometer (JFreeChart's
   meter family) — one value against a scale with warning/critical sub-ranges,

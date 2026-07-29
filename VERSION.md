@@ -1,6 +1,45 @@
 # Version
 
-**1.40.0** - 2026-07-28
+**1.41.0** - 2026-07-29
+
+**The generated SQL runs against a real database, rebuilt from the reports
+themselves.** During a PoC there is usually no database to point a converted
+report at. `report-sample-db` recovers one: the schema from the field
+metadata every `.rpt` declares, the data from the rows Crystal saved inside
+them, split back into base tables by the qualified name. Xtreme and the SAP
+BOE samples were rebuilt this way, loaded into MySQL, and the demo statement's
+own SELECT returns its rows joined correctly. What it cannot recover is stated,
+not smoothed over: a column no report selected has no values, a join key no
+report saved is synthesized and labelled as such.
+
+**A Crystal table is named by its ALIAS, which fixed one bug wearing three
+faces.** Keying tables by the physical name left an XML datasource calling its
+table `dataroot/Customer_Query` while every link said `{Customer...}`: the join
+silently vanished, the FROM named an XPath no database resolves, and the `/`
+forced quoting MySQL rejects. All three gone once the alias — what every field,
+formula and link is written against — became the key.
+
+**A modern cross-tab renders its pivot with real data.** The SAP BOE income
+statements pivot on a date computed from Year and Month; that dimension is now
+computed in the sub-report's SQL, so ComparativeIncomeStatement renders a fully
+populated actuals-vs-budget pivot with its month columns labelled — a 2016-era
+demo the 2002 statement could not be.
+
+**A Crystal gauge converts to a working chart, not a red TODO.** PRD has no
+dial, but its Thermometer chart is the same idea — one value against a scale
+with thresholds — so a gauge maps to it and is flagged for the consultant to
+approve.
+
+**Open in Report Designer actually opens the report now** (the detached launch
+left `cmd` with no console, so the batch's `start` never fired), the PDF and
+consultant reports open in their own browser tabs, and the Try button picks any
+of five demo reports from a dropdown.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full 1.41.0 list and history.
+
+---
+
+## 1.40.0 - 2026-07-28
 
 **The release gate can see.** It compared extracted text and nothing else, so
 a background panel that vanished, a rule the original never draws, or a total
