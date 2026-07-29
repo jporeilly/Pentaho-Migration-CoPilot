@@ -469,16 +469,55 @@ def _crosstab_child_model(model, el):
     child.subreports = {}
     child.record_sorts = []
     child.summaries = []
+    # The crosstab sub-report has no bands of its own - the crosstab group IS
+    # its body - so it has no itemband. A report FORMULA becomes a PRD
+    # expression, and the crosstab evaluates one during its column-axis pass
+    # while the engine reaches for an itemband to read the value's format
+    # from: getItemBand() returns null and the whole render dies with an NPE.
+    # The child only ever needs its query, so it carries no formulas. This
+    # report's {@date} (=DATEVALUE([Year];[Month];1)) is exactly such a
+    # formula, and it took down a report converting with zero manual work.
+    child.formulas = {}
 
     def _order_expr(column):
-        if model.sql_generated:
-            return next((f"{t}.{column}" for t, fs in model.tables.items()
-                         if column in fs), column)
-        return f'"{column}"'  # Command SQL exposes the quoted SELECT aliases
+        if not model.sql_generated:
+            return f'"{column}"'  # Command SQL exposes the quoted SELECT aliases
+        return next((f"{t}.{column}" for t, fs in model.tables.items()
+                     if column in fs), None)
 
     dims = el.crosstab_rows + el.crosstab_columns
+    resolved = [(c, _order_expr(c)) for c in dims]
+    usable = [expr for _c, expr in resolved if expr]
+    # A dimension can be a FORMULA rather than a stored column - the whole BOE
+    # income-statement family pivots its columns on {@date}, a date built from
+    # the Year and Month columns. Two things follow, and the honesty contract
+    # means saying both rather than rendering something that looks converted:
+    #
+    #   - the query cannot ORDER BY a name the database does not have, and
+    #     doing so fails the ENTIRE render ("Unknown column 'date' in 'order
+    #     clause'") - so it is left out here;
+    #   - the crosstab pivots its columns on that same value, so WITHOUT it
+    #     in the result set the column axis has nothing to spread over and
+    #     the body comes out empty.
+    #
+    # The fix is one computed column, but its SQL is database-specific (MySQL
+    # STR_TO_DATE vs others), so emitting it silently would ship a query that
+    # only runs on one engine. It is called out as manual work with the recipe
+    # instead - a deterministic wrong guess is worse than an honest TODO.
+    dropped = [c for c, expr in resolved
+               if not expr and c in model.formulas]
+    for c in dropped:
+        model.issues.append(
+            f"cross-tab '{child.name}' pivots on the formula {{@{c}}} "
+            f"(Crystal: {model.formulas[c].text}), which is computed in the "
+            "report rather than selected. PRD cross-tabs pivot over query "
+            "columns, so the column axis stays empty until this is a real "
+            f"column: add it to the sub-report's SELECT as a database "
+            f"expression aliased `{c}` (e.g. MySQL STR_TO_DATE over the "
+            "underlying fields), then it also sorts. "
+            "MANUAL: cross-tab computed dimension")
     base = re.sub(r"\s+ORDER\s+BY\b.*$", "", child.sql, flags=re.I | re.S)
-    child.sql = base + "\nORDER BY " + ", ".join(_order_expr(c) for c in dims)
+    child.sql = base + ("\nORDER BY " + ", ".join(usable) if usable else "")
     return child
 
 

@@ -432,6 +432,8 @@ class _Parser:
             return self._datediff(args)
         if low == "dateadd":
             return self._dateadd(args)
+        if low in ("cdate", "datevalue"):
+            return self._cdate(low, original, args)
         if low not in FUNC_MAP:
             raise TranslationError(f"no OpenFormula mapping for function {original}()")
         target, note, arg_fn = FUNC_MAP[low]
@@ -440,6 +442,20 @@ class _Parser:
         if arg_fn:
             args = arg_fn(args)
         return f"{target}({';'.join(args)})"
+
+    def _cdate(self, low, original, args):
+        """CDate / DateValue are dual-form in Crystal. Given ONE argument
+        they parse a string into a date - OpenFormula DATEVALUE("2016-01").
+        Given THREE they CONSTRUCT a date from year, month, day, which is
+        OpenFormula DATE(y;m;d) - DATEVALUE has no three-argument form and
+        the engine rejects it with "Invalid number of arguments", failing
+        the whole render. Keyed on arity, not on which name was written:
+        this report's cross-tab pivots on cdate(Year, Month, 1)."""
+        if len(args) == 3:
+            return f"DATE({';'.join(args)})"
+        if low == "cdate":
+            self.notes.append("CDate mapped to DATEVALUE; verify input format")
+        return f"DATEVALUE({';'.join(args)})"
 
     def _color(self, args):
         """Crystal Color(r, g, b) -> a PRD colour literal. Only literal

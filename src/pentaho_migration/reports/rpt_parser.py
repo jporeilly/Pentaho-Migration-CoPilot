@@ -1455,13 +1455,37 @@ def generate_sql(model):
         for tname, fields in model.tables.items():
             if column in fields:
                 return qualify_ident(tname, column)
+        # No table claims it, so it is computed in the report rather than
+        # selected - a group or sort on a formula. Ordering by a name the
+        # database cannot resolve fails the ENTIRE query, taking the report
+        # with it, so it is dropped here and noted below. Only when field
+        # metadata exists to judge against: a Command report exposes its own
+        # SELECT aliases, which are not in model.tables and are still valid.
+        if model.field_types and model.sql_generated:
+            return ""
         return quote_ident(column)
 
-    order = [f"{_qualify(g.column)}{' DESC' if g.descending else ''}"
-             for g in model.groups if g.column]
-    order += [f"{_qualify(col)}{' DESC' if desc else ''}"
-              for col, desc in model.record_sorts
-              if _qualify(col) not in [o.split(" ")[0] for o in order]]
+    unsortable = []
+
+    def _term(column, descending):
+        expr = _qualify(column)
+        if not expr:
+            unsortable.append(column)
+            return ""
+        return f"{expr}{' DESC' if descending else ''}"
+
+    order = [t for t in (_term(g.column, g.descending)
+                         for g in model.groups if g.column) if t]
+    order += [t for t in (_term(col, desc) for col, desc in model.record_sorts)
+              if t and t.split(" ")[0] not in [o.split(" ")[0] for o in order]]
+    if unsortable:
+        model.issues.append(
+            "sorted on " + ", ".join(f"'{c}'" for c in dict.fromkeys(unsortable))
+            + " - computed in the report, not a database column, so it is "
+            "left out of the generated ORDER BY. PRD groups need pre-sorted "
+            "data: if the groups come out in the wrong order, sort on the "
+            "underlying column(s) instead, or add the expression to the "
+            "SELECT and order by that")
     if order:
         sql += "\nORDER BY " + ", ".join(order)
     return sql
