@@ -216,6 +216,10 @@ CHART_EXPRESSIONS = {
     "line": "org.pentaho.plugin.jfreereport.reportcharts.LineChartExpression",
     "area": "org.pentaho.plugin.jfreereport.reportcharts.AreaChartExpression",
     "pie": "org.pentaho.plugin.jfreereport.reportcharts.PieChartExpression",
+    # PRD's nearest thing to a Crystal gauge: a single value against a scale
+    # with warning/critical sub-ranges. Fed by the single-value collector,
+    # not the category/pie one.
+    "thermometer": "org.pentaho.plugin.jfreereport.reportcharts.ThermometerChartExpression",
 }
 NS_LEGACY_CHARTS = "http://reporting.pentaho.org/namespaces/engine/classic/legacy/charting/1.0"
 
@@ -227,7 +231,12 @@ def _render_chart(el, tp, sp):
     expr_class = CHART_EXPRESSIONS.get(el.chart_type)
     if not expr_class or not el.chart_value:
         return render_element(_todo_label(el, f"[TODO chart: {el.chart_type or 'unsupported'}]"), tp, sp)
-    if el.chart_type == "pie":
+    if el.chart_type == "thermometer":
+        # a single value against a scale - no category or series axis, just
+        # the one measure the gauge was reading
+        collector = "org.pentaho.plugin.jfreereport.reportcharts.collectors.ValueDataSetCollector"
+        dataset_props = f'<property name="valueColumn">{escape(el.chart_value)}</property>'
+    elif el.chart_type == "pie":
         collector = "org.pentaho.plugin.jfreereport.reportcharts.collectors.PieDataSetCollector"
         dataset_props = (f'<property name="seriesColumn">{escape(el.chart_category)}</property>'
                          f'<property name="valueColumn">{escape(el.chart_value)}</property>')
@@ -238,7 +247,19 @@ def _render_chart(el, tp, sp):
                             if el.chart_series else '<property name="seriesName">'
                             + escape(el.chart_value) + "</property>")
                          + f'<property name="valueColumn">{escape(el.chart_value)}</property>')
-    title = el.chart_title or f"{el.chart_value} by {el.chart_category}"
+    if el.chart_type == "thermometer":
+        title = el.chart_title or el.chart_value      # no category axis
+        # a KPI meter, not a temperature: drop the default "C" unit label and
+        # the legend a single value does not need
+        chart_props = (f'<property name="titleText">{escape(title)}</property>'
+                       '<property name="thermometerUnits" '
+                       'class="org.pentaho.plugin.jfreereport.reportcharts.'
+                       'ThermometerUnit">None</property>'
+                       '<property name="showLegend" class="java.lang.Boolean">false</property>')
+    else:
+        title = el.chart_title or f"{el.chart_value} by {el.chart_category}"
+        chart_props = (f'<property name="titleText">{escape(title)}</property>'
+                       '<property name="showLegend" class="java.lang.Boolean">true</property>')
     return (
         f'<legacy-charts:legacy-chart core:element-type="legacy-chart" '
         f'xmlns:legacy-charts="{NS_LEGACY_CHARTS}">'
@@ -252,8 +273,7 @@ def _render_chart(el, tp, sp):
         f'<attribute-expression namespace="http://reporting.pentaho.org/namespaces/engine/attributes/core" '
         f'name="value" class="{expr_class}">'
         f"<properties>"
-        f'<property name="titleText">{escape(title)}</property>'
-        f'<property name="showLegend" class="java.lang.Boolean">true</property>'
+        f"{chart_props}"
         f'<property name="backgroundColor">#ffffff</property>'
         f'<property name="showBorder" class="java.lang.Boolean">false</property>'
         f"</properties></attribute-expression>"

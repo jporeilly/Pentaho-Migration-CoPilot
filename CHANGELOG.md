@@ -9,6 +9,15 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **A Crystal gauge converts to a working chart, not a red TODO.** PRD has no
+  dial gauge, but its legacy-charts plugin ships a Thermometer (JFreeChart's
+  meter family) — one value against a scale with warning/critical sub-ranges,
+  which is what a gauge is. A `crChartStyleTypeGauge` now maps to a
+  ThermometerChartExpression fed by the single-value collector, renders (the
+  default "°C" unit and legend suppressed), and is flagged as a **review**
+  substitution: a tube is not a dial and a multi-needle gauge keeps only its
+  first value, so the consultant approves it or swaps a KPI text field. Both
+  gauges on the OrderProcessingEfficiencyDashboard convert this way.
 - **A modern cross-tab report renders its pivot with real data.** The SAP BOE
   income-statement family (Comparative, Consolidated, Monthly Variance, Rolling
   Quarter) pivots its columns on a date COMPUTED from Year and Month, which PRD

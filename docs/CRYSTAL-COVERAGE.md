@@ -39,6 +39,7 @@ semantic judgment is required):
 | Page size, orientation, margins | page-definition | Deterministic |
 | Embedded images (logo etc.) | Embedded bundle resource. Bytes come from `report-images`: the free SAP SDK cannot read picture bytes (`PictureData` is null in the embedded RAS — verified), so the raster is **carved from the .rpt binary** (PNG/JPEG/DIB signature scan, decode-proven with Pillow, converted to PNG) and matched to its PictureObject by aspect ratio. 83 images recovered across all 44 image-bearing corpus reports, zero misses. Auto-run by `extract-rpt.ps1` | Deterministic → review (verify the matched picture) |
 | Charts (bar, line, area, pie, doughnut) | Legacy-chart element + dataset collector + JFreeChart expression | Deterministic → review (verify aggregation) |
+| **Gauge** | PRD has no dial, so it maps to the legacy-charts **Thermometer** (JFreeChart's meter family) — one value against a scale with warning/critical sub-ranges, fed by the single-value collector. Renders. | Deterministic → **review**: a tube not a dial, a single needle only — the consultant approves the substitution or swaps a KPI text field |
 | Special fields (page N of M, print date) | PageOfPagesFunction / report.date message fields | Deterministic |
 
 ## Data & queries — deterministic

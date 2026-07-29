@@ -44,6 +44,12 @@ CHART_STYLE_MAP = {
     "crChartStyleTypeArea": "area",
     "crChartStyleTypePie": "pie",
     "crChartStyleTypeDoughnut": "pie",
+    # PRD has no dial gauge, but its legacy-charts plugin ships a Thermometer
+    # (JFreeChart's meter family) - a single value against a scale with
+    # warning/critical sub-ranges, which is what a Crystal gauge IS. The
+    # metaphor differs (a tube, not a dial), so it converts as a REVIEW item
+    # the consultant approves or swaps - see the note in _parse_object.
+    "crChartStyleTypeGauge": "thermometer",
 }
 
 FIELD_REF_RE = re.compile(r"^\{([^}]+)\}$")
@@ -271,9 +277,26 @@ def _parse_object(obj):
                     for f in parent]
             el.chart_category = cond[0] if cond else ""
             el.chart_value = data[0] if data else ""
-            el.notes.append(
-                "chart migrated as a PRD legacy chart collecting detail rows - "
-                "verify aggregation semantics match the Crystal summary")
+            if mapped == "thermometer":
+                # A gauge is a single value against a scale; the thermometer
+                # is PRD's nearest chart for that. Say plainly that it is a
+                # SUBSTITUTION - the shape differs and a multi-needle gauge
+                # loses its extra needles - so the consultant approves it or
+                # swaps it, rather than finding a tube where a dial was.
+                extra = (f" The Crystal gauge showed {len(data)} values; the "
+                         "thermometer shows the first - the others need their "
+                         "own chart." if len(data) > 1 else "")
+                el.notes.append(
+                    "REVIEW: Crystal gauge converted to a PRD thermometer - "
+                    "the closest single-value meter PRD offers (a tube, not a "
+                    "dial). Verify the scale range and any warning/critical "
+                    "thresholds, and approve the substitution or replace it "
+                    "with a KPI text field." + extra)
+            else:
+                el.notes.append(
+                    "chart migrated as a PRD legacy chart collecting detail "
+                    "rows - verify aggregation semantics match the Crystal "
+                    "summary")
         else:
             el.kind = "unknown"
             el.text = f"ChartObject ({style or 'no definition in dump'})"
