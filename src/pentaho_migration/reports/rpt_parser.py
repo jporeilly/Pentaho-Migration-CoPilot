@@ -1156,6 +1156,32 @@ def apply_topn(model):
             f"groups lead. To collapse the rest into 'Others', add a "
             f"CASE-on-rank column in the query (N assumed {n}).")
 
+    # A pie/bar chart bound to a Top-N group's key follows the same relabelling
+    # for free: its category is that column, and PRD's collector aggregates the
+    # measure by it, so the chart shows the kept groups + Others without a
+    # separate datasource. Wire it explicitly by noting it on the element (and
+    # flag a chart on a nested Top-N group, which is not bucketed yet).
+    topn_cols = {g.column for g in rankable}
+    for s in model.sections:
+        for el in s.elements:
+            if el.kind != "chart" or not getattr(el, "chart_category", ""):
+                continue
+            cat = el.chart_category
+            if cat == outer.column and can_bucket:
+                el.notes.append(
+                    f"Top-N chart: category '{cat}' reads the bucketed column, so "
+                    f"the pie shows the {kind} {n} + '{outer.topn.others_label}' "
+                    "like the original (verify the slice totals)")
+            elif cat == outer.column:
+                el.notes.append(
+                    f"chart category '{cat}' is ordered by the Top-N measure; add "
+                    "the CASE-on-rank column to the query to bucket the tail into "
+                    "'Others'")
+            elif cat in topn_cols:
+                el.notes.append(
+                    f"chart category '{cat}' is a nested Top-N group - it still "
+                    "charts every group; bucket it in the query to match the original")
+
     for g in rankable[1:]:
         model.issues.append(
             f"nested Top-N on '{g.column}' is ordered within '{outer.column}' "

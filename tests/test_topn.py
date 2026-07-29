@@ -101,6 +101,74 @@ class TestTopNBucketsIntoOthers:
         assert "_grp_rank" not in model.sql and "PARTITION BY" not in model.sql
 
 
+# A Top-5 pie: its category is the Top-N group, so it must follow the same
+# bucketing as the table.
+TOP_N_CHART = """\
+<Report Name="TopFiveChart" FileName="tfc.rpt">
+  <Database><Tables>
+    <Table Name="Sales" Alias="Sales"><Fields>
+      <Field Name="Country" LongName="Sales.Country"
+             Type="crFieldValueTypeStringField"/>
+      <Field Name="Sales_Amount" LongName="Sales.Sales_Amount"
+             Type="crFieldValueTypeNumberField"/>
+    </Fields></Table>
+  </Tables></Database>
+  <DataDefinition>
+    <RecordSelectionFormula/>
+    <Groups><Group Name="G0" ConditionField="{Sales.Country}"/></Groups>
+    <SortFields>
+      <SortField Field="Sum ({Sales.Sales_Amount}, {Sales.Country})"
+                 SortDirection="TopNOrder" SortType="GroupSortField"/>
+    </SortFields>
+  </DataDefinition>
+  <ReportDefinition><Areas>
+    <Area Kind="ReportHeader"><Sections><Section Name="RH" Height="300">
+      <ReportObjects>
+        <ChartObject Name="G1" Kind="ChartObject" Left="0" Top="0"
+                     Width="500" Height="300">
+          <ChartDefinition StyleType="crChartStyleTypePie"
+                           ChartType="crChartTypeGroup" Title="" Subtitle="">
+            <ConditionFields>
+              <Field FormulaName="{Sales.Country}" Name="Country"/>
+            </ConditionFields>
+            <DataFields>
+              <Field FormulaName="Sum ({Sales.Sales_Amount}, {Sales.Country})"
+                     Name="Sales_Amount"/>
+            </DataFields>
+          </ChartDefinition>
+        </ChartObject>
+      </ReportObjects>
+    </Section></Sections></Area>
+    <Area Kind="Detail"><Sections><Section Name="D" Height="20">
+      <ReportObjects>
+        <FieldObject Name="a" Kind="FieldObject" Left="0" Top="0"
+            Width="500" Height="20" DataSource="{Sales.Country}"/>
+      </ReportObjects>
+    </Section></Sections></Area>
+  </Areas></ReportDefinition>
+</Report>"""
+
+
+class TestTopNReachesTheChart:
+    def _chart(self, model):
+        return next(el for s in model.sections for el in s.elements
+                    if el.kind == "chart")
+
+    def test_the_pie_category_is_the_bucketed_column(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, TOP_N_CHART))
+        chart = self._chart(model)
+        # the pie's category column is the very column the SQL relabels, so the
+        # pie shows the same top-N + Others the table does
+        assert chart.chart_category == "Country"
+        assert ("CASE WHEN r._grp_rank <= 5 THEN r.Country ELSE 'Others' "
+                "END AS Country") in model.sql
+
+    def test_the_chart_is_annotated_for_review(self, tmp_path):
+        model = load_report_model(_dump(tmp_path, TOP_N_CHART))
+        notes = " ".join(self._chart(model).notes or [])
+        assert "Top-N chart" in notes and "Others" in notes
+
+
 class TestTopNSuggestsAPrdSolution:
     def test_the_note_states_the_solution_not_an_error(self, tmp_path):
         model = load_report_model(_dump(tmp_path, TOP_N))
