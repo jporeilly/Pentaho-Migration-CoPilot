@@ -980,5 +980,45 @@ def report_env() -> None:
         typer.echo(f"  hint: {hint}")
 
 
+@app.command("report-install-drivers")
+def report_install_drivers(
+    only: str = typer.Option(
+        "", "--only", help="comma-separated databases to install "
+        "(e.g. 'Oracle,SQL Server'); default is all the mainstream ones"),
+    force: bool = typer.Option(
+        False, "--force", help="re-download even if a driver is already present"),
+) -> None:
+    """Install the mainstream JDBC drivers into Report Designer's lib/jdbc, so
+    a converted report can connect to Oracle, MySQL, SQL Server, PostgreSQL,
+    MariaDB or DB2. Each jar is fetched from Maven Central and verified against
+    its published SHA-1 before it is written. Drivers already present are left
+    alone unless --force."""
+    from pentaho_migration.reports.db_drivers import install_drivers
+    from pentaho_migration.reports.environment import find_prd_home
+
+    prd = find_prd_home()
+    if prd is None:
+        typer.echo("no local Report Designer found - run "
+                   "`pentaho-migrate report-env` for setup hints", err=True)
+        raise typer.Exit(code=2)
+    names = [s.strip() for s in only.split(",") if s.strip()] or None
+    typer.echo(f"installing JDBC drivers into {Path(prd) / 'lib' / 'jdbc'}")
+    results = install_drivers(
+        prd, only=names, force=force,
+        progress=lambda db: typer.echo(f"  downloading {db} ...", err=True))
+    mark = {"installed": "OK", "present": "--", "failed": "!!"}
+    for r in results:
+        if r["status"] == "installed":
+            detail = f"{r['bytes'] // 1024} KB, sha1 verified"
+        elif r["status"] == "present":
+            detail = "already installed"
+        else:
+            detail = r.get("detail", "failed")
+        typer.echo(f"  [{mark.get(r['status'], '??')}] {r['database']}: "
+                   f"{r['jar']} ({detail})")
+    if any(r["status"] == "failed" for r in results):
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

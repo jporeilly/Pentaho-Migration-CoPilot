@@ -17,6 +17,18 @@ deliberately — not one per work session.
   writes it to the simple-jndi config PRD reads. The mainstream drivers ship
   installed: Oracle, MySQL, SQL Server, PostgreSQL, MariaDB, IBM DB2 (and
   HSQLDB), each downloaded from Maven Central and SHA-1-verified.
+  - **`report-install-drivers` CLI command.** Fetches the mainstream JDBC
+    drivers into PRD's `lib/jdbc`, filling gaps only (a database already
+    present is left alone unless `--force`); `--only mysql,oracle` limits the
+    set. Every jar is checked against the SHA-1 Maven publishes beside it
+    before it is written, because the engine will load and run it.
+  - **Test connection.** The form now has a **Test connection** button beside
+    Save & use: it opens the connection for real through PRD's own Java and
+    `lib/jdbc` drivers (a tiny `JdbcProbe`, password passed by environment so
+    it never hits a command line) and reports the database's own product name
+    on success or its own error message on failure — the JNDI entry can name a
+    driver that is not installed or a URL that does not resolve, and nothing
+    said so until a render failed deep in the engine.
 
 ## [1.41.0] - 2026-07-29
 

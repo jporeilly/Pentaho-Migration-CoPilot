@@ -17,7 +17,7 @@ import uuid
 from pathlib import Path
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
@@ -587,6 +587,26 @@ def db_drivers() -> dict:
     from pentaho_migration.reports.db_drivers import scan_db_drivers
 
     return scan_db_drivers()
+
+
+class ConnectionTest(BaseModel):
+    url: str
+    driver: str = ""
+    user: str = ""
+    password: str = ""
+
+
+@app.post("/settings/db-drivers/test")
+def db_drivers_test(req: ConnectionTest, request: Request) -> dict:
+    """Open the connection for real, through PRD's Java and JDBC drivers, and
+    say whether it worked. Local callers only - it takes a password."""
+    host = (request.client.host if request.client else "") or ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(status_code=403,
+                            detail="connection tests run on the local machine only")
+    from pentaho_migration.reports.db_drivers import test_connection
+
+    return test_connection(req.url, req.driver, req.user, req.password)
 
 
 def _parse_upload(data: bytes, filename: str | None = None) -> tuple[list[Pipeline], SourceInfo]:

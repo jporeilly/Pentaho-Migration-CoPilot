@@ -15,6 +15,8 @@ export default function DatabaseDriversCard() {
   const [connections, setConnections] = useState(null)
   const [form, setForm] = useState(EMPTY)
   const [busy, setBusy] = useState(false)
+  const [testing, setTesting] = useState(false)
+  const [test, setTest] = useState(null)          // { ok, detail }
   const [error, setError] = useState(null)
   const [note, setNote] = useState(null)
 
@@ -31,8 +33,27 @@ export default function DatabaseDriversCard() {
   }
 
   function select(c) {
-    setError(null); setNote(null)
+    setError(null); setNote(null); setTest(null)
     setForm({ name: c.name, url: c.url || '', driver: c.driver || '', user: '', password: '' })
+  }
+
+  async function testConnection() {
+    if (!form.url) return
+    setTesting(true); setTest(null); setError(null)
+    try {
+      const res = await fetch('/settings/db-drivers/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: form.url, driver: form.driver, user: form.user, password: form.password }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || res.statusText)
+      setTest(data)
+    } catch (err) {
+      setTest({ ok: false, detail: err.message })
+    } finally {
+      setTesting(false)
+    }
   }
 
   async function saveAndUse() {
@@ -116,10 +137,18 @@ export default function DatabaseDriversCard() {
                onChange={(e) => setForm({ ...form, user: e.target.value })} />
         <input placeholder="password" type="password" value={form.password}
                onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <button className="secondary" disabled={testing || !form.url} onClick={testConnection}>
+          {testing ? 'Testing…' : 'Test connection'}
+        </button>
         <button className="primary" disabled={busy || !form.name || !form.url} onClick={saveAndUse}>
           {busy ? 'Saving…' : 'Save & use'}
         </button>
       </div>
+      {test && (
+        <p className={test.ok ? 'db-test-ok' : 'db-test-fail'}>
+          {test.ok ? `✓ Connected — ${test.detail}` : `✗ ${test.detail}`}
+        </p>
+      )}
       {error && <div className="error">{error}</div>}
       {note && <p className="muted">{note}</p>}
       <p className="muted">
