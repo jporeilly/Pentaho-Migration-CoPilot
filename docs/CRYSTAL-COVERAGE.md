@@ -168,6 +168,18 @@ where conversion stops being mechanical:
    corpus, these two account for **every** render that needs a live
    connection — 38 of the 52 saved-data reports render with no database at
    all, 11 more are genuinely parameterised, 3 have sub-report queries.
+9. **Rich text runs inside one text object are flattened at extraction.** A
+   Crystal text object with mixed formatting — a bold word inside a regular
+   sentence — is exported by RptToXml as one `<Text>` string and one `<Font>`.
+   The per-run formatting is gone before the pipeline sees it, and nothing in
+   the dump even marks that the object *was* formatted, so it cannot be
+   flagged per-report. The object converts with its single exported font,
+   which is faithful to what the extractor gives us but not to Crystal.
+   Recovering the runs means reading the RTF the way `report-images` reads
+   picture bytes and `report-crosstabs` reads grids — the same free-SDK
+   boundary, addressable only in the C# fork (parked). The other side of
+   #44 — per-statement variance and true underlay (a watermark behind
+   mutually-exclusive letter variants) — is done and regression-tested.
 
 Live demo set: `samples/cr_demo/` — eight CSCU reports of increasing
 complexity, every one converting AND rendering against the live CSCU

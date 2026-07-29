@@ -96,6 +96,65 @@ UNDERLAY_WITH_SPACER = """
     </ReportObjects></Section>"""
 
 
+# An underlay watermark over two mutually-exclusive letter variants: each
+# variant carries a suppress CONDITION, so at runtime exactly one of them
+# renders. They share one slot, and the watermark has to ride BOTH - the
+# customer whose statement shows variant B must still get it.
+UNDERLAY_OVER_VARIANTS = """
+    <Section Name="U" Height="2040">
+      <SectionFormat EnableUnderlaySection="True"/>
+      <ReportObjects>
+        <PictureObject Name="P" Top="0" Left="720" Width="9504" Height="2040"><ImageData>iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAFUlEQVR4nGP8/+4qAzbAhFV00EoAAClcAtLbS0aeAAAAAElFTkSuQmCC</ImageData></PictureObject>
+      </ReportObjects>
+    </Section>
+    <Section Name="VariantA" Height="2040">
+      <SectionFormat EnableSuppress="False">
+        <SectionAreaFormatConditionFormulas EnableSuppress="{T.AMT} &gt; 100"/>
+      </SectionFormat>
+      <ReportObjects>
+        <TextObject Name="TA" Top="180" Left="1200" Width="8385" Height="220"><Text>Premium customer letter</Text></TextObject>
+      </ReportObjects>
+    </Section>
+    <Section Name="VariantB" Height="2040">
+      <SectionFormat EnableSuppress="False">
+        <SectionAreaFormatConditionFormulas EnableSuppress="{T.AMT} &lt;= 100"/>
+      </SectionFormat>
+      <ReportObjects>
+        <TextObject Name="TB" Top="180" Left="1200" Width="8385" Height="220"><Text>Standard customer letter</Text></TextObject>
+      </ReportObjects>
+    </Section>"""
+
+
+class TestUnderlayRidesEveryLetterVariant:
+    """The bug the release gate caught: computing offsets from the DESIGN
+    stack put the watermark into variant A only, so the customer whose
+    statement rendered variant B lost the signature block. Mutually-exclusive
+    conditional sections share ONE runtime slot, and the underlay element has
+    to be copied into each of them."""
+
+    def _layout(self, tmp_path):
+        model = _model(tmp_path, _report(UNDERLAY_OVER_VARIANTS))
+        out = tmp_path / "v.prpt"
+        write_prpt(model, out)
+        with zipfile.ZipFile(out) as z:
+            return z.read("layout.xml").decode("utf-8")
+
+    def test_the_watermark_is_copied_into_both_variants(self, tmp_path):
+        # the underlay band is dropped, so every <content> image in the
+        # layout is a copy - one per variant that shares the slot
+        assert self._layout(tmp_path).count("<content") == 2
+
+    def test_both_variant_letters_still_render(self, tmp_path):
+        layout = self._layout(tmp_path)
+        assert "Premium customer letter" in layout
+        assert "Standard customer letter" in layout
+
+    def test_neither_copy_is_pushed_above_its_band(self, tmp_path):
+        # both variants start at the same slot, so both copies sit at y=0,
+        # never negative - the watermark stays behind the text
+        assert 'y="-' not in self._layout(tmp_path)
+
+
 class TestUnderlayStaysInsideItsBand:
     def test_the_copy_never_gets_a_negative_offset(self, tmp_path):
         """A spacer between the underlay and what it underlays made the
