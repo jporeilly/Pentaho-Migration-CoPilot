@@ -903,7 +903,11 @@ def write_prpt(model, out_path, saved_rows=None):
             with_inline=saved_rows is not None),
     }
     if saved_rows is not None:
-        from pentaho_migration.reports.rpt_saved import build_inline_ds_xml
+        from pentaho_migration.reports.rpt_saved import (
+            build_inline_ds_xml, bucket_saved_rows_topn)
+        # a Top-N report's embedded sample gets the same top-N + Others rollup
+        # the SQL path applies, so the offline .prpt matches the live one
+        bucket_saved_rows_topn(model, saved_rows)
         docs["datasources/inline-ds.xml"] = build_inline_ds_xml(saved_rows)
     media = {name: "text/xml" for name in docs}
     for dirname, el, child in subreports:

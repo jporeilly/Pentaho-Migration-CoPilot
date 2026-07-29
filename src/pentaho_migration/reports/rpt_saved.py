@@ -242,6 +242,68 @@ def _effective_types(saved: SavedRows):
     return out
 
 
+def bucket_saved_rows_topn(model, saved: SavedRows) -> None:
+    """Apply Crystal's Top-N / Group Sort to the embedded sample rows, so the
+    OFFLINE .prpt shows the same top-N + 'Others' as the live SQL path.
+
+    Mirrors rpt_parser.apply_topn but over the recovered rows: for each Top-N
+    group (outer -> inner) sum its measure per group key within its parent
+    (order-grain, the same sum PRD's own group-summary computes over these
+    rows, so the bucketing stays consistent with the numbers on the page),
+    keep the top/bottom N by DENSE_RANK, and relabel the rest 'Others'. Then
+    re-sort so the kept groups lead by rank and 'Others' sits last and
+    contiguous - a stable sort keyed only on the ranks preserves Crystal's
+    within-group order. Mutates `saved` in place; a no-op without Top-N or when
+    the rows lack a needed column."""
+    from collections import defaultdict
+
+    topns = [g for g in model.groups if getattr(g, "topn", None)]
+    if not topns or not getattr(saved, "rows", None):
+        return
+    col = {name: i for i, (name, _vt) in enumerate(saved.columns)}
+    if not all(g.column in col and g.topn.measure in col for g in topns):
+        return
+    group_cols = [g.column for g in model.groups]
+    rows = saved.rows
+    SENTINEL = 10 ** 9
+    ord_per_group = []  # one {row_index: order_rank} per Top-N group, outer first
+
+    for g in topns:
+        gi, mi = col[g.column], col[g.topn.measure]
+        parents = [col[c] for c in group_cols[:group_cols.index(g.column)]
+                   if c in col]
+        n, desc = g.topn.n, g.topn.descending
+        totals = defaultdict(float)
+        for r in rows:
+            pkey = tuple(r[p] for p in parents)
+            m = r[mi]
+            totals[(pkey, r[gi])] += float(m) if isinstance(m, (int, float)) else 0.0
+        # dense-rank the group keys within each parent by their total
+        by_parent = defaultdict(list)
+        for (pkey, gkey), tot in totals.items():
+            by_parent[pkey].append((gkey, tot))
+        rank = {}
+        for pkey, lst in by_parent.items():
+            lst.sort(key=lambda x: x[1], reverse=desc)
+            rk, prev = 0, object()
+            for gkey, tot in lst:
+                if tot != prev:
+                    rk, prev = rk + 1, tot
+                rank[(pkey, gkey)] = rk
+        ords = {}
+        for i, r in enumerate(rows):
+            pkey = tuple(r[p] for p in parents)
+            rk = rank[(pkey, r[gi])]
+            ords[i] = rk if rk <= n else SENTINEL
+            if rk > n:
+                r[gi] = g.topn.others_label  # inner passes see the relabelled parent
+        ord_per_group.append(ords)
+
+    order = sorted(range(len(rows)),
+                   key=lambda i: tuple(ords[i] for ords in ord_per_group))
+    saved.rows = [rows[i] for i in order]
+
+
 def build_inline_ds_xml(saved: SavedRows, query_name: str = "default") -> str:
     """The recovered rowset as a PRD inline-table datasource document
     (datasources/inline-ds.xml) whose table answers `query_name`."""

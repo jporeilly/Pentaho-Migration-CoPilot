@@ -24,7 +24,11 @@ deliberately — not one per work session.
   column, so the chart shows the top N + Others like the original. **Nested
   Top-N** (e.g. the top regions within each country) is handled too — each
   Top-N group is ranked *within its parent* and its tail rolled into a
-  per-parent Others, proven on the live Xtreme data.
+  per-parent Others, proven on the live Xtreme data. The **embedded saved-data
+  sample** (what the offline .prpt shows with no database) gets the same
+  rollup, so the offline demo opens on the top N + Others too — on
+  WorldSalesReport the sample buckets to Crystal's exact top 5 (USA, Germany,
+  England, Switzerland, Italy) + Others.
 - **Consultant report and PDF preview render inline, not in a blank tab.**
   New browser tabs never surface inside embedded webviews, and a `window.open`'d
   tab can't paint a `blob:` URL from its opener — so both opened blank. They now

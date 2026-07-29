@@ -11,6 +11,8 @@ the note says so.
 import textwrap
 
 from pentaho_migration.reports import load_report_model
+from pentaho_migration.reports.model import Group, ReportModel, TopN
+from pentaho_migration.reports.rpt_saved import SavedRows, bucket_saved_rows_topn
 
 
 def _dump(tmp_path, body):
@@ -224,6 +226,53 @@ class TestTopNReachesTheChart:
         model = load_report_model(_dump(tmp_path, TOP_N_CHART))
         notes = " ".join(self._chart(model).notes or [])
         assert "Top-N chart" in notes and "Others" in notes
+
+
+class TestBucketEmbeddedSample:
+    """The offline .prpt's embedded saved rows get the same Top-N + Others
+    rollup the SQL path applies, so it opens showing the top groups + Others
+    with no database."""
+
+    def _saved(self, cols, rows):
+        return SavedRows(columns=cols, rows=[list(r) for r in rows])
+
+    def test_the_tail_rows_become_one_others_group_last(self):
+        model = ReportModel()
+        model.groups = [Group(condition_field="{S.Country}", column="Country",
+                              topn=TopN(op="Sum", measure="Sales", n=2))]
+        saved = self._saved(
+            [("Country", "String"), ("Sales", "Number")],
+            [["USA", 100.0], ["USA", 50.0], ["France", 80.0],
+             ["Germany", 30.0], ["Italy", 20.0]])
+        bucket_saved_rows_topn(model, saved)
+        countries = [r[0] for r in saved.rows]
+        assert set(countries) == {"USA", "France", "Others"}  # top 2 by sum
+        assert countries[-1] == "Others"
+        assert countries.count("Others") == 2                 # Germany + Italy
+
+    def test_nested_ranks_within_the_parent(self):
+        model = ReportModel()
+        model.groups = [
+            Group(condition_field="{S.Country}", column="Country",
+                  topn=TopN(op="Sum", measure="Sales", n=1)),
+            Group(condition_field="{S.Region}", column="Region",
+                  topn=TopN(op="Sum", measure="Sales", n=1))]
+        saved = self._saved(
+            [("Country", "String"), ("Region", "String"), ("Sales", "Number")],
+            [["USA", "CA", 100.0], ["USA", "TX", 10.0], ["France", "IDF", 5.0]])
+        bucket_saved_rows_topn(model, saved)
+        pairs = {(r[0], r[1]) for r in saved.rows}
+        assert ("USA", "CA") in pairs        # top country, top region kept
+        assert ("USA", "Others") in pairs    # TX rolled up within USA
+        assert ("Others", "IDF") in pairs    # France -> Others country
+
+    def test_no_topn_leaves_the_rows_untouched(self):
+        model = ReportModel()
+        model.groups = [Group(condition_field="{S.Country}", column="Country")]
+        saved = self._saved([("Country", "String"), ("Sales", "Number")],
+                            [["USA", 100.0], ["France", 80.0]])
+        bucket_saved_rows_topn(model, saved)
+        assert [r[0] for r in saved.rows] == ["USA", "France"]
 
 
 class TestTopNSuggestsAPrdSolution:
