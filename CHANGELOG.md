@@ -34,6 +34,19 @@ deliberately — not one per work session.
   directly and prints the complexity grade; and a **Try Xactions** picker
   offers five corpus demos spanning the ladder (order_detail Low → BurstSales
   High).
+- **Xaction estate triage — the measured T&M model.** `pentaho-migrate
+  xaction-triage <folder>` walks a whole pentaho-solutions tree, classifies
+  every xaction (report / chart / kettle / other — nothing skipped silently,
+  unparsable files are records too), grades every report Low/Medium/High, and
+  applies the published Level-of-Effort bands (Low 1–2h assisted / 4–8h
+  manual; Medium 3–6h / 8–16h; High 8–16h / 16–40h; totals use mid-points,
+  the bands ship in the assumptions). Output: console distribution + hours +
+  $, optional JSON records, and a **consultant portfolio report** in the house
+  style (complexity distribution, what the estate contains, definition-status
+  P1s, priority actions rolled by kind of work, focus list, LoE band table) —
+  colour/chart/money helpers imported from the Crystal portfolio module so the
+  three portfolio reports stay one visual family. On the steel-wheels corpus:
+  25 reports, 5/16/4, ~128h assisted (~$19k) vs ~334h manual (~$50k).
 - **Informatica: an unmapped transformation gets a SUGGESTED PDI approach, not
   a bare error.** The same principle now driving Crystal→PRD applied to the ETL
   workflow. A PowerCenter transformation type with no 1:1 rule used to land as

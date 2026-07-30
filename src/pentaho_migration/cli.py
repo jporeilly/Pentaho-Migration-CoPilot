@@ -990,6 +990,63 @@ def report_env() -> None:
         typer.echo(f"  hint: {hint}")
 
 
+@app.command("xaction-triage")
+def xaction_triage(
+    folder: Path,
+    rate: float = typer.Option(
+        150.0, "--rate", help="Consultant rate per hour for the $ figures"),
+    out: Path = typer.Option(
+        Path("output/xactions/estate-report.html"), "--out", "-o",
+        help="Where to write the consultant portfolio report (HTML)"),
+    json_out: Path = typer.Option(
+        None, "--json", help="Also write the raw per-xaction records as JSON"),
+) -> None:
+    """Grade a whole solution folder of .xactions: complexity distribution,
+    Level-of-Effort hours and $, and the consultant portfolio report - the
+    measured T&M model for a conversion engagement."""
+    import dataclasses
+    import json as _json
+
+    from pentaho_migration.reports.xaction_triage import (
+        LOE_HOURS, build_xaction_estate_report_html, triage_estate)
+
+    if not folder.is_dir():
+        typer.echo(f"not a folder: {folder}")
+        raise typer.Exit(code=1)
+    records = triage_estate(folder)
+    if not records:
+        typer.echo(f"no .xaction files under {folder}")
+        raise typer.Exit(code=1)
+
+    reports = [r for r in records if r.kind == "report"]
+    kinds: dict = {}
+    for r in records:
+        kinds[r.kind] = kinds.get(r.kind, 0) + 1
+    typer.echo(f"{len(records)} xactions under {folder}  "
+               f"({', '.join(f'{k}: {v}' for k, v in sorted(kinds.items()))})")
+    copilot = sum(r.copilot_hours for r in reports)
+    manual = sum(r.manual_hours for r in reports)
+    for g in ("Low", "Medium", "High"):
+        n = sum(1 for r in reports if r.grade == g)
+        a_band, m_band = LOE_HOURS[g][2], LOE_HOURS[g][3]
+        typer.echo(f"  {g:<7} {n:3d} report(s)  ({a_band} assisted, "
+                   f"{m_band} manual each)")
+    typer.echo(f"  estate effort: ~{copilot:,.0f}h assisted "
+               f"(~${copilot * rate:,.0f}) vs ~{manual:,.0f}h manual "
+               f"(~${manual * rate:,.0f})")
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(build_xaction_estate_report_html(
+        records, rate=rate, estate_label=str(folder)), encoding="utf-8")
+    typer.echo(f"  consultant report -> {out}")
+    if json_out is not None:
+        json_out.parent.mkdir(parents=True, exist_ok=True)
+        json_out.write_text(_json.dumps(
+            [dataclasses.asdict(r) for r in records], indent=2),
+            encoding="utf-8")
+        typer.echo(f"  records -> {json_out}")
+
+
 @app.command("report-install-drivers")
 def report_install_drivers(
     only: str = typer.Option(
