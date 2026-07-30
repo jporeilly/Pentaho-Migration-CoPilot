@@ -9,6 +9,24 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Xactions: old Pentaho BI-platform reports convert to .prpt.** A new source
+  family (task #67) for the estates still on `.xaction` action sequences with
+  their old JFreeReport `.report`/`.xml` definitions — the direct ancestor of
+  PRD's own format. `xaction_parser` reads the sequence (the lookup that feeds
+  the report → the .prpt query with `{PREPARE:x}` → `${x}`; SecureFilter
+  prompts → parameters, query-backed AND static property-map pick-lists;
+  implicit `report-definition` resource binding), `jfreereport_parser` reads
+  the simple-format definition (bands, percent widths against the printable
+  page, `$()` message templates verbatim — PRD inherited the syntax, formats,
+  known functions → group summaries). Everything else carries a suggested
+  solution: bursting/email → a PDI job, JavaScript → SQL computed column or
+  PRD function, MDX → PRD's Mondrian datasource, legacy-EXT definitions →
+  honest rebuild flag. Every xaction also gets a deterministic **complexity
+  grade** (Low/Medium/High with reasons) — the per-report Level-of-Effort
+  signal a T&M estimate needs. Built corpus-first against 36 steel-wheels-era
+  xactions (25 reports: 5 Low / 16 Medium / 4 High, zero parse failures);
+  order_detail converts end to end and renders through the real Pentaho
+  engine. Corpus + provenance in `samples/xactions/`.
 - **Informatica: an unmapped transformation gets a SUGGESTED PDI approach, not
   a bare error.** The same principle now driving Crystal→PRD applied to the ETL
   workflow. A PowerCenter transformation type with no 1:1 rule used to land as
