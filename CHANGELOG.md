@@ -26,7 +26,14 @@ deliberately — not one per work session.
   signal a T&M estimate needs. Built corpus-first against 36 steel-wheels-era
   xactions (25 reports: 5 Low / 16 Medium / 4 High, zero parse failures);
   order_detail converts end to end and renders through the real Pentaho
-  engine. Corpus + provenance in `samples/xactions/`.
+  engine. Corpus + provenance in `samples/xactions/`. **Wired into the same
+  workflow as every other family:** drop an `.xaction` (or a **zipped solution
+  folder** carrying the definition beside it) on the upload page — content
+  routing sends it down the reports pipeline, so convert / PDF preview /
+  open-in-PRD / download all work; the `report` CLI command accepts `.xaction`
+  directly and prints the complexity grade; and a **Try Xactions** picker
+  offers five corpus demos spanning the ladder (order_detail Low → BurstSales
+  High).
 - **Informatica: an unmapped transformation gets a SUGGESTED PDI approach, not
   a bare error.** The same principle now driving Crystal→PRD applied to the ETL
   workflow. A PowerCenter transformation type with no 1:1 rule used to land as

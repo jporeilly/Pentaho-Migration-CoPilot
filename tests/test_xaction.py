@@ -159,3 +159,50 @@ class TestComplexityGrade:
         m = build_report_model(SW / "order_detail.xaction")
         assert m.complexity == "Low"
         assert any(i.startswith("complexity: Low") for i in m.issues)
+
+
+class TestUploadRouting:
+    """The web chokepoint routes by CONTENT: an <action-sequence> root or a
+    zipped solution folder reaches the xaction path through the same
+    /reports/convert endpoint every other report family uses."""
+
+    @pytest.fixture()
+    def client(self):
+        from fastapi.testclient import TestClient
+        from pentaho_migration.api.main import app
+        return TestClient(app, client=("127.0.0.1", 12345))
+
+    def test_a_raw_xaction_converts_via_the_reports_endpoint(self, client):
+        data = (SW / "order_detail.xaction").read_bytes()
+        r = client.post("/reports/convert",
+                        files={"dump": ("order_detail.xaction", data, "text/xml")})
+        assert r.status_code == 200
+        d = r.json()
+        assert d["filename"] == "order_detail.prpt"
+        assert "complexity: Low" in d["report_markdown"]
+
+    def test_a_zipped_solution_folder_carries_its_definition(self, client, tmp_path):
+        import io
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.write(SW / "order_detail.xaction", "order_detail.xaction")
+            zf.write(SW / "order_detail.xml", "order_detail.xml")
+        r = client.post("/reports/convert",
+                        files={"dump": ("solution.zip", buf.getvalue(),
+                                        "application/zip")})
+        assert r.status_code == 200
+        assert r.json()["filename"] == "order_detail.prpt"
+
+    def test_a_zip_without_an_xaction_is_a_clear_422(self, client):
+        import io
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("readme.txt", "nothing here")
+        r = client.post("/reports/convert",
+                        files={"dump": ("x.zip", buf.getvalue(), "application/zip")})
+        assert r.status_code == 422
+        assert ".xaction" in r.json()["detail"]
+
+    def test_the_picker_lists_the_demo_ladder(self, client):
+        names = [m["name"] for m in client.get("/reports/xaction-samples").json()]
+        assert names[0] == "order_detail" and "BurstSales" in names

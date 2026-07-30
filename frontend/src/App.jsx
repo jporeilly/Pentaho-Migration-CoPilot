@@ -30,6 +30,7 @@ export default function App() {
   const [reportFile, setReportFile] = useState(null)
   const [crystalSamples, setCrystalSamples] = useState([])
   const [infaSamples, setInfaSamples] = useState([])
+  const [xactionSamples, setXactionSamples] = useState([])
 
   useEffect(() => {
     fetch('/health')
@@ -44,6 +45,10 @@ export default function App() {
       .then((r) => r.json())
       .then((s) => setInfaSamples(Array.isArray(s) ? s : []))
       .catch(() => {})
+    fetch('/reports/xaction-samples')
+      .then((r) => r.json())
+      .then((s) => setXactionSamples(Array.isArray(s) ? s : []))
+      .catch(() => {})
   }, [])
 
   const maxStep = report ? 3 : results.length ? 4 : 0
@@ -51,8 +56,10 @@ export default function App() {
 
   async function convert(file) {
     // an .rpt is a binary the ETL endpoint can never parse - route it
-    // straight to the reports pipeline, which extracts it server-side
-    if (/\.rpt$/i.test(file.name)) return convertReport(file)
+    // straight to the reports pipeline, which extracts it server-side.
+    // .xaction / .zip solution folders are the old BI-platform reports -
+    // the reports pipeline routes them by content
+    if (/\.(rpt|xaction|zip)$/i.test(file.name)) return convertReport(file)
     setError(null)
     setLoading(true)
     try {
@@ -138,6 +145,16 @@ export default function App() {
     // (the filename stem finds it), so the same report opens in the Crystal
     // viewer first, and its generated SQL binds to the datasource it names.
     convertReport(new File([blob], `${name}.xml`, { type: 'text/xml' }), jndi)
+  }
+
+  async function loadXactionSample(sample) {
+    const name = sample?.name || 'order_detail'
+    const res = await fetch(`/reports/xaction-sample?name=${encodeURIComponent(name)}`,
+                            { cache: 'no-store' })
+    const blob = await res.blob()
+    // the paired old JFreeReport definition resolves server-side from the
+    // same corpus tree, exactly like an .rpt demo finds its dump
+    convertReport(new File([blob], `${name}.xaction`, { type: 'text/xml' }))
   }
 
   async function openFromProject(row) {
@@ -291,6 +308,8 @@ export default function App() {
               onTalendSample={loadTalendSample}
               onCrystalSample={loadCrystalSample}
               crystalSamples={crystalSamples}
+              onXactionSample={loadXactionSample}
+              xactionSamples={xactionSamples}
               infaSamples={infaSamples}
               error={error}
               loading={loading}

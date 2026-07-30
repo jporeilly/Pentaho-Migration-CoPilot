@@ -65,7 +65,7 @@ const PHASES = [
   { name: 'Phase 2 — Multi-source', text: 'Informatica, Crystal Reports and Talend complete; DataStage next.' },
 ]
 
-export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, infaSamples, error, loading, source, onShowPractices, family }) {
+export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, infaSamples, onXactionSample, xactionSamples, error, loading, source, onShowPractices, family }) {
   const stages = family === 'reports' ? REPORTS : family === 'etl' ? ETL : GENERIC
 
   return (
@@ -87,6 +87,9 @@ export default function UploadPage({ onFile, onSample, onTalendSample, onCrystal
           )}
           {onCrystalSample && (
             <SamplePicker title="Try Crystal Reports" samples={crystalSamples} onPick={onCrystalSample} />
+          )}
+          {onXactionSample && xactionSamples.length > 0 && (
+            <SamplePicker title="Try Xactions" samples={xactionSamples} onPick={onXactionSample} />
           )}
         </span>
       </div>

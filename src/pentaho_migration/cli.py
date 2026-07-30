@@ -345,14 +345,24 @@ def report(
              "(needs a local PRD install + Java; see `pentaho-migrate report-env`)",
     ),
 ) -> None:
-    """Convert a Crystal Reports RptToXml dump to a Pentaho .prpt bundle."""
+    """Convert a Crystal Reports RptToXml dump - or an old BI-platform
+    .xaction (its report definition resolves beside it) - to a .prpt bundle."""
     from pentaho_migration.reports import (
         build_conversion_report,
         load_report_model,
         write_prpt,
     )
 
-    model = load_report_model(dump, jndi or None)
+    head = dump.read_bytes()[:4096]
+    if b"<action-sequence" in head:
+        from pentaho_migration.reports.xaction_parser import load_xaction_model
+        model = load_xaction_model(dump, jndi or None)
+        grade = getattr(model, "complexity", None)
+        if grade:
+            typer.echo(f"  xaction report - complexity {grade} "
+                       f"({'; '.join(getattr(model, 'complexity_reasons', []))})")
+    else:
+        model = load_report_model(dump, jndi or None)
 
     # When the .rpt sits beside the dump (the corpus/demo pair convention),
     # recover its saved rows so the .prpt opens in PRD showing real data.

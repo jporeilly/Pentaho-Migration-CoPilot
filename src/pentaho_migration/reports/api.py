@@ -366,14 +366,93 @@ def _load_dump_upload(data: bytes, filename: str, jndi: str):
     return model
 
 
+XACTION_DIR = REPO_ROOT / "samples" / "xactions"
+
+
+def _xaction_resource_resolver(location: str) -> bytes:
+    """Resolve an xaction's report-definition by NAME within the xactions
+    samples tree - the demo/corpus convention, mirroring find_original for
+    .rpt pairs. Path components are stripped, so a hostile location cannot
+    escape the tree."""
+    name = Path(location).name
+    for hit in XACTION_DIR.rglob(name):
+        if hit.is_file():
+            return hit.read_bytes()
+    raise FileNotFoundError(location)
+
+
+def _load_xaction_upload(data: bytes, filename: str, jndi: str):
+    """An uploaded action sequence. The paired report definition resolves
+    from the samples tree (the demo convention); a customer's own xaction
+    without its definition converts the query/parameters and says exactly
+    what to upload next - or they zip the solution folder instead."""
+    from pentaho_migration.reports.xaction_parser import build_report_model
+
+    try:
+        model = build_report_model(data, resolver=_xaction_resource_resolver)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    if jndi:
+        model.jndi = jndi
+    if not model.name or model.name == "Converted xaction report":
+        model.name = Path(filename).stem
+    return model
+
+
+def _load_xaction_zip_upload(data: bytes, filename: str, jndi: str):
+    """A zipped solution folder: the first .xaction member is the report,
+    and every other member is a resolvable resource - so the xaction + its
+    old report definition travel together in one upload."""
+    import io as _io
+    import zipfile
+
+    from pentaho_migration.reports.xaction_parser import build_report_model
+
+    try:
+        zf = zipfile.ZipFile(_io.BytesIO(data))
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=422, detail="not a readable .zip")
+    members = {Path(n).name: n for n in zf.namelist() if not n.endswith("/")}
+    xaction_name = next((n for n in members
+                         if n.lower().endswith(".xaction")), None)
+    if xaction_name is None:
+        raise HTTPException(
+            status_code=422,
+            detail="the .zip holds no .xaction - zip the solution folder "
+                   "with the action sequence and its report definition")
+
+    def resolver(location: str) -> bytes:
+        member = members.get(Path(location).name)
+        if member is None:
+            raise FileNotFoundError(location)
+        return zf.read(member)
+
+    model = build_report_model(zf.read(members[xaction_name]),
+                               resolver=resolver)
+    if jndi:
+        model.jndi = jndi
+    if not model.name or model.name == "Converted xaction report":
+        model.name = Path(xaction_name).stem
+    return model
+
+
+def _looks_like_xaction(data: bytes) -> bool:
+    return b"<action-sequence" in data[:4096]
+
+
 def _load_upload(data: bytes, filename: str, jndi: str):
     """Size gate, then route by CONTENT: an OLE header means the .rpt binary,
-    anything else is treated as a dump. Never by file extension."""
+    a zip is an xaction solution folder, an <action-sequence> root is an
+    xaction, anything else is treated as a dump. Never by file extension."""
     from pentaho_migration.reports.rpt_extract import looks_like_rpt
 
     _check_upload_size(data)
     if looks_like_rpt(data[:8]):
         return _load_rpt_upload(data, filename, jndi)
+    if data[:2] == b"PK":
+        return _load_xaction_zip_upload(data, filename, jndi)
+    if _looks_like_xaction(data):
+        return _load_xaction_upload(data, filename, jndi)
     return _load_dump_upload(data, filename, jndi)
 
 
@@ -663,6 +742,64 @@ def sample(name: str = "") -> FileResponse:
     """A Crystal demo dump for the Try button. `name` selects one of the demo
     reports (see /samples); omitted or unknown, it returns the default."""
     return FileResponse(_demo_file(name), media_type="text/xml")
+
+
+# The xactions the "Try Xactions" picker offers - each a MEASURED story from
+# the steel-wheels corpus, spanning the complexity ladder the T&M model uses.
+_XACTION_DEMO_META = [
+    {"name": "order_detail",
+     "label": "Order details — the walkthrough",
+     "description": "One SQL query straight into the old JFreeReport "
+                    "definition: groups, formats and $() messages carry over. "
+                    "Complexity: Low."},
+    {"name": "Income Statement",
+     "label": "Income statement — implicit wiring",
+     "description": "The report definition binds by the platform's naming "
+                    "convention, not an explicit resource. Complexity: Low."},
+    {"name": "Sales_by_Supplier",
+     "label": "Sales by supplier — static pick-lists",
+     "description": "Prompts whose pick-lists are hardcoded property-map "
+                    "lists — they become PRD list parameters. Complexity: "
+                    "Medium."},
+    {"name": "Sales_by_Customer",
+     "label": "Sales by customer — query pick-lists",
+     "description": "Prompts fed by their own SQL lookups, plus JavaScript "
+                    "glue — query-backed parameters with the SQL carried in "
+                    "the notes. Complexity: Medium."},
+    {"name": "BurstSales",
+     "label": "Burst sales — the honesty demo",
+     "description": "A bursting pipeline: template, JavaScript, a report "
+                    "render and an EMAIL per row — the render converts, the "
+                    "distribution becomes a suggested PDI job. Complexity: "
+                    "High."},
+]
+
+
+def _xaction_file(name: str) -> Path:
+    """The corpus .xaction for a picker name. Traversal-guarded: only a plain
+    stem that resolves inside the xactions tree is honoured."""
+    stem = (name or "").strip()
+    if stem and "/" not in stem and "\\" not in stem and ".." not in stem:
+        for hit in XACTION_DIR.rglob(f"{stem}.xaction"):
+            return hit
+    for hit in XACTION_DIR.rglob("order_detail.xaction"):
+        return hit
+    raise HTTPException(status_code=404, detail="no xaction samples on disk")
+
+
+@router.get("/xaction-samples", include_in_schema=False)
+def xaction_samples() -> list:
+    """The demo xactions the Try picker offers."""
+    return [m for m in _XACTION_DEMO_META
+            if next(XACTION_DIR.rglob(f"{m['name']}.xaction"), None)]
+
+
+@router.get("/xaction-sample", include_in_schema=False)
+def xaction_sample(name: str = "") -> FileResponse:
+    """A demo .xaction for the Try button; its report definition resolves
+    server-side from the same corpus tree."""
+    path = _xaction_file(name)
+    return FileResponse(path, media_type="text/xml", filename=path.name)
 
 
 @router.post("/inspect", response_model=ReportSummary,
