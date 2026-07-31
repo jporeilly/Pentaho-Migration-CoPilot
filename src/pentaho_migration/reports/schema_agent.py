@@ -167,8 +167,10 @@ def _dialect_and_connection(jndi_entry: dict):
     dialect = dialect_for(url)
     if dialect is None:
         raise RuntimeError(
-            "schema introspection supports PostgreSQL, MySQL, SQL Server and "
-            f"Oracle JNDI connections - this url is none of those: {url or '<none>'}")
+            "schema introspection needs a JDBC URL - native adapters for "
+            "PostgreSQL/MySQL/SQL Server/Oracle, and any other jdbc: family "
+            "through Report Designer's own Java and drivers; this url is not "
+            f"JDBC: {url or '<none>'}")
     try:
         conn = dialect.connect(url, jndi_entry.get("user", ""),
                                jndi_entry.get("password", ""))

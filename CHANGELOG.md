@@ -9,6 +9,17 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Schema assistant supports every JDBC database Report Designer has a
+  driver for.** Introspection was limited to the four Python-adapter dialects
+  (PostgreSQL, MySQL, SQL Server, Oracle); any other URL — including the
+  SampleData HSQLDB every xaction demo points at — said "schema check
+  unavailable". A universal fallback dialect now introspects through **PRD's
+  own Java and `lib/jdbc` drivers** (`tools/JdbcSchema.java`, the JdbcProbe
+  pattern): `DatabaseMetaData` columns with PK/FK decoration, SQL validation
+  by prepare-without-execute, and the first-rows **query preview**
+  (`executeQuery` only, hard row cap — nothing can mutate). HSQLDB, DB2,
+  MariaDB, anything with a jar. SampleData now browses 14 tables, validates
+  the converted xaction SQL against the live schema, and previews real rows.
 - **Round 2 against the live database: the Sales_by_* family renders with
   data.** Three more platform semantics translated, all exposed by real rows:
   bare `{name}` placeholders in the query are the JavaScript-built dynamic SQL

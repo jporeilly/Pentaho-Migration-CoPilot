@@ -188,12 +188,140 @@ class _Oracle(Dialect):
         cursor.execute("EXPLAIN PLAN FOR " + sql)
 
 
-DIALECTS = [_Postgres(), _MySql(), _SqlServer(), _Oracle()]
+class _JdbcCursor:
+    """DB-API-shaped cursor over the JdbcSchema helper: each execute() is one
+    probe run through PRD's own Java, so the agent's cursor-based flow works
+    unchanged for any driver in lib/jdbc. Arbitrary statements are limited to
+    SELECT/WITH (the preview path); the Java side uses executeQuery with a
+    hard row cap, so nothing can mutate the database."""
+
+    def __init__(self, dialect, url, user, password):
+        self._d = dialect
+        self._args = (url, user, password)
+        self._rows = []
+        self.description = None
+
+    def execute(self, sql):
+        self.description = None
+        if sql == _Jdbc.columns_sql:
+            self._rows = self._d._run("columns", *self._args, want_cols=4)
+        elif sql == _Jdbc.keys_sql:
+            self._rows = self._d._run("keys", *self._args, want_cols=7)
+        elif re.match(r"(?is)^\s*(SELECT|WITH)\b", sql or ""):
+            raw = self._d._run("query", *self._args, want_cols=None, stdin=sql)
+            self._rows = []
+            for parts in raw:
+                if parts and parts[0] == "HDR":
+                    self.description = [(name,) for name in parts[1:]]
+                elif parts and parts[0] == "ROW":
+                    self._rows.append(tuple(parts[1:]))
+        else:
+            raise RuntimeError(
+                "the JDBC adapter runs SELECT queries and metadata probes only")
+
+    def fetchall(self):
+        return self._rows
+
+    def fetchmany(self, n):
+        return self._rows[:n]
+
+    def close(self):
+        pass
+
+
+class _JdbcConnection:
+    def __init__(self, dialect, url, user, password):
+        self._cursor = _JdbcCursor(dialect, url, user, password)
+
+    def cursor(self):
+        return self._cursor
+
+    def rollback(self):
+        pass
+
+    def close(self):
+        pass
+
+
+class _Jdbc(Dialect):
+    """Universal fallback: introspect through the SAME JDBC drivers the
+    reporting engine uses (tools/JdbcSchema.java run with PRD's own Java and
+    lib/jdbc on the classpath). Covers HSQLDB, DB2, MariaDB - anything with a
+    driver jar - where no Python adapter exists. Validation prepares the
+    statement without executing it; most engines (HSQLDB included) resolve
+    tables and columns at prepare time."""
+
+    # sentinels the shim cursor interprets - the agent's flow stays unchanged
+    columns_sql = "__JDBC_COLUMNS__"
+    keys_sql = "__JDBC_KEYS__"
+
+    def __init__(self):
+        super().__init__("JDBC", re.compile(r"^jdbc:(?P<sub>[^:]+):"), "", "")
+
+    def _tooling(self):
+        from pathlib import Path
+
+        from pentaho_migration.reports.environment import find_prd_home
+        from pentaho_migration.reports.prpt_validator import find_java
+
+        prd = find_prd_home()
+        if prd is None:
+            raise RuntimeError(
+                "JDBC introspection borrows Report Designer's Java and "
+                "drivers - no local Report Designer install was found")
+        java = find_java(Path(prd))
+        if java is None:
+            raise RuntimeError("no Java found under Report Designer")
+        probe = Path(__file__).resolve().parents[3] / "tools" / "JdbcSchema.java"
+        if not probe.is_file():
+            raise RuntimeError(f"probe missing: {probe}")
+        return java, str(Path(prd) / "lib" / "jdbc" / "*"), probe
+
+    def _run(self, mode, url, user, password, want_cols, stdin=None,
+             timeout=60.0):
+        import os
+        import subprocess
+
+        java, cp, probe = self._tooling()
+        env = dict(os.environ, JDBC_PW=password or "")
+        proc = subprocess.run(
+            [str(java), "-cp", cp, str(probe), mode, url, "", user or ""],
+            input=stdin, capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=timeout, env=env)
+        lines = [l for l in (proc.stdout or "").splitlines() if l.strip()]
+        if lines and lines[-1].startswith("ERR "):
+            raise RuntimeError(lines[-1][4:])
+        rows = []
+        for line in lines:
+            parts = line.split("\t")
+            if want_cols is None or len(parts) == want_cols:
+                rows.append(tuple(parts))
+        return rows
+
+    def connect(self, url, user, password):
+        self._tooling()   # fail fast with the actionable message
+        return _JdbcConnection(self, url, user, password)
+
+    def validate(self, cursor, sql):
+        out = self._run("validate", *cursor._args, want_cols=1, stdin=sql)
+        flat = [r[0] for r in out]
+        if "VALID" not in flat:
+            raise RuntimeError(flat[-1] if flat else "validation failed")
+
+    def match(self, url):
+        m = self.url_re.match(url or "")
+        if m:
+            self.name = f"JDBC ({m.group('sub')})"
+        return m
+
+
+DIALECTS = [_Postgres(), _MySql(), _SqlServer(), _Oracle(), _Jdbc()]
 
 
 def dialect_for(url: str):
-    """The matching dialect adapter, or None when no adapter covers the URL
-    (hsqldb, DB2, Access, ...)."""
+    """The matching dialect adapter. Native Python adapters first; any other
+    jdbc: URL falls back to introspection through PRD's own Java and JDBC
+    drivers (HSQLDB, DB2, MariaDB, ...). None only for a non-JDBC URL."""
     for d in DIALECTS:
         if d.match(url):
             return d

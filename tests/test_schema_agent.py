@@ -41,13 +41,15 @@ def test_resolve_jndi_from_properties(tmp_path, monkeypatch):
     assert resolve_jndi("Nope") is None or "url" in (resolve_jndi("Nope") or {})
 
 
-def test_non_postgres_url_is_an_honest_error(tmp_path, monkeypatch):
+def test_non_jdbc_url_is_an_honest_error(tmp_path, monkeypatch):
+    # hsqldb now introspects through the JDBC fallback; only a URL that is
+    # not JDBC at all stays unsupported - and the error says so
     props = tmp_path / "default.properties"
-    props.write_text("H2/url=jdbc:hsqldb:mem:sample\n", encoding="utf-8")
+    props.write_text("M/url=mongodb://h/db\n", encoding="utf-8")
     monkeypatch.setenv("SIMPLE_JNDI_PROPERTIES", str(props))
-    result = validate_sql("H2", "SELECT 1", [])
+    result = validate_sql("M", "SELECT 1", [])
     assert not result["ok"]
-    assert "PostgreSQL" in result["error"]
+    assert "not JDBC" in result["error"]
 
 
 def test_list_jndi_connections(tmp_path, monkeypatch):
@@ -62,7 +64,9 @@ def test_list_jndi_connections(tmp_path, monkeypatch):
     from pentaho_migration.reports.schema_agent import list_jndi_connections
     conns = {c["name"]: c for c in list_jndi_connections()}
     assert conns["CSCU"]["introspectable"] is True
-    assert conns["SampleData"]["introspectable"] is False
+    # the JDBC fallback makes every jdbc: family introspectable
+    assert conns["SampleData"]["introspectable"] is True
+    assert conns["SampleData"]["dialect"] == "JDBC (hsqldb)"
 
 
 def test_api_connections_endpoint():
@@ -329,7 +333,9 @@ def test_dialect_url_parsing():
         assert m.group("port") == port
         assert m.group("db") == db
 
-    assert dialect_for("jdbc:hsqldb:file:/x/sample") is None
+    # any other jdbc: family falls back to introspection through PRD's Java
+    hsql = dialect_for("jdbc:hsqldb:file:/x/sample")
+    assert hsql is not None and hsql.name == "JDBC (hsqldb)"
     assert dialect_for("") is None
 
 
