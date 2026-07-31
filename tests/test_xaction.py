@@ -206,3 +206,40 @@ class TestUploadRouting:
     def test_the_picker_lists_the_demo_ladder(self, client):
         names = [m["name"] for m in client.get("/reports/xaction-samples").json()]
         assert names[0] == "order_detail" and "BurstSales" in names
+
+
+class TestLiveDataFidelity:
+    """The Income Statement fixes, found by rendering against the REAL
+    SampleData database: layered visibility, expression-tag functions, and
+    running-vs-total sum semantics."""
+
+    def _model(self):
+        return build_report_model(SW / "Income Statement.xaction")
+
+    def test_hide_element_by_name_becomes_visibility_expressions(self):
+        m = self._model()
+        detail = next(s for s in m.sections if s.area_kind == "Detail")
+        vis = [f for e in detail.elements
+               for k, f in e.style_expressions if k == "visible"]
+        assert vis, "layered bands should carry visibility expressions"
+        assert any('[Category] = "Revenue"' in f for f in vis)
+        assert any("layered-visibility layout translated" in i for i in m.issues)
+
+    def test_expression_tag_functions_are_scanned(self):
+        # <expression> declares the same classes as <function>; missing them
+        # rendered $ <null> in every computed cell
+        names = {s.expression_name for s in self._model().summaries}
+        assert "Summary_AmountExpression" in names
+        assert "CategoryAmountExpression" in names
+
+    def test_item_sum_is_running_not_total(self):
+        # JFree ItemSumFunction is a RUNNING sum; mapping it to a total put
+        # the report's ending net income on the Gross Margin line
+        summ = next(s for s in self._model().summaries
+                    if s.expression_name == "Summary_AmountExpression")
+        assert summ.running is True
+
+    def test_group_functions_stay_totals(self):
+        m = parse_jfreereport(SW / "order_detail.xml")
+        count = next(s for s in m.summaries if s.operation == "Count")
+        assert count.running is False

@@ -7,6 +7,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **Xaction reports proven against the live Steel Wheels database — three
+  fidelity fixes found by real data.** Rendering the converted Income
+  Statement against the `SampleData` HSQLDB (the JNDI PRD already has wired)
+  exposed what layout-only rendering could not: (1) JFreeReport's
+  `HideElementByNameFunction` — the layered per-category bands the old income
+  statements use — now translates to per-row PRD **visibility expressions**
+  (`=([Category] = "Revenue")`) instead of every layer overprinting at once;
+  (2) computed values declared under `<expression>` (not just `<function>`)
+  are scanned, so `ItemSumFunction` cells compute instead of printing
+  `$ <null>`; (3) the `Item*` function family maps to PRD's **running**
+  functions, not group totals — Gross Margin now shows $220,000
+  (550,000 − 330,000), not the report's ending net income. The statement
+  renders complete and correct from the customer-side database: Total Revenue
+  $550,000, COGS $330,000, itemised expenses, all totals live.
+
 ## [1.42.0] - 2026-07-31
 
 - **Xactions: old Pentaho BI-platform reports convert to .prpt.** A new source

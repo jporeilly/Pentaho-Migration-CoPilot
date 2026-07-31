@@ -27,17 +27,20 @@ _PAGE_SIZES = {
     "A5": (420.0, 595.0),
 }
 
-# JFreeReport function class (short name) -> Crystal-style operation our
-# writer already knows how to emit as a PRD group function
+# JFreeReport function class (short name) -> (operation, running). The Item*
+# family is a RUNNING value (row-by-row, JFreeReport resets it per group);
+# Group*/TotalGroup* are group totals. The writer emits PRD Item*Function for
+# running and TotalGroup*Function for totals - collapsing both to totals put
+# the report's ending net income on the Gross Margin line.
 _FUNCTION_OPS = {
-    "GroupCountFunction": "Count",
-    "ItemCountFunction": "Count",
-    "GroupSumFunction": "Sum",
-    "ItemSumFunction": "Sum",
-    "TotalGroupSumFunction": "Sum",
-    "ItemAvgFunction": "Average",
-    "ItemMinFunction": "Minimum",
-    "ItemMaxFunction": "Maximum",
+    "GroupCountFunction": ("Count", False),
+    "ItemCountFunction": ("Count", True),
+    "GroupSumFunction": ("Sum", False),
+    "ItemSumFunction": ("Sum", True),
+    "TotalGroupSumFunction": ("Sum", False),
+    "ItemAvgFunction": ("Average", True),
+    "ItemMinFunction": ("Minimum", True),
+    "ItemMaxFunction": ("Maximum", True),
 }
 
 _BAND_KINDS = [
@@ -146,25 +149,44 @@ def _parse_element(node, width: float, font: Font, offset_x=0.0, offset_y=0.0):
 
 
 def _parse_band(node, area_kind: str, width: float, base_font: Font,
-                group_index: int = -1) -> Section:
+                group_index: int = -1, vis_map: dict | None = None) -> Section:
     """A band element and its children -> one Section. A nested <band> child
-    offsets its children by its own x/y (JFreeReport's grouping container)."""
+    offsets its children by its own x/y (JFreeReport's grouping container).
+
+    `vis_map` carries the HideElementByNameFunction wiring: {element name ->
+    field}. A named band (or element) the function targets shows only on rows
+    where that field equals the name - the classic layered-categories layout
+    (Income Statement stacks one band per Category at the same position).
+    PRD's per-row element visibility expresses it exactly, so every element
+    inside such a band gets a visibility style expression instead of the
+    whole layer stack printing at once."""
+    vis_map = vis_map or {}
     font = _font(node, base_font)
     section = Section(area_kind=area_kind, name=node.get("name") or "",
                       group_index=group_index)
     elements = []
 
-    def walk(container, ox, oy):
+    def _visibility(name):
+        field = vis_map.get(name or "")
+        if field is None:
+            return None
+        return ("visible", f'=([{field}] = "{name}")')
+
+    def walk(container, ox, oy, vis):
         for child in container:
             if child.tag == "band":
                 walk(child, ox + _pt(child.get("x"), width),
-                     oy + _pt(child.get("y"), 100.0))
+                     oy + _pt(child.get("y"), 100.0),
+                     _visibility(child.get("name")) or vis)
                 continue
             el = _parse_element(child, width, font, ox, oy)
             if el is not None:
+                own = _visibility(child.get("name"))
+                if own or vis:
+                    el.style_expressions.append(own or vis)
                 elements.append(el)
 
-    walk(node, 0.0, 0.0)
+    walk(node, 0.0, 0.0, None)
     section.elements = elements
     declared = _pt(node.get("height"), 100.0, 0.0)
     content = max((e.y + e.height for e in elements), default=0.0)
@@ -203,11 +225,35 @@ def parse_jfreereport(source) -> ReportModel:
     model.page = page
     width = page_w - page.margin_left - page.margin_right
 
+    # Function/expression scan FIRST: the visibility wiring must be known
+    # before the bands parse. JFreeReport declares computed values under BOTH
+    # <function> and <expression> - same classes, same shape.
+    fn_nodes = [n for n in list(root.iter("function"))
+                + list(root.iter("expression"))]
+    vis_map = {}
+    for fn in fn_nodes:
+        cls = (fn.get("class") or "").rsplit(".", 1)[-1]
+        if cls == "HideElementByNameFunction":
+            props = {p.get("name"): (p.text or "").strip()
+                     for p in fn.iter("property")}
+            if props.get("element") and props.get("field"):
+                vis_map[props["element"]] = props["field"]
+    if vis_map:
+        model.issues.append(
+            "layered-visibility layout translated: HideElementByNameFunction "
+            "shows one named band per row - each affected element now carries "
+            "a PRD visibility expression ("
+            + ", ".join(f"'{e}' when {f} matches" for e, f in
+                        sorted(vis_map.items())[:4])
+            + (", ..." if len(vis_map) > 4 else "")
+            + ") - verify each layer prints on its own rows")
+
     base_font = Font()
     for band_tag, kind in _BAND_KINDS:
         node = root.find(band_tag)
         if node is not None:
-            model.sections.append(_parse_band(node, kind, width, base_font))
+            model.sections.append(
+                _parse_band(node, kind, width, base_font, vis_map=vis_map))
 
     wm = root.find("watermark")
     if wm is not None and len(wm):
@@ -226,26 +272,32 @@ def parse_jfreereport(source) -> ReportModel:
         gh = g.find("groupheader")
         if gh is not None:
             model.sections.append(_parse_band(gh, "GroupHeader", width,
-                                              base_font, group_index=gi))
+                                              base_font, group_index=gi,
+                                              vis_map=vis_map))
         gf = g.find("groupfooter")
         if gf is not None:
             model.sections.append(_parse_band(gf, "GroupFooter", width,
-                                              base_font, group_index=gi))
+                                              base_font, group_index=gi,
+                                              vis_map=vis_map))
 
-    # functions -> PRD group functions where the class maps; honesty otherwise
-    for fn in root.iter("function"):
+    # functions/expressions -> PRD group functions where the class maps;
+    # visibility handled above; honesty otherwise
+    for fn in fn_nodes:
         cls = (fn.get("class") or "").rsplit(".", 1)[-1]
+        if cls == "HideElementByNameFunction":
+            continue
         name = fn.get("name") or cls
         props = {p.get("name"): (p.text or "").strip()
                  for p in fn.iter("property")}
-        op = _FUNCTION_OPS.get(cls)
-        if op:
+        op_running = _FUNCTION_OPS.get(cls)
+        if op_running:
+            op, running = op_running
             model.summaries.append(Summary(
                 name=name, operation=op,
                 field_ref="{R." + props.get("field", "") + "}"
                 if props.get("field") else "",
                 group_field=props.get("group", ""),
-                expression_name=name))
+                expression_name=name, running=running))
         else:
             model.issues.append(
                 f"report function '{name}' ({cls}) has no direct PRD "
