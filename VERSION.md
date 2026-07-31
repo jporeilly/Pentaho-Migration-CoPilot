@@ -1,45 +1,57 @@
 # Version
 
-**1.42.0** - 2026-07-31
+**1.43.0** - 2026-07-31
 
-**A fourth source family: old Pentaho BI-platform reports.** The estates still
-on `.xaction` action sequences and their JFreeReport `.report` definitions —
-the direct ancestor of PRD's own format — now convert like every other source.
-The sequence's lookup becomes the `.prpt` query (`{PREPARE:x}` → `${x}`),
-SecureFilter prompts become parameters (query-backed *and* static pick-lists),
-the old definition becomes the layout, `$()` message templates carry over
-verbatim. Drop an `.xaction` or a zipped solution folder on the same upload
-page; the same CLI command converts it; a Try picker offers five corpus demos.
-Built corpus-first against 36 steel-wheels-era xactions: 25 report sequences,
-zero parse failures.
+**Both old Pentaho report dialects now translate — and the whole family is
+proven against a live database.** 1.42.0 added `.xaction` sequences whose
+simple-format definitions convert; the legacy-EXT dialect (`report-definition`
+object graphs, the format the old Report Design Wizard wrote) was honestly
+flagged as a rebuild. No longer: styled elements, resource bundles, nested
+bands with parent-relative percent sizes, nested sub-reports, chart
+expressions and report functions all parse into the same model. All four
+Steel Wheels EXT reports convert and render against the SampleData HSQLDB:
+Inventory List with its traffic-light stock formatting and HASCHANGED vendor
+grouping, invoice with its watermark underlay and one invoice per page,
+Variance Report with green/red trend arrows toggling per row, alternating row
+shading and a three-series chart, Top Ten with its pie chart inside a nested
+sub-report.
 
-**Every gap now proposes its own fix.** The principle that already governed
-Crystal formulas is wired through every workflow: a converter must suggest the
-solution and output it for review, never just log the error. Informatica
-transformations with no 1:1 PDI step carry the closest PDI approach from a
-versioned `_suggestions` library (Transaction Control → commit size or a job
-transaction; Web Services → a lookup or REST step; mapplet ports → the
-sub-transformation's input/output specification steps). Xaction bursting
-suggests a PDI job, JavaScript suggests a computed column, MDX suggests PRD's
-Mondrian datasource. The suggestions reach the Map page, the review checklist,
-the markdown and PDF reports, and the consultant portfolio reports.
+**The sequence's own values resolve at conversion time instead of becoming
+notes.** Dynamic `{name}` SQL fragments substitute the input's default — the
+platform's own text substitution, reproduced; one-line arithmetic JavaScript
+(`PrevYear = (YEAR - 1)`) is evaluated by a guarded interpreter and threaded
+through the query, bindings, labels and chart columns; a comma-list default
+feeding `IN (...)` becomes a PRD multi-select parameter with the values
+pre-selected; prompt pick-lists ship their lookup SQL as real query-backed
+list parameters; an MDX-fed report gets a typed empty stub query so the
+bundle opens and renders for review, with the Mondrian datasource suggested.
+Server-hosted images embed when a local install has them, the watermark band
+converts as an underlay, and the conversion-notes classifier files all of
+this as applied work — "Other manual work" holds only real hand-work. The
+Income Statement converts with zero manual notes.
 
-**Crystal's Top-N is solved, not flagged.** "Top 5 countries with an Others
-row" — Crystal's Group Sort Expert — has no PRD group equivalent, so the query
-now does it: a per-group total, a dense rank of those totals, and a CASE that
-relabels the tail. Nested Top-N ranks within its parent, the pie follows the
-same relabelled column for free, and the embedded sample is bucketed too so the
-offline `.prpt` matches. Measured against the original World Sales Report,
-every figure and percentage agrees: USA $57,573,832 / 36.2% … Others
-$51,239,713 / 32.2%.
+**The emitter is now validated against Report Designer's own output.** PRD
+ships 36 known-good sample `.prpt` files — files its own bundle writer
+authored. A validation harness sweeps them: every XML tag we emit must appear
+in PRD-authored files, unknown expression classes must resolve in the engine
+jars, all 36 render through our harness (34 do; two need scripting engines we
+don't load), and our conversions are compared structurally against the
+shipped re-authorings of the very same Steel Wheels reports — identical group
+and band skeletons. The sweep caught a real bug on its first run: static
+parameter pick-lists were emitted as `<value-list>`, a shape the engine
+parser silently ignores. They are now query-backed list parameters — the only
+kind PRD itself authors.
 
-**An estate is sized by measuring it, not guessing.** `xaction-triage` walks a
-whole solutions folder, classifies every sequence, grades every report
-Low/Medium/High from its own structure, and applies published Level-of-Effort
-bands to produce a costed engagement plan — the T&M model a conversion
-proposal needs, from the customer's own files. Nothing is skipped silently: an
-unparsable file is a record, and an estate with no report sequences is told so.
+**The workbench understands the whole estate.** The schema assistant
+introspects every database PRD has a JDBC driver for — through PRD's own Java
+and `lib/jdbc`, read-only — so SampleData browses its 14 tables, validates
+converted SQL and previews live rows. The data-source panel picks up the
+selected report's connection and tests it. The layout QA pass runs on
+xactions and knows a layered stack (mutually-exclusive visibility) from a
+real overlap; the wireframe badges layered elements so the design view is
+self-explanatory. Estate triage grades legacy-EXT as a translated dialect
+with a review sign-off, not a rebuild line.
 
 Phase 1 remains complete — Informatica PowerCenter, SAP Crystal Reports,
-Talend, and now Pentaho Xactions.
+Talend, and Pentaho Xactions (both definition dialects).
 See [CHANGELOG.md](CHANGELOG.md) for history.
