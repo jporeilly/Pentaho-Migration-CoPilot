@@ -9,6 +9,10 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The wireframe badges layered elements.** Visibility-conditioned elements
+  draw dashed and faded with a ▤ glyph, the legend explains "layered — one
+  prints per row", and each tooltip names the behaviour — so the stacked
+  design view is self-explanatory instead of looking broken.
 - **The layout QA agent runs on xactions and understands layered stacks.**
   The QA/auto-fit pass never ran on the xaction path, so the wireframe's
   stacked Income-Statement fields drew no comment. It runs now (same pass

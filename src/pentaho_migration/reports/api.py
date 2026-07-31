@@ -155,6 +155,8 @@ class ReportElementInfo(BaseModel):
     width: float
     height: float
     label: str = ""   # label text, field/expression name, or TODO text
+    layered: bool = False  # visibility-conditioned: stacks with siblings by
+                           # design, one prints per row
 
 
 class ReportSection(BaseModel):
@@ -228,7 +230,9 @@ def _summarize(model, source_name: str) -> ReportSummary:
             items=[ReportElementInfo(
                 kind=el.kind, x=round(el.x, 1), y=round(el.y, 1),
                 width=round(el.width, 1), height=round(el.height, 1),
-                label=(el.text or el.column or el.field_ref or "")[:60])
+                label=(el.text or el.column or el.field_ref or "")[:60],
+                layered=any(k == "visible" for k, _ in el.style_expressions)
+                or bool(el.condition_formulas))
                 for el in s.elements])
             for s in sections]
 

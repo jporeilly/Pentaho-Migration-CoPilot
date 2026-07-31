@@ -115,12 +115,20 @@ export default function LayoutPreview({ sections }) {
                   stroke={color} strokeWidth="1" />
               }
               return (
-                <g key={j}>
+                <g key={j} opacity={el.layered ? 0.55 : 1}>
                   <rect x={LABEL_W + el.x} y={ey} width={Math.max(el.width, 2)} height={eh}
                     fill={el.kind === 'field' || el.kind === 'special' ? 'rgba(57,135,229,0.12)' : 'none'}
-                    stroke={color} strokeWidth="0.8" rx="1.5">
-                    <title>{el.kind}: {el.label}</title>
+                    stroke={color} strokeWidth="0.8" rx="1.5"
+                    strokeDasharray={el.layered ? '3 2' : undefined}>
+                    <title>{el.layered
+                      ? `${el.kind}: ${el.label} — layered: shows only when its visibility condition matches the row`
+                      : `${el.kind}: ${el.label}`}</title>
                   </rect>
+                  {el.layered && el.width >= 14 && eh >= 8 && (
+                    <text x={LABEL_W + el.x + Math.max(el.width, 2) - 4} y={ey + 8}
+                      textAnchor="end" fontSize="7.5" fill="var(--text-muted)"
+                      fontFamily="system-ui">▤</text>
+                  )}
                   {eh >= 10 && el.width >= 24 && (
                     <text x={LABEL_W + el.x + 3} y={ey + Math.min(eh - 4, 12)}
                       fill={el.kind === 'unknown' ? 'var(--status-serious)' : 'var(--text-secondary)'}
@@ -138,6 +146,7 @@ export default function LayoutPreview({ sections }) {
         <span><span className="wf-swatch" style={{ background: 'var(--accent)' }} /> field / special</span>
         <span><span className="wf-swatch" style={{ background: 'var(--text-muted)' }} /> label</span>
         <span><span className="wf-swatch" style={{ background: 'var(--status-warning)' }} /> image</span>
+        <span><span className="wf-swatch wf-swatch-layered" /> ▤ layered — one prints per row</span>
         <span><span className="wf-swatch" style={{ background: 'var(--status-serious)' }} /> TODO / subreport</span>
         <span>suppressed bands hidden · positions in points from the .rpt</span>
       </div>
