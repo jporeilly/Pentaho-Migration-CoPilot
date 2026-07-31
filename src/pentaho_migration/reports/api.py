@@ -776,6 +776,19 @@ _XACTION_DEMO_META = [
                     "render and an EMAIL per row — the render converts, the "
                     "distribution becomes a suggested PDI job. Complexity: "
                     "High."},
+    {"name": "Inventory List",
+     "label": "Inventory list — the legacy-EXT format",
+     "description": "The OTHER old definition dialect (report-definition "
+                    "root): styled object graphs, traffic-light stock "
+                    "formatting, HASCHANGED vendor grouping — all translated. "
+                    "Complexity: Medium."},
+    {"name": "Variance Report",
+     "label": "Variance report — the full works",
+     "description": "Legacy-EXT with everything: JavaScript-computed years "
+                    "evaluated at conversion, SQL fragments substituted, a "
+                    "multi-select territory prompt, trend arrows as stacked "
+                    "conditional images, ported row banding and a "
+                    "three-series chart. Complexity: Medium."},
 ]
 
 

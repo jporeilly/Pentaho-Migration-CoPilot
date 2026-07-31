@@ -210,6 +210,7 @@ def classify_complexity(x: XActionModel):
 
 _PREPARE = re.compile(r"\{PREPARE:\s*([^}\s]+)\s*\}")
 _PLACEHOLDER = re.compile(r"^\$\{(\w+)\}$")
+_PLACEHOLDER_ANY = re.compile(r"\$\{(\w+)\}")
 
 
 def _select_columns(sql: str):
@@ -242,7 +243,68 @@ def _select_columns(sql: str):
     return out
 
 
-def _resolve_templated_bindings(model, x) -> None:
+def _scripted_values(x) -> dict:
+    """Values the sequence's JavaScript computed before anything ran - but
+    ONLY when the script line is a single pure-arithmetic assignment over
+    the sequence's own inputs (`PrevYear = (YEAR - 1) + ""`). That much is
+    deterministic, so conversion computes it the same way the platform did.
+    Anything past arithmetic stays un-evaluated and keeps its honest note."""
+    import ast
+
+    vals = {}
+    for inp in x.inputs:
+        try:
+            vals[inp.name] = float(str(inp.default))
+        except (TypeError, ValueError):
+            pass
+
+    def _ev(node):
+        if isinstance(node, ast.Expression):
+            return _ev(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value,
+                                                         (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.Name) and node.id in vals:
+            return vals[node.id]
+        if isinstance(node, ast.BinOp):
+            left, right = _ev(node.left), _ev(node.right)
+            if isinstance(node.op, ast.Add):
+                return left + right
+            if isinstance(node.op, ast.Sub):
+                return left - right
+            if isinstance(node.op, ast.Mult):
+                return left * right
+            if isinstance(node.op, ast.Div):
+                return left / right
+        if isinstance(node, ast.UnaryOp):
+            if isinstance(node.op, ast.USub):
+                return -_ev(node.operand)
+            if isinstance(node.op, ast.UAdd):
+                return _ev(node.operand)
+        raise ValueError("not plain arithmetic")
+
+    out = {}
+    for a in x.actions:
+        if a.component != "JavascriptRule":
+            continue
+        declared = {n for n, _t, _m in a.outputs}
+        script = a.deftext("script") or ""
+        for line in re.split(r"[;\n]", script):
+            m = re.match(r"^\s*(\w+)\s*=\s*(.+?)\s*$", line)
+            if not m or m.group(1) not in declared:
+                continue
+            expr = re.sub(r"\+\s*(''|\"\")\s*$", "", m.group(2)).strip()
+            try:
+                value = _ev(ast.parse(expr, mode="eval"))
+            except (ValueError, SyntaxError, ZeroDivisionError, KeyError):
+                continue
+            text = str(int(value)) if float(value).is_integer() else str(value)
+            out[m.group(1)] = text
+            vals[m.group(1)] = float(value)
+    return out
+
+
+def _resolve_templated_bindings(model, x, derived=None) -> None:
     """Resolve `${name}` field bindings left in a shared report definition.
     Order: an xaction input's default value (the platform's own substitution),
     then type-uniqueness against the query (exactly one aggregate column for a
@@ -251,12 +313,26 @@ def _resolve_templated_bindings(model, x) -> None:
     ph_elements = [el for s in model.sections for el in s.elements
                    if el.kind == "field" and _PLACEHOLDER.match(el.column or "")]
     ph_summaries = [s for s in model.summaries if "${" in (s.field_ref or "")]
-    if not ph_elements and not ph_summaries:
+    ph_other = any(
+        "${" in (s.name + s.expression_name) for s in model.summaries
+    ) or any(
+        "${" in (el.chart_category + el.chart_value + el.chart_series
+                 + "".join(c + n for c, n in el.chart_values))
+        for sec in model.sections for el in sec.elements
+        if el.kind == "chart"
+    ) or any(
+        "${" in f for sec in model.sections for el in sec.elements
+        for _k, f in el.style_expressions
+    ) or any(
+        "${" in (el.text + el.text_template)
+        for sec in model.sections for el in sec.elements)
+    if not ph_elements and not ph_summaries and not ph_other:
         return
     cols = _select_columns(model.sql)
     plain = [a for a, agg in cols if not agg]
     aggs = [a for a, agg in cols if agg]
     input_defaults = {i.name: i.default for i in x.inputs if i.default}
+    input_defaults.update(derived or {})
     resolved: dict = {}
     for el in ph_elements:
         name = _PLACEHOLDER.match(el.column).group(1)
@@ -278,12 +354,92 @@ def _resolve_templated_bindings(model, x) -> None:
     for summ in ph_summaries:
         for name, target in resolved.items():
             summ.field_ref = summ.field_ref.replace(f"${{{name}}}", target)
+
+    # the same placeholders reach chart bindings, style-expression formulas
+    # and summary NAMES (the EXT format templates all three); substitute from
+    # what resolved above plus the inputs' own defaults - the same order the
+    # platform substituted in
+    subs = {**input_defaults, **resolved}
+
+    def _sub(text):
+        return _PLACEHOLDER_ANY.sub(
+            lambda m: subs.get(m.group(1), m.group(0)), text or "")
+
+    if subs:
+        for s in model.summaries:
+            s.name = _sub(s.name)
+            s.expression_name = _sub(s.expression_name)
+            s.field_ref = _sub(s.field_ref)
+        for sec in model.sections:
+            for el in sec.elements:
+                el.text = _sub(el.text)
+                el.text_template = _sub(el.text_template)
+                if el.kind == "field":
+                    el.column = _sub(el.column)
+                if el.kind == "chart":
+                    el.chart_category = _sub(el.chart_category)
+                    el.chart_series = _sub(el.chart_series)
+                    el.chart_value = _sub(el.chart_value)
+                    el.chart_values = [(_sub(c), _sub(n))
+                                       for c, n in el.chart_values]
+                el.style_expressions = [(k, _sub(f))
+                                        for k, f in el.style_expressions]
     if resolved:
         model.issues.append(
             "templated field binding(s) resolved from the query's own shape: "
             + ", ".join(f"'${{{n}}}' -> {t}" for n, t in sorted(resolved.items()))
             + " - the platform substituted these from context the sequence "
             "does not define; review the binding")
+
+
+def _stub_missing_queries(model) -> None:
+    if not model.sql:
+        # a non-SQL feed (MDX/XQuery) leaves the bundle with no runnable
+        # query, which would fail outright on open. A typed EMPTY stub over
+        # the columns the layout itself references stands in, so the
+        # converted layout opens, renders and can be reviewed; the datasource
+        # note above says how to wire the real feed back.
+        columns = {}
+        for sec in model.sections:
+            for el in sec.elements:
+                if el.kind == "field" and el.column:
+                    columns.setdefault(
+                        el.column, el.value_type in ("NumberField",
+                                                     "CurrencyField"))
+                if el.kind == "chart":
+                    for col, _label in (el.chart_values
+                                        or [(el.chart_value, "")]):
+                        if col:
+                            columns.setdefault(col, True)
+                    if el.chart_category:
+                        columns.setdefault(el.chart_category, False)
+        for summ in model.summaries:
+            col = re.sub(r"^\{R\.|\}$", "", summ.field_ref or "")
+            if col:
+                columns.setdefault(col, True)
+        if columns:
+            select = ", ".join(
+                ("CAST(NULL AS DOUBLE)" if numeric
+                 else "CAST(NULL AS VARCHAR(80))") + f' AS "{name}"'
+                for name, numeric in columns.items())
+            model.sql = (f"SELECT {select}\nFROM (VALUES(0)) AS stub(x)\n"
+                         "WHERE 1 = 0")
+            model.sql_generated = True
+            model.issues.append(
+                "a typed empty stub query stands in for the non-SQL feed so "
+                "the converted layout opens and renders for review - replace "
+                "it with the datasource the note above describes")
+
+
+    # nested sub-reports carry their own bundles - stub theirs too, and
+    # hand down the connection so the child opens against the same source
+    for sec in model.sections:
+        for el in sec.elements:
+            if el.kind == "subreport" and el.subreport is not None:
+                child = el.subreport
+                child.jndi = child.jndi or model.jndi
+                child.sql_dialect = child.sql_dialect or model.sql_dialect
+                _stub_missing_queries(child)
 
 
 def build_report_model(xaction_source, resolver=None) -> ReportModel:
@@ -324,10 +480,22 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
     if not location:
         location = next((loc for name, loc in x.resources.items()
                          if name.startswith("report-definition")), "")
+    def _sibling(name):
+        try:
+            return resolver(name)
+        except Exception:
+            return None
+
+    derived = _scripted_values(x)
+
     model = ReportModel()
     if location:
         try:
-            model = parse_jfreereport(resolver(location))
+            defaults = {i.name: i.default for i in x.inputs if i.default}
+            defaults.update(derived)
+            model = parse_jfreereport(
+                resolver(location), resource_loader=_sibling,
+                input_defaults=defaults)
         except FileNotFoundError:
             model.issues.append(
                 f"report definition {location!r} was not uploaded with the "
@@ -360,22 +528,38 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
         if feed.component == "SQLLookupRule":
             sql = _PREPARE.sub(r"${\1}", feed.deftext("query"))
             # Bare {name} placeholders (no PREPARE) are DYNAMIC SQL fragments
-            # the platform text-substituted - usually built by the sequence's
-            # JavaScript ("AND col = 'x'", or empty for the 'default' prompt
-            # choice). Removing them runs the query as its default, unfiltered
-            # case - exactly what the xaction's own defaults produce - and the
-            # note says how to keep the prompt-driven filter.
+            # the platform text-substituted. When the sequence itself defines
+            # the value - an input's default, or a line of arithmetic the
+            # evaluator computed - substituting it reproduces the platform's
+            # own default run. Only a fragment nothing defines is removed
+            # (usually an optional clause that is empty in the default case),
+            # and the note says how to keep the prompt-driven filter.
             fragments = sorted(set(re.findall(r"(?<!\$)\{([A-Za-z_]\w*)\}", sql)))
             if fragments:
-                sql = re.sub(r"(?<!\$)\{[A-Za-z_]\w*\}", "", sql)
-                model.issues.append(
-                    "dynamic SQL fragment(s) "
-                    + ", ".join(f"'{{{f}}}'" for f in fragments)
-                    + " were text-substituted by the platform (built by the "
-                    "sequence's JavaScript) - removed so the query runs its "
-                    "DEFAULT unfiltered case; to keep each prompt's filter, "
-                    "add its clause with a ${param} (e.g. AND OFFICES.TERRITORY "
-                    "= ${territory}) per the script logic in these notes")
+                values = {i.name: i.default for i in x.inputs if i.default}
+                values.update(derived)
+                filled = sorted(f for f in fragments if values.get(f))
+                stripped = sorted(f for f in fragments if not values.get(f))
+                for f in filled:
+                    sql = sql.replace(f"{{{f}}}", values[f])
+                if stripped:
+                    sql = re.sub(r"(?<!\$)\{[A-Za-z_]\w*\}", "", sql)
+                if filled:
+                    model.issues.append(
+                        "dynamic SQL fragment(s) "
+                        + ", ".join(f"'{{{f}}}' -> {values[f]}" for f in filled)
+                        + " substituted with the sequence's own value(s), the "
+                        "same text substitution the platform performed - to "
+                        "re-parameterise, swap the value back to a ${param}")
+                if stripped:
+                    model.issues.append(
+                        "dynamic SQL fragment(s) "
+                        + ", ".join(f"'{{{f}}}'" for f in stripped)
+                        + " were text-substituted by the platform (built by the "
+                        "sequence's JavaScript) - removed so the query runs its "
+                        "DEFAULT unfiltered case; to keep each prompt's filter, "
+                        "add its clause with a ${param} (e.g. AND OFFICES.TERRITORY "
+                        "= ${territory}) per the script logic in these notes")
             model.sql = sql
             model.jndi = feed.deftext("jndi") or model.jndi
         elif feed.component == "MDXLookupRule":
@@ -390,7 +574,10 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
                 "the report reads an XQuery/XML source - use PRD's XML/XPath "
                 "datasource against the same document; the field names carry over")
 
+    _stub_missing_queries(model)
+
     # ---- parameters: xaction inputs + SecureFilter prompts ---------------
+
     prompts = {}
     picklist_feeds = {}
     for a in x.actions:
@@ -430,16 +617,35 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
                 f"parameter '{inp.name}' default {inp.default!r} is not ISO "
                 "(dd-mm-yyyy?) - the database will reject it; fix the default "
                 "to yyyy-mm-dd hh:mm:ss")
+        # A ${param} inside an IN (...) filter whose default is a comma list
+        # is the platform's multi-select idiom: the prompt submitted several
+        # values and the text substitution splatted them into the list. The
+        # PRD-native equivalent is a MULTI-VALUE parameter - the engine
+        # expands the selected array inside IN (${param}) - with the same
+        # values pre-selected.
+        if ("," in (inp.default or "")
+                and re.search(r"\bIN\s*\(\s*\$\{%s\}\s*\)" % re.escape(inp.name),
+                              model.sql or "", re.I)):
+            prm.multi_value = True
+            prm.default_values = [v.strip() for v in inp.default.split(",")
+                                  if v.strip()]
+            model.issues.append(
+                f"parameter '{inp.name}' feeds an IN (...) filter with a "
+                "comma-list default - converted to a PRD multi-select "
+                "parameter with those values pre-selected; the engine "
+                "expands the selection into the IN clause")
         src = lookup_by_output.get(list_source)
         list_input = next((i for i in x.inputs
                            if i.name == list_source and i.list_maps), None)
         if src is not None and src.component == "SQLLookupRule":
-            q = src.deftext("query")
+            q = _PREPARE.sub(r"${}", src.deftext("query"))
+            model.param_lov_sql[inp.name] = (q, vcol or "1", dcol or vcol
+                                             or "1")
             model.issues.append(
-                f"parameter '{inp.name}' prompts from a query pick-list "
-                f"(display {dcol!r}, value {vcol!r}) - recreate it as a PRD "
-                "query-backed list parameter with the same query: "
-                + " ".join(q.split())[:180])
+                f"parameter '{inp.name}' pick-list converted as a "
+                "query-backed PRD list parameter - its lookup rides along "
+                f"as query 'lov_{inp.name}' (display {dcol!r}, "
+                f"value {vcol!r})")
         elif list_input is not None:
             # a STATIC pick-list hardcoded in the xaction inputs - carries
             # straight into a PRD list-parameter (LOV)
@@ -454,11 +660,20 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
     # otherwise the query's own shape can settle it DETERMINISTICALLY when
     # unambiguous: one aggregate column for a number-field, one plain column
     # for a string-field. Anything still open stays an honest TODO.
-    _resolve_templated_bindings(model, x)
+    _resolve_templated_bindings(model, x, derived)
 
     # ---- orchestration components -> suggested solutions -----------------
     for a in x.actions:
         if a.component == "JavascriptRule":
+            declared = {n for n, _t, _m in a.outputs}
+            if declared and declared <= set(derived):
+                model.issues.append(
+                    "JavaScript-derived value(s) evaluated at conversion "
+                    "time from the sequence's own arithmetic: "
+                    + ", ".join(f"{n} = {derived[n]}"
+                                for n in sorted(declared))
+                    + " - the query and bindings use the computed value")
+                continue
             script = " ".join(a.deftext("script").split())[:140]
             model.issues.append(
                 "JavaScript business logic in the action sequence - fold it "

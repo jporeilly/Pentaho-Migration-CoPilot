@@ -95,6 +95,11 @@ class Element:
     chart_category: str = ""   # resolved category column
     chart_series: str = ""     # resolved series column (optional)
     chart_value: str = ""      # resolved value column
+    chart_values: list = field(default_factory=list)  # (value column, series label) pairs when one chart plots several series
+    chart_title_literal: bool = False  # chart_title is authored (even empty) - do not invent one
+    chart_category_axis_label: str = ""
+    chart_value_axis_label: str = ""
+    emit_name: bool = False    # write the element's name into the bundle (a report function targets it)
     crosstab_rows: list = field(default_factory=list)      # row dimension columns (kind="crosstab")
     crosstab_columns: list = field(default_factory=list)   # column dimension columns
     crosstab_summaries: list = field(default_factory=list) # (measure column, Crystal op)
@@ -258,6 +263,7 @@ class ReportModel:
     # sample databases' engine; see reports/formula_sql.py.
     sql_dialect: str = "mysql"
     record_selection: str = ""
+    definition_format: str = ""  # simple | legacy-ext: which old JFreeReport dialect the layout came from
     record_selection_folded: bool = False  # True when folded into the SQL WHERE
     # Keyed by the table's ALIAS - the name every field reference, formula
     # and table link is written against. See _parse_database.
@@ -271,11 +277,13 @@ class ReportModel:
     formulas: dict = field(default_factory=dict)     # name -> Formula
     parameters: list = field(default_factory=list)
     summaries: list = field(default_factory=list)
+    port_functions: list = field(default_factory=list)  # (name, java class, {prop: value}) legacy functions PRD still ships, emitted verbatim
     groups: list = field(default_factory=list)
     record_sorts: list = field(default_factory=list)  # (bare column, descending) detail ordering
     saved_rows: object = None  # rpt_saved.SavedRows recovered from the .rpt binary, or None
     table_links: list = field(default_factory=list)   # ((table, col), (table, col)) visual links
     param_sql_columns: dict = field(default_factory=dict)  # param name -> folded SQL column expr
+    param_lov_sql: dict = field(default_factory=dict)  # param name -> (lookup sql, key col, display col): a pick-list feed carried as its own query
     window_columns: list = field(default_factory=list)  # (alias, sql func, column, group column) folded window aggregates
     subreports: dict = field(default_factory=dict)    # subreport name -> child ReportModel
     page: PageSetup = field(default_factory=PageSetup)

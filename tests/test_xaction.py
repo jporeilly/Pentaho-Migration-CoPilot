@@ -100,9 +100,11 @@ class TestBuildReportModel:
         m = build_report_model(SW / "Income Statement.xaction")
         assert m.sections, "layout should come from Income Statement.xml"
 
-    def test_a_legacy_ext_definition_is_flagged_not_crashed(self):
+    def test_a_legacy_ext_definition_translates(self):
+        # the EXT dialect used to be flagged honestly; it now parses for real
         m = build_report_model(SW / "Inventory List.xaction")
-        assert any("legacy-EXT" in i for i in m.issues)
+        assert not any("legacy-EXT" in i for i in m.issues)
+        assert sum(len(s.elements) for s in m.sections) > 20
 
     def test_the_bundle_writes_with_the_parameterised_query(self, tmp_path):
         m = build_report_model(SW / "order_detail.xaction")
@@ -124,13 +126,26 @@ class TestSuggestedSolutions:
         assert "PDI job" in notes and "EMAIL" in notes.upper()
 
     def test_javascript_suggests_sql_or_a_prd_function(self):
-        m = build_report_model(SW / "Variance Report.xaction")
+        # Sales_by_Customer's JS builds query strings - beyond arithmetic,
+        # so the honest fold-it-yourself suggestion stays
+        m = build_report_model(SW / "Sales_by_Customer.xaction")
         assert any("JavaScript" in i and "computed column" in i for i in m.issues)
 
-    def test_a_query_picklist_prompt_carries_its_query(self):
-        # Sales_by_Customer feeds its prompts from SQL lookups
+    def test_pure_arithmetic_javascript_is_evaluated_instead(self):
+        # Variance's JS is one arithmetic line (PrevYear = YEAR - 1) - the
+        # conversion computes it rather than telling the consultant to
+        m = build_report_model(SW / "Variance Report.xaction")
+        assert any("evaluated at conversion time" in i and "PrevYear = 2003" in i
+                   for i in m.issues)
+
+    def test_a_query_picklist_prompt_becomes_a_real_lov_query(self):
+        # Sales_by_Customer feeds its prompts from SQL lookups; the lookup
+        # SQL now ships IN the bundle as the parameter's own query
+        from pentaho_migration.reports.todo_kinds import classify_todo
         m = build_report_model(SW / "Sales_by_Customer.xaction")
-        assert any("query-backed list parameter" in i for i in m.issues)
+        assert m.param_lov_sql, "pick-list lookups should carry their SQL"
+        note = next(i for i in m.issues if "pick-list converted" in i)
+        assert classify_todo(note) == "applied"
 
     def test_a_static_picklist_becomes_a_prd_list_parameter(self):
         # Sales_by_Supplier hardcodes its pick-lists as property-map-lists
@@ -345,3 +360,136 @@ class TestXactionNoteClassification:
         m = build_report_model(SW / "Income Statement.xaction")
         manual = [n for n in m.issues if classify_todo(n) == "manual"]
         assert manual == []
+
+
+class TestLegacyExtParser:
+    """The OTHER old dialect (report-definition root) translates for real:
+    styled object graphs, resource bundles, ported functions, conditional
+    images, chart expressions. Steel Wheels ships four of them."""
+
+    def test_inventory_layout_translates_with_live_styling(self):
+        m = build_report_model(SW / "Inventory List.xaction")
+        assert [g.column for g in m.groups] == ["PRODUCTLINE"]
+        kinds = {e.kind for s in m.sections for e in s.elements}
+        assert {"label", "field", "line", "image"} <= kinds
+        stock = next(e for s in m.sections for e in s.elements
+                     if e.column == "QUANTITYINSTOCK")
+        # the traffic-light stock formatting rides as a style expression
+        assert any(k == "background-color" and "QUANTITYINSTOCK" in f
+                   for k, f in stock.style_expressions)
+        logo = next(e for s in m.sections for e in s.elements
+                    if e.kind == "image" and e.image_bytes)
+        assert logo.image_mime == "image/jpeg"
+
+    def test_missing_resource_bundle_is_an_honest_manual_note(self):
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        m = build_report_model(SW / "Inventory List.xaction")
+        note = next(i for i in m.issues if "shown literally" in i)
+        assert "InventoryList.properties" in note
+        assert classify_todo(note) == "manual"
+
+    def test_resource_bundle_resolves_when_present(self):
+        xml = (
+            '<report-definition xmlns="http://x/legacy/ext" name="R">'
+            "<report-config><simple-page-definition>"
+            '<page orientation="portrait" pageformat="LETTER" topmargin="10"'
+            ' leftmargin="10" bottommargin="10" rightmargin="10"/>'
+            "</simple-page-definition></report-config>"
+            "<report-description><report-header>"
+            '<element name="t" type="text/plain">'
+            '<style><basic-key name="x">0.0</basic-key>'
+            '<basic-key name="y">0.0</basic-key>'
+            '<basic-key name="min-width">100.0</basic-key>'
+            '<basic-key name="min-height">14.0</basic-key></style>'
+            '<template references="resource-label">'
+            '<basic-object name="content">reportTitle</basic-object>'
+            '<basic-object name="resourceIdentifier">Inv</basic-object>'
+            "</template></element>"
+            "</report-header></report-description></report-definition>")
+
+        def loader(name):
+            if name == "Inv.properties":
+                return b"reportTitle=Detail Inventory Report\n"
+            raise FileNotFoundError(name)
+
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        m = parse_jfreereport(xml.encode(), resource_loader=loader)
+        label = next(e for s in m.sections for e in s.elements)
+        assert label.text == "Detail Inventory Report"
+        note = next(i for i in m.issues if "resource-bundle text resolved" in i)
+        assert classify_todo(note) == "applied"
+
+    def test_invoice_groups_pagination_and_parent_relative_percents(self):
+        m = build_report_model(SW / "invoice.xaction")
+        assert [g.column for g in m.groups] == ["CUSTOMERNAME", "ORDERNUMBER"]
+        # the watermark converts as the underlay, image embedded
+        first = m.sections[0]
+        assert first.underlay and any(e.image_bytes for e in first.elements)
+        # each order's footer starts a new page, per the original's style key
+        footers = [s for s in m.sections if s.area_kind == "GroupFooter"]
+        assert any(s.new_page_after for s in footers)
+        # -100.0 widths resolve against the CONTAINING band, not the page:
+        # nothing may overflow the printable width (504pt LETTER + margins)
+        assert all(e.x + e.width <= 505 for s in m.sections
+                   for e in s.elements)
+        total = next(s for s in m.summaries if s.expression_name == "invoicetotal")
+        assert (total.operation, total.group_field, total.running) == \
+            ("Sum", "ORDERNUMBER", True)
+
+    def test_variance_resolves_everything(self):
+        m = build_report_model(SW / "Variance Report.xaction")
+        # JS arithmetic evaluated + fragments substituted -> runnable SQL
+        assert "WHEN 2003" in m.sql and "WHEN 2004" in m.sql
+        assert "{" not in m.sql.replace("${TERRITORY}", "")
+        # comma-list default feeding IN (...) -> PRD multi-select
+        terr = next(p for p in m.parameters if p.name == "TERRITORY")
+        assert terr.multi_value
+        assert terr.default_values == ["EMEA", "APAC", "NA", "Japan"]
+        # the trend arrows: two stacked images, opposite visibility, embedded
+        arrows = [e for s in m.sections for e in s.elements
+                  if e.kind == "image" and e.style_expressions]
+        assert len(arrows) == 2
+        conds = sorted(f for e in arrows for _k, f in e.style_expressions)
+        assert conds == ["=NOT([2004]>[2003])", "=[2004]>[2003]"]
+        assert all(e.image_bytes for e in arrows)
+        # the row-banding function ports unchanged and its band keeps a name
+        assert any(cls.endswith("ElementVisibilitySwitchFunction")
+                   for _n, cls, _p in m.port_functions)
+        assert any(e.emit_name and e.name == "ITEMRECT"
+                   for s in m.sections for e in s.elements)
+        # one chart, three series
+        chart = next(e for s in m.sections for e in s.elements
+                     if e.kind == "chart")
+        assert [c for c, _n in chart.chart_values] == ["2003", "2004",
+                                                       "Variance"]
+
+    def test_topten_mdx_gets_a_stub_query_and_charts(self):
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        m = build_report_model(
+            SW / "Top Ten Customer Product Line Analysis.xaction")
+        assert m.sql_generated and "WHERE 1 = 0" in m.sql
+        assert any("MDX (Mondrian)" in i for i in m.issues)
+        stub_note = next(i for i in m.issues if "stub query stands in" in i)
+        assert classify_todo(stub_note) == "applied"
+        def charts_of(model):
+            for sec in model.sections:
+                for e in sec.elements:
+                    if e.kind == "chart":
+                        yield e
+                    if e.kind == "subreport" and e.subreport is not None:
+                        yield from charts_of(e.subreport)
+        # the pie lives in the nested EXT sub-report (Product Line Mix)
+        assert {c.chart_type for c in charts_of(m)} >= {"bar", "pie"}
+
+    def test_pipeline_work_classifies_applied_not_manual(self):
+        from pentaho_migration.reports.todo_kinds import split_todos
+        m = build_report_model(SW / "Variance Report.xaction")
+        kinds = split_todos(m.issues)
+        for marker in ("substituted with the sequence's own value",
+                       "evaluated at conversion time",
+                       "ported unchanged"):
+            assert any(marker in n for n in kinds["applied"]), marker
+        # the one genuine manual item left: the header arrow whose
+        # condition references a name nothing declares ('Total Selected')
+        assert kinds["manual"], "the Total Selected arrow stays honest"
+        assert all("Total Selected" in n for n in kinds["manual"])

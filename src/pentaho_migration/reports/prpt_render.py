@@ -87,9 +87,12 @@ def _border_styles(el, sp):
 
 
 def _line_style(el, sp):
+    color = el.border_color or "#000000"
+    weight = el.border_width or 0.5
     return (f"<{sp}element-style>"
-            f'<{sp}content-styles draw-shape="true" scale="true" color="#000000" '
-            f'stroke-weight="0.5" stroke-style="solid"/>'
+            f'<{sp}content-styles draw-shape="true" scale="true" '
+            f"color={quoteattr(color)} "
+            f'stroke-weight="{_num(weight)}" stroke-style="solid"/>'
             f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
             f'min-width="{_num(el.width)}" min-height="1"/>'
             f"</{sp}element-style>")
@@ -126,6 +129,14 @@ def _style_expr_block(el):
         for key, formula in el.style_expressions)
 
 
+def _name_attr(el):
+    """`core:name` for elements a report function targets by name (PRD's own
+    files carry the attribute the same way); unnamed elements stay clean."""
+    if getattr(el, "emit_name", False) and el.name:
+        return f" core:name={quoteattr(el.name)}"
+    return ""
+
+
 def render_element(el, tp="", sp="style:"):
     """Render one Element. tp/sp are tag prefixes for layout.xml vs styles.xml."""
     if el.kind == "label":
@@ -133,10 +144,10 @@ def render_element(el, tp="", sp="style:"):
             # Crystal text object with fields embedded in its prose. PRD's
             # message element interpolates $(column) at render time, which is
             # the same thing Crystal does with {Table.Column}.
-            return (f'<{tp}message core:element-type="message">{_style_block(el, sp)}'
+            return (f'<{tp}message core:element-type="message"{_name_attr(el)}{NULL_BLANK}>{_style_block(el, sp)}'
                     f"{_style_expr_block(el)}"
                     f"<core:value>{escape(el.text_template)}</core:value></{tp}message>")
-        return (f'<{tp}label core:element-type="label">{_style_block(el, sp)}'
+        return (f'<{tp}label core:element-type="label"{_name_attr(el)}>{_style_block(el, sp)}'
                 f"{_style_expr_block(el)}"
                 f"<core:value>{escape(el.text)}</core:value></{tp}label>")
     if el.kind == "line":
@@ -144,7 +155,7 @@ def render_element(el, tp="", sp="style:"):
     if el.kind == "box":
         fill = el.bg_color or el.font.color
         stroke = el.border_color or "black"
-        return (f'<{tp}rectangle core:element-type="rectangle" core:arc-width="0.0" core:arc-height="0.0">'
+        return (f'<{tp}rectangle core:element-type="rectangle"{_name_attr(el)} core:arc-width="0.0" core:arc-height="0.0">'
                 f"<{sp}element-style>"
                 f'<{sp}content-styles draw-shape="{str(bool(el.border_width)).lower()}" '
                 f'fill-shape="{str(bool(el.bg_color)).lower()}" scale="true" '
@@ -152,7 +163,7 @@ def render_element(el, tp="", sp="style:"):
                 f'stroke-weight="{_num(el.border_width or 1)}" stroke-style="solid"/>'
                 f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
                 f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
-                f"</{sp}element-style></{tp}rectangle>")
+                f"</{sp}element-style>{_style_expr_block(el)}</{tp}rectangle>")
     if el.kind == "special":
         if el.column in ("pagenumber", "pagenofm", "totalpagecount"):
             return (f'<{tp}message core:element-type="message">{_style_block(el, sp)}'
@@ -216,6 +227,7 @@ def render_element(el, tp="", sp="style:"):
                     f'<{sp}spatial-styles x="{_num(el.x)}" y="{_num(el.y)}" '
                     f'min-width="{_num(el.width)}" min-height="{_num(el.height)}"/>'
                     f"</{sp}element-style>"
+                    f"{_style_expr_block(el)}"
                     f'<core:value resource-type="resource-key">{escape(key)}</core:value>'
                     f"</{tp}content>")
         return render_element(_todo_label(el, "[TODO image: re-embed resource]"), tp, sp)
@@ -253,11 +265,23 @@ def _render_chart(el, tp, sp):
                          f'<property name="valueColumn">{escape(el.chart_value)}</property>')
     else:
         collector = "org.pentaho.plugin.jfreereport.reportcharts.collectors.CategorySetDataCollector"
-        dataset_props = (f'<property name="categoryColumn">{escape(el.chart_category)}</property>'
-                         + (f'<property name="seriesColumn">{escape(el.chart_series)}</property>'
-                            if el.chart_series else '<property name="seriesName">'
-                            + escape(el.chart_value) + "</property>")
-                         + f'<property name="valueColumn">{escape(el.chart_value)}</property>')
+        values = getattr(el, "chart_values", None) or []
+        if len(values) > 1:
+            # one chart, several measures: the collector takes indexed
+            # valueColumn[i]/seriesName[i] pairs (PRD's own property reader
+            # handles the [i] convention)
+            dataset_props = (
+                f'<property name="categoryColumn">{escape(el.chart_category)}</property>'
+                + "".join(
+                    f'<property name="valueColumn[{i}]">{escape(col)}</property>'
+                    f'<property name="seriesName[{i}]">{escape(label or col)}</property>'
+                    for i, (col, label) in enumerate(values)))
+        else:
+            dataset_props = (f'<property name="categoryColumn">{escape(el.chart_category)}</property>'
+                             + (f'<property name="seriesColumn">{escape(el.chart_series)}</property>'
+                                if el.chart_series else '<property name="seriesName">'
+                                + escape(el.chart_value) + "</property>")
+                             + f'<property name="valueColumn">{escape(el.chart_value)}</property>')
     if el.chart_type == "thermometer":
         title = el.chart_title or el.chart_value      # no category axis
         # a KPI meter, not a temperature: drop the default "C" unit label and
@@ -268,9 +292,17 @@ def _render_chart(el, tp, sp):
                        'ThermometerUnit">None</property>'
                        '<property name="showLegend" class="java.lang.Boolean">false</property>')
     else:
-        title = el.chart_title or f"{el.chart_value} by {el.chart_category}"
-        chart_props = (f'<property name="titleText">{escape(title)}</property>'
-                       '<property name="showLegend" class="java.lang.Boolean">true</property>')
+        title = (el.chart_title if getattr(el, "chart_title_literal", False)
+                 else el.chart_title or f"{el.chart_value} by {el.chart_category}")
+        chart_props = ((f'<property name="titleText">{escape(title)}</property>'
+                        if title else "")
+                       + '<property name="showLegend" class="java.lang.Boolean">true</property>')
+        for prop, value in (("categoryAxisLabel",
+                             getattr(el, "chart_category_axis_label", "")),
+                            ("valueAxisLabel",
+                             getattr(el, "chart_value_axis_label", ""))):
+            if value and el.chart_type != "pie":
+                chart_props += f"<property name={quoteattr(prop)}>{escape(value)}</property>"
     return (
         f'<legacy-charts:legacy-chart core:element-type="legacy-chart" '
         f'xmlns:legacy-charts="{NS_LEGACY_CHARTS}">'

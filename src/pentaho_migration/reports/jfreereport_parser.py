@@ -247,24 +247,42 @@ def _parse_band(node, area_kind: str, width: float, base_font: Font,
     return section
 
 
-def parse_jfreereport(source) -> ReportModel:
-    """A simple-format JFreeReport definition -> ReportModel. `source` is a
-    path or bytes. The legacy-ext format (`report-definition` root) is not
-    translated - it returns a model whose issues say so, honestly."""
+def parse_jfreereport(source, resource_loader=None,
+                      input_defaults=None) -> ReportModel:
+    """A JFreeReport definition -> ReportModel. `source` is a path or bytes.
+    Both dialects translate: the simple `<report>` format here, the legacy-EXT
+    `<report-definition>` format via its own parser. `resource_loader` and
+    `input_defaults` feed the EXT side (resource bundles and conditional
+    image URLs live outside the definition)."""
     data = Path(source).read_bytes() if not isinstance(source, (bytes, bytearray)) else bytes(source)
     root = ET.fromstring(data)
 
     model = ReportModel()
     if root.tag != "report":
+        if root.tag.split("}")[-1] == "report-definition":
+            from pentaho_migration.reports.jfreereport_ext_parser import (
+                parse_ext_report,
+            )
+            try:
+                return parse_ext_report(root, resource_loader=resource_loader,
+                                        input_defaults=input_defaults)
+            except Exception as exc:   # honesty beats a crash mid-conversion
+                model.name = "Legacy report definition"
+                model.issues.append(
+                    "legacy-EXT report definition failed to translate "
+                    f"({exc}) - open the original in an old Report Designer "
+                    "and re-save, or rebuild the layout in PRD; the "
+                    "xaction's query and parameters convert either way")
+                return model
         model.name = "Legacy report definition"
         model.issues.append(
-            f"report definition root <{root.tag.split('}')[-1]}> is the "
-            "legacy-EXT JFreeReport format, not the simple format - open the "
-            "original in an old Report Designer and re-save, or rebuild the "
-            "layout in PRD; the xaction's query and parameters convert either way")
+            f"report definition root <{root.tag.split('}')[-1]}> is not a "
+            "JFreeReport format this pipeline knows - rebuild the layout in "
+            "PRD; the xaction's query and parameters convert either way")
         return model
 
     model.name = root.get("name") or "Converted xaction report"
+    model.definition_format = "simple"
     fmt = (root.get("pageformat") or "LETTER").upper()
     page_w, _page_h = _PAGE_SIZES.get(fmt, _PAGE_SIZES["LETTER"])
     page = PageSetup(paper=fmt if fmt in _PAGE_SIZES else "LETTER",

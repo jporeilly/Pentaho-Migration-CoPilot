@@ -59,7 +59,10 @@ class TestEstateReportHtml:
                         "Level-of-Effort bands"):
             assert section in html
         assert "Low: 5" in html and "High: 4" in html
-        assert "Rebuild legacy-EXT" in html      # the corpus has 4 of them
+        # the 4 legacy-EXT definitions now TRANSLATE - the action is a
+        # review sign-off, not a rebuild
+        assert "Review the legacy-EXT conversions" in html
+        assert "Rebuild legacy-EXT" not in html
         assert "1-2h" in html and "16-40h" in html   # the published bands
 
     def test_an_estate_with_no_reports_is_honest(self, tmp_path):

@@ -78,9 +78,7 @@ def triage_estate(folder) -> list:
         grade, reasons = classify_complexity(x)
         model = build_report_model(path)
         if model.sections:
-            definition = "simple"
-        elif any("legacy-EXT" in i for i in model.issues):
-            definition = "legacy-ext"
+            definition = model.definition_format or "simple"
         else:
             definition = "missing"
         copilot, manual, _b1, _b2 = LOE_HOURS[grade]
@@ -122,7 +120,7 @@ def build_xaction_estate_report_html(records, rate: float = 150.0,
     kind_chart = _hbar_chart([(k, v, None) for k, v in
                               sorted(kinds.items(), key=lambda kv: -kv[1])])
     def_chart = _hbar_chart([(k, v, _GRADE_COLORS["High"]
-                              if k in ("legacy-ext", "missing") else None)
+                              if k == "missing" else None)
                              for k, v in defs.items() if v])
 
     # priority actions - one row per kind of work, house table shape; the
@@ -132,11 +130,11 @@ def build_xaction_estate_report_html(records, rate: float = 150.0,
     actions = []
     legacy = _rows_for(lambda r: r.definition == "legacy-ext")
     if legacy:
-        actions.append((1, "Rebuild legacy-EXT report definitions",
-                        "the old extended-format definitions do not translate "
-                        "- re-save via an old Report Designer or rebuild the "
-                        "layout in PRD; the query and parameters convert "
-                        "either way", legacy))
+        actions.append((2, "Review the legacy-EXT conversions",
+                        "the old extended-format definitions translate "
+                        "(styled layouts, resource bundles, charts, ported "
+                        "functions) - run each converted report beside its "
+                        "original and sign off the layout", legacy))
     missing = _rows_for(lambda r: r.definition == "missing")
     if missing:
         actions.append((1, "Locate the missing report definitions",
@@ -254,8 +252,7 @@ for the PDI side.</p>
 {kind_chart}
 
 <h2>Report definitions</h2>
-<p class="muted">Simple-format definitions convert; legacy-EXT and missing
-ones are the P1 rows below.</p>
+<p class="muted">Both old definition dialects translate - the simple format and the legacy-EXT object graphs; only a missing definition needs the original solution folder.</p>
 {def_chart}
 
 <h2>Priority actions across the estate</h2>

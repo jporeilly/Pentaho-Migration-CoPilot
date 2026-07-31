@@ -9,6 +9,39 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The legacy-EXT `.report` dialect translates** (the second half of
+  Xaction + .report -> PRD). `report-definition` object graphs - styled
+  elements, resource bundles, nested bands with parent-relative percent
+  sizes, nested sub-reports, chart expressions, ported functions - now
+  parse into the same model the simple format uses. All four Steel Wheels
+  EXT reports convert and render live against SampleData: Inventory List
+  (traffic-light stock formatting, HASCHANGED vendor grouping), invoice
+  (watermark underlay, per-order page breaks, `Page 1 / 4`), Variance
+  Report (trend arrows as stacked conditional images, alternating row
+  banding via the ported ElementVisibilitySwitchFunction, a three-series
+  chart), and Top Ten (MDX feed stubbed runnable, pie chart inside a
+  nested sub-report).
+- **The sequence's own values resolve at conversion time.** Dynamic
+  `{name}` SQL fragments substitute the input's default (the platform's
+  own text substitution) instead of being stripped; one-line arithmetic
+  JavaScript (`PrevYear = (YEAR - 1)`) is evaluated by a guarded
+  interpreter; a comma-list default feeding `IN (...)` becomes a PRD
+  multi-select parameter; and prompt pick-lists now ship their lookup SQL
+  as real query-backed list parameters instead of a "recreate it" note.
+- **The emitter is validated against PRD's own 36 shipped samples** (#64).
+  `scripts/validate_against_prd_samples.py` checks every tag we emit
+  against the vocabulary PRD's own writer uses, resolves unknown
+  expression classes against the engine jars, renders all 36 samples
+  through our harness (34/36 pass; the two failures need scripting
+  engines we do not load), and compares our conversions structurally
+  against the shipped re-authorings of the same Steel Wheels reports -
+  identical group and band skeletons. The sweep caught a real bug: our
+  static parameter pick-lists were emitted as `<value-list>`, a shape the
+  engine parser ignores - they are now query-backed list parameters, the
+  only kind PRD itself authors.
+- **Estate triage reflects the new reality**: legacy-EXT counts as a
+  translated dialect (review sign-off), not a rebuild line.
+
 - **The "manual work" list resolves itself where it can.** The user's
   challenge on the Income Statement notes: most lines were not manual at all.
   Three answers: (1) server-hosted images (`${serverBaseURL}/sw-style/...`)

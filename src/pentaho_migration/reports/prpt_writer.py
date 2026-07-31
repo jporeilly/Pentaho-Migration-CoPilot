@@ -610,7 +610,7 @@ def build_styles_xml(model):
 
 # ------------------------------------------------------- datadefinition.xml
 
-def _parameter_xml(prm, lov_query=None):
+def _parameter_xml(prm, lov_query=None, lov_cols=("LOV", "LOV")):
     """A Crystal parameter -> PRD parameter. Multi-value or pick-list (LOV)
     parameters become list-parameters; a prompt whose record selection folded
     against a known column becomes a QUERY-BACKED dropdown (SELECT DISTINCT
@@ -620,36 +620,42 @@ def _parameter_xml(prm, lov_query=None):
     mandatory = "false" if prm.optional else "true"
     label = (f'<attribute namespace="{NS_PARAM}" name="label">'
              f'{escape(prm.prompt or prm.name)}</attribute>')
-    if lov_query and not prm.default_values:
+    if lov_query:
         default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
         jtype_list = f"[L{jtype};" if prm.multi_value else jtype
         render = "checkbox" if prm.multi_value else "dropdown"
+        key_col, display_col = lov_cols
         return (
             f'<list-parameter name={quoteattr(prm.name)} '
             f'allow-multi-selection="{str(prm.multi_value).lower()}" '
             f'strict-values="false" mandatory="{mandatory}" '
             f'type={quoteattr(jtype_list)} query={quoteattr(lov_query)} '
-            f'key-column="LOV" value-column="LOV"{default}>'
+            f'key-column={quoteattr(key_col)} '
+            f'value-column={quoteattr(display_col)}{default}>'
             f'{label}'
             f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">{render}</attribute>'
             "</list-parameter>")
     if prm.multi_value or prm.default_values:
-        # a static pick-list built from the Crystal default-value list
-        items = "".join(
-            f'<value type="{jtype}" value={quoteattr(v)} null="false"/>'
-            for v in prm.default_values)
+        # A static pick-list. PRD's own files know only QUERY-BACKED list
+        # parameters (the engine's bundle reader has no value-list handler,
+        # so an inline list would be silently ignored - found by diffing our
+        # shapes against the 36 shipped samples). The values ship as a tiny
+        # literal query in the sql datasource instead, which is exactly how
+        # PRD authors a fixed list.
         render = "checkbox" if prm.multi_value else "dropdown"
         default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
         jtype_list = f"[L{jtype};" if prm.multi_value else jtype
+        query = f"lov_{prm.name}" if prm.default_values else ""
+        qattrs = (f" query={quoteattr(query)} "
+                  'key-column="LOV" value-column="LOV"' if query else "")
         return (
             f'<list-parameter name={quoteattr(prm.name)} '
             f'allow-multi-selection="{str(prm.multi_value).lower()}" '
             f'strict-values="false" mandatory="{mandatory}" '
-            f'type={quoteattr(jtype_list)}{default}>'
+            f'type={quoteattr(jtype_list)}{qattrs}{default}>'
             f'{label}'
             f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">{render}</attribute>'
-            + (f'<value-list>{items}</value-list>' if items else "")
-            + "</list-parameter>")
+            "</list-parameter>")
     default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
     return (
         f'<plain-parameter name={quoteattr(prm.name)} mandatory="{mandatory}" '
@@ -684,8 +690,16 @@ def build_datadefinition_xml(model, parameter_mappings=None):
     for prm in model.parameters:
         if prm.name in imported:
             continue  # supplied by the parent row, never prompted
-        lov = f"lov_{prm.name}" if prm.name in model.param_sql_columns else None
-        parts.append(_parameter_xml(prm, lov_query=lov))
+        lov, cols = None, ("LOV", "LOV")
+        if prm.name in model.param_sql_columns:
+            lov = f"lov_{prm.name}"
+        elif prm.name in model.param_lov_sql:
+            lov = f"lov_{prm.name}"
+            _sql, key_col, display_col = model.param_lov_sql[prm.name]
+            cols = (key_col, display_col)
+        elif prm.default_values:
+            lov = f"lov_{prm.name}"
+        parts.append(_parameter_xml(prm, lov_query=lov, lov_cols=cols))
     parts.append("</parameter-definition>")
     parts.append('<data-source report-query="default" limit="-1" timout="0" '
                  'ref="datasources/compound-ds.xml"/>')
@@ -721,6 +735,15 @@ def build_datadefinition_xml(model, parameter_mappings=None):
         parts.append(f"<expression name={quoteattr(s.expression_name)} class=\"{cls}\">"
                      f"<properties>{''.join(props)}</properties></expression>")
 
+    # legacy functions PRD still ships (the classic-core package kept them):
+    # ported verbatim, properties and all
+    for name, cls, props in model.port_functions:
+        body = "".join(
+            f"<property name={quoteattr(k)}>{escape(v)}</property>"
+            for k, v in props.items() if v != "")
+        parts.append(f"<expression name={quoteattr(name)} class={quoteattr(cls)}>"
+                     f"<properties>{body}</properties></expression>")
+
     for name, cls in _special_functions_used(model):
         parts.append(f'<expression name="{name}" class="{cls}">'
                      "<properties/></expression>")
@@ -753,8 +776,38 @@ def build_sql_ds_xml(model, query_name="default"):
             f'{escape(_lov_sql(model, column))}'
             "</data:static-query></data:query>"
             for name, column in model.param_sql_columns.items())
+        + "".join(
+            f'<data:query name="lov_{escape(name)}"><data:static-query>'
+            f"{escape(sql)}"
+            "</data:static-query></data:query>"
+            for name, (sql, _k, _d) in model.param_lov_sql.items())
+        + "".join(
+            f'<data:query name="lov_{escape(prm.name)}"><data:static-query>'
+            f'{escape(_static_lov_sql(model, prm))}'
+            "</data:static-query></data:query>"
+            for prm in model.parameters
+            if prm.default_values and prm.name not in model.param_sql_columns
+            and prm.name not in model.param_lov_sql)
         + "</data:query-definitions>"
         "</data:sql-datasource>")
+
+
+def _static_lov_sql(model, prm):
+    """A fixed pick-list as PRD authors one: a literal query. UNION ALL of
+    one-row selects, with the dialect's one-row FROM (HSQLDB and friends
+    refuse a FROM-less SELECT)."""
+    dialect = (model.sql_dialect or "").lower()
+    one_row = (" FROM DUAL" if dialect in ("mysql", "oracle")
+               else ' FROM (VALUES(0)) AS onerow(x)')
+    numeric = prm.value_type in ("NumberField", "CurrencyField")
+
+    def lit(v):
+        if numeric and re.fullmatch(r"-?\d+(\.\d+)?", v):
+            return v
+        return "'" + v.replace("'", "''") + "'"
+
+    return "\nUNION ALL\n".join(
+        f'SELECT {lit(v)} AS "LOV"{one_row}' for v in prm.default_values)
 
 
 def _lov_sql(model, column):

@@ -53,6 +53,17 @@ _RULES = (
     (APPLIED, re.compile(r"\btemplated field binding\(s\) resolved\b", re.I)),
     (APPLIED, re.compile(r"\bembedded from the local server\b", re.I)),
     (APPLIED, re.compile(r"\bconverts as an underlay\b", re.I)),
+    # Legacy-EXT / dynamic-value notes: the pipeline substituted, evaluated,
+    # ported or stood in - each sentence names finished work.
+    (APPLIED, re.compile(r"\bsubstituted with the sequence's own value", re.I)),
+    (APPLIED, re.compile(r"\bevaluated at conversion time\b", re.I)),
+    (APPLIED, re.compile(r"\bported unchanged\b", re.I)),
+    (APPLIED, re.compile(r"\bresource-bundle text resolved\b", re.I)),
+    (APPLIED, re.compile(r"\bstub query stands in\b", re.I)),
+    (INFO, re.compile(r"\bno-data band\b", re.I)),
+    # "an HTML template wraps the render - PRD owns the whole page instead":
+    # the platform's chrome went away with the platform; context, not work.
+    (INFO, re.compile(r"\bHTML template wraps the render\b", re.I)),
     (INFO, re.compile(r"\bstack under mutually-exclusive visibility\b", re.I)),
     (INFO, re.compile(r"^complexity: (Low|Medium|High)\b", re.I)),
     (INFO, re.compile(r"\bimage carved from the \.rpt", re.I)),
