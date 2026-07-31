@@ -9,6 +9,22 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The sequences' JavaScript now runs through a real (safe) interpreter**
+  (gap #2: 58 corpus2 reports). `reports/js_eval.py` evaluates the JS
+  subset the estates actually use - literal assignments, string
+  concatenation and `+=`, arithmetic, `if/else` parameter defaulting,
+  `.toString()` - over the sequence's own input defaults, with PREFIX
+  semantics: run statements in order, stop honestly at the first
+  construct outside the subset, keep everything computed before the stop
+  (the platform executed the same prefix identically). Corpus2's JS
+  manual notes drop 179 -> 71 and every survivor is pointed: lookup-read
+  scripts name the fold-into-the-query / query-backed-parameter fix,
+  date scripts name `$(report.date, date, ...)`. Corpus-wide manual
+  notes: 217 -> 109. Corpus1's Sales_by_* family upgrades for free -
+  dynamic SQL fragments substitute the platform's own computed defaults
+  instead of being stripped, and report titles get their real text
+  ("All Territories").
+
 - **The corpus2 function-class gap is closed** (gap #1: 96 of 126 reports).
   One shared translation table
   (`reports/jfreereport_functions.py`) now serves BOTH definition

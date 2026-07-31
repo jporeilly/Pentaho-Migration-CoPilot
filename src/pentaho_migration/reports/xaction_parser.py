@@ -243,65 +243,43 @@ def _select_columns(sql: str):
     return out
 
 
-def _scripted_values(x) -> dict:
-    """Values the sequence's JavaScript computed before anything ran - but
-    ONLY when the script line is a single pure-arithmetic assignment over
-    the sequence's own inputs (`PrevYear = (YEAR - 1) + ""`). That much is
-    deterministic, so conversion computes it the same way the platform did.
-    Anything past arithmetic stays un-evaluated and keeps its honest note."""
-    import ast
+def _scripted_values(x):
+    """Evaluate every JavascriptRule over the sequence's own input
+    defaults through the safe JS-subset interpreter (js_eval). Returns
+    ``(values, script_states)``:
 
-    vals = {}
+    * ``values`` - {output name: string} for every output the scripts
+      assigned; exact, because the interpreter runs the same statement
+      prefix the platform ran.
+    * ``script_states`` - one entry per script:
+      ``(action, evaluated outputs, stopped_at fragment or None)`` so
+      the note pass can say per script whether it was fully computed,
+      partially computed, or why it stayed manual.
+    """
+    from pentaho_migration.reports.js_eval import evaluate_script
+
+    inputs = {}
     for inp in x.inputs:
+        if inp.default in (None, ""):
+            continue
         try:
-            vals[inp.name] = float(str(inp.default))
+            text = str(inp.default)
+            inputs[inp.name] = (float(text) if "." in text else int(text))
         except (TypeError, ValueError):
-            pass
+            inputs[inp.name] = str(inp.default)
 
-    def _ev(node):
-        if isinstance(node, ast.Expression):
-            return _ev(node.body)
-        if isinstance(node, ast.Constant) and isinstance(node.value,
-                                                         (int, float)):
-            return float(node.value)
-        if isinstance(node, ast.Name) and node.id in vals:
-            return vals[node.id]
-        if isinstance(node, ast.BinOp):
-            left, right = _ev(node.left), _ev(node.right)
-            if isinstance(node.op, ast.Add):
-                return left + right
-            if isinstance(node.op, ast.Sub):
-                return left - right
-            if isinstance(node.op, ast.Mult):
-                return left * right
-            if isinstance(node.op, ast.Div):
-                return left / right
-        if isinstance(node, ast.UnaryOp):
-            if isinstance(node.op, ast.USub):
-                return -_ev(node.operand)
-            if isinstance(node.op, ast.UAdd):
-                return _ev(node.operand)
-        raise ValueError("not plain arithmetic")
-
-    out = {}
+    values = {}
+    script_states = []
     for a in x.actions:
         if a.component != "JavascriptRule":
             continue
-        declared = {n for n, _t, _m in a.outputs}
+        declared = [n for n, _t, _m in a.outputs]
         script = a.deftext("script") or ""
-        for line in re.split(r"[;\n]", script):
-            m = re.match(r"^\s*(\w+)\s*=\s*(.+?)\s*$", line)
-            if not m or m.group(1) not in declared:
-                continue
-            expr = re.sub(r"\+\s*(''|\"\")\s*$", "", m.group(2)).strip()
-            try:
-                value = _ev(ast.parse(expr, mode="eval"))
-            except (ValueError, SyntaxError, ZeroDivisionError, KeyError):
-                continue
-            text = str(int(value)) if float(value).is_integer() else str(value)
-            out[m.group(1)] = text
-            vals[m.group(1)] = float(value)
-    return out
+        got, stopped = evaluate_script(script, {**inputs, **values},
+                                       declared)
+        values.update(got)
+        script_states.append((a, got, stopped))
+    return values, script_states
 
 
 def _resolve_templated_bindings(model, x, derived=None) -> None:
@@ -486,7 +464,7 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
         except Exception:
             return None
 
-    derived = _scripted_values(x)
+    derived, script_states = _scripted_values(x)
 
     model = ReportModel()
     if location:
@@ -663,23 +641,54 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
     _resolve_templated_bindings(model, x, derived)
 
     # ---- orchestration components -> suggested solutions -----------------
-    for a in x.actions:
-        if a.component == "JavascriptRule":
-            declared = {n for n, _t, _m in a.outputs}
-            if declared and declared <= set(derived):
-                model.issues.append(
-                    "JavaScript-derived value(s) evaluated at conversion "
-                    "time from the sequence's own arithmetic: "
-                    + ", ".join(f"{n} = {derived[n]}"
-                                for n in sorted(declared))
-                    + " - the query and bindings use the computed value")
-                continue
-            script = " ".join(a.deftext("script").split())[:140]
+    def _clip(value, limit=40):
+        text = " ".join(str(value).split())
+        return text if len(text) <= limit else text[:limit] + "..."
+
+    for a, got, stopped in script_states:
+        script = a.deftext("script") or ""
+        if got:
             model.issues.append(
-                "JavaScript business logic in the action sequence - fold it "
-                "into the SQL as a computed column, or a PRD function/"
-                f"formula. Script head: {script}")
-        elif a.component == "EmailComponent":
+                "JavaScript-derived value(s) evaluated at conversion time "
+                "(the interpreter ran the same statements the platform "
+                "ran): "
+                + ", ".join(f"{n} = {_clip(v)!r}"
+                            for n, v in sorted(got.items())[:6])
+                + (", ..." if len(got) > 6 else "")
+                + " - the query, bindings and labels use the computed "
+                "values")
+        remaining = [n for n, _t, _m in a.outputs if n not in got]
+        if stopped is None or not remaining:
+            continue
+        # the rest of the script is outside the deterministic subset -
+        # say WHICH platform idiom it is and the PRD-native replacement
+        if "getValueAt" in script or "getRowCount" in script:
+            model.issues.append(
+                "JavaScript reads a prior lookup's result set into "
+                f"value(s) {', '.join(remaining[:5])} - PRD-native: fold "
+                "that lookup into the main query (a join or scalar "
+                "subquery), or make each value a query-backed parameter "
+                f"default. Evaluation stopped at: {_clip(stopped, 60)}")
+        elif "Date(" in script:
+            model.issues.append(
+                "JavaScript computes report-run date part(s) "
+                f"{', '.join(remaining[:5])} - PRD prints these itself: "
+                "$(report.date, date, <pattern>) in a message field, or "
+                "a =TODAY()-based expression; no parameter needed. "
+                f"Evaluation stopped at: {_clip(stopped, 60)}")
+        elif "JavaScriptResultSet" in script:
+            model.issues.append(
+                "JavaScript BUILDS a result set in code - recreate the "
+                "rows as a SQL query or a PRD table datasource. "
+                f"Evaluation stopped at: {_clip(stopped, 60)}")
+        else:
+            model.issues.append(
+                "JavaScript business logic in the action sequence - fold "
+                "it into the SQL as a computed column, or a PRD function/"
+                f"formula. Script head: {_clip(script, 140)}")
+
+    for a in x.actions:
+        if a.component == "EmailComponent":
             model.issues.append(
                 "the sequence EMAILS the rendered report (bursting/"
                 "distribution) - the render converts to .prpt; schedule and "

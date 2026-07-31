@@ -125,18 +125,36 @@ class TestSuggestedSolutions:
         notes = " ".join(m.issues)
         assert "PDI job" in notes and "EMAIL" in notes.upper()
 
-    def test_javascript_suggests_sql_or_a_prd_function(self):
-        # Sales_by_Customer's JS builds query strings - beyond arithmetic,
-        # so the honest fold-it-yourself suggestion stays
+    def test_conditional_defaulting_javascript_fully_evaluates(self):
+        # Sales_by_Customer's JS is the classic if(x=="default") shape -
+        # the interpreter runs the same branch the platform ran
         m = build_report_model(SW / "Sales_by_Customer.xaction")
-        assert any("JavaScript" in i and "computed column" in i for i in m.issues)
+        note = next(i for i in m.issues
+                    if "evaluated at conversion time" in i)
+        assert "'All Customers'" in note or "All " in note
+        assert not any("computed column" in i and "Script head" in i
+                       for i in m.issues)
+
+    def test_lookup_read_javascript_gets_the_pointed_suggestion(self):
+        # lanit's scripts read a prior lookup's result set - outside the
+        # deterministic subset, so the note names the PRD-native fix
+        xa = Path("samples/xactions/corpus2/lanit/lodint/lod"
+                  "/orel/application.xaction")
+        if not xa.is_file():
+            import pytest
+            pytest.skip("corpus2 not present")
+        m = build_report_model(xa)
+        note = next((i for i in m.issues
+                     if "prior lookup's result set" in i), "")
+        assert "query-backed parameter default" in note
+        assert "stopped at" in note
 
     def test_pure_arithmetic_javascript_is_evaluated_instead(self):
         # Variance's JS is one arithmetic line (PrevYear = YEAR - 1) - the
         # conversion computes it rather than telling the consultant to
         m = build_report_model(SW / "Variance Report.xaction")
-        assert any("evaluated at conversion time" in i and "PrevYear = 2003" in i
-                   for i in m.issues)
+        assert any("evaluated at conversion time" in i
+                   and "PrevYear = '2003'" in i for i in m.issues)
 
     def test_a_query_picklist_prompt_becomes_a_real_lov_query(self):
         # Sales_by_Customer feeds its prompts from SQL lookups; the lookup
@@ -229,10 +247,14 @@ class TestLiveDataFidelityRound2:
     """Second round of fixes from live SampleData rendering: dynamic SQL
     fragments, date-default padding, and templated field bindings."""
 
-    def test_dynamic_sql_fragments_are_stripped_with_a_note(self):
+    def test_dynamic_sql_fragments_take_the_platforms_own_values(self):
+        # the JS computes territory_qry_string = " " for the default
+        # prompt choice; the fragment substitutes that exact value -
+        # reproducing the platform's own text substitution, not a strip
         m = build_report_model(SW / "Sales_by_Customer.xaction")
         assert "{territory_qry_string}" not in m.sql
-        assert any("dynamic SQL fragment" in i and "DEFAULT unfiltered" in i
+        assert any("dynamic SQL fragment" in i
+                   and "substituted with the sequence's own value" in i
                    for i in m.issues)
 
     def test_date_defaults_are_padded_for_strict_hsqldb(self):
