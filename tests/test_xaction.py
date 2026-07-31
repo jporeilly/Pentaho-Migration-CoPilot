@@ -282,3 +282,66 @@ class TestLiveDataFidelity:
         m = parse_jfreereport(SW / "order_detail.xml")
         count = next(s for s in m.summaries if s.operation == "Count")
         assert count.running is False
+
+
+class TestLocalAssetEmbedding:
+    """Server-hosted images (${serverBaseURL}/sw-style/...) embed when a local
+    copy exists - the env override or the conventional install path - and the
+    watermark band becomes an underlay carrying it."""
+
+    def _definition(self, tmp_path, monkeypatch):
+        webapps = tmp_path / "webapps"
+        (webapps / "sw-style").mkdir(parents=True)
+        (webapps / "sw-style" / "logo.jpg").write_bytes(b"\xff\xd8fakejpg")
+        monkeypatch.setenv("PENTAHO_SERVER_WEBAPPS", str(webapps))
+        xml = tmp_path / "r.xml"
+        xml.write_text(
+            '<report name="R" pageformat="LETTER">'
+            '<watermark><imageref src="${serverBaseURL}/sw-style/logo.jpg"'
+            ' x="0" y="0" width="100%" height="40"/></watermark>'
+            '<items><string-field fieldname="A" x="0" y="0" width="100"'
+            ' height="12"/></items></report>', encoding="utf-8")
+        return xml
+
+    def test_the_image_embeds_and_the_note_is_applied(self, tmp_path, monkeypatch):
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        m = parse_jfreereport(self._definition(tmp_path, monkeypatch))
+        wm = m.sections[0]
+        assert wm.underlay is True
+        img = next(e for e in wm.elements if e.kind == "image")
+        assert img.image_bytes.startswith(b"\xff\xd8")
+        assert img.image_mime == "image/jpeg"
+        note = next(i for i in m.issues if "underlay" in i)
+        assert classify_todo(note) == "applied"
+
+    def test_an_unresolvable_image_stays_an_honest_manual_note(self, tmp_path,
+                                                               monkeypatch):
+        monkeypatch.setenv("PENTAHO_SERVER_WEBAPPS", str(tmp_path / "nope"))
+        xml = tmp_path / "r.xml"
+        xml.write_text(
+            '<report name="R" pageformat="LETTER">'
+            '<items><imageref src="${serverBaseURL}/missing/x.png" x="0" y="0"'
+            ' width="50" height="20"/></items></report>', encoding="utf-8")
+        m = parse_jfreereport(xml)
+        img = next(e for s in m.sections for e in s.elements
+                   if e.kind == "image")
+        assert not img.image_bytes
+        assert any("no local copy was found" in n for n in img.notes)
+
+    def test_a_hostile_src_cannot_escape_the_root(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("PENTAHO_SERVER_WEBAPPS", str(tmp_path))
+        from pentaho_migration.reports.jfreereport_parser import (
+            _resolve_image_asset)
+        assert _resolve_image_asset("${serverBaseURL}/../../secret.txt") is None
+
+
+class TestXactionNoteClassification:
+    """The pipeline's own work must not read as manual backlog: the layered
+    translation, padding, fragments and embeds classify applied/info, so the
+    'Other manual work' panel holds only real hand-work."""
+
+    def test_income_statement_has_no_manual_notes(self):
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        m = build_report_model(SW / "Income Statement.xaction")
+        manual = [n for n in m.issues if classify_todo(n) == "manual"]
+        assert manual == []

@@ -42,6 +42,19 @@ _RULES = (
     # the sentence names it. Without this the note reads as a rebuild.
     (APPLIED, re.compile(r"\bcomputed as a\b|\brewritten as a\b|\bemitted as a "
                          r"PRD\b|\bgenerated in the bundle\b", re.I)),
+    # Xaction conversion notes: the pipeline DID the work - these say what it
+    # chose (layered visibility, padded defaults, stripped dynamic fragments,
+    # resolved template bindings, embedded server images/watermark). Without
+    # these rules every one lands in "Other manual work", which reads as an
+    # unconverted backlog for a report that renders correctly.
+    (APPLIED, re.compile(r"\blayered-visibility layout translated\b", re.I)),
+    (APPLIED, re.compile(r"\bdefault padded to\b", re.I)),
+    (APPLIED, re.compile(r"\bremoved so the query runs its DEFAULT\b", re.I)),
+    (APPLIED, re.compile(r"\btemplated field binding\(s\) resolved\b", re.I)),
+    (APPLIED, re.compile(r"\bembedded from the local server\b", re.I)),
+    (APPLIED, re.compile(r"\bconverts as an underlay\b", re.I)),
+    (INFO, re.compile(r"\bstack under mutually-exclusive visibility\b", re.I)),
+    (INFO, re.compile(r"^complexity: (Low|Medium|High)\b", re.I)),
     (INFO, re.compile(r"\bimage carved from the \.rpt", re.I)),
     # "53 saved data row(s) recovered from the .rpt and embedded as the
     # report's dataset" / the row-cap note - the good news, not a work item.

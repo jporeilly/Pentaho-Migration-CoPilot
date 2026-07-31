@@ -138,13 +138,66 @@ def _parse_element(node, width: float, font: Font, offset_x=0.0, offset_y=0.0):
             el.border_width = _pt(node.get("weight"), 0, 1.0)
         return el
     if tag == "imageref":
-        el = Element(kind="image", **common)
         src = node.get("src") or ""
-        el.notes.append(
-            f"image resource {src!r} - a server-side path the bundle cannot "
-            "carry; re-embed the image in PRD (Insert > image) or point the "
-            "element at a reachable URL")
+        el = Element(kind="image", name=Path(src).name, **common)
+        resolved = _resolve_image_asset(src)
+        if resolved is not None:
+            path, data = resolved
+            el.image_bytes = data
+            el.image_mime = _IMAGE_MIMES.get(Path(src).suffix.lower(),
+                                             "image/png")
+            el.notes.append(
+                f"image {Path(src).name!r} embedded from the local server "
+                f"install ({path}) - the old xaction loaded it from "
+                f"{src!r} at run time")
+        else:
+            el.notes.append(
+                f"image resource {src!r} - a server-side path the bundle "
+                "cannot carry and no local copy was found; re-embed the image "
+                "in PRD (Insert > image), point the element at a reachable "
+                "URL, or set PENTAHO_SERVER_WEBAPPS to the old server's "
+                "tomcat/webapps folder so conversion embeds it")
         return el
+    return None
+
+
+_IMAGE_MIMES = {".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                ".png": "image/png", ".gif": "image/gif"}
+
+
+def _asset_roots():
+    """Where the old server's web assets live locally: the env override
+    first, then the conventional install location. A missing root is simply
+    skipped - resolution is best-effort and the note says what happened."""
+    import os
+
+    roots = []
+    env = os.environ.get("PENTAHO_SERVER_WEBAPPS")
+    if env:
+        roots.append(Path(env))
+    conventional = Path("C:/Pentaho/server/pentaho-server/tomcat/webapps")
+    if conventional.is_dir():
+        roots.append(conventional)
+    return roots
+
+
+def _resolve_image_asset(src: str):
+    """A JFreeReport image src (`${serverBaseURL}/sw-style/...` or an
+    http URL) -> (local path, bytes) when the file exists under a known local
+    server root; None otherwise. Path components are normalised so a hostile
+    src cannot escape the root."""
+    rel = re.sub(r"^\$\{[^}]*\}/*", "", src or "")
+    rel = re.sub(r"^https?://[^/]+/+", "", rel)
+    parts = [p for p in rel.split("/") if p not in ("", ".", "..")]
+    if not parts:
+        return None
+    for root in _asset_roots():
+        candidate = root.joinpath(*parts)
+        if candidate.is_file():
+            try:
+                return candidate, candidate.read_bytes()
+            except OSError:
+                return None
     return None
 
 
@@ -255,12 +308,24 @@ def parse_jfreereport(source) -> ReportModel:
             model.sections.append(
                 _parse_band(node, kind, width, base_font, vis_map=vis_map))
 
+    # The watermark band becomes an UNDERLAY section placed first - the same
+    # machinery that carries Crystal letterhead watermarks paints its content
+    # behind the following band. Its image embeds when a local copy resolves.
     wm = root.find("watermark")
     if wm is not None and len(wm):
+        section = _parse_band(wm, "ReportHeader", width, base_font,
+                              vis_map=vis_map)
+        section.underlay = True
+        model.sections.insert(0, section)
+        embedded = any(e.image_bytes for e in section.elements)
         model.issues.append(
-            "the report carries a watermark band (usually a server-hosted "
-            "background image) - PRD has a watermark band too, but the image "
-            "must be re-embedded from a reachable file, not the old server path")
+            "the watermark band converts as an underlay behind the report "
+            "header"
+            + (" with its background image embedded from the local server "
+               "install" if embedded else
+               " - its background image could not be resolved locally, so "
+               "re-embed it in PRD or set PENTAHO_SERVER_WEBAPPS")
+            + " - verify the placement against the original")
 
     # groups, outermost first; the group column is the LAST listed field
     # (earlier fields are the parent groups' keys, repeated JFreeReport-style)

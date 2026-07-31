@@ -9,6 +9,18 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The "manual work" list resolves itself where it can.** The user's
+  challenge on the Income Statement notes: most lines were not manual at all.
+  Three answers: (1) server-hosted images (`${serverBaseURL}/sw-style/...`)
+  now **embed** when a local copy resolves — the conventional
+  `tomcat/webapps` install path or `PENTAHO_SERVER_WEBAPPS` — so the Steel
+  Wheels logo and the car watermark render in the converted report; (2) the
+  **watermark band converts as an underlay** carrying its embedded image
+  (the same machinery as Crystal letterheads); (3) the xaction pipeline's own
+  work (layered translation, padded defaults, stripped fragments, resolved
+  bindings, embedded images) now **classifies applied/info**, so "Other
+  manual work" holds only real hand-work. Income Statement: zero manual
+  notes, logo + watermark on the page, verified live.
 - **The wireframe badges layered elements.** Visibility-conditioned elements
   draw dashed and faded with a ▤ glyph, the legend explains "layered — one
   prints per row", and each tooltip names the behaviour — so the stacked
