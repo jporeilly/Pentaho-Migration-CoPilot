@@ -90,7 +90,9 @@ class TestBuildReportModel:
         by_name = {p.name: p for p in m.parameters}
         assert set(by_name) == {"customernumber", "time_start", "time_stop"}
         assert all(p.optional for p in by_name.values())
-        assert by_name["time_start"].default == "2005-01-01"
+        # date-only defaults are padded to midnight: HSQLDB 2.x only
+        # implicitly converts the FULL timestamp format
+        assert by_name["time_start"].default == "2005-01-01 00:00:00"
 
     def test_the_implicit_report_definition_resource_binds(self):
         # Income Statement's component names no action-resource; the platform
@@ -206,6 +208,43 @@ class TestUploadRouting:
     def test_the_picker_lists_the_demo_ladder(self, client):
         names = [m["name"] for m in client.get("/reports/xaction-samples").json()]
         assert names[0] == "order_detail" and "BurstSales" in names
+
+
+class TestLiveDataFidelityRound2:
+    """Second round of fixes from live SampleData rendering: dynamic SQL
+    fragments, date-default padding, and templated field bindings."""
+
+    def test_dynamic_sql_fragments_are_stripped_with_a_note(self):
+        m = build_report_model(SW / "Sales_by_Customer.xaction")
+        assert "{territory_qry_string}" not in m.sql
+        assert any("dynamic SQL fragment" in i and "DEFAULT unfiltered" in i
+                   for i in m.issues)
+
+    def test_date_defaults_are_padded_for_strict_hsqldb(self):
+        m = build_report_model(SW / "Sales_by_Supplier.xaction")
+        start = next(p for p in m.parameters if p.name == "time_start")
+        assert start.default == "2005-01-01 00:00:00"
+
+    def test_a_non_iso_original_default_is_flagged(self):
+        m = build_report_model(SW / "order_detail.xaction")
+        assert any("not ISO" in i for i in m.issues)
+
+    def test_templated_bindings_resolve_by_type_uniqueness(self):
+        # ${Group_by}/${Amount} in the shared Sales_by_* definition: exactly
+        # one plain column and one aggregate alias in the query settle them
+        m = build_report_model(SW / "Sales_by_Supplier.xaction")
+        detail = next(s for s in m.sections if s.area_kind == "Detail")
+        cols = {e.column for e in detail.elements if e.kind == "field"}
+        assert "PRODUCTVENDOR" in cols and "SOLD_PRICE" in cols
+        assert not any(c.startswith("${") for c in cols)
+        assert any("templated field binding" in i for i in m.issues)
+
+    def test_templated_summary_fields_resolve_too(self):
+        m = build_report_model(SW / "Sales_by_Supplier.xaction")
+        total = next(s2 for s2 in m.summaries
+                     if s2.expression_name == "totalsales")
+        assert "${" not in total.field_ref
+        assert "SOLD_PRICE" in total.field_ref
 
 
 class TestLiveDataFidelity:

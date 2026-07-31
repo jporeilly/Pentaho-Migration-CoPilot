@@ -9,6 +9,25 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Round 2 against the live database: the Sales_by_* family renders with
+  data.** Three more platform semantics translated, all exposed by real rows:
+  bare `{name}` placeholders in the query are the JavaScript-built dynamic SQL
+  fragments the platform text-substituted — stripped so the query runs its
+  DEFAULT unfiltered case, with the keep-the-filter clause suggested;
+  date-only parameter defaults are padded to midnight (HSQLDB 2.x only
+  implicitly converts the full timestamp format — 1.8 was lenient); and
+  `${Group_by}`/`${Amount}` templated field bindings in the shared definitions
+  resolve deterministically by type-uniqueness against the query's own columns
+  (one plain column for a string-field, one aggregate for a number-field),
+  review-flagged. A non-ISO original default (order_detail's dd-mm-yyyy) is
+  flagged as the source defect it is. Live scoreboard: 12 of 13 SQL-fed corpus
+  reports render, 8 with real Steel Wheels rows.
+- **The Data source panel picks up the selected connection and tests it.**
+  Opening ⚙ Manage now pre-loads the report's OWN connection (name, URL,
+  driver, user — never the password) instead of a stale form, and a **Test
+  connection** button probes it through PRD's own Java/JDBC — the same
+  machinery the Settings card uses. `/reports/connections` now returns the
+  JNDI user for the pre-fill.
 - **Xaction reports proven against the live Steel Wheels database — three
   fidelity fixes found by real data.** Rendering the converted Income
   Statement against the `SampleData` HSQLDB (the JNDI PRD already has wired)

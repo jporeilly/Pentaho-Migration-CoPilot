@@ -15,8 +15,19 @@ export default function ConnectionPanel({ summary, file, onUpdate }) {
   const [error, setError] = useState(null)
   const [manage, setManage] = useState(false)
   const [form, setForm] = useState(EMPTY)
+  const [testing, setTesting] = useState(false)
+  const [test, setTest] = useState(null)          // { ok, detail }
 
   useEffect(() => { refresh() }, [])
+
+  // The report already names its connection - opening Manage (or switching
+  // the report's connection while managing) pre-loads THAT connection's
+  // details, so the form never shows a stale leftover.
+  useEffect(() => {
+    if (!manage || !available) return
+    const current = available.find((c) => c.name === summary.jndi)
+    if (current) editInForm(current, false)
+  }, [manage, summary.jndi, available])
 
   async function refresh() {
     try {
@@ -83,9 +94,31 @@ export default function ConnectionPanel({ summary, file, onUpdate }) {
     }
   }
 
-  function editInForm(c) {
-    setManage(true)
-    setForm({ name: c.name, url: c.url || '', driver: c.driver || '', user: '', password: '' })
+  function editInForm(c, open = true) {
+    if (open) setManage(true)
+    setTest(null)
+    setForm({ name: c.name, url: c.url || '', driver: c.driver || '',
+              user: c.user || '', password: '' })
+  }
+
+  async function testConnection() {
+    if (!form.url) return
+    setTesting(true); setTest(null)
+    try {
+      const res = await fetch('/settings/db-drivers/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: form.url, driver: form.driver,
+                               user: form.user, password: form.password }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || res.statusText)
+      setTest(data)
+    } catch (err) {
+      setTest({ ok: false, detail: err.message })
+    } finally {
+      setTesting(false)
+    }
   }
 
   return (
@@ -138,10 +171,19 @@ export default function ConnectionPanel({ summary, file, onUpdate }) {
                    onChange={(e) => setForm({ ...form, user: e.target.value })} />
             <input placeholder="password" type="password" value={form.password}
                    onChange={(e) => setForm({ ...form, password: e.target.value })} />
+            <button className="secondary" disabled={testing || !form.url}
+                    onClick={testConnection}>
+              {testing ? 'Testing…' : 'Test connection'}
+            </button>
             <button disabled={busy || !form.name || !form.url} onClick={save}>
               Save &amp; use
             </button>
           </div>
+          {test && (
+            <p className={test.ok ? 'db-test-ok' : 'db-test-fail'}>
+              {test.ok ? `✓ Connected — ${test.detail}` : `✗ ${test.detail}`}
+            </p>
+          )}
           <p className="muted">
             Saved to <code>~/.pentaho/simple-jndi/default.properties</code> — the
             file Report Designer reads. The driver class is inferred from the

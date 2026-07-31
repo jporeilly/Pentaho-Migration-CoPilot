@@ -58,7 +58,9 @@ def list_jndi_connections() -> list[dict]:
             if not prefix or not prop:
                 continue
             entry = connections.setdefault(prefix, {"name": prefix})
-            if prop in ("url", "driver") and prop not in entry:
+            # user travels to the UI so an edit pre-fills it; the password
+            # NEVER leaves the server
+            if prop in ("url", "driver", "user") and prop not in entry:
                 entry[prop] = value.strip()
     from pentaho_migration.reports.db_dialects import dialect_for
 

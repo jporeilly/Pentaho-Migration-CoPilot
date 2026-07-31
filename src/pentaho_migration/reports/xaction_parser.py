@@ -209,6 +209,81 @@ def classify_complexity(x: XActionModel):
 
 
 _PREPARE = re.compile(r"\{PREPARE:\s*([^}\s]+)\s*\}")
+_PLACEHOLDER = re.compile(r"^\$\{(\w+)\}$")
+
+
+def _select_columns(sql: str):
+    """The output columns of the feeding SELECT: [(alias, is_aggregate)].
+    Top-level comma split between SELECT and FROM; an item containing a
+    parenthesis is an aggregate/expression."""
+    m = re.search(r"\bSELECT\b(.*?)\bFROM\b", sql or "", re.I | re.S)
+    if not m:
+        return []
+    items, depth, cur = [], 0, ""
+    for ch in m.group(1):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch == "," and depth == 0:
+            items.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        items.append(cur)
+    out = []
+    for item in items:
+        alias = re.search(r'\bAS\s+"?([A-Za-z_]\w*)"?\s*$', item.strip(), re.I)
+        name = (alias.group(1) if alias
+                else (re.findall(r"([A-Za-z_]\w*)\s*$", item.strip()) or [""])[0])
+        if name:
+            out.append((name, "(" in item))
+    return out
+
+
+def _resolve_templated_bindings(model, x) -> None:
+    """Resolve `${name}` field bindings left in a shared report definition.
+    Order: an xaction input's default value (the platform's own substitution),
+    then type-uniqueness against the query (exactly one aggregate column for a
+    number-field, exactly one plain column for a string-field). Unresolved
+    bindings stay honest TODOs."""
+    ph_elements = [el for s in model.sections for el in s.elements
+                   if el.kind == "field" and _PLACEHOLDER.match(el.column or "")]
+    ph_summaries = [s for s in model.summaries if "${" in (s.field_ref or "")]
+    if not ph_elements and not ph_summaries:
+        return
+    cols = _select_columns(model.sql)
+    plain = [a for a, agg in cols if not agg]
+    aggs = [a for a, agg in cols if agg]
+    input_defaults = {i.name: i.default for i in x.inputs if i.default}
+    resolved: dict = {}
+    for el in ph_elements:
+        name = _PLACEHOLDER.match(el.column).group(1)
+        target = resolved.get(name) or input_defaults.get(name)
+        if not target:
+            if el.value_type == "NumberField" and len(aggs) == 1:
+                target = aggs[0]
+            elif el.value_type == "StringField" and len(plain) == 1:
+                target = plain[0]
+        if target:
+            resolved[name] = target
+            el.column = target
+            model.field_types.setdefault(target, el.value_type)
+        else:
+            el.notes.append(
+                f"field bound to the template placeholder '${{{name}}}' - the "
+                "platform substituted it from context this sequence does not "
+                "define; bind it to the query column it stands for")
+    for summ in ph_summaries:
+        for name, target in resolved.items():
+            summ.field_ref = summ.field_ref.replace(f"${{{name}}}", target)
+    if resolved:
+        model.issues.append(
+            "templated field binding(s) resolved from the query's own shape: "
+            + ", ".join(f"'${{{n}}}' -> {t}" for n, t in sorted(resolved.items()))
+            + " - the platform substituted these from context the sequence "
+            "does not define; review the binding")
 
 
 def build_report_model(xaction_source, resolver=None) -> ReportModel:
@@ -283,8 +358,25 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
 
     if feed is not None:
         if feed.component == "SQLLookupRule":
-            sql = feed.deftext("query")
-            model.sql = _PREPARE.sub(r"${\1}", sql)
+            sql = _PREPARE.sub(r"${\1}", feed.deftext("query"))
+            # Bare {name} placeholders (no PREPARE) are DYNAMIC SQL fragments
+            # the platform text-substituted - usually built by the sequence's
+            # JavaScript ("AND col = 'x'", or empty for the 'default' prompt
+            # choice). Removing them runs the query as its default, unfiltered
+            # case - exactly what the xaction's own defaults produce - and the
+            # note says how to keep the prompt-driven filter.
+            fragments = sorted(set(re.findall(r"(?<!\$)\{([A-Za-z_]\w*)\}", sql)))
+            if fragments:
+                sql = re.sub(r"(?<!\$)\{[A-Za-z_]\w*\}", "", sql)
+                model.issues.append(
+                    "dynamic SQL fragment(s) "
+                    + ", ".join(f"'{{{f}}}'" for f in fragments)
+                    + " were text-substituted by the platform (built by the "
+                    "sequence's JavaScript) - removed so the query runs its "
+                    "DEFAULT unfiltered case; to keep each prompt's filter, "
+                    "add its clause with a ${param} (e.g. AND OFFICES.TERRITORY "
+                    "= ${territory}) per the script logic in these notes")
+            model.sql = sql
             model.jndi = feed.deftext("jndi") or model.jndi
         elif feed.component == "MDXLookupRule":
             mdx = feed.deftext("query") or feed.deftext("mdx")
@@ -322,6 +414,22 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
             inp.name, ("", "", "", "", ""))
         prm = Parameter(name=inp.name, prompt=title or inp.name,
                         default=inp.default, optional=inp.has_default)
+        # The old platform TEXT-substituted parameter strings into the SQL and
+        # HSQLDB 1.8 cast a bare date leniently; PRD binds a JDBC string and
+        # HSQLDB 2.x only implicitly converts the FULL timestamp format. A
+        # date-only default is padded to midnight so the comparison still
+        # works; a non-ISO default is the original's own defect - flagged.
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", inp.default or ""):
+            prm.default = f"{inp.default} 00:00:00"
+            model.issues.append(
+                f"date parameter '{inp.name}' default padded to "
+                f"'{prm.default}' - HSQLDB 2.x converts only the full "
+                "timestamp format; pick-list values may need the same padding")
+        elif re.fullmatch(r"\d{2}-\d{2}-\d{4}", inp.default or ""):
+            model.issues.append(
+                f"parameter '{inp.name}' default {inp.default!r} is not ISO "
+                "(dd-mm-yyyy?) - the database will reject it; fix the default "
+                "to yyyy-mm-dd hh:mm:ss")
         src = lookup_by_output.get(list_source)
         list_input = next((i for i in x.inputs
                            if i.name == list_source and i.list_maps), None)
@@ -338,6 +446,15 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
             prm.default_values = [m.get(vcol, "") for m in list_input.list_maps
                                   if m.get(vcol)]
         model.parameters.append(prm)
+
+    # ---- templated field bindings ----------------------------------------
+    # Some shared definitions bind fields to ${name} placeholders the platform
+    # substituted from context (Sales_by_*: ${Group_by}/${Amount}). When the
+    # sequence itself defines the name (an input default), that is the value;
+    # otherwise the query's own shape can settle it DETERMINISTICALLY when
+    # unambiguous: one aggregate column for a number-field, one plain column
+    # for a string-field. Anything still open stays an honest TODO.
+    _resolve_templated_bindings(model, x)
 
     # ---- orchestration components -> suggested solutions -----------------
     for a in x.actions:
