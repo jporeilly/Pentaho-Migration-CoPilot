@@ -474,7 +474,11 @@ def report_qa(
     from pentaho_migration.reports import load_report_model, write_prpt
     from pentaho_migration.reports.layout_qa import lint_layout, render_qa
 
-    model = load_report_model(dump, jndi or None)
+    if b"<action-sequence" in dump.read_bytes()[:4096]:
+        from pentaho_migration.reports.xaction_parser import load_xaction_model
+        model = load_xaction_model(dump, jndi or None)
+    else:
+        model = load_report_model(dump, jndi or None)
     qa = lint_layout(model)
     findings = list(qa.findings)
 

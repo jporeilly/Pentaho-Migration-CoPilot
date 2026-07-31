@@ -486,6 +486,17 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
                 "a ChartComponent renders a chart image beside the report - "
                 "recreate it as a PRD chart element bound to the same query")
 
+    # The same layout auto-fit/QA pass every Crystal model gets: nudges
+    # always-visible overlaps apart and notes what it did. Layered
+    # (visibility-conditioned) stacks are exempt - they render one per row -
+    # and the lint's layered findings are folded into the notes so the
+    # wireframe's stacked look is explained where the reviewer reads.
+    from pentaho_migration.reports.layout_qa import autofit_layout, lint_layout
+    autofit_layout(model)
+    for f in lint_layout(model).findings:
+        if f.code == "layered":
+            model.issues.append(f"{f.band}: {f.message}")
+
     grade, reasons = classify_complexity(x)
     model.complexity = grade
     model.complexity_reasons = reasons

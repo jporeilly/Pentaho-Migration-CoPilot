@@ -9,6 +9,17 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The layout QA agent runs on xactions and understands layered stacks.**
+  The QA/auto-fit pass never ran on the xaction path, so the wireframe's
+  stacked Income-Statement fields drew no comment. It runs now (same pass
+  every Crystal model gets), and the overlap lint is **visibility-aware**:
+  a pair that stacks under mutually-exclusive visibility conditions — the
+  layered pattern the converter itself produces from HideElementByName —
+  is one informational "layered" finding per band ("one prints per row;
+  the wireframe shows every layer at once"), folded into the conversion
+  notes so the Inspect page explains what the wireframe shows. Overlaps
+  WITHOUT conditions keep the hard warning. `report-qa` accepts .xaction
+  files directly.
 - **Schema assistant supports every JDBC database Report Designer has a
   driver for.** Introspection was limited to the four Python-adapter dialects
   (PostgreSQL, MySQL, SQL Server, Oracle); any other URL — including the

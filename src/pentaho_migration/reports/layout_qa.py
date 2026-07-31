@@ -268,7 +268,12 @@ def lint_layout(model) -> LayoutQA:
                     f"{el.kind} prints as a TODO placeholder - rebuild by hand"))
 
         # pairwise collision check between content elements
+        def _conditioned(el):
+            return (any(key == "visible" for key, _ in el.style_expressions)
+                    or bool(el.condition_formulas))
+
         content = [el for el in visible if el.kind in _CONTENT_KINDS]
+        layered = 0
         for i, a in enumerate(content):
             for b in content[i + 1:]:
                 ox = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
@@ -282,10 +287,23 @@ def lint_layout(model) -> LayoutQA:
                     continue
                 smaller = min(a.width * a.height, b.width * b.height)
                 if smaller > 0 and (ox * oy) / smaller > 0.4:
+                    # both carrying visibility conditions = the LAYERED
+                    # pattern (Crystal conditional sections, JFreeReport
+                    # HideElementByName): one prints per row, the stack is
+                    # the design - counted once per band, informationally
+                    if _conditioned(a) and _conditioned(b):
+                        layered += 1
+                        continue
                     qa.findings.append(Finding(
                         "warning", "overlap", band, _label(a),
                         f"overlaps '{_label(b)}' by more than 40% - "
                         "one of them will print on top of the other"))
+        if layered:
+            qa.findings.append(Finding(
+                "info", "layered", band, "",
+                f"{layered} overlapping pair(s) stack under mutually-"
+                "exclusive visibility conditions - one prints per row; the "
+                "wireframe shows every layer at once"))
     return qa
 
 
