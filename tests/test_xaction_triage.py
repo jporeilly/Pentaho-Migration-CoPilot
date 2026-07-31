@@ -8,7 +8,9 @@ from pathlib import Path
 from pentaho_migration.reports.xaction_triage import (
     LOE_HOURS, build_xaction_estate_report_html, triage_estate)
 
-ESTATE = Path("samples/xactions")
+# corpus1 only: corpus2 (the 126-report second harvest) has its own
+# gap-report sweep and would drift these distribution assertions
+ESTATE = Path("samples/xactions/corpus")
 
 
 def _records():

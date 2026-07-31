@@ -21,6 +21,9 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from pentaho_migration.reports.jfreereport_functions import (
+    port_note, targets, translate,
+)
 from pentaho_migration.reports.jfreereport_parser import (
     _IMAGE_MIMES, _PAGE_SIZES, _resolve_image_asset,
 )
@@ -38,32 +41,11 @@ _COLORS = {
     "cyan": "#00ffff", "magenta": "#ff00ff",
 }
 
-# aggregate function classes -> (operation, running); same split as the
-# simple format: Item* accumulates row by row, Group*/TotalGroup* totals
-_FUNCTION_OPS = {
-    "GroupCountFunction": ("Count", False),
-    "ItemCountFunction": ("Count", True),
-    "GroupSumFunction": ("Sum", False),
-    "ItemSumFunction": ("Sum", True),
-    "TotalGroupSumFunction": ("Sum", False),
-    "ItemAvgFunction": ("Average", True),
-    "ItemMinFunction": ("Minimum", True),
-    "ItemMaxFunction": ("Maximum", True),
-}
-
 _CHART_TYPES = {
     "BarChartExpression": "bar",
     "LineChartExpression": "line",
     "AreaChartExpression": "area",
     "PieChartExpression": "pie",
-}
-
-# legacy functions PRD still ships under the classic-core package; they port
-# with their properties unchanged
-_PORTABLE_FUNCTIONS = {
-    "ElementVisibilitySwitchFunction":
-        "org.pentaho.reporting.engine.classic.core.function."
-        "ElementVisibilitySwitchFunction",
 }
 
 _EXT_BANDS = [
@@ -530,13 +512,13 @@ def _scan_functions(root, model, ctx):
         if cls in _CHART_TYPES:
             charts.append((name, cls, props))
             continue
-        if cls == "PageOfPagesFunction":
-            ctx.specials[name] = "pagenofm"
-            continue
         ctx.known_names.add(name)
-        op_running = _FUNCTION_OPS.get(cls)
-        if op_running:
-            op, running = op_running
+        decision, payload = translate(cls, name, props)
+        if decision == "special":
+            ctx.specials[name] = payload
+            continue
+        if decision == "aggregate":
+            op, running = payload
             gcol = group_columns.get(props.get("group", ""), "")
             model.summaries.append(Summary(
                 name=name, operation=op,
@@ -558,17 +540,10 @@ def _scan_functions(root, model, ctx):
                 "two declared sums (the same share machinery Crystal's "
                 "PercentOfSum converts through)")
             continue
-        if cls in _PORTABLE_FUNCTIONS:
-            model.port_functions.append((name, _PORTABLE_FUNCTIONS[cls],
-                                         props))
-            target = props.get("element", "")
-            if target:
-                ctx.fn_targets.add(target)
-            model.issues.append(
-                f"report function '{name}' ({cls}) ported unchanged - PRD "
-                "ships the same class"
-                + (f"; it toggles element '{target}' per row (banded "
-                   "shading) - verify the shading" if target else ""))
+        if decision == "port":
+            model.port_functions.append((name, payload, props))
+            ctx.fn_targets.update(targets(cls, props))
+            model.issues.append(port_note(name, cls, props))
             continue
         if cls == "HideElementByNameFunction":
             continue  # handled by the simple parser's machinery when present

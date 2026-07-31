@@ -7,6 +7,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **The corpus2 function-class gap is closed** (gap #1: 96 of 126 reports).
+  One shared translation table
+  (`reports/jfreereport_functions.py`) now serves BOTH definition
+  dialects - the old classes did not die, they moved wholesale from
+  `org.jfree.report.*` to `org.pentaho.reporting.engine.classic.core.*`
+  with subpackages preserved, and every mapping is verified against the
+  PRD engine jars by the suite. Ported unchanged: the no-data visibility
+  pair (Show/HideElementIfDataAvailableExpression - breadboard's banner
+  boilerplate, 54 reports), **BeanShell scripts** (BSHExpression, 33
+  reports - PRD still ships the bsh interpreter; scripts carry verbatim
+  with a review note), ItemHideFunction, ElementColorFunction,
+  TextFormatExpression, CreateHyperLinksFunction, DateExpression,
+  To(Upper|Lower)CaseStringExpression, SubStringExpression,
+  MessageFormatExpression, AverageExpression, CreateGroupAnchorsFunction.
+  PageOfPagesFunction binds to the writer's own page function. The simple
+  dialect gains the full port machinery the EXT dialect already had
+  (element names, function-targeted band name inheritance,
+  ElementVisibilitySwitchFunction). Corpus2 re-sweep: manual notes 668 ->
+  217, blocked reports 96 -> 3 (only the XY-chart family remains);
+  the Quadrant For Region test report renders live against SampleData
+  with its BeanShell and colour functions instantiated by the engine.
+
 ## [1.43.0] - 2026-07-31
 
 - **The legacy-EXT `.report` dialect translates** (the second half of

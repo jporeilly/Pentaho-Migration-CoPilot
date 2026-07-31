@@ -15,6 +15,9 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from pentaho_migration.reports.jfreereport_functions import (
+    port_note, targets, translate,
+)
 from pentaho_migration.reports.model import (
     Element, Font, Group, PageSetup, ReportModel, Section, Summary,
 )
@@ -25,22 +28,6 @@ _PAGE_SIZES = {
     "LEGAL": (612.0, 1008.0),
     "A4": (595.0, 842.0),
     "A5": (420.0, 595.0),
-}
-
-# JFreeReport function class (short name) -> (operation, running). The Item*
-# family is a RUNNING value (row-by-row, JFreeReport resets it per group);
-# Group*/TotalGroup* are group totals. The writer emits PRD Item*Function for
-# running and TotalGroup*Function for totals - collapsing both to totals put
-# the report's ending net income on the Gross Margin line.
-_FUNCTION_OPS = {
-    "GroupCountFunction": ("Count", False),
-    "ItemCountFunction": ("Count", True),
-    "GroupSumFunction": ("Sum", False),
-    "ItemSumFunction": ("Sum", True),
-    "TotalGroupSumFunction": ("Sum", False),
-    "ItemAvgFunction": ("Average", True),
-    "ItemMinFunction": ("Minimum", True),
-    "ItemMaxFunction": ("Maximum", True),
 }
 
 _BAND_KINDS = [
@@ -94,7 +81,8 @@ def _parse_element(node, width: float, font: Font, offset_x=0.0, offset_y=0.0):
     visible = (node.get("visible") or "true").lower() != "false"
     align = (node.get("alignment") or "").lower()
     valign = (node.get("vertical-alignment") or "").lower()
-    common = dict(x=x, y=y, width=w, height=h, visible=visible,
+    common = dict(name=node.get("name") or "",
+                  x=x, y=y, width=w, height=h, visible=visible,
                   align=align if align in ("left", "center", "right") else "",
                   valign="middle" if valign == "middle" else
                          ("top" if valign == "top" else
@@ -139,7 +127,8 @@ def _parse_element(node, width: float, font: Font, offset_x=0.0, offset_y=0.0):
         return el
     if tag == "imageref":
         src = node.get("src") or ""
-        el = Element(kind="image", name=Path(src).name, **common)
+        el = Element(kind="image",
+                     **{**common, "name": common["name"] or Path(src).name})
         resolved = _resolve_image_asset(src)
         if resolved is not None:
             path, data = resolved
@@ -202,7 +191,8 @@ def _resolve_image_asset(src: str):
 
 
 def _parse_band(node, area_kind: str, width: float, base_font: Font,
-                group_index: int = -1, vis_map: dict | None = None) -> Section:
+                group_index: int = -1, vis_map: dict | None = None,
+                fn_targets: set | None = None) -> Section:
     """A band element and its children -> one Section. A nested <band> child
     offsets its children by its own x/y (JFreeReport's grouping container).
 
@@ -225,18 +215,24 @@ def _parse_band(node, area_kind: str, width: float, base_font: Font,
             return None
         return ("visible", f'=([{field}] = "{name}")')
 
-    def walk(container, ox, oy, vis):
+    fn_targets = fn_targets or set()
+
+    def walk(container, ox, oy, vis, inherit=""):
         for child in container:
             if child.tag == "band":
+                bname = child.get("name") or ""
                 walk(child, ox + _pt(child.get("x"), width),
                      oy + _pt(child.get("y"), 100.0),
-                     _visibility(child.get("name")) or vis)
+                     _visibility(bname) or vis,
+                     bname if bname in fn_targets else inherit)
                 continue
             el = _parse_element(child, width, font, ox, oy)
             if el is not None:
                 own = _visibility(child.get("name"))
                 if own or vis:
                     el.style_expressions.append(own or vis)
+                if inherit:
+                    el.name = inherit
                 elements.append(el)
 
     walk(node, 0.0, 0.0, None)
@@ -302,13 +298,16 @@ def parse_jfreereport(source, resource_loader=None,
     fn_nodes = [n for n in list(root.iter("function"))
                 + list(root.iter("expression"))]
     vis_map = {}
+    fn_targets = set()
     for fn in fn_nodes:
         cls = (fn.get("class") or "").rsplit(".", 1)[-1]
+        props = {p.get("name"): (p.text or "").strip()
+                 for p in fn.iter("property")}
         if cls == "HideElementByNameFunction":
-            props = {p.get("name"): (p.text or "").strip()
-                     for p in fn.iter("property")}
             if props.get("element") and props.get("field"):
                 vis_map[props["element"]] = props["field"]
+        else:
+            fn_targets.update(targets(cls, props))
     if vis_map:
         model.issues.append(
             "layered-visibility layout translated: HideElementByNameFunction "
@@ -324,7 +323,8 @@ def parse_jfreereport(source, resource_loader=None,
         node = root.find(band_tag)
         if node is not None:
             model.sections.append(
-                _parse_band(node, kind, width, base_font, vis_map=vis_map))
+                _parse_band(node, kind, width, base_font, vis_map=vis_map,
+                            fn_targets=fn_targets))
 
     # The watermark band becomes an UNDERLAY section placed first - the same
     # machinery that carries Crystal letterhead watermarks paints its content
@@ -332,7 +332,7 @@ def parse_jfreereport(source, resource_loader=None,
     wm = root.find("watermark")
     if wm is not None and len(wm):
         section = _parse_band(wm, "ReportHeader", width, base_font,
-                              vis_map=vis_map)
+                              vis_map=vis_map, fn_targets=fn_targets)
         section.underlay = True
         model.sections.insert(0, section)
         embedded = any(e.image_bytes for e in section.elements)
@@ -356,15 +356,19 @@ def parse_jfreereport(source, resource_loader=None,
         if gh is not None:
             model.sections.append(_parse_band(gh, "GroupHeader", width,
                                               base_font, group_index=gi,
-                                              vis_map=vis_map))
+                                              vis_map=vis_map,
+                                              fn_targets=fn_targets))
         gf = g.find("groupfooter")
         if gf is not None:
             model.sections.append(_parse_band(gf, "GroupFooter", width,
                                               base_font, group_index=gi,
-                                              vis_map=vis_map))
+                                              vis_map=vis_map,
+                                              fn_targets=fn_targets))
 
-    # functions/expressions -> PRD group functions where the class maps;
-    # visibility handled above; honesty otherwise
+    # functions/expressions -> the shared translation table: aggregates
+    # become summaries, PageOfPages becomes the writer's own page
+    # function, classes PRD still ships port verbatim; honesty otherwise
+    specials = {}
     for fn in fn_nodes:
         cls = (fn.get("class") or "").rsplit(".", 1)[-1]
         if cls == "HideElementByNameFunction":
@@ -372,15 +376,20 @@ def parse_jfreereport(source, resource_loader=None,
         name = fn.get("name") or cls
         props = {p.get("name"): (p.text or "").strip()
                  for p in fn.iter("property")}
-        op_running = _FUNCTION_OPS.get(cls)
-        if op_running:
-            op, running = op_running
+        decision, payload = translate(cls, name, props)
+        if decision == "aggregate":
+            op, running = payload
             model.summaries.append(Summary(
                 name=name, operation=op,
                 field_ref="{R." + props.get("field", "") + "}"
                 if props.get("field") else "",
                 group_field=props.get("group", ""),
                 expression_name=name, running=running))
+        elif decision == "special":
+            specials[name] = payload
+        elif decision == "port":
+            model.port_functions.append((name, payload, props))
+            model.issues.append(port_note(name, cls, props))
         else:
             model.issues.append(
                 f"report function '{name}' ({cls}) has no direct PRD "
@@ -388,10 +397,18 @@ def parse_jfreereport(source, resource_loader=None,
                 "SQL column, then point the elements that reference "
                 f"$({name}) at it")
 
-    # field types for every bound column, so the writer types its fields
-    for s in model.sections:
-        for el in s.elements:
+    # field types for every bound column, so the writer types its fields;
+    # elements bound to a special function become PRD special fields, and
+    # elements a ported function targets keep their name in the bundle
+    for sec in model.sections:
+        for el in sec.elements:
+            if el.kind == "field" and el.column in specials:
+                el.kind = "special"
+                el.column = specials[el.column]
+                continue
             if el.kind == "field" and el.column:
                 model.field_types.setdefault(el.column, el.value_type
                                              or "StringField")
+            if el.name and el.name in fn_targets:
+                el.emit_name = True
     return model
