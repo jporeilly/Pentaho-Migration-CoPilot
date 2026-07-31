@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Регистрация в журнале устных консультаций</title>
+  <version>1</version>
+  <documentation> 
+    <author>Teslya Dmitrii</author>  
+    <description>Регистрация в журнале устных консультаций</description>  
+    <icon>PentahoReporting.png</icon>  
+    <help/>  
+    <result-type>report</result-type> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources>  
+      <default-value/> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources>  
+      <default-value/> 
+    </activityId> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>consultation_registration.xml</location>  
+        <mime-type>text/xml</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputTypeList type="property-map-list"/>  
+        <outputType type="string"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <title>Формат вывода:</title>  
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+          </outputType> 
+        </selections>  
+        <target><![CDATA[Report_Window]]></target> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JS -список переменных для запроса к SHARK</action-type>
+      <action-inputs/>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <variableList type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList="consultType,consult_object,consult_result,consult_time,"+
+"consult_note,consult_FIO,cons_place,lastName,firstName,middleName";]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom - Получаем перемнные из SHARK</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <processId type="string"/>  
+        <activityId type="string"/>  
+        <variableList type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-inputs> 
+        <dsResult type="result-set"/> 
+      </action-inputs>
+      <action-outputs> 
+        <consultationType type="string"/>  
+        <consultationObject type="string"/>  
+        <CONSULTATION_RESULT type="string"/>  
+        <CONSULTATION_TIME type="string"/>  
+        <COMMENT type="string"/>  
+        <NAME type="string"/>  
+        <PLACE type="string"/>  
+        <R_LAST_NAME type="string"/>  
+        <R_FIRST_NAME type="string"/>  
+        <R_MIDDLE_NAME type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[rcount=dsResult.getRowCount();
+if (rcount!=0){
+
+if((dsResult.getValueAt(0,0) == null) || (dsResult.getValueAt(0,0).isEmpty())){
+  consultationType="noType";
+}else{
+  consultationType=dsResult.getValueAt(0,0);
+}
+
+if((dsResult.getValueAt(0,2) == null) || (dsResult.getValueAt(0,2).isEmpty())){
+  consultationObject=" ";
+}else{
+  consultationObject=dsResult.getValueAt(0,2);
+}
+
+if((dsResult.getValueAt(0,4) == null) || (dsResult.getValueAt(0,4).isEmpty())){
+  CONSULTATION_RESULT=" ";
+}else{
+  CONSULTATION_RESULT=dsResult.getValueAt(0,4);
+}
+
+if((dsResult.getValueAt(0,6) == null) || (dsResult.getValueAt(0,6).isEmpty())){
+  CONSULTATION_TIME=" ";
+}else{
+  CONSULTATION_TIME=dsResult.getValueAt(0,6);
+}
+
+if((dsResult.getValueAt(0,8) == null) || (dsResult.getValueAt(0,8).isEmpty())){
+  COMMENT=1;
+}else{
+  COMMENT=dsResult.getValueAt(0,8);
+}
+
+if((dsResult.getValueAt(0,10) == null) || (dsResult.getValueAt(0,10).isEmpty())){
+  NAME=" ";
+}else{
+  NAME=dsResult.getValueAt(0,10);
+}
+
+if((dsResult.getValueAt(0,12) == null) || (dsResult.getValueAt(0,12).isEmpty())){
+  PLACE=" ";
+}else{
+  PLACE=dsResult.getValueAt(0,12);
+}
+
+if((dsResult.getValueAt(0,14) == null) || (dsResult.getValueAt(0,14).isEmpty())){
+  R_LAST_NAME=" ";
+}else{
+  R_LAST_NAME=dsResult.getValueAt(0,14);
+}
+
+if((dsResult.getValueAt(0,16) == null) || (dsResult.getValueAt(0,16).isEmpty())){
+  R_FIRST_NAME=" ";
+}else{
+  R_FIRST_NAME=dsResult.getValueAt(0,16);
+}
+
+if((dsResult.getValueAt(0,18) == null) || (dsResult.getValueAt(0,18).isEmpty())){
+  R_MIDDLE_NAME=" ";
+}else{
+  R_MIDDLE_NAME=dsResult.getValueAt(0,18);
+}
+}]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-inputs> 
+        <consultationType type="string"/>  
+        <consultationObject type="string"/>
+      </action-inputs>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql=" select "+
+" ce1.name, "+
+" ce2.name "+
+" from "+
+" CardElement ce1, CardElement ce2"+
+" where "+
+" ce1.id='{consultationType}' and ce2.id='{consultationObject}' ";
+
+fields="CONSULTATION_TYPE,"+
+"CONSULTATION_OBJECT";]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom-Выполняем запрос</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JFreeReportComponent</component-name>
+      <action-type>report</action-type>
+      <action-inputs> 
+        <output-type type="string" mapping="outputType"/>  
+        <CONSULTATION_RESULT type="string"/>  
+        <CONSULTATION_TIME type="string"/>  
+        <NAME type="string"/>  
+        <PLACE type="string"/>  
+        <R_LAST_NAME type="string"/>  
+        <R_FIRST_NAME type="string"/>  
+        <R_MIDDLE_NAME type="string"/>  
+        <data type="result-set" mapping="dsResult"/>  
+        <COMMENT type="string"/>
+      </action-inputs>
+      <action-resources> 
+        <report-definition type="resource"/> 
+      </action-resources>
+      <action-outputs> 
+        <report-output type="content" mapping="content"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

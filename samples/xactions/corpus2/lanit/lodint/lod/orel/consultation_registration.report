@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+    <property name="name">Report</property>
+    <child type="org.pentaho.reportdesigner.crm.report.model.dataset.DataSetsReportElement">
+        <property name="name">Element@1698955577</property>
+        <property name="position">-1.0, 0.0</property>
+        <child type="org.pentaho.reportdesigner.crm.report.datasetplugin.properties.PropertiesDataSetReportElement">
+            <property name="name">Element@852841705</property>
+            <properties>
+                <property name="VFalse" type="java.lang.Boolean">false</property>
+                <property name="ZAppendixNo" type="java.lang.String">${ZAppendixNo}</property>
+                <property name="ZDate" type="java.lang.String">09.01.2007</property>
+                <property name="ZMetalType" type="java.lang.String">${ZMetalType}</property>
+                <property name="ZNo" type="java.lang.String">347-&#1086;&#1076;</property>
+                <property name="report.name" type="java.lang.String">Report</property>
+            </properties>
+        </child>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.ReportFunctionsElement">
+        <property name="name">Element@1270348279</property>
+        <child type="org.jfree.report.function.date.DateExpression_DesignerWrapper">
+            <property name="name">CURRENT_DATE</property>
+            <property name="dependencyLevel">0</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">COMMENT_SCR</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object m = dataRow.get(&quot;COMMENT&quot;);
+
+if(m == 1) return (String)&quot;&quot;;
+
+return (String)m;
+}</property>
+            <property name="preserve">false</property>
+        </child>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelPageReportElement" bandToplevelType="PAGE_HEADER">
+        <property name="name">anonymousBand@255732038</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">0.0</property>
+        <verticalLinealModel></verticalLinealModel>
+        <property name="displayOnFirstPage">true</property>
+        <property name="displayOnLastPage">true</property>
+        <property name="sticky">false</property>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="REPORT_HEADER">
+        <property name="name">anonymousBand@907942180</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@27682495</property>
+            <property name="minimumSize">555.0, 25.0</property>
+            <property name="maximumSize">32767.0, 32767.0</property>
+            <elementBorder sameBorderForAllSides="false">
+                <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+                <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+                <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+                <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+                <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+                <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+                <topRightEdge radii="0.0, 0.0"></topRightEdge>
+                <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+                <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+            </elementBorder>
+            <property name="font">Roman Unicode,16,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">MIDDLE</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">false</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">&#1056;&#1077;&#1075;&#1080;&#1089;&#1090;&#1088;&#1072;&#1094;&#1080;&#1103;</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@27682495</property>
+            <property name="position">0.0, 25.0</property>
+            <property name="minimumSize">555.0, 25.0</property>
+            <property name="maximumSize">32767.0, 32767.0</property>
+            <elementBorder sameBorderForAllSides="false">
+                <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+                <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+                <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+                <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+                <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+                <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+                <topRightEdge radii="0.0, 0.0"></topRightEdge>
+                <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+                <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+            </elementBorder>
+            <property name="font">Roman Unicode,14,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text"> &#1082;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1072;&#1094;&#1080;&#1080; &#1074; &#1078;&#1091;&#1088;&#1085;&#1072;&#1083;&#1077; &#1091;&#1089;&#1090;&#1085;&#1099;&#1093; &#1082;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1072;&#1094;&#1080;&#1081;</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@agentName@NotEmpty</property>
+            <property name="position">0.0, 135.0</property>
+            <property name="minimumSize">555.0, 130.0</property>
+            <property name="maximumSize">32767.0, 32767.0</property>
+            <property name="dynamicContent">true</property>
+            <elementBorder sameBorderForAllSides="false">
+                <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+                <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+                <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+                <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+                <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+                <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+                <topRightEdge radii="0.0, 0.0"></topRightEdge>
+                <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+                <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+            </elementBorder>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">false</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">&#1058;&#1080;&#1087; &#1086;&#1073;&#1088;&#1072;&#1097;&#1077;&#1085;&#1080;&#1103; &#1079;&#1072; &#1082;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1072;&#1094;&#1080;&#1077;&#1081;:  $(CONSULTATION_TYPE)
+
+&#1055;&#1088;&#1077;&#1076;&#1084;&#1077;&#1090; &#1086;&#1073;&#1088;&#1072;&#1097;&#1077;&#1085;&#1080;&#1103;:  $(CONSULTATION_OBJECT)
+
+&#1056;&#1077;&#1079;&#1091;&#1083;&#1100;&#1090;&#1072;&#1090; &#1082;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103;:  $(CONSULTATION_RESULT)
+
+&#1055;&#1088;&#1080;&#1084;&#1077;&#1095;&#1072;&#1085;&#1080;&#1077;:  $(COMMENT_SCR)
+
+&#1052;&#1077;&#1089;&#1090;&#1086;&#1085;&#1072;&#1093;&#1086;&#1078;&#1076;&#1077;&#1085;&#1080;&#1077;:  $(PLACE)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@706763928</property>
+            <property name="position">120.0, 65.0</property>
+            <property name="minimumSize">130.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">false</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(CURRENT_DATE, date, dd.MM.yyyy)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@833048728</property>
+            <property name="position">0.0, 65.0</property>
+            <property name="minimumSize">120.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">&#1044;&#1072;&#1090;&#1072; &#1086;&#1073;&#1088;&#1072;&#1097;&#1077;&#1085;&#1080;&#1103;:</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LineReportElement">
+            <property name="name">Element@1565473023</property>
+            <property name="position">120.0, 90.0</property>
+            <property name="minimumSize">130.0, 0.0</property>
+            <property name="direction">HORIZONTAL</property>
+            <lineDefinition color="0, 0, 0, 255" width="1.0" join="0" cap="2" miterlimit="10.0" dashPhase="0.0"></lineDefinition>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@602490742</property>
+            <property name="position">305.0, 65.0</property>
+            <property name="minimumSize">145.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">&#1042;&#1088;&#1077;&#1084;&#1103; &#1082;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1072;&#1094;&#1080;&#1080;:</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1106570297</property>
+            <property name="position">450.0, 65.0</property>
+            <property name="minimumSize">105.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(CONSULTATION_TIME)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LineReportElement">
+            <property name="name">Element@1350908438</property>
+            <property name="position">450.0, 90.0</property>
+            <property name="minimumSize">105.0, 0.0</property>
+            <property name="direction">HORIZONTAL</property>
+            <lineDefinition color="0, 0, 0, 255" width="1.0" join="0" cap="2" miterlimit="10.0" dashPhase="0.0"></lineDefinition>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@150900455</property>
+            <property name="position">0.0, 90.0</property>
+            <property name="minimumSize">90.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">&#1050;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1072;&#1085;&#1090;:</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LineReportElement">
+            <property name="name">Element@1968791904</property>
+            <property name="position">90.0, 115.0</property>
+            <property name="minimumSize">465.0, 0.0</property>
+            <property name="direction">HORIZONTAL</property>
+            <lineDefinition color="0, 0, 0, 255" width="1.0" join="0" cap="2" miterlimit="10.0" dashPhase="0.0"></lineDefinition>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@1860015893</property>
+            <property name="position">90.0, 115.0</property>
+            <property name="minimumSize">465.0, 15.0</property>
+            <property name="font">Roman Unicode,10,2</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">(&#1060;&#1048;&#1054; &#1089;&#1087;&#1077;&#1094;&#1080;&#1072;&#1083;&#1080;&#1089;&#1090;&#1072; &#1086;&#1082;&#1072;&#1079;&#1072;&#1074;&#1096;&#1077;&#1075;&#1086; &#1082;&#1086;&#1085;&#1089;&#1091;&#1083;&#1100;&#1090;&#1072;&#1094;&#1080;&#1102;)</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1447561662</property>
+            <property name="position">90.0, 90.0</property>
+            <property name="minimumSize">465.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(R_LAST_NAME) $(R_FIRST_NAME) $(R_MIDDLE_NAME)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">295.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelItemReportElement" bandToplevelType="ITEM_BAND">
+        <property name="name">anonymousBand@1365507840</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">5.0</property>
+        <verticalLinealModel></verticalLinealModel>
+        <rowBandingDefinition enabled="false" color="192, 192, 192, 255" startState="true" switchItemCount="1"></rowBandingDefinition>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="REPORT_FOOTER">
+        <property name="name">anonymousBand@1912907325</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@20369879</property>
+            <property name="position">0.0, 25.0</property>
+            <property name="minimumSize">445.0, 15.0</property>
+            <property name="maximumSize">32767.0, 32767.0</property>
+            <elementBorder sameBorderForAllSides="false">
+                <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+                <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+                <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+                <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+                <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+                <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+                <topRightEdge radii="0.0, 0.0"></topRightEdge>
+                <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+                <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+            </elementBorder>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">false</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(NAME)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@25163278</property>
+            <property name="position">0.0, 45.0</property>
+            <property name="minimumSize">445.0, 15.0</property>
+            <property name="maximumSize">32767.0, 32767.0</property>
+            <styleExpressions>
+                <styleExpression styleKeyName="dynamic_height" expression="true"></styleExpression>
+                <styleExpression styleKeyName="fixed-position" expression="false"></styleExpression>
+            </styleExpressions>
+            <elementBorder sameBorderForAllSides="false">
+                <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+                <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+                <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+                <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+                <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+                <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+                <topRightEdge radii="0.0, 0.0"></topRightEdge>
+                <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+                <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+            </elementBorder>
+            <property name="font">Roman Unicode,10,2</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">false</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">(&#1060;&#1048;&#1054;)</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@25163278</property>
+            <property name="position">455.0, 45.0</property>
+            <property name="minimumSize">100.0, 15.0</property>
+            <property name="maximumSize">32767.0, 32767.0</property>
+            <styleExpressions>
+                <styleExpression styleKeyName="dynamic_height" expression="true"></styleExpression>
+                <styleExpression styleKeyName="fixed-position" expression="false"></styleExpression>
+            </styleExpressions>
+            <elementBorder sameBorderForAllSides="false">
+                <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+                <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+                <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+                <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+                <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+                <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+                <topRightEdge radii="0.0, 0.0"></topRightEdge>
+                <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+                <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+            </elementBorder>
+            <property name="font">Roman Unicode,10,2</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">false</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">(&#1087;&#1086;&#1076;&#1087;&#1080;&#1089;&#1100;)</property>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LineReportElement">
+            <property name="name">Element@743730049</property>
+            <property name="position">455.0, 45.0</property>
+            <property name="minimumSize">100.0, 0.0</property>
+            <property name="direction">HORIZONTAL</property>
+            <lineDefinition color="0, 0, 0, 255" width="1.0" join="0" cap="2" miterlimit="10.0" dashPhase="0.0"></lineDefinition>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LineReportElement">
+            <property name="name">Element@2016702775</property>
+            <property name="position">0.0, 45.0</property>
+            <property name="minimumSize">445.0, 0.0</property>
+            <property name="direction">HORIZONTAL</property>
+            <lineDefinition color="0, 0, 0, 255" width="1.0" join="0" cap="2" miterlimit="10.0" dashPhase="0.0"></lineDefinition>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.LabelReportElement">
+            <property name="name">Element@1800893406</property>
+            <property name="minimumSize">555.0, 20.0</property>
+            <property name="font">Roman Unicode,14,0</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="text">&#1047;&#1072;&#1080;&#1085;&#1090;&#1077;&#1088;&#1077;&#1089;&#1086;&#1074;&#1072;&#1085;&#1085;&#1086;&#1077; &#1083;&#1080;&#1094;&#1086;:</property>
+        </child>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">71.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelPageReportElement" bandToplevelType="PAGE_FOOTER">
+        <property name="name">anonymousBand@973585019</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">5.0</property>
+        <verticalLinealModel></verticalLinealModel>
+        <property name="displayOnFirstPage">true</property>
+        <property name="displayOnLastPage">true</property>
+        <property name="sticky">false</property>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="NO_DATA_BAND">
+        <property name="name">anonymousBand@2073937800</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">false</property>
+        <property name="visualHeight">100.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="WATERMARK">
+        <property name="name">anonymousBand@2080015038</property>
+        <property name="minimumSize">555.0, 802.0</property>
+        <property name="maximumSize">32767.0, 32767.0</property>
+        <elementBorder sameBorderForAllSides="false">
+            <borderTop width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderTop>
+            <borderBottom width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderBottom>
+            <borderLeft width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderLeft>
+            <borderRight width="1.0" borderType="NONE" color="0, 0, 0, 255"></borderRight>
+            <borderBreak width="0.0" borderType="NONE" color="0, 0, 0, 255"></borderBreak>
+            <topLeftEdge radii="0.0, 0.0"></topLeftEdge>
+            <topRightEdge radii="0.0, 0.0"></topRightEdge>
+            <bottomLeftEdge radii="0.0, 0.0"></bottomLeftEdge>
+            <bottomRightEdge radii="0.0, 0.0"></bottomRightEdge>
+        </elementBorder>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">false</property>
+        <property name="visualHeight">100.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.ReportGroups">
+        <property name="name">Element@354082252</property>
+    </child>
+    <property name="defaultLocale">ru_RU_</property>
+    <horizontalLinealModel></horizontalLinealModel>
+    <pageDefinition pageSize="595.0, 842.0" topBorder="20.0" bottomBorder="20.0" leftBorder="20.0" rightBorder="20.0"></pageDefinition>
+    <reportConfiguration></reportConfiguration>
+    <property name="useMaxCharBounds">false</property>
+</report>

@@ -1,0 +1,2345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.17" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.3.2.r232_v20090521 Build &lt;2.3.2.v20090601-0700></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">fixed layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <parameters>
+        <scalar-parameter name="user" id="25">
+            <property name="hidden">false</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="isRequired">false</property>
+            <property name="controlType">text-box</property>
+            <property name="defaultValue">Alena</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="processId" id="271">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="defaultValue">62_lod_license_docs_check</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="activityId" id="272">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="defaultValue">678_62_lod_license_docs_check_lod_notice_defects_docs1</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.jboss.tools.birt.oda" name="Data Source Hiber" id="347">
+            <property name="configuration">lodint</property>
+            <property name="maxRows">100</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.jboss.tools.birt.oda.dataSet" name="Data Set Hiber" id="348">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">OGV_SIGNATURE_POST</property>
+                    <property name="displayName">aps1:settingValue as OGV_SIGNATURE_POST</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_SIGNATURE_NAME</property>
+                    <property name="displayName">aps2:settingValue as OGV_SIGNATURE_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_ADDRESS</property>
+                    <property name="displayName">aps3:settingValue as OGV_ADDRESS</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_INDEX</property>
+                    <property name="displayName">aps4:settingValue as OGV_INDEX</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_PHONES</property>
+                    <property name="displayName">aps5:settingValue as OGV_PHONES</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_FAX</property>
+                    <property name="displayName">aps6:settingValue as OGV_FAX</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_MAIL</property>
+                    <property name="displayName">aps7:settingValue as OGV_MAIL</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_NAME</property>
+                    <property name="displayName">aps8:settingValue as OGV_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">DOC_NUM</property>
+                    <property name="displayName">pd1:docNum as DOC_NUM</property>
+                </structure>
+                <structure>
+                    <property name="columnName">DOC_DATE</property>
+                    <property name="displayName">pd1:docDate as DOC_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">REF_NUM</property>
+                    <property name="displayName">pd1:refNum as REF_NUM</property>
+                </structure>
+                <structure>
+                    <property name="columnName">REF_DATE</property>
+                    <property name="displayName">pd1:refDate as REF_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">BODY</property>
+                    <property name="displayName">pd1:body as BODY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">HEAD</property>
+                    <property name="displayName">pd1:head as HEAD</property>
+                </structure>
+                <structure>
+                    <property name="columnName">REFERENCE</property>
+                    <property name="displayName">pd1:reference as REFERENCE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">BACKSIDE</property>
+                    <property name="displayName">pd1:backside as BACKSIDE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">EXECUTOR_LAST_NAME</property>
+                    <property name="displayName">u1:lastName as EXECUTOR_LAST_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">EXECUTOR_PHONE</property>
+                    <property name="displayName">u1:phone as EXECUTOR_PHONE</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">OGV_SIGNATURE_POST</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">OGV_SIGNATURE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">OGV_ADDRESS</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">OGV_INDEX</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">OGV_PHONES</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">OGV_FAX</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">OGV_MAIL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">OGV_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">DOC_NUM</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">DOC_DATE</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">REF_NUM</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">REF_DATE</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">BODY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">HEAD</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">REFERENCE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">BACKSIDE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">EXECUTOR_LAST_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">EXECUTOR_PHONE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source Hiber</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">USER</property>
+                    <property name="paramName">user</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">PROCESS_ID</property>
+                    <property name="paramName">processId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ACTIVITY_ID</property>
+                    <property name="paramName">activityId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">OGV_SIGNATURE_POST</property>
+                    <property name="nativeName">OGV_SIGNATURE_POST</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">OGV_SIGNATURE_NAME</property>
+                    <property name="nativeName">OGV_SIGNATURE_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">OGV_ADDRESS</property>
+                    <property name="nativeName">OGV_ADDRESS</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">OGV_INDEX</property>
+                    <property name="nativeName">OGV_INDEX</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">OGV_PHONES</property>
+                    <property name="nativeName">OGV_PHONES</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">OGV_FAX</property>
+                    <property name="nativeName">OGV_FAX</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">OGV_MAIL</property>
+                    <property name="nativeName">OGV_MAIL</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">OGV_NAME</property>
+                    <property name="nativeName">OGV_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">DOC_NUM</property>
+                    <property name="nativeName">DOC_NUM</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">DOC_DATE</property>
+                    <property name="nativeName">DOC_DATE</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">91</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">REF_NUM</property>
+                    <property name="nativeName">REF_NUM</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">REF_DATE</property>
+                    <property name="nativeName">REF_DATE</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">91</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">BODY</property>
+                    <property name="nativeName">BODY</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">HEAD</property>
+                    <property name="nativeName">HEAD</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">REFERENCE</property>
+                    <property name="nativeName">REFERENCE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">BACKSIDE</property>
+                    <property name="nativeName">BACKSIDE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">EXECUTOR_LAST_NAME</property>
+                    <property name="nativeName">EXECUTOR_LAST_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">EXECUTOR_PHONE</property>
+                    <property name="nativeName">EXECUTOR_PHONE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <property name="queryText">select 
+aps1.settingValue as OGV_SIGNATURE_POST, 
+aps2.settingValue as OGV_SIGNATURE_NAME,
+aps3.settingValue as OGV_ADDRESS,
+aps4.settingValue as OGV_INDEX,
+aps5.settingValue as OGV_PHONES,
+aps6.settingValue as OGV_FAX,
+aps7.settingValue as OGV_MAIL, 
+aps8.settingValue as OGV_NAME,
+pd1.docNum as DOC_NUM,
+pd1.docDate as DOC_DATE,
+pd1.refNum as REF_NUM,
+pd1.refDate as REF_DATE,
+pd1.body as BODY,
+pd1.head as HEAD,
+pd1.reference as REFERENCE,
+pd1.backside as BACKSIDE,
+u1.lastName as EXECUTOR_LAST_NAME,
+u1.phone as EXECUTOR_PHONE
+
+from 
+UserRef as u1, PrintDoc as pd1,
+AppSetting as aps1, AppSetting as aps2, AppSetting as aps3,
+AppSetting as aps4, AppSetting as aps5, AppSetting as aps6,
+AppSetting as aps7, AppSetting as aps8,
+BpmsActivityVariable as BAV
+
+where
+u1.login=? and BAV.bpmsDefinitionId = 'univDoc' and 
+pd1.id = BAV.bpmsValueLong and 
+BAV.bpmsProcessId = ? and BAV.bpmsActivityId = ? and
+
+aps1.id='ogv_boss_post' and aps2.id='ogv_boss_name' and
+aps3.id='ogv_address' and
+aps4.id='ogv_index' and aps5.id='ogv_phones' and
+aps6.id='ogv_fax' and aps7.id='ogv_mail' and
+aps8.id='ogv_name'</property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">"Verdana"</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">2cm</property>
+            <property name="leftMargin">2cm</property>
+            <property name="bottomMargin">2cm</property>
+            <property name="rightMargin">2cm</property>
+            <property name="canShrink">false</property>
+            <property name="showHeaderOnFirst">true</property>
+            <property name="showFooterOnLast">true</property>
+            <property name="headerHeight">0.5cm</property>
+            <property name="footerHeight">1.51cm</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="273">
+            <property name="height">3.0416666666666665in</property>
+            <property name="width">6.697916666666667in</property>
+            <column id="274">
+                <property name="width">3.4375in</property>
+            </column>
+            <column id="275">
+                <property name="width">0.3020833333333333in</property>
+            </column>
+            <column id="276">
+                <property name="width">2.9583333333333335in</property>
+            </column>
+            <row id="322">
+                <cell id="323">
+                    <property name="textAlign">center</property>
+                    <image id="330">
+                        <property name="height">73px</property>
+                        <property name="width">53px</property>
+                        <property name="source">file</property>
+                        <expression name="uri">"pentaho-solutions/lodint/lod/orel/gerb_oryol.gif"</expression>
+                    </image>
+                </cell>
+                <cell id="324"/>
+                <cell id="325">
+                    <property name="verticalAlign">top</property>
+                </cell>
+            </row>
+            <row id="318">
+                <cell id="319">
+                    <label id="331">
+                        <text-property name="text">    </text-property>
+                    </label>
+                </cell>
+                <cell id="320"/>
+                <cell id="321">
+                    <property name="verticalAlign">top</property>
+                </cell>
+            </row>
+            <row id="314">
+                <cell id="315">
+                    <grid id="332">
+                        <property name="width">100%</property>
+                        <column id="333">
+                            <property name="width">0.20833333333333334in</property>
+                        </column>
+                        <column id="334">
+                            <property name="width">2.9583333333333335in</property>
+                        </column>
+                        <column id="335">
+                            <property name="width">0.208in</property>
+                        </column>
+                        <row id="336">
+                            <cell id="337"/>
+                            <cell id="338">
+                                <text id="356">
+                                    <property name="backgroundAttachment">scroll</property>
+                                    <property name="backgroundPositionX">0%</property>
+                                    <property name="backgroundPositionY">0%</property>
+                                    <property name="backgroundRepeat">repeat</property>
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">12pt</property>
+                                    <property name="fontWeight">bold</property>
+                                    <property name="fontStyle">normal</property>
+                                    <property name="fontVariant">normal</property>
+                                    <property name="color">black</property>
+                                    <property name="textLineThrough">none</property>
+                                    <property name="textOverline">none</property>
+                                    <property name="textUnderline">none</property>
+                                    <property name="borderBottomColor">black</property>
+                                    <property name="borderBottomStyle">none</property>
+                                    <property name="borderBottomWidth">medium</property>
+                                    <property name="borderLeftColor">black</property>
+                                    <property name="borderLeftStyle">none</property>
+                                    <property name="borderLeftWidth">medium</property>
+                                    <property name="borderRightColor">black</property>
+                                    <property name="borderRightStyle">none</property>
+                                    <property name="borderRightWidth">medium</property>
+                                    <property name="borderTopColor">black</property>
+                                    <property name="borderTopStyle">none</property>
+                                    <property name="borderTopWidth">medium</property>
+                                    <property name="marginTop">0pt</property>
+                                    <property name="marginLeft">0pt</property>
+                                    <property name="marginBottom">0pt</property>
+                                    <property name="marginRight">0pt</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1pt</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <property name="paddingRight">1pt</property>
+                                    <property name="textAlign">center</property>
+                                    <property name="letterSpacing">normal</property>
+                                    <property name="lineHeight">normal</property>
+                                    <property name="orphans">2</property>
+                                    <property name="textTransform">none</property>
+                                    <property name="whiteSpace">normal</property>
+                                    <property name="widows">2</property>
+                                    <property name="wordSpacing">normal</property>
+                                    <property name="display">block</property>
+                                    <property name="pageBreakAfter">auto</property>
+                                    <property name="pageBreakBefore">auto</property>
+                                    <property name="pageBreakInside">auto</property>
+                                    <property name="showIfBlank">false</property>
+                                    <property name="canShrink">false</property>
+                                    <property name="dataSet">Data Set Hiber</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_POST</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_ADDRESS</property>
+                                            <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_INDEX</property>
+                                            <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_PHONES</property>
+                                            <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_FAX</property>
+                                            <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_MAIL</property>
+                                            <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_NUM</property>
+                                            <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_DATE</property>
+                                            <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_NUM</property>
+                                            <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_DATE</property>
+                                            <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BODY</property>
+                                            <expression name="expression">dataSetRow["BODY"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">HEAD</property>
+                                            <expression name="expression">dataSetRow["HEAD"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REFERENCE</property>
+                                            <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BACKSIDE</property>
+                                            <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_LAST_NAME</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_PHONE</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="contentType">html</property>
+                                    <text-property name="content"><![CDATA[<VALUE-OF format="HTML">BirtStr.toUpper(row["OGV_NAME"])</VALUE-OF>]]></text-property>
+                                </text>
+                            </cell>
+                            <cell id="339"/>
+                        </row>
+                    </grid>
+                </cell>
+                <cell id="316"/>
+                <cell id="317">
+                    <property name="colSpan">1</property>
+                    <property name="rowSpan">3</property>
+                    <property name="verticalAlign">top</property>
+                    <text id="361">
+                        <property name="backgroundAttachment">scroll</property>
+                        <property name="backgroundPositionX">0%</property>
+                        <property name="backgroundPositionY">0%</property>
+                        <property name="backgroundRepeat">repeat</property>
+                        <property name="fontFamily">"Roman Unicode"</property>
+                        <property name="fontSize">12pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="fontStyle">normal</property>
+                        <property name="fontVariant">normal</property>
+                        <property name="color">black</property>
+                        <property name="textLineThrough">none</property>
+                        <property name="textOverline">none</property>
+                        <property name="textUnderline">none</property>
+                        <property name="borderBottomColor">black</property>
+                        <property name="borderBottomStyle">none</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderLeftColor">black</property>
+                        <property name="borderLeftStyle">none</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightColor">black</property>
+                        <property name="borderRightStyle">none</property>
+                        <property name="borderRightWidth">medium</property>
+                        <property name="borderTopColor">black</property>
+                        <property name="borderTopStyle">none</property>
+                        <property name="borderTopWidth">medium</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="marginLeft">0pt</property>
+                        <property name="marginBottom">0pt</property>
+                        <property name="marginRight">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingRight">1pt</property>
+                        <property name="textAlign">right</property>
+                        <property name="letterSpacing">normal</property>
+                        <property name="lineHeight">normal</property>
+                        <property name="orphans">2</property>
+                        <property name="textTransform">none</property>
+                        <property name="verticalAlign">top</property>
+                        <property name="whiteSpace">normal</property>
+                        <property name="widows">2</property>
+                        <property name="wordSpacing">normal</property>
+                        <property name="display">block</property>
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="pageBreakInside">auto</property>
+                        <property name="showIfBlank">false</property>
+                        <property name="canShrink">false</property>
+                        <property name="dataSet">Data Set Hiber</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_POST</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_ADDRESS</property>
+                                <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_INDEX</property>
+                                <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_PHONES</property>
+                                <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_FAX</property>
+                                <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_MAIL</property>
+                                <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_NUM</property>
+                                <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_DATE</property>
+                                <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_NUM</property>
+                                <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_DATE</property>
+                                <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BODY</property>
+                                <expression name="expression">dataSetRow["BODY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HEAD</property>
+                                <expression name="expression">dataSetRow["HEAD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REFERENCE</property>
+                                <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BACKSIDE</property>
+                                <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_LAST_NAME</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_PHONE</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<VALUE-OF format="HTML">row["HEAD"]</VALUE-OF>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="277">
+                <cell id="278">
+                    <text id="342">
+                        <property name="fontFamily">"Roman Unicode"</property>
+                        <property name="textAlign">center</property>
+                        <property name="dataSet">Data Set Hiber</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_POST</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_ADDRESS</property>
+                                <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_INDEX</property>
+                                <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_PHONES</property>
+                                <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_FAX</property>
+                                <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_MAIL</property>
+                                <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_NUM</property>
+                                <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_DATE</property>
+                                <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_NUM</property>
+                                <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_DATE</property>
+                                <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BODY</property>
+                                <expression name="expression">dataSetRow["BODY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HEAD</property>
+                                <expression name="expression">dataSetRow["HEAD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REFERENCE</property>
+                                <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BACKSIDE</property>
+                                <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_LAST_NAME</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_PHONE</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<DIV><VALUE-OF format="HTML">row["OGV_ADDRESS"]</VALUE-OF>, <VALUE-OF format="HTML">row["OGV_INDEX"]</VALUE-OF>,</DIV>
+<DIV>Телефон:  <VALUE-OF format="HTML">row["OGV_PHONES"]</VALUE-OF></DIV>
+<DIV>Факс:  <VALUE-OF format="HTML">row["OGV_FAX"]</VALUE-OF></DIV>
+<DIV>E-mail:  <VALUE-OF format="HTML">row["OGV_MAIL"]</VALUE-OF></DIV>
+<DIV>URL: http://www.adm.orel.ru</DIV>
+<DIV><A name="URL: http://www.adm.orel.ru" href="www.adm.orel.ru" ></A></DIV>]]></text-property>
+                    </text>
+                </cell>
+                <cell id="279">
+                    <property name="colSpan">1</property>
+                    <property name="rowSpan">2</property>
+                </cell>
+            </row>
+            <row id="281">
+                <cell id="282">
+                    <grid id="110">
+                        <property name="width">100%</property>
+                        <column id="111">
+                            <property name="width">0.3125in</property>
+                        </column>
+                        <column id="313">
+                            <property name="width">0.20833333333333334in</property>
+                        </column>
+                        <column id="112">
+                            <property name="width">1.28125in</property>
+                        </column>
+                        <column id="113">
+                            <property name="width">0.2708333333333333in</property>
+                        </column>
+                        <column id="114">
+                            <property name="width">1.28125in</property>
+                        </column>
+                        <row id="116">
+                            <property name="height">0.2708333333333333in</property>
+                            <property name="verticalAlign">bottom</property>
+                            <cell id="117"/>
+                            <cell id="309">
+                                <property name="colSpan">2</property>
+                                <property name="rowSpan">1</property>
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">1px</property>
+                                <data id="351">
+                                    <property name="backgroundAttachment">scroll</property>
+                                    <property name="backgroundPositionX">0%</property>
+                                    <property name="backgroundPositionY">0%</property>
+                                    <property name="backgroundRepeat">repeat</property>
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <property name="fontWeight">normal</property>
+                                    <property name="fontStyle">normal</property>
+                                    <property name="fontVariant">normal</property>
+                                    <property name="color">black</property>
+                                    <property name="textLineThrough">none</property>
+                                    <property name="textOverline">none</property>
+                                    <property name="textUnderline">none</property>
+                                    <property name="borderBottomColor">black</property>
+                                    <property name="borderBottomStyle">none</property>
+                                    <property name="borderBottomWidth">medium</property>
+                                    <property name="borderLeftColor">black</property>
+                                    <property name="borderLeftStyle">none</property>
+                                    <property name="borderLeftWidth">medium</property>
+                                    <property name="borderRightColor">black</property>
+                                    <property name="borderRightStyle">none</property>
+                                    <property name="borderRightWidth">medium</property>
+                                    <property name="borderTopColor">black</property>
+                                    <property name="borderTopStyle">none</property>
+                                    <property name="borderTopWidth">medium</property>
+                                    <property name="marginTop">0pt</property>
+                                    <property name="marginLeft">0pt</property>
+                                    <property name="marginBottom">0pt</property>
+                                    <property name="marginRight">0pt</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1pt</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <property name="paddingRight">1pt</property>
+                                    <structure name="dateTimeFormat">
+                                        <property name="category">Medium Date</property>
+                                        <property name="pattern">Medium Date</property>
+                                    </structure>
+                                    <property name="textAlign">center</property>
+                                    <property name="letterSpacing">normal</property>
+                                    <property name="lineHeight">115%</property>
+                                    <property name="orphans">2</property>
+                                    <property name="textTransform">none</property>
+                                    <property name="verticalAlign">bottom</property>
+                                    <property name="whiteSpace">normal</property>
+                                    <property name="widows">2</property>
+                                    <property name="wordSpacing">normal</property>
+                                    <property name="display">block</property>
+                                    <property name="pageBreakAfter">auto</property>
+                                    <property name="pageBreakBefore">auto</property>
+                                    <property name="pageBreakInside">auto</property>
+                                    <property name="showIfBlank">false</property>
+                                    <property name="canShrink">false</property>
+                                    <property name="dataSet">Data Set Hiber</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_POST</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_ADDRESS</property>
+                                            <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_INDEX</property>
+                                            <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_PHONES</property>
+                                            <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_FAX</property>
+                                            <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_MAIL</property>
+                                            <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_NUM</property>
+                                            <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_DATE</property>
+                                            <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_NUM</property>
+                                            <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_DATE</property>
+                                            <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BODY</property>
+                                            <expression name="expression">dataSetRow["BODY"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">HEAD</property>
+                                            <expression name="expression">dataSetRow["HEAD"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REFERENCE</property>
+                                            <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BACKSIDE</property>
+                                            <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_LAST_NAME</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_PHONE</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">DOC_DATE</property>
+                                </data>
+                            </cell>
+                            <cell id="119">
+                                <label id="78">
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <property name="textAlign">center</property>
+                                    <text-property name="text">№</text-property>
+                                </label>
+                            </cell>
+                            <cell id="120">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">1px</property>
+                                <data id="352">
+                                    <property name="backgroundAttachment">scroll</property>
+                                    <property name="backgroundPositionX">0%</property>
+                                    <property name="backgroundPositionY">0%</property>
+                                    <property name="backgroundRepeat">repeat</property>
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <property name="fontWeight">normal</property>
+                                    <property name="fontStyle">normal</property>
+                                    <property name="fontVariant">normal</property>
+                                    <property name="color">black</property>
+                                    <property name="textLineThrough">none</property>
+                                    <property name="textOverline">none</property>
+                                    <property name="textUnderline">none</property>
+                                    <property name="borderBottomColor">black</property>
+                                    <property name="borderBottomStyle">none</property>
+                                    <property name="borderBottomWidth">medium</property>
+                                    <property name="borderLeftColor">black</property>
+                                    <property name="borderLeftStyle">none</property>
+                                    <property name="borderLeftWidth">medium</property>
+                                    <property name="borderRightColor">black</property>
+                                    <property name="borderRightStyle">none</property>
+                                    <property name="borderRightWidth">medium</property>
+                                    <property name="borderTopColor">black</property>
+                                    <property name="borderTopStyle">none</property>
+                                    <property name="borderTopWidth">medium</property>
+                                    <property name="marginTop">0pt</property>
+                                    <property name="marginLeft">0pt</property>
+                                    <property name="marginBottom">0pt</property>
+                                    <property name="marginRight">0pt</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1pt</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <property name="paddingRight">1pt</property>
+                                    <property name="textAlign">center</property>
+                                    <property name="letterSpacing">normal</property>
+                                    <property name="lineHeight">115%</property>
+                                    <property name="orphans">2</property>
+                                    <property name="textTransform">none</property>
+                                    <property name="verticalAlign">bottom</property>
+                                    <property name="whiteSpace">normal</property>
+                                    <property name="widows">2</property>
+                                    <property name="wordSpacing">normal</property>
+                                    <property name="display">block</property>
+                                    <property name="pageBreakAfter">auto</property>
+                                    <property name="pageBreakBefore">auto</property>
+                                    <property name="pageBreakInside">auto</property>
+                                    <property name="showIfBlank">false</property>
+                                    <property name="canShrink">false</property>
+                                    <property name="dataSet">Data Set Hiber</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_POST</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_ADDRESS</property>
+                                            <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_INDEX</property>
+                                            <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_PHONES</property>
+                                            <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_FAX</property>
+                                            <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_MAIL</property>
+                                            <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_NUM</property>
+                                            <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_DATE</property>
+                                            <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_NUM</property>
+                                            <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_DATE</property>
+                                            <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BODY</property>
+                                            <expression name="expression">dataSetRow["BODY"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">HEAD</property>
+                                            <expression name="expression">dataSetRow["HEAD"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REFERENCE</property>
+                                            <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BACKSIDE</property>
+                                            <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_LAST_NAME</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_PHONE</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">DOC_NUM</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="122">
+                            <property name="verticalAlign">bottom</property>
+                            <cell id="123">
+                                <property name="colSpan">2</property>
+                                <property name="rowSpan">1</property>
+                                <label id="79">
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <text-property name="text">на №</text-property>
+                                </label>
+                            </cell>
+                            <cell id="124">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">1px</property>
+                                <data id="353">
+                                    <property name="backgroundAttachment">scroll</property>
+                                    <property name="backgroundPositionX">0%</property>
+                                    <property name="backgroundPositionY">0%</property>
+                                    <property name="backgroundRepeat">repeat</property>
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <property name="fontWeight">normal</property>
+                                    <property name="fontStyle">normal</property>
+                                    <property name="fontVariant">normal</property>
+                                    <property name="color">black</property>
+                                    <property name="textLineThrough">none</property>
+                                    <property name="textOverline">none</property>
+                                    <property name="textUnderline">none</property>
+                                    <property name="borderBottomColor">black</property>
+                                    <property name="borderBottomStyle">none</property>
+                                    <property name="borderBottomWidth">medium</property>
+                                    <property name="borderLeftColor">black</property>
+                                    <property name="borderLeftStyle">none</property>
+                                    <property name="borderLeftWidth">medium</property>
+                                    <property name="borderRightColor">black</property>
+                                    <property name="borderRightStyle">none</property>
+                                    <property name="borderRightWidth">medium</property>
+                                    <property name="borderTopColor">black</property>
+                                    <property name="borderTopStyle">none</property>
+                                    <property name="borderTopWidth">medium</property>
+                                    <property name="marginTop">0pt</property>
+                                    <property name="marginLeft">0pt</property>
+                                    <property name="marginBottom">0pt</property>
+                                    <property name="marginRight">0pt</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1pt</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <property name="paddingRight">1pt</property>
+                                    <property name="textAlign">center</property>
+                                    <property name="letterSpacing">normal</property>
+                                    <property name="lineHeight">115%</property>
+                                    <property name="orphans">2</property>
+                                    <property name="textTransform">none</property>
+                                    <property name="verticalAlign">bottom</property>
+                                    <property name="whiteSpace">normal</property>
+                                    <property name="widows">2</property>
+                                    <property name="wordSpacing">normal</property>
+                                    <property name="display">block</property>
+                                    <property name="pageBreakAfter">auto</property>
+                                    <property name="pageBreakBefore">auto</property>
+                                    <property name="pageBreakInside">auto</property>
+                                    <property name="showIfBlank">false</property>
+                                    <property name="canShrink">false</property>
+                                    <property name="dataSet">Data Set Hiber</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_POST</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_ADDRESS</property>
+                                            <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_INDEX</property>
+                                            <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_PHONES</property>
+                                            <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_FAX</property>
+                                            <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_MAIL</property>
+                                            <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_NUM</property>
+                                            <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_DATE</property>
+                                            <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_NUM</property>
+                                            <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_DATE</property>
+                                            <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BODY</property>
+                                            <expression name="expression">dataSetRow["BODY"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">HEAD</property>
+                                            <expression name="expression">dataSetRow["HEAD"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REFERENCE</property>
+                                            <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BACKSIDE</property>
+                                            <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_LAST_NAME</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_PHONE</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">REF_NUM</property>
+                                </data>
+                            </cell>
+                            <cell id="125">
+                                <label id="80">
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <property name="textAlign">center</property>
+                                    <text-property name="text">от</text-property>
+                                </label>
+                            </cell>
+                            <cell id="126">
+                                <property name="borderBottomColor">#000000</property>
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">1px</property>
+                                <data id="354">
+                                    <property name="backgroundAttachment">scroll</property>
+                                    <property name="backgroundPositionX">0%</property>
+                                    <property name="backgroundPositionY">0%</property>
+                                    <property name="backgroundRepeat">repeat</property>
+                                    <property name="fontFamily">"Roman Unicode"</property>
+                                    <property name="fontSize">11pt</property>
+                                    <property name="fontWeight">normal</property>
+                                    <property name="fontStyle">normal</property>
+                                    <property name="fontVariant">normal</property>
+                                    <property name="color">black</property>
+                                    <property name="textLineThrough">none</property>
+                                    <property name="textOverline">none</property>
+                                    <property name="textUnderline">none</property>
+                                    <property name="borderBottomColor">black</property>
+                                    <property name="borderBottomStyle">none</property>
+                                    <property name="borderBottomWidth">medium</property>
+                                    <property name="borderLeftColor">black</property>
+                                    <property name="borderLeftStyle">none</property>
+                                    <property name="borderLeftWidth">medium</property>
+                                    <property name="borderRightColor">black</property>
+                                    <property name="borderRightStyle">none</property>
+                                    <property name="borderRightWidth">medium</property>
+                                    <property name="borderTopColor">black</property>
+                                    <property name="borderTopStyle">none</property>
+                                    <property name="borderTopWidth">medium</property>
+                                    <property name="marginTop">0pt</property>
+                                    <property name="marginLeft">0pt</property>
+                                    <property name="marginBottom">0pt</property>
+                                    <property name="marginRight">0pt</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1pt</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <property name="paddingRight">1pt</property>
+                                    <structure name="dateTimeFormat">
+                                        <property name="category">Medium Date</property>
+                                        <property name="pattern">Medium Date</property>
+                                    </structure>
+                                    <property name="textAlign">center</property>
+                                    <property name="letterSpacing">normal</property>
+                                    <property name="lineHeight">115%</property>
+                                    <property name="orphans">2</property>
+                                    <property name="textTransform">none</property>
+                                    <property name="verticalAlign">bottom</property>
+                                    <property name="whiteSpace">normal</property>
+                                    <property name="widows">2</property>
+                                    <property name="wordSpacing">normal</property>
+                                    <property name="display">block</property>
+                                    <property name="pageBreakAfter">auto</property>
+                                    <property name="pageBreakBefore">auto</property>
+                                    <property name="pageBreakInside">auto</property>
+                                    <property name="showIfBlank">false</property>
+                                    <property name="canShrink">false</property>
+                                    <property name="dataSet">Data Set Hiber</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_POST</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_SIGNATURE_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_ADDRESS</property>
+                                            <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_INDEX</property>
+                                            <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_PHONES</property>
+                                            <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_FAX</property>
+                                            <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_MAIL</property>
+                                            <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">OGV_NAME</property>
+                                            <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_NUM</property>
+                                            <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">DOC_DATE</property>
+                                            <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_NUM</property>
+                                            <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REF_DATE</property>
+                                            <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                            <property name="dataType">date</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BODY</property>
+                                            <expression name="expression">dataSetRow["BODY"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">HEAD</property>
+                                            <expression name="expression">dataSetRow["HEAD"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">REFERENCE</property>
+                                            <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">BACKSIDE</property>
+                                            <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_LAST_NAME</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">EXECUTOR_PHONE</property>
+                                            <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">REF_DATE</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="289">
+                            <cell id="290">
+                                <property name="colSpan">5</property>
+                                <property name="rowSpan">1</property>
+                                <label id="299">
+                                    <property name="fontSize">10pt</property>
+                                    <text-property name="text"> </text-property>
+                                </label>
+                            </cell>
+                        </row>
+                    </grid>
+                </cell>
+            </row>
+        </grid>
+        <grid id="148">
+            <property name="height">1.3541666666666667in</property>
+            <property name="width">6.6875in</property>
+            <column id="149">
+                <property name="width">6.6875in</property>
+            </column>
+            <row id="305">
+                <cell id="306">
+                    <label id="307">
+                        <text-property name="text"> </text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="152">
+                <cell id="153">
+                    <text id="269">
+                        <property name="backgroundAttachment">scroll</property>
+                        <property name="backgroundPositionX">0%</property>
+                        <property name="backgroundPositionY">0%</property>
+                        <property name="backgroundRepeat">repeat</property>
+                        <property name="fontFamily">"Roman Unicode"</property>
+                        <property name="fontSize">14pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="fontStyle">normal</property>
+                        <property name="fontVariant">normal</property>
+                        <property name="color">black</property>
+                        <property name="textLineThrough">none</property>
+                        <property name="textOverline">none</property>
+                        <property name="textUnderline">none</property>
+                        <property name="borderBottomColor">black</property>
+                        <property name="borderBottomStyle">none</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderLeftColor">black</property>
+                        <property name="borderLeftStyle">none</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightColor">black</property>
+                        <property name="borderRightStyle">none</property>
+                        <property name="borderRightWidth">medium</property>
+                        <property name="borderTopColor">black</property>
+                        <property name="borderTopStyle">none</property>
+                        <property name="borderTopWidth">medium</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="marginLeft">0pt</property>
+                        <property name="marginBottom">0pt</property>
+                        <property name="marginRight">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingRight">1pt</property>
+                        <property name="textAlign">center</property>
+                        <property name="textIndent">0cm</property>
+                        <property name="letterSpacing">normal</property>
+                        <property name="lineHeight">115%</property>
+                        <property name="orphans">2</property>
+                        <property name="textTransform">none</property>
+                        <property name="whiteSpace">normal</property>
+                        <property name="widows">2</property>
+                        <property name="wordSpacing">normal</property>
+                        <property name="display">block</property>
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="pageBreakInside">auto</property>
+                        <property name="showIfBlank">false</property>
+                        <property name="canShrink">false</property>
+                        <property name="dataSet">Data Set Hiber</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_POST</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_ADDRESS</property>
+                                <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_INDEX</property>
+                                <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_PHONES</property>
+                                <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_FAX</property>
+                                <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_MAIL</property>
+                                <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_NUM</property>
+                                <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_DATE</property>
+                                <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_NUM</property>
+                                <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_DATE</property>
+                                <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BODY</property>
+                                <expression name="expression">dataSetRow["BODY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HEAD</property>
+                                <expression name="expression">dataSetRow["HEAD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REFERENCE</property>
+                                <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BACKSIDE</property>
+                                <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_LAST_NAME</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_PHONE</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<VALUE-OF format="HTML">row["REFERENCE"]</VALUE-OF>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="154">
+                <cell id="155">
+                    <property name="textIndent">1.25cm</property>
+                    <property name="orphans">2</property>
+                    <label id="343">
+                        <text-property name="text">   </text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="156">
+                <cell id="157">
+                    <text id="252">
+                        <property name="fontFamily">"Roman Unicode"</property>
+                        <property name="fontSize">12pt</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="textAlign">justify</property>
+                        <property name="lineHeight">115%</property>
+                        <property name="dataSet">Data Set Hiber</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_POST</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_ADDRESS</property>
+                                <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_INDEX</property>
+                                <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_PHONES</property>
+                                <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_FAX</property>
+                                <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_MAIL</property>
+                                <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_NUM</property>
+                                <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_DATE</property>
+                                <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_NUM</property>
+                                <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_DATE</property>
+                                <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BODY</property>
+                                <expression name="expression">dataSetRow["BODY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HEAD</property>
+                                <expression name="expression">dataSetRow["HEAD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REFERENCE</property>
+                                <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BACKSIDE</property>
+                                <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_LAST_NAME</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_PHONE</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<VALUE-OF format="HTML">row["BODY"]</VALUE-OF>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="344">
+                <cell id="345">
+                    <label id="346">
+                        <text-property name="text">   </text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid id="183">
+            <property name="fontSize">10pt</property>
+            <property name="marginRight">0pt</property>
+            <property name="height">0.8020833333333334in</property>
+            <property name="width">6.708333333333333in</property>
+            <column id="184">
+                <property name="width">3.15625in</property>
+            </column>
+            <column id="185">
+                <property name="width">0.20833333333333334in</property>
+            </column>
+            <column id="186">
+                <property name="width">0.8958333333333334in</property>
+            </column>
+            <column id="187">
+                <property name="width">0.20833333333333334in</property>
+            </column>
+            <column id="188">
+                <property name="width">2.2083333333333335in</property>
+            </column>
+            <row id="189">
+                <cell id="190">
+                    <label id="209">
+                        <text-property name="text"> </text-property>
+                    </label>
+                </cell>
+                <cell id="191"/>
+                <cell id="192"/>
+                <cell id="193"/>
+                <cell id="194"/>
+            </row>
+            <row id="195">
+                <cell id="196">
+                    <property name="verticalAlign">bottom</property>
+                    <data id="357">
+                        <property name="backgroundAttachment">scroll</property>
+                        <property name="backgroundPositionX">0%</property>
+                        <property name="backgroundPositionY">0%</property>
+                        <property name="backgroundRepeat">repeat</property>
+                        <property name="fontFamily">"Roman Unicode"</property>
+                        <property name="fontSize">12pt</property>
+                        <property name="fontWeight">normal</property>
+                        <property name="fontStyle">normal</property>
+                        <property name="fontVariant">normal</property>
+                        <property name="color">black</property>
+                        <property name="textLineThrough">none</property>
+                        <property name="textOverline">none</property>
+                        <property name="textUnderline">none</property>
+                        <property name="borderBottomColor">black</property>
+                        <property name="borderBottomStyle">none</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderLeftColor">black</property>
+                        <property name="borderLeftStyle">none</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightColor">black</property>
+                        <property name="borderRightStyle">none</property>
+                        <property name="borderRightWidth">medium</property>
+                        <property name="borderTopColor">black</property>
+                        <property name="borderTopStyle">none</property>
+                        <property name="borderTopWidth">medium</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="marginLeft">0pt</property>
+                        <property name="marginBottom">0pt</property>
+                        <property name="marginRight">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingRight">1pt</property>
+                        <property name="letterSpacing">normal</property>
+                        <property name="lineHeight">115%</property>
+                        <property name="orphans">2</property>
+                        <property name="textTransform">none</property>
+                        <property name="verticalAlign">bottom</property>
+                        <property name="whiteSpace">normal</property>
+                        <property name="widows">2</property>
+                        <property name="wordSpacing">normal</property>
+                        <property name="display">block</property>
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="pageBreakInside">auto</property>
+                        <property name="showIfBlank">false</property>
+                        <property name="canShrink">false</property>
+                        <property name="dataSet">Data Set Hiber</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_POST</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_ADDRESS</property>
+                                <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_INDEX</property>
+                                <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_PHONES</property>
+                                <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_FAX</property>
+                                <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_MAIL</property>
+                                <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_NUM</property>
+                                <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_DATE</property>
+                                <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_NUM</property>
+                                <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_DATE</property>
+                                <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BODY</property>
+                                <expression name="expression">dataSetRow["BODY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HEAD</property>
+                                <expression name="expression">dataSetRow["HEAD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REFERENCE</property>
+                                <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BACKSIDE</property>
+                                <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_LAST_NAME</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_PHONE</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">OGV_SIGNATURE_POST</property>
+                    </data>
+                </cell>
+                <cell id="197"/>
+                <cell id="198"/>
+                <cell id="199"/>
+                <cell id="200">
+                    <property name="verticalAlign">bottom</property>
+                    <data id="359">
+                        <property name="backgroundAttachment">scroll</property>
+                        <property name="backgroundPositionX">0%</property>
+                        <property name="backgroundPositionY">0%</property>
+                        <property name="backgroundRepeat">repeat</property>
+                        <property name="fontFamily">"Roman Unicode"</property>
+                        <property name="fontSize">12pt</property>
+                        <property name="fontWeight">normal</property>
+                        <property name="fontStyle">normal</property>
+                        <property name="fontVariant">normal</property>
+                        <property name="color">black</property>
+                        <property name="textLineThrough">none</property>
+                        <property name="textOverline">none</property>
+                        <property name="textUnderline">none</property>
+                        <property name="borderBottomColor">black</property>
+                        <property name="borderBottomStyle">none</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderLeftColor">black</property>
+                        <property name="borderLeftStyle">none</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightColor">black</property>
+                        <property name="borderRightStyle">none</property>
+                        <property name="borderRightWidth">medium</property>
+                        <property name="borderTopColor">black</property>
+                        <property name="borderTopStyle">none</property>
+                        <property name="borderTopWidth">medium</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="marginLeft">0pt</property>
+                        <property name="marginBottom">0pt</property>
+                        <property name="marginRight">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingRight">1pt</property>
+                        <property name="textAlign">center</property>
+                        <property name="letterSpacing">normal</property>
+                        <property name="lineHeight">115%</property>
+                        <property name="orphans">2</property>
+                        <property name="textTransform">none</property>
+                        <property name="verticalAlign">bottom</property>
+                        <property name="whiteSpace">normal</property>
+                        <property name="widows">2</property>
+                        <property name="wordSpacing">normal</property>
+                        <property name="display">block</property>
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="pageBreakInside">auto</property>
+                        <property name="showIfBlank">false</property>
+                        <property name="canShrink">false</property>
+                        <property name="dataSet">Data Set Hiber</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_POST</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_POST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_SIGNATURE_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_SIGNATURE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_ADDRESS</property>
+                                <expression name="expression">dataSetRow["OGV_ADDRESS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_INDEX</property>
+                                <expression name="expression">dataSetRow["OGV_INDEX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_PHONES</property>
+                                <expression name="expression">dataSetRow["OGV_PHONES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_FAX</property>
+                                <expression name="expression">dataSetRow["OGV_FAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_MAIL</property>
+                                <expression name="expression">dataSetRow["OGV_MAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OGV_NAME</property>
+                                <expression name="expression">dataSetRow["OGV_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_NUM</property>
+                                <expression name="expression">dataSetRow["DOC_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DOC_DATE</property>
+                                <expression name="expression">dataSetRow["DOC_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_NUM</property>
+                                <expression name="expression">dataSetRow["REF_NUM"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REF_DATE</property>
+                                <expression name="expression">dataSetRow["REF_DATE"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BODY</property>
+                                <expression name="expression">dataSetRow["BODY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HEAD</property>
+                                <expression name="expression">dataSetRow["HEAD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REFERENCE</property>
+                                <expression name="expression">dataSetRow["REFERENCE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BACKSIDE</property>
+                                <expression name="expression">dataSetRow["BACKSIDE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_LAST_NAME</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_LAST_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXECUTOR_PHONE</property>
+                                <expression name="expression">dataSetRow["EXECUTOR_PHONE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">OGV_SIGNATURE_NAME</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="201">
+                <cell id="202"/>
+                <cell id="203"/>
+                <cell id="204"/>
+                <cell id="205"/>
+                <cell id="206"/>
+            </row>
+        </grid>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">gerb_korkino.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwg
+                JC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIy
+                MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wgARCACrAIkDASIAAhEBAxEB/8QA
+                GwAAAQUBAQAAAAAAAAAAAAAABQACAwQGAQf/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAA
+                AAEA9Xig6/tTzhHBBnmHrBmFoKoJ7JAP41D+xomfXea7ceeenlJ88JBhPQMkaPlOAJWacYWBPeZgJ6ZZ
+                PFV65TPN2GBIcvUJQ5BDEXG1+Gmtj6pezNFpJ1lEJR5xBIe1DnMeX5h+uM4RDlihOE1JYy3dAA7F1oCK
+                XoCfNWzBnJ27MxEliEZLCwNjy+dCavAjSwzFiNrIxCTg4HXXATkhUAOcx5xj+GgzpaEJAr3QwUETFd1+
+                YeBlrD87pAQfzJ4KMkjeSa7G2Rh3MGgLqhQ4snOUwpzMvDFezTK5AIfAevw945V444x7BJI0FcOVBVs2
+                wjjimA8xthbyreCSR17HHY7GpMcrVUSSF3khYh1eYKqSEkhKTXmNfYhC9b1fCGPWpRllqUZZakUNGq2V
+                FqOmWWpRliZaQzm7M6ASSEkhJIUciPK/Ra5cSSEkhJISSP/EAC0QAAICAgEDBAEDAwUAAAAAAAIDAQQA
+                BRESExQQFRYgMQYhMiIkMCU0NUBB/9oACAEBAAEFAgEZDoHOgc7Odsc7Y4c8H1TnM5znM51TnVOc51Tn
+                XOdc51YqJkDrktdUeqxx/XeRIsz2qyxM6VvLdU0HFrbUONRrP70XEqWrjsprxXrcRh14fVMCA6f+z/8A
+                f25CYhf7RL9ZUJTdLOM19tU+kKOQxU8QBi1UMA1zbSuEuBqb3EnVI+zK2GkUweMGSNZsNvQ4SguiZkpw
+                q4FjX6+kN7YMuzgfwXYaoFWiVrr7e86i3tlYZ3kVFdVXp7U2NnXr43ekWe8u5Dd2hyd1YIZ3Vvht6y6e
+                efUP4YRq7NgxMpMIU0w7de0tFSwyy9JDrBz/AEmc8Ok7LNCxV+8WeiIsTIeXg8zT8vEtN7WWQ10MabjX
+                VsOw9bcDJiRmrsHVsdVTaV6CsiXHpEBJqRT9tYtct2hQr059togs3snxdbnl7G5MztE4O070WqELUh51
+                nX0raoenqrrpe3OhMHhfkXEKdUHc2NhnesUEeTdvP8i4E+366tWSqtM3mrWF3OFbEqtg6Fm/VitY1RwT
+                GBK2C4hT6F/LNTPQ3NT/AEmIyRbIe9tpiD2T7RKt+dDLV4CajY/3FZs+RpFH2m7gYjY+pfnNRwVjNTwR
+                LOVsvT2d5Ic3KttcXbTF2Ldgo62R06FH7aXN3x5fqX54njXN7V+6rs3KL/HuX6/j3Cj3DW1nhbU4RIlw
+                XU84dmzYHcsx2NSoO47bnBbHpnp9IHrYign25q4UV2PLo4rjZ01m2pYmKewwa+2rwdS+7DsoqLoVYcdy
+                zNqzqgGG8951elX9vcoVHhfkHyFfNfZFDbtMqjgMll362wF2rsqzqcnIW95BroRFy734WsmsvGFZGBYk
+                K3oX59altZLt0GVvRVlyJjcXOD2tw4IpKUpZYZJr1SZ5mfoX5+lW86rnGut5OneUTrbkSGounnhVEY3Y
+                8K+xfn7+VYw2sZ949OiTNWrZFJyCQX0EeqUaw/Ackkl9BHrKvrD8BqCQWbSuVe+u1K6X2VZ7dT7Ks9uo
+                pZOZ8dHLlJV1bP09agvj93Pj93Pj93Pj93Pj93LNGzU9E122D9huznx+7nx+7nx+7nx+7g/p+5M6/Vqp
+                R/gIRMbur7eyq1l1E/8AQsf8l/h//8QAFBEBAAAAAAAAAAAAAAAAAAAAYP/aAAgBAwEBPwFH/8QAFBEB
+                AAAAAAAAAAAAAAAAAAAAYP/aAAgBAgEBPwFH/8QAOxAAAQMBBAgBCgUEAwAAAAAAAQACAxEEEiExEBMi
+                MkFRYXFSICMwM0JDgZGSoRQ0YoLBBSSx8EBEov/aAAgBAQAGPwIYLILIL1f2W6FuhHv6QUBPZB9QQWh2
+                HVNyoDU1TcTkU6UYtJp9tGvbQgndrimecbjvdEyNhD73HKi1bY75pWrckWPaQ4Zj0DbtMVIX7Ru0QaG4
+                +11W4fknh2FcW9EWuzCi7I6L1cOaP6vurgju9W5rzMnwcqOgf8MdJeGG6MzTQ0oPGIIV5rgWqjpW1CNw
+                1u4Jx9sUPPAj/fmogBW7Q/tKeWPvjWlwMe1hWtE7fuyCta0p06KG/Dg05B2AUpNWyZCu00DmMlTeoOe8
+                eJW0wrALzkbf3Cq3Y73ha3FU3Yxk2ugJzWPIDs04Ctb9AmyD2mAqSpo25iopHet3T1oonXnDDJVFFtEl
+                /FoQuwAdzVA3G5JtbrqdM1QtZWmdFRpa3sEb8z6HMVw+XkDQyJt6laufT+ENWDda26KrVsrji5xH2Ucb
+                K0bUkniSotaaA4DCqIe5lkiJ3nnaI4LantEruJaKf5WVrHai8xbLp8Mo/lecZs+JuXl0u/dF+r2Rmarc
+                +6daXUawGgx3j0W590I446uPVaqM620D2jlH2RfI4ud1VY4ZHDmGrGzv/aK/4VCKFXa34jmx2SNosQoR
+                6yLl20vkA2WZ6TfJA6CqmpKTHeF59Mlcgc99TQVbRRWNh2Ym499AI/MzjPwNQYwXnlUui0WnjXdath0l
+                OUYoFecbQB8VctsTZm+ICjghaLO/WWc8eLe6EsZoQm26zijH4Pb4ShfJp0U1Hu1ZpfJGS8y57h+oaCnx
+                8HkE/BRA9/kpJPE6qjjO7Wruye/hWjey1n/YtGR8LV+LteIPq4/Eg980djipstyX9t/UY5iPZvVTopoh
+                Z7bw4Xk6OQbFbsjFRmMTheYeifZZPVzimPNOY7NpoVJGMn0r8NJ0Wh+FWQOI76LRJxZCSEGjM4BNs4Gy
+                27G3spZHN81Y2bLevBCNjGyWo0Dnv4HkEbNao2711sjcHMKkc78zZSKvA3m81ZrbxeLr+4UbzvQPufD/
+                AGia8ZtNU4j2gD5B0Sx1xkhc0aLRHxfCQE14zaaps2F0lrgeit9mydM0PZ3CGuszNa5+0/ka9UYI7KzW
+                Xrt/H+F/Upa7IjEfxUNfamJCtR4FzdDOerFfJqoXdafNSs5OUch3ePZPb7Jxb2TS319nFCOYUbHSaq1x
+                YRSc+irbrDJfGcsWRTjY7I6Mvznm4dlHYLLti9V0niPNMs8e5A278eKs8HtyO1pTGeIgJ4HsgBF1MBpp
+                eDepUoNpYb5FXjJtFQSMk6tUNsGLm+bl76BCSPxMW4fEOSvNqyRpV68LNPxB3SvNvLm8KPqFW1ziOPiX
+                Pw+SMVjqXuwdMf4Rlmws8eLjz6J0vDgOQT7S/cgbXHnwRc94BcalxUw/EtIdS88DdoqMmbIOY0FSw8JC
+                D8tBZKKwyi68K7mx2LXcwg5po4cVdtXmrRwlGR7qobrGeJmKwL2V+CrckkJ6VWst8gjb4AdooRxt1cDc
+                mBBjBVxyCbYYjWhvSuHE6JYeD6eX+FteMPB3FivjbhO68aPNSub2KxeHd2hU1t0fpFFVxJPMoMjbecrk
+                RD7W7edwZ0VTn6KjSCw5sdkVWpssvzaqwPjnb+lyp+HevU3R+o0VbTa2u/RFijDZI9RHxPtH0/r5frK2
+                3ud3PoSBT4mimDrutcRdxV192vRwPk0FPiaKYG7ffS7irrrtejq+TTD4mimDi29JS7irri39rq6Ja7rj
+                eapoPHQ+XNBjt0p5c8OO3SibGwVc40C/Mf8AlXZBiMnclsOjcPkvd/Uvd/Uvd/Uvd/Uvd/UvPRkDnw0X
+                YYy89FkwfuXu/qXu/qXu/qXu/qWJjA7q9vzeLl6EtcAQeBTIIt2XFvRCKNtBz5/8Gx9n/wCB6L//xAAp
+                EAACAQIFBAICAwEAAAAAAAABEQAhMRBBUWFxgZGh8CCxwdEw4fFA/9oACAEBAAE/ISARJOBasl1YkQgI
+                yLA3o+uFuTcj6zcm7BqRoAzCsDnEOqCyV+QYIOeBcfEJYlbfAVm9ALLvAAAwuLx1g6YJIMWLvuJ2wAHM
+                vKFBb5DB2woqRAsxInIG48QVIjcL6pWIt0igl0lloFZHrhpSHYqNgdRH+AOsK2AlXo/QgoAbf7kumlmh
+                2gTUigv44m5dtDrKbxW3FYWQNocuA2hsq6h17QeDAuzKUMWYIRPzA1LhFmwcMEPgQD0Kt1JURuBrzhKL
+                /wCoIR1925FKv4iQ+gmy2N3aB/NKQ6jHoAab8CHv02Vffc6QYj8x2TQwyFvXDOuOTe3bI9I2mZmu+uPs
+                z3D2kqDAF0z/ABBWZ9pLnkm0093gi7NSszeRCdC+uY5B1XIF43AAQLuznKriDYkIRWp1hCjcXVBlGTOe
+                sN53afMYqqhXsUhMmTXWA40XrEyQ8qPdE3hm6m5fmK6xUAVBYniDGXSUb4wHV0hLUUg5kyh6tywwQTCI
+                ze2Rgq2Za3xidZmGoB42gZF2+sOuyVmr0erDO/u0GwZlapswPv4h8IzKDASCmF3iltwjkoGREA0qCrIQ
+                jqpLffsxbQQ+jti3Ad+8JW9GNZC1OvmAGrcGmcqDDPqd/d8AQYntX9ntoayTQawrVqHd6b/1lL7WVAbU
+                gpEVZJCAGWPQP1P8q1EOkPvtGG16/wB6wTQM5FmVuyUMTyiVqFOBSANeYH7gbcBNexzfcDiKJ9AqYc3p
+                QyC0MIAABGv6fiAzaQNCX6gbHQmWJZpXHmEViqQCFuI3WbarEcjrTQt4sVgy+8QHyMFuIhJ5SBw8jBah
+                ryLUYEFbjwnWVGpjXgAAetY5QIu1HroIfbYIwTtiso0KRrFC4vs0amW9bxQA9teYQOdb3jPwhWZEVtLC
+                3jcBh5WAl6chU/vAG9RaweR6TVxuoaA/BhzhaTWp9wohVISyXKysMYmhrtY1NYVzC95ijRyIIiASwoQP
+                UYWX/QwEYl3mAxAChc6TKwF/hKPoEQ2NRB2gK5obOhwzKXT/AIT4JIIzl1/UpLLODyJhDwxESGCJZ+4v
+                hHHFJWeZBGgiPpHhdoYSGUg3MsAXnaAgBOROjgwA20VliewExBr5nOaJXkRQyAzwPuowABI61PV7eWcC
+                IP0ZSp7eOu0o7NEjbgGDzdkF4M4u1M0WkZs0dIEVQqdoiH6zuWQmelsUzwIUPlUFz202IMn8xwpDp+xP
+                3hfGRLbxiFSIIXMYDKKiAQQUXF/pjBQbOJaBwWEWaBm4yiUf8ybmEnnoE/E9weAsCqbdlBHLvPwARvO8
+                fqB9TVYWT0wcqnUUD0gSblIfVQJAgnNdyMwocmQh6LqHWAiiElcnEYXefi11zSCdTCou+9JWmlxscuG9
+                hoHKzcVIUgtKbo9YMBlsWdzCWWfgMLvPzaLFIE0gIKfZ5/hXBtv7QNFIkKA33fiEtEK/QfEzwDsB5jJt
+                mjBCt941pbL6fEwBIE5gCE1bqOKVvvHVTsJ2iOogGCrMqEGsck1g21707fMmbJ6Ar+7fOvrHSFN4awgJ
+                vYzPhV4Mxlsv6TZhsw2YbMNmFVK7DUuuHHpVudIBgeMbJsw2YbMNmASNbS1iy5jsH8N8CwGDCXRVMuY6
+                RfovmLU/8Ifxaf/aAAwDAQACAAMAAAAQAUwsEEMMEcYc4gIU4I8QAoY4M8Mkc4A0Y80gcEoQ8YoMY8Q0
+                YsAc4o8c0IsAc4Q88o8cAs8sY888w884wc84wY4w4A8888U8888//8QAFBEBAAAAAAAAAAAAAAAAAAAA
+                YP/aAAgBAwEBPxBH/8QAFBEBAAAAAAAAAAAAAAAAAAAAYP/aAAgBAgEBPxBH/8QAKRABAAEDAwMEAwAD
+                AQAAAAAAAREAITFBUWFxgZEQobHRIMHwMOHxQP/aAAgBAQABPxAnxXXL6MxNlF63726qFS8MJzQNDnwC
+                Da9clLavRc1c6pdVc6uf5oAiXmo8SzXO1LhJEJiVscFPZ8QMzbtIYiZ2tU3AyAASBnWUDlKQFvpYvgQW
+                ddNKQMg6rF8BDDjUcejJ9lFxYREa5ninJcE05Q/10xovckomCCWDqTNKmhCl0kyiG2G9J5uLgvrmo/H9
+                qh2pGRQZCXv1tJF8zEgidDoWbaC0wwXVg2IFnQgVRuxLwVaydLi9pyX0qdBpcQBcQYbu8OmCw3AUSDJG
+                oCBElOzFChDFJ1xUEsXLEYOvHWhAGyAohff4Cjf6/RmrKmRnDY0iCoSS0RVLwEy4MG9LTIIAVJAZlIii
+                Qmnpf20KzBfDU81H/b/VO9xjqNGyAB6TCP7qNWBd2pwy+HvRYpVrrGYS3zisb2mSJ3QwhHGm1B42KXAB
+                GCIURlu3pBEmCCSEuwmYAutTJwNIIggsxhdopN2eAUQVosDOo6KZ0ukDCRYGQDEGYLxKKI0qmIkmJSqP
+                YrQlBDEEXsAwCMURuRIoALRLpN2cWiZFICk8PanVPcBEhviRfd3oUdRSgom2CXEwS5REQicAxEqCWc4l
+                qeDxTwWt+6HI0RnuTlFpIfBDziKAgiXy3zQ6pAnRyPJTzRdPEj5KwGrDWlo2Q7IDJ3seasYkVqd3CJlt
+                rjSZoLkRgDVE+XzQo6yWyJXgwmpQM8BG8nSICKE4tGgtbuPdoRmSopCECCFp20Kc0REi5bKLbUZhCMXk
+                1EPSmlvEjxEYLINNJpqhTKrrTY5q+1e2/dAQKCbsTBTwlJGZEgsWI1oHudRCyIwrhfBR1EYRAYEtpvm8
+                FqseywG8QFgARfXyTKROC6CAs9v1M5LwRQwLxm8zsN0a+k8Z1jK8y1HljqnPmaUi2LtJ0wFnYpg+1Kmn
+                nTox+P71JuoBawzbPtSX2MRShjWXhqG7+dKYLR0EhF41eu4qP8/VWFMGANVYsBrTJUKlTIYYUYidaNT2
+                Wc9tjgqA2g5PayDzQb0l8m6KWIEMZHpUFBEeeyE4m/G40fQVjNeDXIg2ttTUVL6Rm1U9xWVSbUBXjAFM
+                7PJrRb9PBEQIyxK8auzyiCKdQhcsu4aUzbCBEaV4Z7vRCLBhHW6OVo5uKiTeHKyvyq1bKsVUWQRdpOe4
+                LJl0Fam7jurRKZMaouzkjraog1CQs5EgtODuu0yF3V7HtMF8haVNymbHVbjSZIwX3cYHtkdgRSe0kcCh
+                71GnysiSQC6O01Fi2EWvJCyPINRzTG5L81e3axcbEeVRhLmE5B7lPKKTQi5Y9ooFZ05jGMYmIndKisCg
+                ILIR7vK0xJDAD1NZbP2ISqXU0Jy9nSOwyREPIMAQklojHBepTYbrl3e9qLmUty8NeU6usuKnrkOHCoYU
+                J4S2GkcMojfQ6nxDrSgCTgBL4dovNL2DSGEhxyVH2ZEluUDa77FJEVLu17x8+ioYCDAxT3Oi+kqwkmLk
+                UtU0GowHmpm3RlkDN9b/AAU2oJGDeASBcY6G1WP0jJwFg7J1m8pQFIofYAjkJiO5ZCwLkF7EFnVMELWo
+                gheMjUibTDOA3oQqKCSzBEaKHRp7AuZSpo1EVmyw/Xpn3qa94+aGGaxQqMypfAu3o75vom7F6hQvjiUJ
+                8VP02aLVLNJ8E0UZQmIsTF93A9iP2B92NkQlYjtT95QdWwsRMZlmIbNJzp5UsCdxgdqNAURm4sfJS1bH
+                LSI/rz6JGbJ3Mw9o9D81w171806lHAWliamxuZE2H2rJPBkBiDaEpm2xxjQXmJmOKI8L3JFSX4x2pGXI
+                DTdSgHh3JAuJADEJrI2M5m8o4NgkiWQMDAEN+lgZ9qBnpDmeOJ4u+TQq+XNl1b2MwSysJhCLODVQl1Rp
+                AYlVEIwJqu5ZmnNkuRgI96vDk26YC/MdqSjAMspQLzD4fTBz5o4UeSnOwL4KuxklrpgupUeYwtueHJMo
+                L4YL1AOEBKCJOs5+qi1Xk42IzzSMuw6qhiMiIRMhqb1AjFhW17rX9ey3WZijImdB6wNWepjRpZIy4ner
+                X/dhe1zmDBmyMjBnUM0uq6xpylBSvH6eGxuxqtAzOTLJJgy3jWQiiAeZAiqzN10KYLDSLgCLcnXKnkys
+                CwaTAJ6LXVUHUfmhpZgjiVkc/A9F9Y8ALbsl2y7Uxsc+PuNezhqQxJYVQMAIrHYDpbVxGQtUjni+MSzB
+                cxtHNMpq5P0KaAVFhYNm84aGi7gL6IIkDGJtOMmillkuHL/XzR/55Ff7WjO3QQLrOINdDUtT3lZuasHN
+                vFJXvU696/BYM4U8gc5Pna1EGNba4lDJk4dFqWpNlCkQYnBy5KmztyfYKnLmnhCEnZp+4ykjytY634g3
+                VsFSqy2A1HMmNUlwFOYRUSrqr6/vUO9e9fiq09tC6aPTvNIYuEki7Jtps0Bb1gGqEDJCAdBaUjKiwPJZ
+                oEDsOrZFmOg1NLyysy8A/wBhVv8ACmdBqnlzExlERVZV1/HDzXvXzQL2/IZIowjcoUBAYID3rsqCektL
+                P4xaayrzQ8DNbDndBU55RXCW2ehuWkuDkOCbiU7x+I9s184QUWzoLcRZJl7FJzxhIt1GTD1/FRWwCHVU
+                CpgmSUcwxEuYs1fY6NzGRkw8PpDx8KSth0WO1EPothPteHKnP5NaxgQyW45Iv+ZroNAhC3re5BQh0AFv
+                201ejX/BfdS/3Fq6ZNzFmzFSLmytRNpQwxy9a/l/Vfy/qv5f1X8v6r+X9U8PhFl9skJ2YePQBbeSwN1g
+                cqVNVJKWeDBFfy/qv5f1X8v6r+X9UzNTLbHYKNHIkAB0dDnL0tUcv+AAZQUDZGoaweiVdSUAu6c5GFct
+                1S6vxgsUEf8AgBmD/Fn/2Q==
+            </property>
+        </structure>
+    </list-property>
+</report>

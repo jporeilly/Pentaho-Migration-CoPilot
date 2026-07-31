@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.17" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.3.2.r232_v20090521 Build &lt;2.3.2.v20090601-0700></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <parameters>
+        <scalar-parameter name="processId" id="128">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="activityId" id="129">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="Data Source" id="7"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="Data Set" id="8">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">LICENCE_NUMBER</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">ACTIVITY_TYPE_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">OGV</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">AGENT_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">AGENT_SHORT_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">AGENT_ADDRESS</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">AGENT_PASSPORT</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">OBJECT_TYPE</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">OBJECT_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">OBJECT_ADDRESS</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">OGV_SIGNATURE_LICENSE_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">COUNTER</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">AGENT_INN</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">AGENT_OGRN</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">LICENCE_DATE</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">LICENCE_END_DATE</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">LICENCE_NUMBER</property>
+                </structure>
+                <structure>
+                    <property name="columnName">ACTIVITY_TYPE_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AGENT_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AGENT_SHORT_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AGENT_ADDRESS</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AGENT_PASSPORT</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OBJECT_TYPE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OBJECT_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OBJECT_ADDRESS</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OGV_SIGNATURE_LICENSE_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">COUNTER</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AGENT_INN</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AGENT_OGRN</property>
+                </structure>
+                <structure>
+                    <property name="columnName">LICENCE_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">LICENCE_END_DATE</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">LICENCE_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">ACTIVITY_TYPE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">OGV</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">AGENT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">AGENT_SHORT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">AGENT_ADDRESS</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">AGENT_PASSPORT</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">OBJECT_TYPE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">OBJECT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">OBJECT_ADDRESS</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">OGV_SIGNATURE_LICENSE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">COUNTER</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">AGENT_INN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">AGENT_OGRN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">LICENCE_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">LICENCE_END_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.Shark();
+
+result2 = clazz.getActivityVariableValue
+	(
+		"obj_extracts,licenseId",
+		params["processId"],
+		params["activityId"]
+	);	
+
+selectId = result2[0];
+licenceId = result2[1];
+/*
+result = clazz.getEntityManagerLod().createQuery
+(
+
+" select "+
+	" l.activityTypeId, "+
+	" (select ce.name from CardElement ce where ce.id=l.activityTypeId) as ACTIVITY_TYPE_NAME, "+
+	" (select a.name from Agent a where l.agent = a) as AGENT_NAME, "+
+	" (select a5.nameShort from Agent a5 where l1.agent = a5) as AGENT_SHORT_NAME, "+
+	" (select a1.address from Agent a1 where l1.agent = a1) as AGENT_ADDRESS, "+
+	" (select a2.inn from Agent a2 where l1.agent = a2) as AGENT_INN, "+
+	" (select a3.ogrn from Agent a3 where l1.agent = a3) as AGENT_OGRN, "+
+	" (select a4.passport from Agent a4 where l1.agent = a4) as AGENT_OGRN, "+
+	" l1.licenseNumber as LICENSE_NUMBER, "+
+	" l1.licenseDate as LICENSE_DATE,"+
+	" l1.licenseEndDate as LICENSE_END_DATE, "+
+	" lobj.kladr as OBJECT_ADDRESS, "+
+	" lobj.name as OBJECT_NAME, "+
+	" (select ce1.name from CardElement ce1 where ce1.id=lobj.objType) as OBJECT_TYPE, "+
+	" lobj.isHeavyAlc as IS_HEAVY_ALC, "+
+	" (select as1.value from AppSetting as1 where as1.id='ogv_name') as OGV, "+
+	" (select as2.value from AppSetting as2 where as2.id='ogv_signature_licence_name') as OGV_SIGNATURE_LICENCE_NAME, "+
+	" (month(l1.licenseDate)) as LICENSE_DATE_MONTH, "+
+	" (day(l1.licenseDate)) as LICENSE_DATE_DAY, "+
+	" (year(l1.licenseDate)) as LICENSE_DATE_YEAR, "+
+	" (month(l1.licenseEndDate)) as LICENSE_END_DATE_MONTH, "+
+	" (day(l1.licenseEndDate)) as LICENSE_END_DATE_DAY, "+
+	" (year(l1.licenseEndDate)) as LICENSE_END_DATE_YEAR "+
+" from "+
+	" ObjectSelectionItem oi, "+
+	" License l1 "+
+	" left outer join l1.licObjects lobj "+
+"where "+
+	" l1.id=:licence_id and "+
+	" oi.objectSelection.id = :selectId and "+
+	" oi.objectId = lobj.id "
+)
+.setParameter("selectId", selectId)
+.getResultList();
+*/
+
+result = clazz.getEntityManagerLod().createQuery
+(
+" select "+
+	" ce.name as ACTIVITY_TYPE_NAME, "+
+	" a.name as AGENT_NAME, "+
+	" a.nameShort as AGENT_SHORT_NAME, "+
+	" a.address as AGENT_ADDRESS, "+
+	" a.inn as AGENT_INN, "+
+	" a.ogrn as AGENT_OGRN, "+
+	" a.passport as AGENT_OGRN, "+
+	" l.licenseNumber as LICENSE_NUMBER, "+
+	" l.licenseDate as LICENSE_DATE,"+
+	" l.licenseEndDate as LICENSE_END_DATE, "+
+	" lobj.kladr as OBJECT_ADDRESS, "+
+	" lobj.name as OBJECT_NAME, "+
+	" ce1.name as OBJECT_TYPE, "+
+	" lobj.isHeavyAlc as IS_HEAVY_ALC, "+
+	" (select as1.value from AppSetting as1 where as1.id='ogv_name') as OGV, "+
+	" (select as2.value from AppSetting as2 where as2.id='ogv_signature_licence_name') as OGV_SIGNATURE_LICENCE_NAME "+
+//	" (month(l1.licenseDate)) as LICENSE_DATE_MONTH, "+
+//	" (day(l1.licenseDate)) as LICENSE_DATE_DAY, "+
+//	" (year(l1.licenseDate)) as LICENSE_DATE_YEAR, "+
+//	" (month(l1.licenseEndDate)) as LICENSE_END_DATE_MONTH, "+
+//	" (day(l1.licenseEndDate)) as LICENSE_END_DATE_DAY, "+
+//	" (year(l1.licenseEndDate)) as LICENSE_END_DATE_YEAR "+
+" from "+
+	" ObjectSelectionItem oi, "+
+	" License l left outer join l1.licObjects lobj, "+
+	" CardElement ce, "+
+	" Agent a, "+
+	" CardElement ce1 "+
+"where "+
+	" l.id=:licenceId and "+
+	" ce.id=l.activityTypeId and "+
+	" l.agent = a and "+
+	" ce1.id=lobj.objType and "+
+	" oi.objectSelection.id = :selectId and "+
+	" oi.objectId = lobj.id "
+)
+.setParameter("licenceId", licenceId)
+.setParameter("selectId", selectId)
+.getResultList();
+
+
+totalrows = result.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+
+var rowValue = result.get(currentrow);
+
+row["ACTIVITY_TYPE_NAME"] = rowValue[0];
+row["AGENT_NAME"] = rowValue[1];
+row["AGENT_SHORT_NAME"] = rowValue[2];
+row["AGENT_ADDRESS"] = rowValue[3];
+row["AGENT_INN"] = rowValue[4];
+row["AGENT_OGRN"] = rowValue[5];
+row["AGENT_PASSPORT"] = rowValue[6];
+row["LICENSE_NUMBER"] = rowValue[7];
+row["LICENSE_DATE"] = rowValue[8];
+row["LICENSE_END_DATE"] = rowValue[9];
+row["OBJECT_ADDRESS"] = rowValue[10];
+row["OBJECT_NAME"] = rowValue[11];
+row["OBJECT_TYPEIS_HEAVY_ALC"] = rowValue[12];
+row["OGV"] = rowValue[13];
+row["OGV_SIGNATURE_LICENCE_NAME"] = rowValue[14];
+
+/*
+LICENSE_DATE_MONTH
+LICENSE_END_DATE_MONTH
+LICENSE_DATE_DAY
+LICENSE_DATE_YEAR
+LICENSE_END_DATE_DAY
+LICENSE_END_DATE_YEAR
+*/
+
+currentrow = currentrow + 1;
+
+return(true);]]></method>
+            <method name="close"><![CDATA[clazz = null;
+result = null;
+result2 = null;]]></method>
+        </script-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="32">
+            <property name="fontFamily">"Roman Unicode"</property>
+            <property name="fontSize">12pt</property>
+            <property name="verticalAlign">middle</property>
+            <property name="height">100%</property>
+            <property name="width">100%</property>
+            <property name="dataSet">Data Set</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">LICENCE_NUMBER</property>
+                    <expression name="expression">dataSetRow["LICENCE_NUMBER"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ACTIVITY_TYPE_NAME</property>
+                    <expression name="expression">dataSetRow["ACTIVITY_TYPE_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OGV</property>
+                    <expression name="expression">dataSetRow["OGV"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AGENT_NAME</property>
+                    <expression name="expression">dataSetRow["AGENT_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AGENT_SHORT_NAME</property>
+                    <expression name="expression">dataSetRow["AGENT_SHORT_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AGENT_ADDRESS</property>
+                    <expression name="expression">dataSetRow["AGENT_ADDRESS"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AGENT_PASSPORT</property>
+                    <expression name="expression">dataSetRow["AGENT_PASSPORT"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OBJECT_TYPE</property>
+                    <expression name="expression">dataSetRow["OBJECT_TYPE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OBJECT_NAME</property>
+                    <expression name="expression">dataSetRow["OBJECT_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OBJECT_ADDRESS</property>
+                    <expression name="expression">dataSetRow["OBJECT_ADDRESS"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OGV_SIGNATURE_LICENSE_NAME</property>
+                    <expression name="expression">dataSetRow["OGV_SIGNATURE_LICENSE_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">COUNTER</property>
+                    <expression name="expression">dataSetRow["COUNTER"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">AGENT_INN</property>
+                    <expression name="expression">dataSetRow["AGENT_INN"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AGENT_OGRN</property>
+                    <expression name="expression">dataSetRow["AGENT_OGRN"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">LICENCE_DATE</property>
+                    <expression name="expression">dataSetRow["LICENCE_DATE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">LICENCE_END_DATE</property>
+                    <expression name="expression">dataSetRow["LICENCE_END_DATE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="33"/>
+            <column id="34"/>
+            <row id="35">
+                <cell id="36">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="38">
+                <cell id="39">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="41">
+                <cell id="42">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="44">
+                <cell id="45"/>
+                <cell id="46">
+                    <data id="53">
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">16pt</property>
+                        <property name="textAlign">right</property>
+                        <property name="resultSetColumn">COUNTER</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="47">
+                <cell id="48">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="50">
+                <cell id="51"/>
+                <cell id="52">
+                    <data id="54">
+                        <property name="textAlign">right</property>
+                        <property name="resultSetColumn">LICENCE_NUMBER</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="64">
+                <cell id="65">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="61">
+                <cell id="62">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="58">
+                <property name="height">100%</property>
+                <cell id="59">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="67">
+                        <property name="textAlign">center</property>
+                        <property name="resultSetColumn">ACTIVITY_TYPE_NAME</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="55">
+                <cell id="56">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="80">
+                <cell id="81">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="84">
+                        <property name="textAlign">center</property>
+                        <property name="resultSetColumn">OGV</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="77">
+                <cell id="78">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="74">
+                <cell id="75">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="85">
+                        <property name="textAlign">center</property>
+                        <property name="resultSetColumn">AGENT_NAME</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="71">
+                <cell id="72">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="86">
+                        <property name="textAlign">center</property>
+                        <property name="resultSetColumn">AGENT_SHORT_NAME</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="68">
+                <cell id="69">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="87">
+                        <property name="textAlign">center</property>
+                        <property name="resultSetColumn">AGENT_ADDRESS</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="103">
+                <cell id="104">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="106">
+                        <property name="textAlign">center</property>
+                        <property name="resultSetColumn">AGENT_PASSPORT</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="100">
+                <cell id="101"/>
+                <cell id="102">
+                    <text id="107">
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<VALUE-OF>row["AGENT_INN"]</VALUE-OF> ОГРН: <VALUE-OF>row["AGENT_OGRN"]</VALUE-OF>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="97">
+                <cell id="98">
+                    <label id="108">
+                        <text-property name="text">Место нахождения обособленного подразделения
+(территориально-обособленного объекта):</text-property>
+                    </label>
+                </cell>
+                <cell id="99"/>
+            </row>
+            <row id="94">
+                <cell id="95">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <text id="109">
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<VALUE-OF>row["OBJECT_TYPE"]</VALUE-OF> <VALUE-OF>row["OBJECT_NAME"]</VALUE-OF>, <VALUE-OF>row["OBJECT_ADDRESS"]</VALUE-OF> срок действия с <VALUE-OF>row["LICENCE_DATE"]</VALUE-OF> до <VALUE-OF>row["LICENCE_END_DATE"]</VALUE-OF>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="91">
+                <cell id="92">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="88">
+                <cell id="89">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="119">
+                <cell id="120">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="116">
+                <cell id="117">
+                    <property name="colSpan">1</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+                <cell id="123">
+                    <text id="124">
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[с <VALUE-OF>row["LICENCE_DATE"]</VALUE-OF> по <VALUE-OF>row["LICENCE_END_DATE"]</VALUE-OF>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="113">
+                <cell id="114">
+                    <property name="colSpan">1</property>
+                    <property name="rowSpan">2</property>
+                    <label id="126">
+                        <text-property name="text">в отношении указанного обособленного подразделения (территориально обособленного объекта)</text-property>
+                    </label>
+                </cell>
+                <cell id="125"/>
+            </row>
+            <row id="110">
+                <cell id="112">
+                    <data id="127">
+                        <property name="resultSetColumn">OGV_SIGNATURE_LICENSE_NAME</property>
+                    </data>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

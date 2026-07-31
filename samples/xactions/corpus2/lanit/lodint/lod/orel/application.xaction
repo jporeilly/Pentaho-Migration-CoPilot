@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатная форма заявления</title>
+  <version>1</version>
+  <documentation> 
+    <author>Teslya Dmitrii</author>  
+    <description>Печатная форма заявления</description>  
+    <icon>PentahoReporting.png</icon>  
+    <help/>  
+    <result-type>report</result-type> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources>  
+      <default-value/> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources>  
+      <default-value/> 
+    </activityId>  
+    <outputDocType type="string"> 
+      <sources> 
+        <request>outputDocType</request> 
+      </sources>  
+      <default-value><![CDATA[application-get]]></default-value> 
+    </outputDocType>  
+    <outputDocTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputDocTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="id">application-get</entry>  
+          <entry key="desc">Заявление о выдаче лицензии</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="id">application-get-list</entry>  
+          <entry key="desc">Опись документов для получения лицензии</entry> 
+        </property-map> 
+      </default-value> 
+    </outputDocTypeList>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>application_metal_get.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition>  
+    <report-definition1> 
+      <solution-file> 
+        <location>application_alcohol_reget.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition1>  
+    <report-definition2> 
+      <solution-file> 
+        <location>application_alcohol_prolong.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition2>  
+    <report-definition3> 
+      <solution-file> 
+        <location>application_alcohol_freestop.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition3>  
+    <report-definition4> 
+      <solution-file> 
+        <location>application_alcohol_get.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition4>  
+    <report-definition5> 
+      <solution-file> 
+        <location>application_alcohol_get_list.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition5>  
+    <report-definition6> 
+      <solution-file> 
+        <location>application_metal_reget.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition6>  
+    <report-definition7> 
+      <solution-file> 
+        <location>application_metal_prolong.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition7>  
+    <report-definition8> 
+      <solution-file> 
+        <location>application_metal_freestop.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition8> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JS -список переменных для запроса к SHARK</action-type>
+      <action-inputs/>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <variableList type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList='agentId,activityType,govServiceType,licenseId,askDate,licObjPac';]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom - Получаем перемнные из SHARK</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <processId type="string"/>  
+        <activityId type="string"/>  
+        <variableList type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-inputs> 
+        <dsResult type="result-set"/> 
+      </action-inputs>
+      <action-outputs> 
+        <agentId type="string"/>  
+        <activityType type="string"/>  
+        <govServiceType type="string"/>  
+        <licenseId type="string"/>  
+        <NEW_LICENSE_END_DATE type="object"/>  
+        <lic_obj_pac_id type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[rcount=dsResult.getRowCount();
+if (rcount!=0){
+
+  agentId=dsResult.getValueAt(0,0);
+
+  activityType=dsResult.getValueAt(0,2);
+
+  govServiceType=dsResult.getValueAt(0,4);
+
+  if(dsResult.getValueAt(0,6) != null){
+    licenseId=dsResult.getValueAt(0,6);
+  }else{
+    licenseId=-1;
+  }
+
+  if(dsResult.getValueAt(0,8) != null){
+    NEW_LICENSE_END_DATE=dsResult.getValueAt(0,8);
+  }else{
+    NEW_LICENSE_END_DATE="0";
+  }
+
+  lic_obj_pac_id=dsResult.getValueAt(0,10);
+}]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript - Get current Date</action-type>
+      <action-outputs> 
+        <CURRENT_DATE_DAY type="string"/>  
+        <CURRENT_DATE_MONTH type="string"/>  
+        <CURRENT_DATE_YEAR type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[monthNames = new Array(12);
+monthNames[1] = "января";
+monthNames[2] = "февраля";
+monthNames[3] = "марта";
+monthNames[4] = "апреля";
+monthNames[5] = "мая";
+monthNames[6] = "июня";
+monthNames[7] = "июля";
+monthNames[8] = "августа";
+monthNames[9] = "сентября";
+monthNames[10] = "октября";
+monthNames[11] = "ноября";
+monthNames[12] = "декабря";
+
+currentDate = new Date();
+
+CURRENT_DATE_DAY = currentDate.getDate().toString();
+CURRENT_DATE_MONTH = monthNames[currentDate.getMonth() + 1];
+CURRENT_DATE_YEAR = (currentDate.getYear() + 1900).toString();]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript-Create EJBQL</action-type>
+      <action-inputs> 
+        <agentId type="string"/>  
+        <activityType type="string"/>  
+        <user type="string"/>  
+        <licenseId type="string"/>  
+        <lic_obj_pac_id type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+if(licenseId == -1){
+
+sql=" select "+
+" a1.name, "+
+" a1.address, "+
+" a1.inn, "+
+" a1.ogrn, "+
+" a1.taxRegDoc, "+
+" a1.govRegDoc, "+
+" a1.phone, "+
+" a1.postAddress, "+
+" a1.agentType, "+
+" a1.bossPosition, "+
+" a1.bossFio, "+
+" a1.bank, "+
+" a1.bankAccount, "+
+" u1.firstName, u1.lastName, u1.middleName, "+
+" (select MAX(r1.name) from u1.roles r1), "+
+" lo1.kladr, "+
+" '', "+
+" '', "+
+" '', "+
+" '', "+
+" '', "+
+" ce1.name "+
+" from "+
+" CardElement ce1, LicObject lo1, Agent a1, User u1 "+
+" where "+
+" ce1.id='{activityType}' and a1.id={agentId} and u1.login='{user}' and "+
+" lo1.licObjectPac.id={lic_obj_pac_id} ";
+
+}else{
+
+sql=" select "+
+" a1.name, "+
+" a1.address, "+
+" a1.inn, "+
+" a1.ogrn, "+
+" a1.taxRegDoc, "+
+" a1.govRegDoc, "+
+" a1.phone, "+
+" a1.postAddress, "+
+" a1.agentType, "+
+" a1.bossPosition, "+
+" a1.bossFio, "+
+" a1.bank, "+
+" a1.bankAccount, "+
+" u1.firstName, u1.lastName, u1.middleName, "+
+" (select MAX(r1.name) from u1.roles r1), "+
+" lo1.kladr, "+
+" l1.licenseSerie, "+
+" l1.licenseNumber, "+
+" l1.licenseDate, "+
+" l1.licenseEndDate, "+
+" l1.agentName, "+
+" ce1.name "+
+" from "+
+" CardElement ce1, LicObject lo1, Agent a1, User u1, License l1 "+
+" where "+
+" ce1.id='{activityType}' and a1.id={agentId} and u1.login='{user}' and "+
+" lo1.licObjectPac.id={lic_obj_pac_id} and l1.id={licenseId} ";
+
+}
+
+fields="AGENT_NAME,"+
+"AGENT_ADDRESS,"+
+"AGENT_INN,"+
+"AGENT_OGRN,"+
+"AGENT_TAX_REG_DOC,"+
+"AGENT_GOV_REG_DOC,"+
+"AGENT_PHONE,"+
+"AGENT_POST_ADDRESS,"+
+"AGENT_TYPE,"+
+"BOSS_POSITION,"+
+"BOSS_FIO,"+
+"AGENT_BANK_NAME,"+
+"AGENT_BANK_NUMBER,"+
+"R_FIRST_NAME,R_LAST_NAME,R_MIDDLE_NAME,"+
+"R_DOLZHNOST,"+
+"ACTIVITY_ADDRESS,"+
+"LICENSE_SERIE,"+
+"LICENSE_NUMBER,"+
+"LICENSE_DATE,"+
+"LICENSE_END_DATE,"+
+"LICENSE_GIVEN_TO,"+
+"ACTIVITY_TYPE";]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom-Выполняем запрос</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <actions> 
+      <condition><![CDATA[(activityType=="AT_Spirit")]]></condition>  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_Get")]]></condition>  
+        <action-definition> 
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Prompt/Secure Filter</action-type>
+          <action-inputs> 
+            <outputType type="string"/>  
+            <outputTypeList type="property-map-list"/>  
+            <user type="string"/> 
+          </action-inputs>
+          <component-definition> 
+            <selections> 
+              <outputType style="select"> 
+                <title>Формат вывода:</title>  
+                <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+              </outputType> 
+            </selections> 
+          </component-definition> 
+        </action-definition>
+  
+        <actions> 
+          <condition><![CDATA[(outputDocType=="application-get")]]></condition>  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report</action-type>
+            <action-inputs> 
+              <data type="result-set" mapping="dsResult"/>  
+              <output-type type="string" mapping="outputType"/>  
+              <NEW_LICENSE_END_DATE type="string"/>  
+              <CURRENT_DATE_DAY type="string"/>  
+              <CURRENT_DATE_MONTH type="string"/>  
+              <CURRENT_DATE_YEAR type="string"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource" mapping="report-definition4"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+  
+        <actions> 
+          <condition><![CDATA[(outputDocType=="application-get-list")]]></condition>  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report</action-type>
+            <action-inputs> 
+              <data type="result-set" mapping="dsResult"/>  
+              <output-type type="string" mapping="outputType"/>  
+              <NEW_LICENSE_END_DATE type="string"/>  
+              <CURRENT_DATE_DAY type="string"/>  
+              <CURRENT_DATE_MONTH type="string"/>  
+              <CURRENT_DATE_YEAR type="string"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource" mapping="report-definition5"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_ReGet")]]></condition>  
+        <action-definition> 
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Prompt/Secure Filter</action-type>
+          <action-inputs> 
+            <outputType type="string"/>  
+            <outputTypeList type="property-map-list"/> 
+          </action-inputs>
+          <component-definition> 
+            <selections> 
+              <outputType style="select"> 
+                <title>Формат вывода:</title>  
+                <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+              </outputType> 
+            </selections> 
+          </component-definition> 
+        </action-definition>
+  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>  
+            <NEW_LICENSE_END_DATE type="string"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition1"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_ProLong")]]></condition>  
+        <action-definition> 
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Prompt/Secure Filter</action-type>
+          <action-inputs> 
+            <outputType type="string"/>  
+            <outputTypeList type="property-map-list"/> 
+          </action-inputs>
+          <component-definition> 
+            <selections> 
+              <outputType style="select"> 
+                <title>Формат вывода:</title>  
+                <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+              </outputType> 
+            </selections> 
+          </component-definition> 
+        </action-definition>
+  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>  
+            <NEW_LICENSE_END_DATE type="object"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition2"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_FreeStop")]]></condition>  
+        <action-definition> 
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Prompt/Secure Filter</action-type>
+          <action-inputs> 
+            <outputType type="string"/>  
+            <outputTypeList type="property-map-list"/> 
+          </action-inputs>
+          <component-definition> 
+            <selections> 
+              <outputType style="select"> 
+                <title>Формат вывода:</title>  
+                <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+              </outputType> 
+            </selections> 
+          </component-definition> 
+        </action-definition>
+  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>  
+            <NEW_LICENSE_END_DATE type="string"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition3"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+ 
+    </actions>
+  
+    <actions> 
+      <condition><![CDATA[(activityType=="AT_NonferrousMetal" || activityType=="AT_FerrousMetal")]]></condition>  
+      <action-definition> 
+        <component-name>SecureFilterComponent</component-name>
+        <action-type>Promt params for Report</action-type>
+        <action-inputs> 
+          <outputTypeList type="property-map-list"/>  
+          <outputType type="string"/> 
+        </action-inputs>
+        <component-definition> 
+          <selections> 
+            <outputType style="select"> 
+              <title>Формат вывода:</title>  
+              <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+            </outputType> 
+          </selections>  
+          <target><![CDATA[Report_Window]]></target> 
+        </component-definition> 
+      </action-definition>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_Get")]]></condition>  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>  
+            <NEW_LICENSE_END_DATE type="string"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_ReGet")]]></condition>  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <data type="result-set" mapping="dsResult"/>  
+            <output-type type="string" mapping="outputType"/>  
+            <NEW_LICENSE_END_DATE type="string"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition6"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_ProLong")]]></condition>  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <data type="result-set" mapping="dsResult"/>  
+            <output-type type="string" mapping="outputType"/>  
+            <NEW_LICENSE_END_DATE type="string"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition7"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(govServiceType=="ST_FreeStop")]]></condition>  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>Pentaho Report</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>  
+            <NEW_LICENSE_END_DATE type="string"/>  
+            <CURRENT_DATE_DAY type="string"/>  
+            <CURRENT_DATE_MONTH type="string"/>  
+            <CURRENT_DATE_YEAR type="string"/> 
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition8"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+ 
+    </actions>
+ 
+  </actions> 
+</action-sequence>

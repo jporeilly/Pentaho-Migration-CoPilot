@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>MetaRepNewRunEJB</title>
+  <version>1</version>
+  <logging-level>INFO</logging-level>
+  <documentation> 
+    <author/>  
+    <description>Empty blank action sequence document</description>  
+    <help/>  
+    <result-type/>  
+    <icon/> 
+  </documentation>
+
+  <inputs/>
+
+  <outputs> 
+    <dsResult type="result-set"/> 
+  </outputs>
+
+  <resources> 
+    <newResource> 
+      <solution-file> 
+        <location>test.xml</location>  
+        <mime-type/> 
+      </solution-file> 
+    </newResource> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <date_begin type="string"/>
+        <date_end type="string"/>
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+method="getResult";
+date_begin='12345';
+date_end='6789';]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <date_begin type="string"/>
+        <date_end type="string"/>
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

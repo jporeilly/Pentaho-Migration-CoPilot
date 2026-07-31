@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатная форма описи документов</title>
+  <version>1</version>
+  <logging-level/>
+  <documentation> 
+    <author>Тесля Дмитрий и Третьякова Алёна</author>  
+    <description>Печатная форма описи документов</description>  
+    <help/>  
+    <result-type>report</result-type>  
+    <icon/> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>opis_doc.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputType type="string"/>  
+        <outputTypeList type="property-map-list"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter>  
+            <title>Формат вывода:</title> 
+          </outputType> 
+        </selections> 
+      </component-definition> 
+    </action-definition>
+  
+    <actions> 
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - по DataSet формируем список переменных для запроса к SHARK</action-type>
+        <action-inputs/>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList="Komplekt_Doc,agentId,FIO_man,amount_pages";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Получаем перемнные из SHARK</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/>  
+          <processId type="string"/>  
+          <activityId type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - извлекаем данные</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <application_id type="string"/>  
+          <person_id type="string"/>  
+          <FIO_AGENT type="string"/>  
+          <COUNT_LIST type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+application_id=dsResult.getValueAt(0,0);
+person_id=dsResult.getValueAt(0,2);
+FIO_AGENT=dsResult.getValueAt(0,4);
+COUNT_LIST=dsResult.getValueAt(0,6);
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Get current Date</action-type>
+        <action-outputs> 
+          <CURRENT_DATE_DAY type="string"/>  
+          <CURRENT_DATE_MONTH type="string"/>  
+          <CURRENT_DATE_YEAR type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[monthNames = new Array(12);
+monthNames[1] = "января";
+monthNames[2] = "февраля";
+monthNames[3] = "марта";
+monthNames[4] = "апреля";
+monthNames[5] = "мая";
+monthNames[6] = "июня";
+monthNames[7] = "июля";
+monthNames[8] = "августа";
+monthNames[9] = "сентября";
+monthNames[10] = "октября";
+monthNames[11] = "ноября";
+monthNames[12] = "декабря";
+
+currentDate = new Date();
+currentDay = currentDate.getDate();
+
+if(currentDay < 10){
+	CURRENT_DATE_DAY = "0" + currentDay.toString();
+}else{
+	CURRENT_DATE_DAY = currentDay.toString();
+}
+
+CURRENT_DATE_MONTH = monthNames[currentDate.getMonth() + 1];
+
+CURRENT_DATE_YEAR = (currentDate.getYear() + 1900).toString();]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS</action-type>
+        <action-inputs> 
+          <application_id type="string"/>  
+          <person_id type="string"/>  
+          <user type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql="select distinct "+
+" u1.firstName,u1.lastName,u1.middleName, "+
+" (select MAX(r1.name) from u1.roles r1), "+
+" ce.name, "+
+" (select count(it2.id) "+
+" from GossrvcDocPackage dp2, GossrvcDocPackageItem it2 "+
+" where dp2.id=dp.id and dp2.id=it2.gossrvcDocPackage and "+
+" it2.docTypeId=it.docTypeId and it2.docClassId=it.docClassId), "+
+" a1.name "+
+" from "+
+" Agent a1,User u1, "+
+" CardElement ce , GossrvcDocPackage dp, GossrvcDocPackageItem it "+
+" where "+
+" a1.id={person_id} and u1.login='{user}' and "+
+" dp.id={application_id} and dp.id=it.gossrvcDocPackage and ce.id=it.docTypeId and "+
+" it.docValue=1 ";
+
+fields="R_FIRST_NAME,R_LAST_NAME,R_MIDDLE_NAME,"+
+"R_DOLZHNOST,"+
+"DOC_TYPE_NAME,"+
+"COUNT_DOC_STR,"+
+"AGENT_NAME";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JFreeReportComponent</component-name>
+        <action-type>Pentaho Report</action-type>
+        <action-inputs> 
+          <output-type type="string" mapping="outputType"/>  
+          <data type="result-set" mapping="dsResult"/>  
+          <CURRENT_DATE_DAY type="string"/>  
+          <CURRENT_DATE_MONTH type="string"/>  
+          <CURRENT_DATE_YEAR type="string"/>  
+          <FIO_AGENT type="string"/>  
+          <COUNT_LIST type="string"/> 
+        </action-inputs>
+        <action-resources> 
+          <report-definition type="resource"/> 
+        </action-resources>
+        <action-outputs> 
+          <report-output type="content" mapping="content"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+ 
+    </actions>
+ 
+  </actions> 
+</action-sequence>

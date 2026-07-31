@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатная форма лицензии</title>
+  <version>1</version>
+  <logging-level/>
+  <documentation> 
+    <author>Тесля Дмитрий</author>  
+    <description>Печатная форма лицензии Лицензионной палаты Орла</description>  
+    <help/>  
+    <result-type>report</result-type>  
+    <icon/> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="desc">PDF</entry>  
+          <entry key="id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="desc">Excel</entry>  
+          <entry key="id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="desc">Word</entry>  
+          <entry key="id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="desc">Web Page</entry>  
+          <entry key="id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="desc">Comma Separated Value</entry>  
+          <entry key="id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources> 
+    </activityId>  
+    <outTypeDoc type="string"> 
+      <sources> 
+        <request>outTypeDoc</request> 
+      </sources>  
+      <default-value><![CDATA[licence-face]]></default-value> 
+    </outTypeDoc>  
+    <outTypeDocList type="property-map-list"> 
+      <sources> 
+        <runtime>outTypeDocList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="id">licence-face</entry>  
+          <entry key="desc">Лицензия - лицевая сторона</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="id">licence-loopback</entry>  
+          <entry key="desc">Лицензия - обратная сторона</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="id">licence-attachment</entry>  
+          <entry key="desc">Лицензия - приложение к лицензии</entry> 
+        </property-map> 
+      </default-value> 
+    </outTypeDocList>  
+    <outTypeDocList1 type="property-map-list"> 
+      <sources> 
+        <runtime>outTypeDocList1</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="id">licence-face</entry>  
+          <entry key="desc">Лицензия - лицевая сторона</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="id">licence-attachment</entry>  
+          <entry key="desc">Лицензия - приложение к лицензии</entry> 
+        </property-map> 
+      </default-value> 
+    </outTypeDocList1> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition1> 
+      <solution-file> 
+        <location>licence_alcohol_loopback.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition1>  
+    <report-definition2> 
+      <solution-file> 
+        <location>licence_alcohol_attachment.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition2>  
+    <report-definition3> 
+      <solution-file> 
+        <location>licence_metal_face.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition3>  
+    <report-definition5> 
+      <solution-file> 
+        <location>licence_metal_attachment.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition5>  
+    <report-definition4> 
+      <solution-file> 
+        <location>licence_metal_loopback.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition4>  
+    <report-definition> 
+      <solution-file> 
+        <location>licence_alcohol_face.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition>  
+    <report-definition6>
+      <solution-file>
+        <location>licence_alcohol_face.xml</location>
+        <mime-type>text/plain</mime-type>
+      </solution-file>
+    </report-definition6>
+    <report-definition7>
+      <solution-file>
+        <location>licence_alcohol_attach_prolong.xml</location>
+        <mime-type>text/plain</mime-type>
+      </solution-file>
+    </report-definition7>
+  </resources>
+  
+  <actions> 
+    <actions> 
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Preparing params list for request to SHARK</action-type>
+        <action-inputs/>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList="licenseId,govServiceType,univDoc,prikaz_date";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Get params from SHARK</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/>  
+          <processId type="string"/>  
+          <activityId type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Get id licence</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <licence_id type="string"/>  
+          <service_type type="string"/>  
+          <UNIV_DOC_ID type="string"/>  
+          <PRIKAZ_DATE type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+	licence_id=dsResult.getValueAt(0,0);
+
+	service_type=dsResult.getValueAt(0,2);
+
+	UNIV_DOC_ID=dsResult.getValueAt(0,4);
+
+	PRIKAZ_DATE=dsResult.getValueAt(0,6);
+
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Preparing EJBQL query</action-type>
+        <action-inputs> 
+          <licence_id type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql="select "+
+" l1.activityTypeId "+
+" from "+
+" License l1 "+
+" where "+
+" l1.id={licence_id} ";
+
+fields="ACTIVITY_TYPE_ID";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Get data from DB</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Get type licence</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <licence_type type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+licence_type=dsResult.getValueAt(0,0);
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <actions> 
+        <condition><![CDATA[(service_type=="ST_ProLong")]]></condition>  
+        <action-definition> 
+          <component-name>JavascriptRule</component-name>
+          <action-type>JavaScript - Preparing EJBQL query</action-type>
+          <action-inputs> 
+            <licence_id type="string"/>  
+            <UNIV_DOC_ID type="string"/> 
+          </action-inputs>
+          <action-outputs> 
+            <beenName type="string"/>  
+            <method type="string"/>  
+            <sql type="string"/>  
+            <fields type="string"/> 
+          </action-outputs>
+          <component-definition> 
+            <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql=" select "+
+" l1.licenseEndDate, "+
+" (day(l1.licenseEndDate)), "+
+" (month(l1.licenseEndDate)), "+
+" (year(l1.licenseEndDate)), "+
+" pd1.docNum, "+
+" pd1.docDate, "+
+" (month(pd1.docDate)), "+
+" as2.value, "+
+" as3.value "+
+" from "+
+" License l1, AppSetting as2, AppSetting as3, PrintDoc pd1 "+
+" where "+
+" l1.id={licence_id} and "+
+" as2.id='ogv_signature_licence_name' and "+
+" as3.id='ogv_signature_licence_post' and "+
+" pd1.id={UNIV_DOC_ID} ";
+
+fields="LICENSE_PROL_DATE,"+
+"LICENSE_PROL_DATE_DAY,"+
+"LICENSE_PROL_DATE_MONTH,"+
+"LICENSE_PROL_DATE_YEAR,"+
+"PRIKAZ_NUM_PROL,"+
+"PRIKAZ_DATE_PROL,"+
+"PRIKAZ_DATE_MONTH_PROL,"+
+"OGV_SIGNATURE_LICENCE_NAME_PROL,"+
+"OGV_SIGNATURE_LICENCE_POST_PROL";]]></script> 
+          </component-definition> 
+        </action-definition>
+  
+        <action-definition> 
+          <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+          <action-type>Custom - Get data from DB</action-type>
+          <action-inputs> 
+            <beenName type="string"/>  
+            <method type="string"/>  
+            <sql type="string"/>  
+            <fields type="string"/> 
+          </action-inputs>
+          <action-outputs> 
+            <dsResult type="result-set"/>  
+            <dsMetaColumn type="string"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(service_type=="ST_FreeStop" || service_type=="ST_Get" || service_type=="ST_ReGet")]]></condition>  
+        <action-definition> 
+          <component-name>JavascriptRule</component-name>
+          <action-type>JavaScript - Preparing EJBQL query</action-type>
+          <action-inputs> 
+            <licence_id type="string"/>  
+            <licence_type type="string"/>  
+            <service_type type="string"/>  
+            <UNIV_DOC_ID type="string"/> 
+          </action-inputs>
+          <action-outputs> 
+            <beenName type="string"/>  
+            <method type="string"/>  
+            <sql type="string"/>  
+            <fields type="string"/> 
+          </action-outputs>
+          <component-definition> 
+            <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql=" select "+
+" l1.activityAddress, "+
+" ce2.name, "+
+" l1.agentName, "+
+" l1.agentInn, "+
+" l1.agentAddress, "+
+" a1.ogrn, "+
+" l1.licenseNumber, "+
+" l1.licenseSerie, "+
+" l1.licenseDate, "+
+" l1.licenseDocDate, "+
+" l1.licenseDocNo, "+
+" l1.licenseEndDate, "+
+" l1.prolongDate, "+
+" l1.prolongDocDate, "+
+" l1.prolongDocNo, "+
+" lo1.kladr, "+
+" lo1.name, "+
+" lo1.isHeavyAlc, "+
+" as1.value, "+
+" as2.value, "+
+" as3.value, "+
+" (select ce1.name from CardElement ce1 where ce1.id=lo1.objType), "+
+" (month(l1.licenseDate)), "+
+" (month(l1.licenseDocDate)), "+
+" (month(l1.licenseEndDate)), "+
+" (month(l1.prolongDate)), "+
+" (month(l1.prolongDocDate)), "+
+" (day(l1.licenseDate)), "+
+" (year(l1.licenseDate)), "+
+" (day(l1.licenseEndDate)), "+
+" (year(l1.licenseEndDate)), "+
+" pd1.docNum, "+
+" pd1.docDate, "+
+" (month(pd1.docDate)), "+
+" a1.passport "+
+" from "+
+" License l1, AppSetting as1, AppSetting as2, AppSetting as3, "+
+" LicObject lo1, Agent a1, CardElement ce2, PrintDoc pd1 "+
+" where "+
+" l1.id={licence_id} and l1.agent = a1 and "+
+" lo1.id in (select lo2.id from l1.licObjects lo2) and "+
+" as1.id='ogv_name' and "+
+" as2.id='ogv_signature_licence_name' and "+
+" as3.id='ogv_signature_licence_post' and ce2.id='{licence_type}' and "+
+" pd1.id={UNIV_DOC_ID} ";
+
+fields="ACTIVITY_ADDRESS,"+
+"ACTIVITY_TYPE_NAME,"+
+"AGENT_NAME,"+
+"AGENT_INN,"+
+"AGENT_ADDRESS,"+
+"AGENT_OGRN,"+
+"LICENSE_NUMBER,"+
+"LICENSE_SERIE,"+
+"LICENSE_DATE,"+
+"LICENSE_DOC_DATE,"+
+"LICENSE_DOC_NO,"+
+"LICENSE_END_DATE,"+
+"PROLONG_DATE,"+
+"PROLONG_DOC_DATE,"+
+"PROLONG_DOC_NO,"+
+"OBJECT_ADDRESS,"+
+"OBJECT_NAME,"+
+"IS_HEAVY_ALC,"+
+"OGV,"+
+"OGV_SIGNATURE_LICENCE_NAME,"+
+"OGV_SIGNATURE_LICENCE_POST,"+
+"OBJECT_TYPE,"+
+"LICENSE_DATE_MONTH,"+
+"LICENSE_DOC_DATE_MONTH,"+
+"LICENSE_END_DATE_MONTH,"+
+"PROLONG_DATE_MONTH,"+
+"PROLONG_DOC_DATE_MONTH,"+
+"LICENSE_DATE_DAY,"+
+"LICENSE_DATE_YEAR,"+
+"LICENSE_END_DATE_DAY,"+
+"LICENSE_END_DATE_YEAR,"+
+"PRIKAZ_NUM,"+
+"PRIKAZ_DATE,"+
+"PRIKAZ_DATE_MONTH,"+
+"AGENT_PASSPORT";]]></script> 
+          </component-definition> 
+        </action-definition>
+  
+        <action-definition> 
+          <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+          <action-type>Custom - Get data from DB</action-type>
+          <action-inputs> 
+            <beenName type="string"/>  
+            <method type="string"/>  
+            <sql type="string"/>  
+            <fields type="string"/> 
+          </action-inputs>
+          <action-outputs> 
+            <dsResult type="result-set"/>  
+            <dsMetaColumn type="string"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions>
+        <condition><![CDATA[(service_type =="ST_ProLong") &&(licence_type=="AT_Spirit")]]></condition>
+        <action-definition>
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Prompt/Secure Filter</action-type>
+          <action-inputs>
+            <outputType type="string"/>
+            <outTypeDoc type="string"/>
+            <outputTypeList type="property-map-list"/>
+            <outTypeDocList1 type="property-map-list"/>
+          </action-inputs>
+          <component-definition>
+            <selections>
+              <outputType style="select">
+                <title>Формат вывода:</title>
+                <filter value-col-name="id" display-col-name="desc">outputTypeList</filter>
+              </outputType>
+              <outTypeDoc style="select">
+                <title>Вывести на печать:</title>
+                <filter value-col-name="id" display-col-name="desc">outTypeDocList1</filter>
+              </outTypeDoc>
+            </selections>
+          </component-definition>
+        </action-definition>
+
+        <actions>
+          <condition><![CDATA[(outTypeDoc=="licence-face")]]></condition>
+          <action-definition>
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-face</action-type>
+            <action-inputs>
+              <output-type type="string" mapping="outputType"/>
+              <data type="result-set" mapping="dsResult"/>
+            </action-inputs>
+            <action-resources>
+              <report-definition type="resource" mapping="report-definition6"/>
+            </action-resources>
+            <action-outputs>
+              <report-output type="content" mapping="content"/>
+            </action-outputs>
+            <component-definition/>
+          </action-definition>
+
+        </actions>
+
+        <actions>
+          <condition><![CDATA[(outTypeDoc=="licence-attachment")]]></condition>
+          <action-definition>
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-attachment</action-type>
+            <action-inputs>
+              <output-type type="string" mapping="outputType"/>
+              <data type="result-set" mapping="dsResult"/>
+            </action-inputs>
+            <action-resources>
+              <report-definition type="resource" mapping="report-definition7"/>
+            </action-resources>
+            <action-outputs>
+              <report-output type="content" mapping="content"/>
+            </action-outputs>
+            <component-definition/>
+          </action-definition>
+
+        </actions>
+
+      </actions>
+
+      <actions> 
+        <condition><![CDATA[(licence_type=="AT_FerrousMetal" || licence_type=="AT_NonferrousMetal")]]></condition>  
+        <action-definition> 
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Promt params for Report</action-type>
+          <action-inputs> 
+            <outputType type="string"/>  
+            <outputTypeList type="property-map-list"/>  
+            <outTypeDoc type="string"/>  
+            <outTypeDocList type="property-map-list"/> 
+          </action-inputs>
+          <component-definition> 
+            <selections> 
+              <outputType style="select"> 
+                <filter value-col-name="id" display-col-name="desc">outputTypeList</filter>  
+                <title>Формат вывода:</title> 
+              </outputType>  
+              <outTypeDoc style="select"> 
+                <filter value-col-name="id" display-col-name="desc">outTypeDocList</filter>  
+                <title>Вывести на печать:</title> 
+              </outTypeDoc> 
+            </selections> 
+          </component-definition> 
+        </action-definition>
+  
+        <actions> 
+          <condition><![CDATA[(outTypeDoc=="licence-face")]]></condition>  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-face</action-type>
+            <action-inputs> 
+              <data type="result-set" mapping="dsResult"/>  
+              <output-type type="string" mapping="outputType"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource" mapping="report-definition3"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+  
+        <actions> 
+          <condition><![CDATA[(outTypeDoc=="licence-loopback")]]></condition>  
+          <action-definition> 
+            <component-name>JavascriptRule</component-name>
+            <action-type>JavaScript - Preparing EJBQL query</action-type>
+            <action-inputs> 
+              <licence_type type="string"/>  
+              <licence_id type="string"/>  
+              <UNIV_DOC_ID type="string"/> 
+            </action-inputs>
+            <action-outputs> 
+              <beenName type="string"/>  
+              <method type="string"/>  
+              <sql type="string"/>  
+              <fields type="string"/>  
+              <from type="string"/>  
+              <to type="string"/> 
+            </action-outputs>
+            <component-definition> 
+              <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+from="0";
+to="4";
+
+sql=" select "+
+" l1.activityAddress, "+
+" ce2.name, "+
+" l1.agentName, "+
+" l1.agentInn, "+
+" l1.agentAddress, "+
+" a1.ogrn, "+
+" l1.licenseNumber, "+
+" l1.licenseSerie, "+
+" l1.licenseDate, "+
+" l1.licenseDocDate, "+
+" l1.licenseDocNo, "+
+" l1.licenseEndDate, "+
+" l1.prolongDate, "+
+" l1.prolongDocDate, "+
+" l1.prolongDocNo, "+
+" lo1.kladr, "+
+" lo1.name, "+
+" lo1.isHeavyAlc, "+
+" as1.value, "+
+" as2.value, "+
+" as3.value, "+
+" (select ce1.name from CardElement ce1 where ce1.id=lo1.objType), "+
+" (month(l1.licenseDate)), "+
+" (month(l1.licenseDocDate)), "+
+" (month(l1.licenseEndDate)), "+
+" (month(l1.prolongDate)), "+
+" (month(l1.prolongDocDate)), "+
+" (day(l1.licenseDate)), "+
+" (year(l1.licenseDate)), "+
+" (day(l1.licenseEndDate)), "+
+" (year(l1.licenseEndDate)), "+
+" pd1.docNum, "+
+" pd1.docDate, "+
+" (month(pd1.docDate)), "+
+" a1.passport "+
+" from "+
+" License l1, AppSetting as1, AppSetting as2, AppSetting as3, "+
+" LicObject lo1, Agent a1, CardElement ce2, PrintDoc pd1 "+
+" where "+
+" l1.id={licence_id} and l1.agent = a1 and "+
+" lo1.id in (select lo2.id from l1.licObjects lo2) and "+
+" as1.id='ogv_name' and "+
+" as2.id='ogv_signature_licence_name' and "+
+" as3.id='ogv_signature_licence_post' and ce2.id='{licence_type}' and "+
+" pd1.id={UNIV_DOC_ID} ";
+
+fields="ACTIVITY_ADDRESS,"+
+"ACTIVITY_TYPE_NAME,"+
+"AGENT_NAME,"+
+"AGENT_INN,"+
+"AGENT_ADDRESS,"+
+"AGENT_OGRN,"+
+"LICENSE_NUMBER,"+
+"LICENSE_SERIE,"+
+"LICENSE_DATE,"+
+"LICENSE_DOC_DATE,"+
+"LICENSE_DOC_NO,"+
+"LICENSE_END_DATE,"+
+"PROLONG_DATE,"+
+"PROLONG_DOC_DATE,"+
+"PROLONG_DOC_NO,"+
+"OBJECT_ADDRESS_LOOP,"+
+"OBJECT_NAME,"+
+"IS_HEAVY_ALC,"+
+"OGV,"+
+"OGV_SIGNATURE_LICENCE_NAME,"+
+"OGV_SIGNATURE_LICENCE_POST,"+
+"OBJECT_TYPE,"+
+"LICENSE_DATE_MONTH,"+
+"LICENSE_DOC_DATE_MONTH,"+
+"LICENSE_END_DATE_MONTH,"+
+"PROLONG_DATE_MONTH,"+
+"PROLONG_DOC_DATE_MONTH,"+
+"LICENSE_DATE_DAY,"+
+"LICENSE_DATE_YEAR,"+
+"LICENSE_END_DATE_DAY,"+
+"LICENSE_END_DATE_YEAR,"+
+"PRIKAZ_NUM,"+
+"PRIKAZ_DATE,"+
+"PRIKAZ_DATE_MONTH,"+
+"AGENT_PASSPORT";]]></script> 
+            </component-definition> 
+          </action-definition>
+  
+          <action-definition> 
+            <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+            <action-type>Custom - Get data from DB</action-type>
+            <action-inputs> 
+              <beenName type="string"/>  
+              <method type="string"/>  
+              <sql type="string"/>  
+              <fields type="string"/>  
+              <from type="string"/>  
+              <to type="string"/> 
+            </action-inputs>
+            <action-outputs> 
+              <dsResult type="result-set"/>  
+              <dsMetaColumn type="string"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-loopback</action-type>
+            <action-inputs> 
+              <output-type type="string" mapping="outputType"/>  
+              <data type="result-set" mapping="dsResult"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource" mapping="report-definition4"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+  
+        <actions> 
+          <condition><![CDATA[(outTypeDoc=="licence-attachment")]]></condition>  
+          <action-definition> 
+            <component-name>JavascriptRule</component-name>
+            <action-type>JavaScript - Preparing EJBQL query</action-type>
+            <action-inputs> 
+              <licence_type type="string"/>  
+              <licence_id type="string"/>  
+              <UNIV_DOC_ID type="string"/> 
+            </action-inputs>
+            <action-outputs> 
+              <beenName type="string"/>  
+              <method type="string"/>  
+              <sql type="string"/>  
+              <fields type="string"/>  
+              <from type="string"/> 
+            </action-outputs>
+            <component-definition> 
+              <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+from="5";
+
+sql=" select "+
+" l1.activityAddress, "+
+" ce2.name, "+
+" l1.agentName, "+
+" l1.agentInn, "+
+" l1.agentAddress, "+
+" a1.ogrn, "+
+" l1.licenseNumber, "+
+" l1.licenseSerie, "+
+" l1.licenseDate, "+
+" l1.licenseDocDate, "+
+" l1.licenseDocNo, "+
+" l1.licenseEndDate, "+
+" l1.prolongDate, "+
+" l1.prolongDocDate, "+
+" l1.prolongDocNo, "+
+" lo1.kladr, "+
+" lo1.name, "+
+" lo1.isHeavyAlc, "+
+" as1.value, "+
+" as2.value, "+
+" as3.value, "+
+" (select ce1.name from CardElement ce1 where ce1.id=lo1.objType), "+
+" (month(l1.licenseDate)), "+
+" (month(l1.licenseDocDate)), "+
+" (month(l1.licenseEndDate)), "+
+" (month(l1.prolongDate)), "+
+" (month(l1.prolongDocDate)), "+
+" (day(l1.licenseDate)), "+
+" (year(l1.licenseDate)), "+
+" (day(l1.licenseEndDate)), "+
+" (year(l1.licenseEndDate)), "+
+" pd1.docNum, "+
+" pd1.docDate, "+
+" (month(pd1.docDate)), "+
+" a1.passport "+
+" from "+
+" License l1, AppSetting as1, AppSetting as2, AppSetting as3, "+
+" LicObject lo1, Agent a1, CardElement ce2, PrintDoc pd1 "+
+" where "+
+" l1.id={licence_id} and l1.agent = a1 and "+
+" lo1.id in (select lo2.id from l1.licObjects lo2) and "+
+" as1.id='ogv_name' and "+
+" as2.id='ogv_signature_licence_name' and "+
+" as3.id='ogv_signature_licence_post' and ce2.id='{licence_type}' and "+
+" pd1.id={UNIV_DOC_ID} ";
+
+fields="ACTIVITY_ADDRESS,"+
+"ACTIVITY_TYPE_NAME,"+
+"AGENT_NAME,"+
+"AGENT_INN,"+
+"AGENT_ADDRESS,"+
+"AGENT_OGRN,"+
+"LICENSE_NUMBER,"+
+"LICENSE_SERIE,"+
+"LICENSE_DATE,"+
+"LICENSE_DOC_DATE,"+
+"LICENSE_DOC_NO,"+
+"LICENSE_END_DATE,"+
+"PROLONG_DATE,"+
+"PROLONG_DOC_DATE,"+
+"PROLONG_DOC_NO,"+
+"OBJECT_ADDRESS_PRIL,"+
+"OBJECT_NAME,"+
+"IS_HEAVY_ALC,"+
+"OGV,"+
+"OGV_SIGNATURE_LICENCE_NAME,"+
+"OGV_SIGNATURE_LICENCE_POST,"+
+"OBJECT_TYPE,"+
+"LICENSE_DATE_MONTH,"+
+"LICENSE_DOC_DATE_MONTH,"+
+"LICENSE_END_DATE_MONTH,"+
+"PROLONG_DATE_MONTH,"+
+"PROLONG_DOC_DATE_MONTH,"+
+"LICENSE_DATE_DAY,"+
+"LICENSE_DATE_YEAR,"+
+"LICENSE_END_DATE_DAY,"+
+"LICENSE_END_DATE_YEAR,"+
+"PRIKAZ_NUM,"+
+"PRIKAZ_DATE,"+
+"PRIKAZ_DATE_MONTH,"+
+"AGENT_PASSPORT";]]></script> 
+            </component-definition> 
+          </action-definition>
+  
+          <action-definition> 
+            <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+            <action-type>Custom - Get data from DB</action-type>
+            <action-inputs> 
+              <beenName type="string"/>  
+              <method type="string"/>  
+              <sql type="string"/>  
+              <fields type="string"/>  
+              <from type="string"/> 
+            </action-inputs>
+            <action-outputs> 
+              <dsResult type="result-set"/>  
+              <dsMetaColumn type="string"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-attachment</action-type>
+            <action-inputs> 
+              <data type="result-set" mapping="dsResult"/>  
+              <output-type type="string" mapping="outputType"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource" mapping="report-definition5"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(service_type !="ST_ProLong") &&(licence_type=="AT_Spirit")]]></condition>  
+        <action-definition> 
+          <component-name>SecureFilterComponent</component-name>
+          <action-type>Promt params for Report</action-type>
+          <action-inputs> 
+            <outputType type="string"/>  
+            <outTypeDoc type="string"/>  
+            <outputTypeList type="property-map-list"/>  
+            <outTypeDocList1 type="property-map-list"/> 
+          </action-inputs>
+          <component-definition> 
+            <selections> 
+              <outputType style="select"> 
+                <title>Формат вывода:</title>  
+                <filter value-col-name="id" display-col-name="desc">outputTypeList</filter> 
+              </outputType>  
+              <outTypeDoc style="select"> 
+                <title>Вывести на печать:</title>  
+                <filter value-col-name="id" display-col-name="desc">outTypeDocList1</filter> 
+              </outTypeDoc> 
+            </selections> 
+          </component-definition> 
+        </action-definition>
+  
+        <actions> 
+          <condition><![CDATA[(outTypeDoc=="licence-face")]]></condition>  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-face</action-type>
+            <action-inputs> 
+              <output-type type="string" mapping="outputType"/>  
+              <data type="result-set" mapping="dsResult"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+  
+        <actions> 
+          <condition><![CDATA[(outTypeDoc=="licence-attachment")]]></condition>  
+          <action-definition> 
+            <component-name>JFreeReportComponent</component-name>
+            <action-type>Pentaho Report - Print licence-attachment</action-type>
+            <action-inputs> 
+              <output-type type="string" mapping="outputType"/>  
+              <data type="result-set" mapping="dsResult"/> 
+            </action-inputs>
+            <action-resources> 
+              <report-definition type="resource" mapping="report-definition2"/> 
+            </action-resources>
+            <action-outputs> 
+              <report-output type="content" mapping="content"/> 
+            </action-outputs>
+            <component-definition/> 
+          </action-definition>
+ 
+        </actions>
+ 
+      </actions>
+ 
+    </actions>
+ 
+  </actions> 
+</action-sequence>

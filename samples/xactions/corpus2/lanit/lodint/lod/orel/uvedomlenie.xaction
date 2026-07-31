@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Уведомление заявителю</title>
+  <version>1</version>
+  <documentation> 
+    <author>Tretyakova Alena</author>  
+    <description>Уведомление заявителю</description>  
+    <icon>PentahoReporting.png</icon>  
+    <help/>  
+    <result-type>report</result-type> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources>  
+      <default-value/> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources>  
+      <default-value/> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>uvedomlenie.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputTypeList type="property-map-list"/>  
+        <outputType type="string"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <title>Формат вывода:</title>  
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+          </outputType> 
+        </selections>  
+        <target><![CDATA[Report_Window]]></target> 
+      </component-definition> 
+    </action-definition>
+  
+    <actions>
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS -список переменных для запроса к SHARK</action-type>
+        <action-inputs/>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList='agentId,agentAddress,govServiceTypeS,licenseId,rejectReason,tarifAmount';]]></script> 
+        </component-definition> 
+      </action-definition>
+
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Получаем перемнные из SHARK</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <processId type="string"/>  
+          <activityId type="string"/>  
+          <variableList type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <agentId type="string"/>  
+          <AGENT_ADDRESS type="string"/>  
+          <govServiceTypeS type="string"/>  
+          <licenseId type="string"/>  
+          <TARIF_OGV type="string"/>
+          <prichina_otkaza type="string"/>
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+if (rcount!=0){
+
+  agentId=dsResult.getValueAt(0,0);
+
+  if((dsResult.getValueAt(0,2) != null) || (!dsResult.getValueAt(0,2).isEmpty()))
+   {
+     AGENT_ADDRESS=dsResult.getValueAt(0,2);
+   }else{
+     AGENT_ADDRESS=" ";
+   }
+
+   govServiceTypeS=dsResult.getValueAt(0,4);
+
+   if (dsResult.getValueAt(0,6) != null)
+   {
+    licenseId=dsResult.getValueAt(0,6);
+   }else{
+    licenseId=-1;
+   }
+
+   if(dsResult.getValueAt(0,8) != null)
+   {
+     prichina_otkaza=dsResult.getValueAt(0,8);
+   }else{
+     prichina_otkaza="-1";
+   }
+
+   if((dsResult.getValueAt(0,10) != null) || (!dsResult.getValueAt(0,10).isEmpty()))
+   {
+     TARIF_OGV=dsResult.getValueAt(0,10);
+   }else{
+     TARIF_OGV=" ";
+   }
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript-Create EJBQL</action-type>
+        <action-inputs> 
+          <agentId type="string"/>
+          <govServiceTypeS type="string"/>
+          <licenseId type="string"/>
+          <prichina_otkaza type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+if (licenseId == -1)  {
+
+sql=" select "+
+" a1.name, "+
+" ce1.name, "+
+" as1.value, "+
+" as2.value, "+
+" '', "+
+" '', "+
+" '', "+
+('{prichina_otkaza}'.equals("-1") ? '' : '\'{prichina_otkaza}\'') +
+" from "+
+" Agent a1, "+
+" AppSetting as1, AppSetting as2, CardElement ce1, "+
+" License l1 "+
+" where "+
+" a1.id={agentId} and "+
+" as1.id='ogv_boss_post' and as2.id='ogv_boss_name' and ce1.id='{govServiceTypeS}' ";
+
+}else{
+
+sql=" select "+
+" a1.name, "+
+" ce1.name, "+
+" as1.value, "+
+" as2.value, "+
+" l1.licenseSerie, "+
+" l1.licenseNumber, "+
+" l1.licenseDate, "+
+('{prichina_otkaza}'.equals("-1") ? '' : '\'{prichina_otkaza}\'') +
+" from "+
+" Agent a1, "+
+" AppSetting as1, AppSetting as2, CardElement ce1, "+
+" License l1 "+
+" where "+
+" a1.id={agentId} and "+
+" as1.id='ogv_boss_post' and as2.id='ogv_boss_name' and ce1.id='{govServiceTypeS}' and "+
+" l1.id={licenseId} ";
+}
+
+fields="AGENT_NAME,"+
+"GOS_SERVICE,"+
+"OGV_BOSS_POST,"+
+"OGV_BOSS_NAME,"+
+"LICENSE_SERIE,"+
+"LICENSE_NUMBER,"+
+"LICENSE_DATE,"+
+"PRICHINA_OTKAZA";]]></script> 
+        </component-definition> 
+      </action-definition>
+
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom-Выполняем запрос</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+
+      <action-definition> 
+        <component-name>JFreeReportComponent</component-name>
+        <action-type>report</action-type>
+        <action-inputs> 
+          <output-type type="string" mapping="outputType"/>  
+          <data type="result-set" mapping="dsResult"/>  
+          <AGENT_ADDRESS type="string"/>
+          <TARIF_OGV type="string"/>
+        </action-inputs>
+        <action-resources> 
+          <report-definition type="resource"/> 
+        </action-resources>
+        <action-outputs> 
+          <report-output type="content" mapping="content"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+
+    </actions>
+ 
+  </actions> 
+</action-sequence>

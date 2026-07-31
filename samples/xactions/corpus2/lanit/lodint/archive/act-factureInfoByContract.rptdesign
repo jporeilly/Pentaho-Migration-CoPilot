@@ -1,0 +1,1947 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.1.v20090903 Build &lt;2.5.1.v20090917-1447></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <parameters>
+        <scalar-parameter name="collId" id="209">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="687">
+            <property name="hidden">false</property>
+            <text-property name="helpText">Дата начала (в фомате dd.MM.yyyy)</text-property>
+            <text-property name="promptText">Дата начала (в фомате dd.MM.yyyy)</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">12.12.2001</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="688">
+            <property name="hidden">false</property>
+            <text-property name="helpText">Дата окончания, не включительно, не включительно (в фомате dd.MM.yyyy)</text-property>
+            <text-property name="promptText">Дата окончания, не включительно, не включительно (в фомате dd.MM.yyyy)</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">12.12.2014</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stateList" id="693">
+            <text-property name="helpText">Статус документа</text-property>
+            <text-property name="promptText">Статус документа</text-property>
+            <property name="valueType">dynamic</property>
+            <property name="dataSetName">stateDataSet</property>
+            <expression name="valueExpr" type="javascript">dataSetRow["stateId"]</expression>
+            <expression name="labelExpr" type="javascript">dataSetRow["stateName"]</expression>
+            <expression name="sortByColumn">dataSetRow["stateName"]</expression>
+            <property name="sortDirection">asc</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">list-box</property>
+            <property name="mustMatch">true</property>
+            <property name="fixedOrder">false</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="viewAll" id="800">
+            <text-property name="helpText">Выводить этапы</text-property>
+            <text-property name="promptText">Выводить этапы</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">1</value>
+            </simple-property-list>
+            <list-property name="selectionList">
+                <structure>
+                    <property name="value">1</property>
+                    <property name="label">Все</property>
+                </structure>
+                <structure>
+                    <property name="value">0</property>
+                    <property name="label">Незакрытые</property>
+                </structure>
+            </list-property>
+            <property name="paramType">simple</property>
+            <property name="controlType">radio-button</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="useStateSearch" id="975">
+            <text-property name="helpText">Использовать фильтрацию по статусу документов?</text-property>
+            <text-property name="promptText">Использовать фильтрацию по статусу документов?</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">1</value>
+            </simple-property-list>
+            <list-property name="selectionList">
+                <structure>
+                    <property name="value">1</property>
+                    <property name="label">Да</property>
+                </structure>
+                <structure>
+                    <property name="value">0</property>
+                    <property name="label">Нет</property>
+                </structure>
+            </list-property>
+            <property name="paramType">simple</property>
+            <property name="controlType">radio-button</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="Data Source" id="207"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="ContractDataSet" id="208">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">fieldName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">fieldValue</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">fieldValueDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">contrName</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">fieldName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">fieldValue</property>
+                </structure>
+                <structure>
+                    <property name="columnName">fieldValueDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">contrName</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">currCollId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue" type="javascript">-1</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">fieldName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">fieldValue</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">fieldValueDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">contrName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.Shark();
+localParam = inputParams["currCollId"];
+result = clazz.getEntityManagerLod().createQuery(
+" select "+
+" v.field.caption,"+
+" v.field.type, "+
+" v.stringValue, "+
+" v.integerValue, "+
+" v.dateValue, "+
+" v.booleanValue, "+
+" acloll.name "+
+" from AdditionalFieldValue v,ArchiveCollection acloll where "+
+" v.field.model = 'org.lanit.samara.darchive.ArchiveCollection' "+
+" and acloll.id = "+localParam+
+" and v.field.name in ('cipher','name','dateFinishProject','executorName') "+
+" and v.itemId = "+localParam
+).getResultList();
+totalrows = result.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = result.get(currentrow);
+row["contrName"] = rowValue[6];
+row["fieldName"] = rowValue[0];
+row["fieldValue"] = "---";
+if (("string".equals(rowValue[1]) || "largeString".equals(rowValue[1])) 
+	&amp;&amp; (!"".equals(rowValue[2]) || !" ".equals(rowValue[2])))
+	row["fieldValue"] = rowValue[2];
+if ("integer".equals(rowValue[1]))
+	row["fieldValue"] = rowValue[3];
+if ("date".equals(rowValue[1]))
+	row["fieldValueDate"] = rowValue[4];
+if ("boolean".equals(rowValue[1]))
+	row["fieldValue"] = rowValue[5];
+
+if (rowValue[1].startsWith("card=")){
+	clazz1 = new Packages.org.lanit.samara.birt.plugins.Shark();
+	entity = clazz1.getEntityManagerLod().createQuery(
+	" select name from CardElement where id = :id "	
+	).setParameter("id",rowValue[2]).getResultList();
+	if (entity.size()>0)
+	row["fieldValue"] = entity;
+}
+if (rowValue[1].startsWith("entity=")){
+	clazz2 = new Packages.org.lanit.samara.birt.plugins.Shark();
+	className=rowValue[1].substring(rowValue[1].lastIndexOf(".")+1,rowValue[1].length());
+	if (className.startsWith("User"))
+	entity = clazz2.getEntityManagerLod().createQuery(
+	" select lastName||' '||firstName||' '||middleName from User where id = :id "	
+	).setParameter("id",rowValue[3]).getResultList();
+	
+	if (className.startsWith("Agent"))
+	entity = clazz2.getEntityManagerLod().createQuery(
+	" select name||' ('||inn||'/'||kpp||')' from Agent where id = :id "	
+	).setParameter("id",rowValue[3]).getResultList();
+	
+	if (className.startsWith("Person"))
+	entity = clazz2.getEntityManagerLod().createQuery(
+	" select lastName||' '||firstName||' '||middleName from Person where id = :id "	
+	).setParameter("id",rowValue[3]).getResultList();
+	
+	if (entity.size()>0)
+	row["fieldValue"] = entity;
+}
+
+currentrow = currentrow + 1;
+
+return(true);]]></method>
+            <method name="close"><![CDATA[clazz = null;
+result = null;]]></method>
+        </script-data-set>
+        <script-data-set name="StagesDataSet" id="210">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">collectionName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">fieldValueStatus</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">fieldValueDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">docName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">docDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">status</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">isSigned</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">rowNum</property>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">collectionName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">fieldValueStatus</property>
+                </structure>
+                <structure>
+                    <property name="columnName">fieldValueDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">docName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">docDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">status</property>
+                </structure>
+                <structure>
+                    <property name="columnName">isSigned</property>
+                </structure>
+                <structure>
+                    <property name="columnName">rowNum</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">currCollId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue" type="javascript">-1</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">collectionName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">fieldValueStatus</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">fieldValueDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">docName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">docDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">status</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">isSigned</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">rowNum</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+clazzDate = new Packages.org.lanit.samara.birt.plugins.Converter();
+localParam = inputParams["currCollId"];
+
+paramStateName = clazz.getEntityManagerLod().createQuery(
+" select name from CardElement where id = '"+params["stateList"]+"'"
+).getSingleResult();
+
+valid= clazzDate.dateIsValid(params["startDate"],params["endDate"]);
+	if (valid){
+		dStartFormatedLong = clazzDate.getLongDate(params["startDate"]);
+		dEndFormatedLong = clazzDate.getLongDate(params["endDate"]);
+	}	
+
+stagesInfoList = clazz.getEntityManagerLod().createQuery(
+
+" select "+
+" aColl.name, "+
+" aCard.docType, "+
+" aCard.docDate, "+
+" ( select "+
+	" ce.name "+
+	" from "+
+	" AdditionalFieldValue afv1, CardElement ce "+ 
+	" where "+
+	" afv1.field.name = 'status' "+
+	" and afv1.itemId = aColl.id and ce.id= afv1.stringValue "+
+	" and afv1.field.model='org.lanit.samara.darchive.ArchiveCollection' ), "+
+"( select "+
+	" afv2.dateValue "+
+	" from "+
+	" AdditionalFieldValue afv2 "+ 
+	" where "+
+	" afv2.field.name = 'dateFinish' "+
+	" and afv2.itemId = aColl.id "+
+	" and afv2.field.model='org.lanit.samara.darchive.ArchiveCollection' ), "+
+"(select ce.name  "+
+"	 from   "+
+"	 ArchiveHistory ah, CardElement ce "+ 
+"	 where   "+
+"	 ah.card.id = aCard.id and "+ 
+"	 ce.id = ah.status   "+
+"	 and ah.date = (select max(ah1.date) from ArchiveHistory ah1 "+ 
+"	 where  "+
+"	 ah1.card.id = ah.card.id)), "+
+" aCard.docName, "+
+//"( select name from CardElement where "+ 
+//"			 card.cardCode = 'SDocType' and id = aCard.docType ), "+
+" (select "+
+	" afv3.booleanValue "+
+	" from "+
+	" AdditionalFieldValue afv3 "+ 
+	" where "+
+	" afv3.field.name = 'signed' "+
+	" and afv3.itemId = aCard.id "+
+	" and afv3.field.model='org.lanit.samara.darchive.ArchiveCard' ), "+
+" aCard.docNumber "+
+" from "+
+" ArchiveCard aCard right join aCard.collection aColl"+ 
+" where "+
+" aColl.parent.id= "+localParam +" and aColl.useAsFolder = 1 "//+
+
+).getResultList();
+
+totalrows = stagesInfoList.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = stagesInfoList.get(currentrow);
+
+docState = rowValue[5];
+if (docState==null) isEequealState=0;
+else isEequealState = docState.equals(paramStateName);
+
+if (params["useStateSearch"]==0) isEequealState=1;
+
+row["collectionName"] = rowValue[0];
+row["fieldValueStatus"] = rowValue[3];
+row["rowNum"] = totalrows;
+
+date= rowValue[4];
+if (date!=null)
+	row["fieldValueDate"] = date;
+	
+if (isEequealState){
+
+if ("act_sch_fact".equals(rowValue[1])){
+docName = "";
+if (rowValue[6]!=null &amp;&amp; !"".equals(rowValue[6])) docName = rowValue[6];
+if (rowValue[8]!=null &amp;&amp; !"".equals(rowValue[8])) docName += " №"+rowValue[8];
+row["docName"] = docName;
+row["docDate"] =rowValue[2];
+if (rowValue[7]==0 ) row["isSigned"] ="нет";
+else row["isSigned"] ="да";
+if (docState==null) row["status"]="[не задано]"; 
+else row["status"] = docState;
+}
+}	
+currentrow = currentrow + 1;
+
+return(true);]]></method>
+            <method name="close"><![CDATA[clazz = null;
+stagesInfoList = null;
+cards=null;date=null;]]></method>
+        </script-data-set>
+        <script-data-set name="dateData" id="692">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">startDate</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">endDate</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">valid</property>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">startDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">endDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">valid</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">startDate</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">endDate</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">valid</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.Converter();
+clazzLod = new Packages.org.lanit.samara.birt.plugins.Shark();
+
+resultDate = clazz.dateIsValid(params["startDate"],params["endDate"]);
+
+totalrows = 1;
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+
+if(resultDate==1){
+row["startDate"] = params["startDate"];
+row["endDate"] = params["endDate"];
+row["valid"] = 1;
+}
+else{
+row["startDate"] = "(Неправильно определен формат даты)";
+row["endDate"] = "(Неправильно определен формат даты)";
+row["valid"] = 0;
+}
+
+currentrow = currentrow + 1;
+
+return(true);]]></method>
+        </script-data-set>
+        <script-data-set name="stateDataSet" id="694">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">0</property>
+                    <property name="name">stateName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">stateId</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">stateName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">stateId</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">stateName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">stateId</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazzLod = new Packages.org.lanit.samara.birt.plugins.Shark();
+
+stateList= clazzLod.getEntityManagerLod().createQuery(
+"SELECT ce.name,ce.id FROM CardElement ce where ce.card.cardCode='cardOper'"
+).getResultList();
+
+totalrows = stateList.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = stateList.get(currentrow);
+
+row["stateName"] = rowValue[0];
+row["stateId"] = rowValue[1];
+
+currentrow = currentrow + 1;
+
+return(true);
+
+
+]]></method>
+            <method name="close"><![CDATA[stateList=null;]]></method>
+        </script-data-set>
+        <script-data-set name="ContractDocsDataSet" id="712">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">docName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">docDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">status</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">countRows</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">isSigned</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">docName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">docDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">status</property>
+                </structure>
+                <structure>
+                    <property name="columnName">countRows</property>
+                </structure>
+                <structure>
+                    <property name="columnName">isSigned</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">currCollId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue" type="javascript">-1</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">docName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">docDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">status</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">countRows</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">isSigned</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+localParam = inputParams["currCollId"];
+
+paramStateNameProj = clazz.getEntityManagerLod().createQuery(
+" select name from CardElement where id = '"+params["stateList"]+"'"
+).getSingleResult();
+
+contractDocsList = clazz.getEntityManagerLod().createQuery(
+
+" select "+ 
+" aCard.docType, "+ 
+" aCard.docDate,  "+
+" (select  "+
+"	 afv3.booleanValue "+ 
+"	 from  "+
+"	 AdditionalFieldValue afv3 "+ 
+"	 where  "+
+"	 afv3.field.name = 'signed' "+ 
+"	 and afv3.itemId = aCard.id  "+
+"	 and afv3.field.model='org.lanit.samara.darchive.ArchiveCard' ), "+ 
+"(select ce.name   "+
+"	 from    "+
+"	 ArchiveHistory ah, CardElement ce "+ 
+"	 where    "+
+"	 ah.card.id = aCard.id and "+ 
+"	 ce.id = ah.status    "+
+"	 and ah.date = (select max(ah1.date) from ArchiveHistory ah1 "+ 
+"	 where   "+
+"	 ah1.card.id = ah.card.id)), "+ 
+" aCard.docName, "+
+//"( select name from CardElement where "+ 
+//"			 card.cardCode = 'SDocType' and id = aCard.docType ), "+
+" aCard.docNumber "+
+" from "+ 
+" ArchiveCard aCard "+ 
+" where "+
+" aCard.collection.id="+localParam
+
+).getResultList();
+
+totalrows = contractDocsList.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = contractDocsList.get(currentrow);
+if ("act_sch_fact".equals(rowValue[0])){
+cardState = rowValue[3];
+if (cardState==null) isEequealState = 0; 
+else isEequealState = cardState.equals(paramStateNameProj);
+
+if (params["useStateSearch"]==0) isEequealState=1;
+
+if (isEequealState){
+docName = "";
+if (rowValue[4]!=null &amp;&amp; !"".equals(rowValue[4])) docName = rowValue[4];
+if (rowValue[5]!=null &amp;&amp; !"".equals(rowValue[5])) docName += " №"+rowValue[5];
+row["docName"] = docName;
+row["docDate"] =rowValue[1];
+if (rowValue[2]==0 ) row["isSigned"] ="нет";
+else row["isSigned"] ="да";
+
+if (cardState==null) row["status"] = "[не задано]"; 
+else row["status"] = cardState;
+
+
+row["countRows"]=contractDocsList.size();
+}
+}
+
+currentrow = currentrow + 1;
+
+return(true);
+
+]]></method>
+            <method name="close"><![CDATA[clazz = null;
+stagesInfoList = null;
+cards=null;date=null;]]></method>
+        </script-data-set>
+        <script-data-set name="rootDataSet" id="976">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">currCollIdParam</property>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">currCollIdParam</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">currCollIdParam</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.DocPackage();
+clazzConv = new Packages.org.lanit.samara.birt.plugins.Converter();
+
+valid= clazzConv.dateIsValid(params["startDate"],params["endDate"]);
+	if (valid){
+		dStartString = clazzConv.getStringFormat(params["startDate"]);
+		dEndString = clazzConv.getStringFormat(params["endDate"]);
+	}
+
+resultAll = clazz.getRecurColl(params["collId"]);
+
+j=0;
+result = new java.util.ArrayList();
+while (j<resultAll.size()){
+	tmp = resultAll.get(j);
+	if ("dColTypeProject".equals(tmp[1]))
+		if (valid){		
+			canAddFromDate = clazzConv.canAdd(dStartString,dEndString,tmp[2],tmp[3]);
+			//clazzConv.logg(canAddFromDate);
+						
+			if (canAddFromDate) 
+				result.add(tmp[0]);
+		}else result.add(tmp[0]);
+	j++;
+}
+
+totalrows = result.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = result.get(currentrow);
+
+row["currCollIdParam"] = rowValue;
+
+currentrow = currentrow + 1;
+
+return(true);
+]]></method>
+        </script-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.5cm</property>
+            <property name="leftMargin">3cm</property>
+            <property name="bottomMargin">0.5cm</property>
+            <property name="rightMargin">1cm</property>
+            <page-footer>
+                <auto-text id="1002">
+                    <property name="fontFamily">"Roman Unicode"</property>
+                    <property name="textAlign">right</property>
+                    <property name="type">page-number</property>
+                </auto-text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="977">
+            <property name="dataSet">rootDataSet</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">currCollIdParam</property>
+                    <text-property name="displayName">currCollIdParam</text-property>
+                    <expression name="expression">dataSetRow["currCollIdParam"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <column id="986"/>
+            <header>
+                <row id="992">
+                    <cell id="993">
+                        <text id="991">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[ ]]></text-property>
+                        </text>
+                        <text id="990">
+                            <property name="fontFamily">"Linux Libertine"</property>
+                            <property name="fontSize">14pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Реестр актов и счет-фактур]]></text-property>
+                        </text>
+                        <text id="989">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[ ]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="981">
+                    <property name="borderTopColor">#000000</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">thin</property>
+                    <cell id="982">
+                        <label id="996">
+                            <property name="fontSize">9pt</property>
+                            <text-property name="text"> </text-property>
+                        </label>
+                        <grid id="7">
+                            <property name="fontFamily">"Roman Unicode"</property>
+                            <property name="fontSize">8pt</property>
+                            <property name="verticalAlign">middle</property>
+                            <property name="width">9.282352941176471in</property>
+                            <column id="8">
+                                <property name="width">3.3058823529411763in</property>
+                            </column>
+                            <column id="9">
+                                <property name="width">3.7529411764705882in</property>
+                            </column>
+                            <column id="10">
+                                <property name="width">2.223529411764706in</property>
+                            </column>
+                            <row id="48">
+                                <property name="height">98%</property>
+                                <cell id="49">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <grid id="665">
+                                        <property name="fontFamily">"Ozrad CLM"</property>
+                                        <property name="verticalAlign">middle</property>
+                                        <property name="height">1.3529411764705883in</property>
+                                        <property name="width">100%</property>
+                                        <column id="974">
+                                            <property name="width">0.3411764705882353in</property>
+                                        </column>
+                                        <column id="684">
+                                            <property name="width">0.9294117647058824in</property>
+                                        </column>
+                                        <column id="667">
+                                            <property name="width">1.9529411764705882in</property>
+                                        </column>
+                                        <row id="669">
+                                            <property name="height">0.3176470588235294in</property>
+                                            <cell id="970">
+                                                <property name="verticalAlign">middle</property>
+                                            </cell>
+                                            <cell id="681">
+                                                <property name="colSpan">2</property>
+                                                <property name="rowSpan">1</property>
+                                                <property name="verticalAlign">middle</property>
+                                                <text id="685">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <property name="fontWeight">bold</property>
+                                                    <property name="textAlign">center</property>
+                                                    <property name="contentType">auto</property>
+                                                    <text-property name="content"><![CDATA[Входные параметры:]]></text-property>
+                                                </text>
+                                            </cell>
+                                        </row>
+                                        <row id="673">
+                                            <property name="height">1.035294117647059in</property>
+                                            <cell id="971">
+                                                <property name="fontFamily">"Roman Unicode"</property>
+                                                <property name="verticalAlign">bottom</property>
+                                            </cell>
+                                            <cell id="682">
+                                                <property name="fontFamily">"Roman Unicode"</property>
+                                                <property name="verticalAlign">middle</property>
+                                                <text id="689">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <property name="contentType">auto</property>
+                                                    <text-property name="content"><![CDATA[Диапазон дат:]]></text-property>
+                                                </text>
+                                                <text id="690">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <list-property name="visibility">
+                                                        <structure>
+                                                            <property name="format">all</property>
+                                                            <expression name="valueExpr" type="javascript">params["useStateSearch"].value==0</expression>
+                                                        </structure>
+                                                    </list-property>
+                                                    <property name="contentType">auto</property>
+                                                    <text-property name="content"><![CDATA[Статус:]]></text-property>
+                                                </text>
+                                                <text id="804">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <property name="contentType">auto</property>
+                                                    <text-property name="content"><![CDATA[Выбраны:]]></text-property>
+                                                </text>
+                                            </cell>
+                                            <cell id="675">
+                                                <property name="fontFamily">"Roman Unicode"</property>
+                                                <property name="verticalAlign">middle</property>
+                                                <text id="696">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <property name="fontSize">8pt</property>
+                                                    <property name="dataSet">dateData</property>
+                                                    <list-property name="boundDataColumns">
+                                                        <structure>
+                                                            <property name="name">startDate</property>
+                                                            <expression name="expression">dataSetRow["startDate"]</expression>
+                                                            <property name="dataType">string</property>
+                                                        </structure>
+                                                        <structure>
+                                                            <property name="name">endDate</property>
+                                                            <expression name="expression">dataSetRow["endDate"]</expression>
+                                                            <property name="dataType">string</property>
+                                                        </structure>
+                                                        <structure>
+                                                            <property name="name">valid</property>
+                                                            <expression name="expression">dataSetRow["valid"]</expression>
+                                                            <property name="dataType">integer</property>
+                                                        </structure>
+                                                    </list-property>
+                                                    <property name="contentType">html</property>
+                                                    <text-property name="content"><![CDATA[с <U><B><VALUE-OF>row["startDate"]</VALUE-OF> г.</B></U> по <U><B><VALUE-OF>row["endDate"]</VALUE-OF> г.</B></U>]]></text-property>
+                                                </text>
+                                                <table id="697">
+                                                    <property name="dataSet">stateDataSet</property>
+                                                    <list-property name="visibility">
+                                                        <structure>
+                                                            <property name="format">all</property>
+                                                            <expression name="valueExpr" type="javascript">params["useStateSearch"].value==0</expression>
+                                                        </structure>
+                                                    </list-property>
+                                                    <list-property name="boundDataColumns">
+                                                        <structure>
+                                                            <property name="name">stateName</property>
+                                                            <expression name="expression">dataSetRow["stateName"]</expression>
+                                                            <property name="dataType">string</property>
+                                                        </structure>
+                                                        <structure>
+                                                            <property name="name">stateId</property>
+                                                            <expression name="expression">dataSetRow["stateId"]</expression>
+                                                            <property name="dataType">string</property>
+                                                        </structure>
+                                                    </list-property>
+                                                    <column id="711"/>
+                                                    <detail>
+                                                        <row id="702">
+                                                            <list-property name="visibility">
+                                                                <structure>
+                                                                    <property name="format">all</property>
+                                                                    <expression name="valueExpr" type="javascript">!params["stateList"].value.equals(row["stateId"])</expression>
+                                                                </structure>
+                                                            </list-property>
+                                                            <cell id="704">
+                                                                <text id="695">
+                                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                                    <property name="contentType">html</property>
+                                                                    <text-property name="content"><![CDATA[<VALUE-OF>row["stateName"]</VALUE-OF>]]></text-property>
+                                                                </text>
+                                                            </cell>
+                                                        </row>
+                                                    </detail>
+                                                </table>
+                                                <text id="805">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <property name="textAlign">left</property>
+                                                    <list-property name="visibility">
+                                                        <structure>
+                                                            <property name="format">all</property>
+                                                            <expression name="valueExpr" type="javascript">params["viewAll"].value==0</expression>
+                                                        </structure>
+                                                    </list-property>
+                                                    <property name="contentType">html</property>
+                                                    <text-property name="content"><![CDATA[все]]></text-property>
+                                                </text>
+                                                <text id="806">
+                                                    <property name="fontFamily">"Linux Libertine"</property>
+                                                    <list-property name="visibility">
+                                                        <structure>
+                                                            <property name="format">all</property>
+                                                            <expression name="valueExpr" type="javascript">params["viewAll"].value==1</expression>
+                                                        </structure>
+                                                    </list-property>
+                                                    <property name="contentType">html</property>
+                                                    <text-property name="content"><![CDATA[незакрытые]]></text-property>
+                                                </text>
+                                            </cell>
+                                        </row>
+                                    </grid>
+                                </cell>
+                                <cell id="100">
+                                    <property name="colSpan">2</property>
+                                    <property name="rowSpan">1</property>
+                                    <table id="291">
+                                        <property name="width">100%</property>
+                                        <property name="dataSet">ContractDataSet</property>
+                                        <list-property name="paramBindings">
+                                            <structure>
+                                                <property name="paramName">currCollId</property>
+                                                <expression name="expression" type="javascript">row["currCollIdParam"]</expression>
+                                            </structure>
+                                        </list-property>
+                                        <list-property name="boundDataColumns">
+                                            <structure>
+                                                <property name="name">fieldName</property>
+                                                <expression name="expression">dataSetRow["fieldName"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">fieldValue</property>
+                                                <expression name="expression">dataSetRow["fieldValue"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">fieldValueDate</property>
+                                                <expression name="expression">dataSetRow["fieldValueDate"]</expression>
+                                                <property name="dataType">date</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">contrName</property>
+                                                <expression name="expression">dataSetRow["contrName"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                        </list-property>
+                                        <column id="305"/>
+                                        <column id="306"/>
+                                        <header>
+                                            <row id="292">
+                                                <cell id="293">
+                                                    <property name="colSpan">2</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <text id="35">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Общая информация по контракту: <VALUE-OF>row["contrName"]</VALUE-OF>]]></text-property>
+                                                    </text>
+                                                </cell>
+                                            </row>
+                                        </header>
+                                        <detail>
+                                            <row id="297">
+                                                <cell id="298">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <data id="299">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="resultSetColumn">fieldName</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="300">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <data id="301">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <list-property name="visibility">
+                                                            <structure>
+                                                                <property name="format">all</property>
+                                                                <expression name="valueExpr" type="javascript">row["fieldValueDate"]!=null</expression>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">fieldValue</property>
+                                                    </data>
+                                                    <data id="352">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <list-property name="visibility">
+                                                            <structure>
+                                                                <property name="format">all</property>
+                                                                <expression name="valueExpr" type="javascript">row["fieldValueDate"]==null</expression>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">fieldValueDate</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </detail>
+                                    </table>
+                                    <label id="967">
+                                        <text-property name="text"> </text-property>
+                                    </label>
+                                    <table id="736">
+                                        <property name="width">100%</property>
+                                        <property name="dataSet">ContractDocsDataSet</property>
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["countRows"]==null || row["countRows"]==0</expression>
+                                            </structure>
+                                        </list-property>
+                                        <list-property name="paramBindings">
+                                            <structure>
+                                                <property name="paramName">currCollId</property>
+                                                <expression name="expression" type="javascript">row["currCollIdParam"]</expression>
+                                            </structure>
+                                        </list-property>
+                                        <list-property name="boundDataColumns">
+                                            <structure>
+                                                <property name="name">docName</property>
+                                                <expression name="expression">dataSetRow["docName"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">docDate</property>
+                                                <expression name="expression">dataSetRow["docDate"]</expression>
+                                                <property name="dataType">date</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">status</property>
+                                                <expression name="expression">dataSetRow["status"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">countRows</property>
+                                                <expression name="expression">dataSetRow["countRows"]</expression>
+                                                <property name="dataType">integer</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">isSigned</property>
+                                                <expression name="expression">dataSetRow["isSigned"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                        </list-property>
+                                        <column id="755"/>
+                                        <column id="787"/>
+                                        <column id="756"/>
+                                        <column id="757"/>
+                                        <header>
+                                            <row id="737">
+                                                <cell id="738">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <text id="758">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Перечень документов по ГК: <VALUE-OF>row["contrName"]</VALUE-OF>]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="785">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <text id="760">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Статус  документов]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="740">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <text id="788">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Факт подписания]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="742">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <text id="759">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Дата документа]]></text-property>
+                                                    </text>
+                                                </cell>
+                                            </row>
+                                        </header>
+                                        <detail>
+                                            <row id="744">
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr" type="javascript">row["docName"]==null</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <cell id="745">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <data id="746">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">docName</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="786">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <data id="750">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">status</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="747">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <data id="969">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">isSigned</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="749">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <data id="968">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">docDate</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </detail>
+                                    </table>
+                                </cell>
+                            </row>
+                            <row id="19">
+                                <cell id="20">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="textAlign">center</property>
+                                    <label id="988"/>
+                                    <table id="136">
+                                        <property name="verticalAlign">middle</property>
+                                        <property name="width">9.176470588235293in</property>
+                                        <property name="dataSet">StagesDataSet</property>
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["rowNum"]==null || row["rowNum"]==0</expression>
+                                            </structure>
+                                        </list-property>
+                                        <list-property name="paramBindings">
+                                            <structure>
+                                                <property name="paramName">currCollId</property>
+                                                <expression name="expression" type="javascript">row["currCollIdParam"]</expression>
+                                            </structure>
+                                        </list-property>
+                                        <list-property name="boundDataColumns">
+                                            <structure>
+                                                <property name="name">collectionName</property>
+                                                <expression name="expression">dataSetRow["collectionName"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">fieldValueStatus</property>
+                                                <expression name="expression">dataSetRow["fieldValueStatus"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">fieldValueDate</property>
+                                                <expression name="expression">dataSetRow["fieldValueDate"]</expression>
+                                                <property name="dataType">date</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">docName</property>
+                                                <expression name="expression">dataSetRow["docName"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">docDate</property>
+                                                <expression name="expression">dataSetRow["docDate"]</expression>
+                                                <property name="dataType">date</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">status</property>
+                                                <expression name="expression">dataSetRow["status"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">isSigned</property>
+                                                <expression name="expression">dataSetRow["isSigned"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">rowNum</property>
+                                                <expression name="expression">dataSetRow["rowNum"]</expression>
+                                                <property name="dataType">integer</property>
+                                            </structure>
+                                        </list-property>
+                                        <column id="664">
+                                            <property name="width">0.6705882352941176in</property>
+                                        </column>
+                                        <column id="173">
+                                            <property name="width">1.9764705882352942in</property>
+                                        </column>
+                                        <column id="794">
+                                            <property name="width">2.6470588235294117in</property>
+                                        </column>
+                                        <column id="176">
+                                            <property name="width">1.4705882352941178in</property>
+                                        </column>
+                                        <column id="177">
+                                            <property name="width">2.4235294117647057in</property>
+                                        </column>
+                                        <header>
+                                            <row id="137">
+                                                <cell id="659">
+                                                    <property name="colSpan">2</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <text id="184">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">9pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Этап]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="789">
+                                                    <property name="colSpan">2</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <text id="187">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">9pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Статус этапа]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="142">
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <text id="188">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="fontSize">9pt</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Дата закрытия этапа]]></text-property>
+                                                    </text>
+                                                </cell>
+                                            </row>
+                                        </header>
+                                        <group id="634">
+                                            <property name="groupName">NewTableGroup1</property>
+                                            <property name="interval">none</property>
+                                            <property name="sortDirection">asc</property>
+                                            <expression name="keyExpr" type="javascript">row["collectionName"]</expression>
+                                            <structure name="toc">
+                                                <expression name="expressionValue" type="javascript">row["collectionName"]</expression>
+                                            </structure>
+                                            <property name="repeatHeader">true</property>
+                                            <property name="hideDetail">false</property>
+                                            <property name="pageBreakAfter">auto</property>
+                                            <property name="pageBreakBefore">auto</property>
+                                            <property name="pageBreakInside">auto</property>
+                                            <header>
+                                                <row id="635">
+                                                    <list-property name="visibility">
+                                                        <structure>
+                                                            <property name="format">all</property>
+                                                            <expression name="valueExpr" type="javascript">if (params["viewAll"].value==0) row["fieldValueDate"]!=null &amp;&amp; row["collectionName"]==null;
+else row["collectionName"]==null</expression>
+                                                        </structure>
+                                                    </list-property>
+                                                    <cell id="660">
+                                                        <property name="colSpan">2</property>
+                                                        <property name="rowSpan">1</property>
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="221">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">9pt</property>
+                                                            <property name="fontWeight">bold</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[<VALUE-OF>row["collectionName"]</VALUE-OF>]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                    <cell id="790">
+                                                        <property name="colSpan">2</property>
+                                                        <property name="rowSpan">1</property>
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="222">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">9pt</property>
+                                                            <property name="fontWeight">bold</property>
+                                                            <property name="textAlign">center</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[<VALUE-OF>row["fieldValueStatus"]</VALUE-OF>]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                    <cell id="638">
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="353">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">9pt</property>
+                                                            <property name="fontWeight">bold</property>
+                                                            <property name="textAlign">center</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[<VALUE-OF>row["fieldValueDate"]</VALUE-OF>]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                </row>
+                                                <row id="644">
+                                                    <list-property name="visibility">
+                                                        <structure>
+                                                            <property name="format">all</property>
+                                                            <expression name="valueExpr" type="javascript">if (params["viewAll"].value==0) row["fieldValueDate"]!=null &amp;&amp; row["collectionName"]==null;
+else row["collectionName"]==null</expression>
+                                                        </structure>
+                                                    </list-property>
+                                                    <cell id="661">
+                                                        <property name="colSpan">2</property>
+                                                        <property name="rowSpan">1</property>
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="189">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">8pt</property>
+                                                            <property name="textAlign">center</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[Перечень документов по ГК]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                    <cell id="791">
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="192">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">8pt</property>
+                                                            <property name="textAlign">center</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[Статус  документов]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                    <cell id="646">
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="191">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">8pt</property>
+                                                            <property name="textAlign">center</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[Факт подписания]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                    <cell id="647">
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <text id="797">
+                                                            <property name="fontFamily">"Linux Libertine"</property>
+                                                            <property name="fontSize">8pt</property>
+                                                            <property name="textAlign">center</property>
+                                                            <property name="contentType">html</property>
+                                                            <text-property name="content"><![CDATA[Дата документа]]></text-property>
+                                                        </text>
+                                                    </cell>
+                                                </row>
+                                            </header>
+                                        </group>
+                                        <detail>
+                                            <row id="593">
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr" type="javascript">if (params["viewAll"].value==0) row["fieldValueDate"]!=null &amp;&amp; row["docName"]==null ;
+else row["docName"]==null</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <cell id="662">
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                </cell>
+                                                <cell id="594">
+                                                    <property name="colSpan">1</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <data id="616">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">docName</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="792">
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <data id="618">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">status</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="648">
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <data id="798">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">isSigned</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="649">
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <property name="verticalAlign">middle</property>
+                                                    <data id="799">
+                                                        <property name="fontFamily">"Linux Libertine"</property>
+                                                        <property name="textAlign">center</property>
+                                                        <property name="resultSetColumn">docDate</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </detail>
+                                        <footer>
+                                            <row id="1009">
+                                                <property name="borderTopColor">#000000</property>
+                                                <property name="borderTopStyle">solid</property>
+                                                <property name="borderTopWidth">thin</property>
+                                                <cell id="1010"/>
+                                                <cell id="1011"/>
+                                                <cell id="1012"/>
+                                                <cell id="1013"/>
+                                                <cell id="1014"/>
+                                            </row>
+                                        </footer>
+                                    </table>
+                                </cell>
+                            </row>
+                        </grid>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="1000">
+                    <property name="borderTopColor">#000000</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">thin</property>
+                    <cell id="1001"/>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>

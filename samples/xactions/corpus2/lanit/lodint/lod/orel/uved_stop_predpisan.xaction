@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Уведомление заявителю о снятии с контроля предписания об устранении нарушений</title>
+  <version>1</version>
+  <documentation> 
+    <author>Tretyakova Alena</author>  
+    <description>Уведомление заявителю о снятии с контроля предписания об устранении нарушений</description>  
+    <icon>PentahoReporting.png</icon>  
+    <help/>  
+    <result-type>report</result-type> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources>  
+      <default-value/> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources>  
+      <default-value/> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>uved_stop_predpisan.xml</location>  
+        <mime-type>text/xml</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputTypeList type="property-map-list"/>  
+        <outputType type="string"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <title>Формат вывода:</title>  
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+          </outputType> 
+        </selections>  
+        <target><![CDATA[Report_Window]]></target> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JS -список переменных для запроса к SHARK</action-type>
+      <action-inputs/>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <variableList type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList='agentId,agentAddress,outRejectDate';]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom - Получаем переменные из SHARK</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <processId type="string"/>  
+        <activityId type="string"/>  
+        <variableList type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-inputs> 
+        <dsResult type="result-set"/> 
+      </action-inputs>
+      <action-outputs> 
+        <AGENT_ADDRESS type="string"/>  
+        <DATE type="string"/>  
+        <agentId type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[rcount=dsResult.getRowCount();
+if (rcount!=0){
+    
+  agentId=dsResult.getValueAt(0,0);
+
+  AGENT_ADDRESS=dsResult.getValueAt(0,2);
+  
+  DATE=dsResult.getValueAt(0,4);
+ 
+}]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript-Create EJBQL</action-type>
+      <action-inputs> 
+        <agentId type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql=" select "+
+" val1.fieldStringValue, "+
+" val2.fieldStringValue, "+
+" val3.fieldStringValue, "+
+" a1.name, "+
+" a1.bossPosition, "+
+" a1.bossFio "+
+" from "+
+" CardElementFieldValue val1, CardElementFieldValue val2, "+
+" CardElementFieldValue val3, CardField cf1,CardField cf2, "+
+" CardField cf3, Agent a1 "+
+" where "+
+" cf1.fieldName='ФИО Руководителя ОГВ' and "+
+" val1.cardElement='ServiceTarif' and val1.cardField=cf1.fieldId and "+
+" cf2.fieldName='Адрес государственного органа' and "+
+" val2.cardElement='ServiceTarif' and val2.cardField=cf2.fieldId and "+
+" cf3.fieldName='Телефоны ОГВ' and "+
+" val3.cardElement='ServiceTarif' and val3.cardField=cf3.fieldId and "+
+" a1.id={agentId}";
+
+fields="RUK_SERVICE,"+
+"OGV_ADDRESS,"+
+"OGV_PHONES,"+
+"AGENT_NAME,"+
+"BOSS_POSITION,"+
+"BOSS_FIO";]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom-Выполняем запрос</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JFreeReportComponent</component-name>
+      <action-type>report</action-type>
+      <action-inputs> 
+        <output-type type="string" mapping="outputType"/>  
+        <data type="result-set" mapping="dsResult"/>  
+        <AGENT_ADDRESS type="string"/>  
+        <DATE type="string"/> 
+      </action-inputs>
+      <action-resources> 
+        <report-definition type="resource"/> 
+      </action-resources>
+      <action-outputs> 
+        <report-output type="content" mapping="content"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

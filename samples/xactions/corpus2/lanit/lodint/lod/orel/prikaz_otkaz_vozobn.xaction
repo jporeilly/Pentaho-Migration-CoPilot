@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Приказ об отказе в возобновлении действия лицензии</title>
+  <version>1</version>
+  <documentation> 
+    <author>Tretyakova Alena</author>  
+    <description>Приказ об отказе в возобновлении действия лицензии</description>  
+    <icon>PentahoReporting.png</icon>  
+    <help/>  
+    <result-type>report</result-type> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources>  
+      <default-value/> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources>  
+      <default-value/> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>prikaz_otkaz_vozobn.xml</location>  
+        <mime-type>text/xml</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputTypeList type="property-map-list"/>  
+        <outputType type="string"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <title>Формат вывода:</title>  
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+          </outputType> 
+        </selections>  
+        <target><![CDATA[Report_Window]]></target> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JS -список переменных для запроса к SHARK</action-type>
+      <action-inputs/>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <variableList type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList='ctrl_act_date,ctrl_act_num,agentId,agentAddress,licenseNumber,licenseDate,prikaz_num,prikaz_text,licenseSerie,
+licObjPac';]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom - Получаем перемнные из SHARK</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <processId type="string"/>  
+        <activityId type="string"/>  
+        <variableList type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-inputs> 
+        <dsResult type="result-set"/> 
+      </action-inputs>
+      <action-outputs> 
+        <inDocNo type="string"/>  
+        <agentId type="string"/>  
+        <AGENT_ADDRESS type="string"/>  
+        <licenseNumber type="string"/>  
+        <LICENSE_DATE type="string"/>  
+        <LICENSE_NUMBER type="string"/>  
+        <DOC_NUMBER type="string"/>  
+        <PRIKAZ_NUMBER type="string"/>  
+        <PRIKAZ_TEXT type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[rcount=dsResult.getRowCount();
+if (rcount!=0){
+  CTRL_ACT_DATE=dsResult.getValueAt(0,2);
+  
+  CTRL_ACT_NUM=dsResult.getValueAt(0,4);
+
+  agentId=dsResult.getValueAt(0,6);
+
+  AGENT_ADDRESS=dsResult.getValueAt(0,8);
+  
+  licenseNumber=dsResult.getValueAt(0,10);
+ 
+  LICENSE_NUMBER=dsResult.getValueAt(0,12);
+
+  LICENSE_DATE=dsResult.getValueAt(0,14);
+
+  PRIKAZ_NUMBER=dsResult.getValueAt(0,16);
+
+  PRIKAZ_TEXT=dsResult.getValueAt(0,18);
+
+  LICENSE_SERIE=dsResult.getValueAt(0,20);
+
+  licObjPac=dsResult.getValueAt(0,22);
+}]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript - Get current Date</action-type>
+      <action-outputs> 
+        <CURRENT_DATE_DAY type="string"/>  
+        <CURRENT_DATE_MONTH type="string"/>  
+        <CURRENT_DATE_YEAR type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[monthNames = new Array(12);
+monthNames[1] = "января";
+monthNames[2] = "февраля";
+monthNames[3] = "марта";
+monthNames[4] = "апреля";
+monthNames[5] = "мая";
+monthNames[6] = "июня";
+monthNames[7] = "июля";
+monthNames[8] = "августа";
+monthNames[9] = "сентября";
+monthNames[10] = "октября";
+monthNames[11] = "ноября";
+monthNames[12] = "декабря";
+
+currentDate = new Date();
+
+CURRENT_DATE_DAY = currentDate.getDate().toString();
+CURRENT_DATE_MONTH = monthNames[currentDate.getMonth() + 1];
+CURRENT_DATE_YEAR = (currentDate.getYear() + 1900).toString();]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript-Create EJBQL</action-type>
+      <action-inputs> 
+        <inDocNo type="string"/>  
+        <agentId type="string"/>  
+        <licenseNumber type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql=" select "+
+" ind1.docDate, "+
+" ind1.docNumber, "+
+" l1.licenseEndDate, "+
+" a1.name, "+
+" val.fieldStringValue "+
+" from "+
+" IncomingDoc ind1,License l1,Agent a1,CardElementFieldValue val, "+
+" CardField cf "+
+" where "+
+" l1.licenseNumber='{licenseNumber}' and ind1.id ='{inDocNo}' and "+
+" a1.id={agentId} and cf.fieldName='ФИО Руководителя ОГВ' and "+
+" val.cardElement='ServiceTarif' and val.cardField=cf.fieldId";
+
+fields="DOC_DATE,"+
+"DOC_NUMBER,"+
+"LICENSE_END_DATE,"+
+"AGENT_NAME,"+
+"RUK_SERVICE";]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom-Выполняем запрос</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JFreeReportComponent</component-name>
+      <action-type>report</action-type>
+      <action-inputs> 
+        <output-type type="string" mapping="outputType"/>  
+        <data type="result-set" mapping="dsResult"/>  
+        <AGENT_ADDRESS type="string"/>  
+        <LICENSE_DATE type="string"/>  
+        <CURRENT_DATE_DAY type="string"/>  
+        <CURRENT_DATE_MONTH type="string"/>  
+        <CURRENT_DATE_YEAR type="string"/>  
+        <LICENSE_NUMBER type="string"/>  
+        <PRIKAZ_NUMBER type="string"/>  
+        <PRIKAZ_TEXT type="string"/> 
+      </action-inputs>
+      <action-resources> 
+        <report-definition type="resource"/> 
+      </action-resources>
+      <action-outputs> 
+        <report-output type="content" mapping="content"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

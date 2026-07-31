@@ -1,0 +1,1206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.1.v20090903 Build &lt;2.5.1.v20090917-1447></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <parameters>
+        <scalar-parameter name="cardID" id="9">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="DataSource" id="7"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="ArchiveCardData" id="8">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">cardNumber</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">archiveCode</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">docType</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">docNumber</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">docDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">from</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">increateNum</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">increateDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">actualDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">restoreDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">pageCount</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">pageCountApp</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">hasPaper</property>
+                    <property name="dataType">boolean</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">description</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">mainDoc</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">collection</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">title</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">cardNumber</property>
+                    <text-property name="displayName">Номенклатурный номер</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">archiveCode</property>
+                    <text-property name="displayName">Архивный шифр</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">docType</property>
+                    <text-property name="displayName">Тип документа</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">docNumber</property>
+                    <text-property name="displayName">Номер документа</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">docDate</property>
+                    <text-property name="displayName">Дата документа</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">from</property>
+                    <text-property name="displayName">От кого</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">increateNum</property>
+                    <text-property name="displayName">Входящий номер</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">increateDate</property>
+                    <text-property name="displayName">Входящяя дата</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">actualDate</property>
+                    <text-property name="displayName">Актуальная дата документа</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">restoreDate</property>
+                    <text-property name="displayName">Дата списания</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pageCount</property>
+                    <text-property name="displayName">Количество листов</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pageCountApp</property>
+                    <text-property name="displayName">Количество листов приложения</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">hasPaper</property>
+                    <text-property name="displayName">Наличие бумажного документа</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">description</property>
+                    <text-property name="displayName">Описание</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">mainDoc</property>
+                    <text-property name="displayName">Связанный документ</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">collection</property>
+                    <text-property name="displayName">Раздел</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">title</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">cardNumber</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">archiveCode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">docType</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">docNumber</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">docDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">from</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">increateNum</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">increateDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">actualDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">restoreDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">pageCount</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">pageCountApp</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">hasPaper</property>
+                        <property name="dataType">boolean</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">description</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">mainDoc</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">collection</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">title</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">DataSource</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+
+cardId = params["cardID"];
+
+result = clazz.getEntityManager().createNativeQuery(
+	"select ID, CARD_NUMBER, ARCHIVE_CODE,DOC_TYPE,DOC_NUM, DOC_DATE, FROM_ID, IN_NUM, IN_DATE, ACTUAL_DATE, RESTORE_DATE, PAGE_COUNT, "
+		+ "PAGE_COUNT_APP, HAS_PAPER, DESCRIPTION, MAINDOC_ID, COLLECTION_ID "
+	+ "from ARCHIVE_CARD where id = "+cardId)
+		.getResultList();
+
+totalrows = result.size();
+
+currentrow = 0;
+]]></method>
+            <method name="fetch"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+
+function getCardTitle(id){
+	if(id==null)return id;
+	
+	card = clazz.getEntityManager().createNativeQuery("select card_number, doc_type, doc_num, doc_date from archive_card where id = "+id).getSingleResult();
+	title = "";
+	if(card[0]!=null &amp;&amp; !card[0].isEmpty())
+		title += "№ "+ card[0];
+	if(card[1]!=null &amp;&amp; !card[1].isEmpty())
+		title += " "+getCardElementName(card[1]);
+	if(card[2]!=null &amp;&amp; !card[2].isEmpty())
+		title += " № "+ card[2];
+	if(card[3]!=null){
+		dateFormat = new Packages.java.text.SimpleDateFormat("dd.MM.yyyy");
+		title += " от "+dateFormat.format(card[3]);
+	}
+	return title;  
+}
+
+function getCardElementName(code){
+	if(code==null)return code;
+	return clazz.getEntityManager().createNativeQuery("select name from card_element where id = '"+code+"'").getSingleResult();
+}
+
+function getPersonToString(id){
+	if(id==null)return id;
+	
+	return clazz.getEntityManager().createNativeQuery("select last_name||' '||first_name||' '||middle_name from person where id = "+id).getSingleResult();
+}
+
+function getCollectionToString(id){
+	if(id==null)return id;
+	
+	var collection = clazz.getEntityManager().createNativeQuery("select name, parent_id from archive_collection where id = "+id).getSingleResult();
+	return collection[1]!=null ? getCollectionToString(collection[1])+"/"+collection[0] : collection[0];
+}
+
+
+if (currentrow >= totalrows) {
+	return(false);
+}
+
+var rowValue = result.get(currentrow);
+
+row["title"] = getCardTitle(rowValue[0]);
+row["cardNumber"] = rowValue[1];//.getCardNumber();
+row["archiveCode"] = rowValue[2];//.getArchiveCode();
+row["docType"] = getCardElementName(rowValue[3]);//.getDocType();
+row["docNumber"] = rowValue[4];//.getDocNumber();
+row["docDate"] = rowValue[5];//.getDocDate();
+row["from"] = getPersonToString(rowValue[6]);//.getFrom();
+row["increateNum"] = rowValue[7];//.getIncreateNum();
+row["increateDate"] = rowValue[8];//.getIncreateDate();
+row["actualDate"] = rowValue[9];//.getActualDate();
+row["restoreDate"] = rowValue[10];//.getRestoreDate();
+row["pageCount"] = rowValue[11];//.getPageCount();
+row["pageCountApp"] = rowValue[12];//.getPageCountApp();
+row["hasPaper"] = rowValue[13];//.getHasPaper();
+row["description"] = rowValue[14];//.getDescription();
+row["mainDoc"] = getCardTitle(rowValue[15]);//.getMainDoc();
+row["collection"] = getCollectionToString(rowValue[16]);//.getCollection();*/
+
+
+currentrow = currentrow + 1;
+
+return(true);
+
+
+]]></method>
+        </script-data-set>
+        <script-data-set name="AdditionalData" id="400">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">caption</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">value</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">caption</property>
+                    <text-property name="displayName">caption</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">value</property>
+                    <text-property name="displayName">value</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">caption</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">value</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">DataSource</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+
+cardId = params["cardID"];
+
+result = clazz.getEntityManager().createQuery(
+	"select field.type, field.caption, "
+	+ "stringValue, dateValue, integerValue, booleanValue "
+	+ "from AdditionalFieldValue "
+	+ "where field.model = 'org.lanit.samara.darchive.ArchiveCard' "
+	+ "and item_Id = "+cardId).getResultList();
+
+totalrows = result.size();
+
+currentrow = 0;
+]]></method>
+            <method name="fetch"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+
+if (currentrow >= totalrows) {
+	return(false);
+}
+
+var rowValue = result.get(currentrow);
+
+row["caption"] = rowValue[1];
+row["value"] = getValue(rowValue);
+
+function getValue(additionalValue){
+	if (additionalValue[2]!=null &amp;&amp;	"string".equals(rowValue[0]))
+		return additionalValue[2];
+	if (additionalValue[3]!=null &amp;&amp; "date".equals(rowValue[0])){
+		dateFormat = new Packages.java.text.SimpleDateFormat("dd.MM.yyyy");
+		return dateFormat.format(additionalValue[3]);
+	}
+	if (additionalValue[4]!=null &amp;&amp;	"integer".equals(rowValue[0]))
+		return additionalValue[4];
+	if (additionalValue[5]!=null &amp;&amp;	"boolean".equals(rowValue[0])){
+		if (additionalValue[5].equals("true")) return "да";
+		else return "нет";
+	}
+	return null;
+}
+
+currentrow = currentrow + 1;
+
+return(true);
+
+
+]]></method>
+        </script-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">"Verdana"</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="Label" id="378">
+            <property name="fontFamily">"Roman Unicode"</property>
+            <property name="fontSize">large</property>
+            <property name="fontWeight">600</property>
+            <property name="fontStyle">normal</property>
+            <property name="textLineThrough">none</property>
+            <property name="textOverline">none</property>
+            <property name="textUnderline">none</property>
+            <property name="borderBottomStyle">none</property>
+            <property name="borderRightWidth">thick</property>
+            <property name="borderTopWidth">thick</property>
+            <structure name="dateTimeFormat">
+                <property name="category">Long Date</property>
+                <property name="pattern">Long Date</property>
+            </structure>
+            <structure name="numberFormat">
+                <property name="category">Unformatted</property>
+            </structure>
+            <property name="textAlign">right</property>
+        </style>
+        <style name="Text" id="379">
+            <property name="fontFamily">"Roman Unicode"</property>
+            <property name="fontSize">large</property>
+            <property name="fontWeight">300</property>
+            <property name="textAlign">left</property>
+        </style>
+        <style name="Title" id="380">
+            <property name="fontFamily">"Roman Unicode"</property>
+            <property name="fontSize">x-large</property>
+            <property name="fontWeight">normal</property>
+            <property name="textAlign">center</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="topMargin">0.25in</property>
+            <property name="leftMargin">0.25in</property>
+            <property name="bottomMargin">0.25in</property>
+            <property name="rightMargin">0.25in</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="401">
+            <property name="dataSet">AdditionalData</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">caption</property>
+                    <text-property name="displayName">caption</text-property>
+                    <expression name="expression">dataSetRow["caption"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">value</property>
+                    <text-property name="displayName">value</text-property>
+                    <expression name="expression">dataSetRow["value"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="415"/>
+            <column id="532">
+                <property name="width">10px</property>
+            </column>
+            <column id="503">
+                <property name="width">10px</property>
+            </column>
+            <column id="416"/>
+            <column id="420"/>
+            <header>
+                <row id="504">
+                    <cell id="628">
+                        <property name="colSpan">5</property>
+                        <property name="rowSpan">1</property>
+                        <label id="509">
+                            <property name="style">Title</property>
+                            <text-property name="text">Карточка документа</text-property>
+                        </label>
+                    </cell>
+                </row>
+                <row id="481">
+                    <cell id="629">
+                        <property name="colSpan">5</property>
+                        <property name="rowSpan">1</property>
+                        <property name="style">Title</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="255">
+                            <property name="style">Title</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">title</property>
+                                    <text-property name="displayName">title</text-property>
+                                    <expression name="expression">dataSetRow["title"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">title</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="477">
+                    <cell id="630">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="43">
+                            <property name="style">Label</property>
+                            <text-property name="text">Раздел</text-property>
+                        </label>
+                    </cell>
+                    <cell id="515">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="486"/>
+                    <cell id="479">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="377">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">collection</property>
+                                    <text-property name="displayName">Раздел</text-property>
+                                    <expression name="expression">dataSetRow["collection"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">collection</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="473">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="631">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="13">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Номенклатурный номер</text-property>
+                        </label>
+                    </cell>
+                    <cell id="516">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="487"/>
+                    <cell id="475">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="256">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">cardNumber</property>
+                                    <text-property name="displayName">Номенклатурный номер</text-property>
+                                    <expression name="expression">dataSetRow["cardNumber"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">cardNumber</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="469">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="632">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="15">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Архивный шифр</text-property>
+                        </label>
+                    </cell>
+                    <cell id="517">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="488"/>
+                    <cell id="471">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="363">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">archiveCode</property>
+                                    <text-property name="displayName">Архивный шифр</text-property>
+                                    <expression name="expression">dataSetRow["archiveCode"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">archiveCode</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="465">
+                    <cell id="633">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="17">
+                            <property name="style">Label</property>
+                            <text-property name="text">Тип документа</text-property>
+                        </label>
+                    </cell>
+                    <cell id="518">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="489"/>
+                    <cell id="467">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="364">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">docType</property>
+                                    <text-property name="displayName">Тип документа</text-property>
+                                    <expression name="expression">dataSetRow["docType"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">docType</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="461">
+                    <cell id="634">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="19">
+                            <property name="style">Label</property>
+                            <text-property name="text">Номер документа</text-property>
+                        </label>
+                    </cell>
+                    <cell id="519">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="490"/>
+                    <cell id="463">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="365">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">docNumber</property>
+                                    <text-property name="displayName">Номер документа</text-property>
+                                    <expression name="expression">dataSetRow["docNumber"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">docNumber</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="457">
+                    <cell id="635">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="21">
+                            <property name="style">Label</property>
+                            <text-property name="text">Дата документа</text-property>
+                        </label>
+                    </cell>
+                    <cell id="520">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="491"/>
+                    <cell id="459">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="366">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">docDate</property>
+                                    <text-property name="displayName">Дата документа</text-property>
+                                    <expression name="expression">dataSetRow["docDate"]</expression>
+                                    <property name="dataType">date</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">docDate</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="453">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="636">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="23">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">От кого</text-property>
+                        </label>
+                    </cell>
+                    <cell id="521">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="492"/>
+                    <cell id="455">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="367">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">from</property>
+                                    <text-property name="displayName">От кого</text-property>
+                                    <expression name="expression">dataSetRow["from"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">from</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="449">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="637">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="25">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Входящий номер</text-property>
+                        </label>
+                    </cell>
+                    <cell id="522">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="493"/>
+                    <cell id="451">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="368">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">increateNum</property>
+                                    <text-property name="displayName">Входящий номер</text-property>
+                                    <expression name="expression">dataSetRow["increateNum"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">increateNum</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="445">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="638">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="27">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Входящяя дата</text-property>
+                        </label>
+                    </cell>
+                    <cell id="523">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="494"/>
+                    <cell id="447">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="369">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">increateDate</property>
+                                    <text-property name="displayName">Входящяя дата</text-property>
+                                    <expression name="expression">dataSetRow["increateDate"]</expression>
+                                    <property name="dataType">date</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">increateDate</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="441">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="639">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="29">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Актуальная дата документа</text-property>
+                        </label>
+                    </cell>
+                    <cell id="524">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="495"/>
+                    <cell id="443">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="370">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">actualDate</property>
+                                    <text-property name="displayName">Актуальная дата документа</text-property>
+                                    <expression name="expression">dataSetRow["actualDate"]</expression>
+                                    <property name="dataType">date</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">actualDate</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="429">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="640">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="31">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Дата списания</text-property>
+                        </label>
+                    </cell>
+                    <cell id="525">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="496"/>
+                    <cell id="431">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="371">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">restoreDate</property>
+                                    <text-property name="displayName">Дата списания</text-property>
+                                    <expression name="expression">dataSetRow["restoreDate"]</expression>
+                                    <property name="dataType">date</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">restoreDate</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="437">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="641">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="33">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Количество листов</text-property>
+                        </label>
+                    </cell>
+                    <cell id="526">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="497"/>
+                    <cell id="439">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="372">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">pageCount</property>
+                                    <text-property name="displayName">Количество листов</text-property>
+                                    <expression name="expression">dataSetRow["pageCount"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">pageCount</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="433">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="642">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="35">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Количество листов приложения</text-property>
+                        </label>
+                    </cell>
+                    <cell id="527">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="498"/>
+                    <cell id="435">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="373">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">pageCountApp</property>
+                                    <text-property name="displayName">Количество листов приложения</text-property>
+                                    <expression name="expression">dataSetRow["pageCountApp"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">pageCountApp</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="425">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="643">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="37">
+                            <property name="style">Label</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Наличие бумажного документа</text-property>
+                        </label>
+                    </cell>
+                    <cell id="528">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="499"/>
+                    <cell id="427">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="374">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">hasPaper</property>
+                                    <text-property name="displayName">Наличие бумажного документа</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["hasPaper"] ? "да" : "нет"</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">hasPaper</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="421">
+                    <cell id="644">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="39">
+                            <property name="style">Label</property>
+                            <text-property name="text">Описание</text-property>
+                        </label>
+                    </cell>
+                    <cell id="529">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="500"/>
+                    <cell id="423">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="375">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">description</property>
+                                    <text-property name="displayName">Описание</text-property>
+                                    <expression name="expression">dataSetRow["description"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">description</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="402">
+                    <cell id="645">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <label id="41">
+                            <property name="style">Label</property>
+                            <text-property name="text">Связанный документ</text-property>
+                        </label>
+                    </cell>
+                    <cell id="530">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="501"/>
+                    <cell id="405">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="376">
+                            <property name="style">Text</property>
+                            <property name="dataSet">ArchiveCardData</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">mainDoc</property>
+                                    <text-property name="displayName">Связанный документ</text-property>
+                                    <expression name="expression">dataSetRow["mainDoc"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">mainDoc</property>
+                        </data>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="407">
+                    <cell id="646">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <data id="409">
+                            <property name="style">Label</property>
+                            <property name="resultSetColumn">caption</property>
+                        </data>
+                    </cell>
+                    <cell id="531">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                    </cell>
+                    <cell id="502"/>
+                    <cell id="410">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <data id="411">
+                            <property name="style">Text</property>
+                            <property name="resultSetColumn">value</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+    </body>
+</report>

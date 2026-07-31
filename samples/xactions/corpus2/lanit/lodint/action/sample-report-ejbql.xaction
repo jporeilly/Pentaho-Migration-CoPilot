@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Sample-report-EjbQL</title><version>1</version><logging-level>INFO</logging-level><documentation> 
+    <author>Иван Погодин, Сергей Матвеев</author>  
+    <description>Empty blank action sequence document</description>  
+    <help/>  
+    <result-type/>  
+    <icon/> 
+  </documentation><inputs> 
+    <newInput type="string"> 
+      <sources> 
+        <request>newInput</request> 
+      </sources>  
+      <default-value/> 
+    </newInput> 
+  </inputs><outputs> 
+    <dsResult type="result-set"/> 
+  </outputs><resources> 
+    <newResource> 
+      <solution-file> 
+        <location>test.xml</location>  
+        <mime-type/> 
+      </solution-file> 
+    </newResource> 
+  </resources>
+  
+  
+  
+
+  
+
+  
+
+  
+  
+  <actions> 
+    <action-definition> 
+      <component-name>JavascriptRule</component-name><action-type>JavaScript</action-type><action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-outputs><component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+method="getResult";
+method="getEJBQL";
+//sql="SELECT evs.evId FROM Evs evs";
+//fields="evId";]]></script> 
+      </component-definition>
+      
+      
+       
+    </action-definition>
+  
+    <action-definition><component-name>SecureFilterComponent</component-name><action-type>Prompt/Secure Filter</action-type><action-inputs><sql type="string"/><fields type="string"/></action-inputs><component-definition><selections><sql filter="none" style="text-box"><title>Текст запроса EJB QL</title></sql><fields filter="none" style="text-box"><title>столбцы</title></fields></selections></component-definition></action-definition><action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name><action-type>Custom</action-type><action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string"/>  
+        <fields type="string"/> 
+      </action-inputs><action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs><component-definition/>
+      
+      
+      
+       
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

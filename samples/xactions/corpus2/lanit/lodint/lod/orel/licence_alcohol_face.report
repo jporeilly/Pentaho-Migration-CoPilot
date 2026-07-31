@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+    <property name="name">Report</property>
+    <child type="org.pentaho.reportdesigner.crm.report.model.dataset.DataSetsReportElement">
+        <property name="name">Element@1390501921</property>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.ReportFunctionsElement">
+        <property name="name">Element@1266059708</property>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">LICENSE_DATE_MONTH_STR</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object m = dataRow.get(&quot;LICENSE_DATE_MONTH&quot;);
+
+if(m == null) return (String) &quot;&quot;;
+
+String ms = (m instanceof String)?((String)m):m.toString();
+
+if(ms.equals(&quot;1&quot;)){return &quot;&#1103;&#1085;&#1074;&#1072;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;2&quot;)){return &quot;&#1092;&#1077;&#1074;&#1088;&#1072;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;3&quot;)){return &quot;&#1084;&#1072;&#1088;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;4&quot;)){return &quot;&#1072;&#1087;&#1088;&#1077;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;5&quot;)){return &quot;&#1084;&#1072;&#1103;&quot;;}
+if(ms.equals(&quot;6&quot;)){return &quot;&#1080;&#1102;&#1085;&#1103;&quot;;}
+if(ms.equals(&quot;7&quot;)){return &quot;&#1080;&#1102;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;8&quot;)){return &quot;&#1072;&#1074;&#1075;&#1091;&#1089;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;9&quot;)){return &quot;&#1089;&#1077;&#1085;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;10&quot;)){return &quot;&#1086;&#1082;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;11&quot;)){return &quot;&#1085;&#1086;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;12&quot;)){return &quot;&#1076;&#1077;&#1082;&#1072;&#1073;&#1088;&#1103;&quot;;}
+
+return (String) &quot;&quot;;
+}</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">LICENSE_END_DATE_MONTH_STR</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object m = dataRow.get(&quot;LICENSE_END_DATE_MONTH&quot;);
+
+if(m == null) return (String) &quot;&quot;;
+
+String ms = (m instanceof String)?((String)m):m.toString();
+
+if(ms.equals(&quot;1&quot;)){return &quot;&#1103;&#1085;&#1074;&#1072;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;2&quot;)){return &quot;&#1092;&#1077;&#1074;&#1088;&#1072;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;3&quot;)){return &quot;&#1084;&#1072;&#1088;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;4&quot;)){return &quot;&#1072;&#1087;&#1088;&#1077;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;5&quot;)){return &quot;&#1084;&#1072;&#1103;&quot;;}
+if(ms.equals(&quot;6&quot;)){return &quot;&#1080;&#1102;&#1085;&#1103;&quot;;}
+if(ms.equals(&quot;7&quot;)){return &quot;&#1080;&#1102;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;8&quot;)){return &quot;&#1072;&#1074;&#1075;&#1091;&#1089;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;9&quot;)){return &quot;&#1089;&#1077;&#1085;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;10&quot;)){return &quot;&#1086;&#1082;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;11&quot;)){return &quot;&#1085;&#1086;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;12&quot;)){return &quot;&#1076;&#1077;&#1082;&#1072;&#1073;&#1088;&#1103;&quot;;}
+
+return (String) &quot;&quot;;
+}</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">LICENSE_PROL_DATE_STR</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object n = dataRow.get(&quot;LICENSE_PROL_DATE&quot;);
+
+if(n == null) return (String)&quot;&quot;;
+
+d = dataRow.get(&quot;LICENSE_PROL_DATE_DAY&quot;);
+m = dataRow.get(&quot;LICENSE_PROL_DATE_MONTH&quot;);
+y = dataRow.get(&quot;LICENSE_PROL_DATE_YEAR&quot;);
+
+String ms = (m instanceof String)?((String)m):m.toString();
+
+if(ms.equals(&quot;1&quot;)){month = &quot;&#1103;&#1085;&#1074;&#1072;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;2&quot;)){month = &quot;&#1092;&#1077;&#1074;&#1088;&#1072;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;3&quot;)){month = &quot;&#1084;&#1072;&#1088;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;4&quot;)){month = &quot;&#1072;&#1087;&#1088;&#1077;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;5&quot;)){month = &quot;&#1084;&#1072;&#1103;&quot;;}
+if(ms.equals(&quot;6&quot;)){month = &quot;&#1080;&#1102;&#1085;&#1103;&quot;;}
+if(ms.equals(&quot;7&quot;)){month = &quot;&#1080;&#1102;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;8&quot;)){month = &quot;&#1072;&#1074;&#1075;&#1091;&#1089;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;9&quot;)){month = &quot;&#1089;&#1077;&#1085;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;10&quot;)){month = &quot;&#1086;&#1082;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;11&quot;)){month = &quot;&#1085;&#1086;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;12&quot;)){month = &quot;&#1076;&#1077;&#1082;&#1072;&#1073;&#1088;&#1103;&quot;;}
+
+
+return &quot;&#1057;&#1088;&#1086;&#1082; &#1076;&#1077;&#1081;&#1089;&#1090;&#1074;&#1080;&#1103; &#1083;&#1080;&#1094;&#1077;&#1085;&#1079;&#1080;&#1080; &#1087;&#1088;&#1086;&#1076;&#1083;&#1077;&#1085; &#1076;&#1086; &quot;+d.toString()+&quot; &quot;+month+&quot; &quot;+y.toString()+&quot; &#1075;.&quot;;
+}
+
+</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">PRINT_TEXT_2</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object n = dataRow.get(&quot;LICENSE_PROL_DATE&quot;);
+
+if(n !=null) return (String)&quot;&quot;;
+
+Object m = dataRow.get(&quot;LICENSE_NUMBER&quot;);
+
+return &quot;&#1052;&#1077;&#1089;&#1090;&#1072; &#1085;&#1072;&#1093;&#1086;&#1078;&#1076;&#1077;&#1085;&#1080;&#1103; &#1086;&#1073;&#1086;&#1089;&#1086;&#1073;&#1083;&#1077;&#1085;&#1085;&#1099;&#1093; &#1087;&#1086;&#1076;&#1088;&#1072;&#1079;&#1076;&#1077;&#1083;&#1077;&#1085;&#1080;&#1081; (&#1090;&#1077;&#1088;&#1088;&#1080;&#1090;&#1086;&#1088;&#1080;&#1072;&#1083;&#1100;&#1085;&#1086;-&#1086;&#1073;&#1086;&#1089;&#1086;&#1073;&#1083;&#1077;&#1085;&#1085;&#1099;&#1093; &#1086;&#1073;&#1098;&#1077;&#1082;&#1090;&#1086;&#1074;) &#1086;&#1088;&#1075;&#1072;&#1085;&#1080;&#1079;&#1072;&#1094;&#1080;&#1080;, &#1086;&#1089;&#1091;&#1097;&#1077;&#1089;&#1090;&#1074;&#1083;&#1103;&#1102;&#1097;&#1080;&#1093; &#1083;&#1080;&#1094;&#1077;&#1085;&#1079;&#1080;&#1088;&#1091;&#1077;&#1084;&#1099;&#1081; &#1074;&#1080;&#1076; &#1076;&#1077;&#1103;&#1090;&#1077;&#1083;&#1100;&#1085;&#1086;&#1089;&#1090;&#1080; &#1074; &#1089;&#1086;&#1086;&#1090;&#1074;&#1077;&#1090;&#1089;&#1090;&#1074;&#1080;&#1080; &#1089; &#1083;&#1080;&#1094;&#1077;&#1085;&#1079;&#1080;&#1077;&#1081; &#8470;    &quot;+m.toString()+&quot;   &quot;+&quot;&#1083;&#1080;&#1089;&#1090; &#8470;   2&quot;;
+}
+</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">PRINT_TEXT_1</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object n = dataRow.get(&quot;LICENSE_PROL_DATE&quot;);
+
+if(n !=null) return (String)&quot;&quot;;
+
+ inn = dataRow.get(&quot;AGENT_INN&quot;);
+ ogr = dataRow.get(&quot;AGENT_OGRN&quot;);
+
+return inn.toString()+&quot;    &quot;+&quot;&#1054;&#1043;&#1056;&#1053;:&quot;+ogr.toString();
+}
+</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">PRINT_TEXT_3</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object n = dataRow.get(&quot;LICENSE_PROL_DATE&quot;);
+
+if(n !=null) return (String)&quot;&quot;;
+
+return &quot;&#1059;&#1089;&#1083;&#1086;&#1074;&#1080;&#1103; &#1076;&#1077;&#1081;&#1089;&#1090;&#1074;&#1080;&#1103; &#1083;&#1080;&#1094;&#1077;&#1085;&#1079;&#1080;&#1080;: &#1074; &#1089;&#1086;&#1086;&#1090;&#1074;&#1077;&#1090;&#1089;&#1090;&#1074;&#1080;&#1080; &#1089;&#1086; &#1089;&#1090;. 11 &#1047;&#1072;&#1082;&#1086;&#1085;&#1072; &#1054;&#1088;&#1083;&#1086;&#1074;&#1089;&#1082;&#1086;&#1081; &#1086;&#1073;&#1083;&#1072;&#1089;&#1090;&#1080; &#1086;&#1090; 28.12.2005&#1075;. &#8470;564-&#1054;&#1047; &#171;&#1054; &#1075;&#1086;&#1089;&#1091;&#1076;&#1072;&#1088;&#1089;&#1090;&#1074;&#1077;&#1085;&#1085;&#1086;&#1084; &#1088;&#1077;&#1075;&#1091;&#1083;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1080;&#1080; &#1087;&#1088;&#1086;&#1080;&#1079;&#1074;&#1086;&#1076;&#1089;&#1090;&#1074;&#1072; &#1080; &#1086;&#1073;&#1086;&#1088;&#1086;&#1090;&#1072; &#1101;&#1090;&#1080;&#1083;&#1086;&#1074;&#1086;&#1075;&#1086; &#1089;&#1087;&#1080;&#1088;&#1090;&#1072;, &#1072;&#1083;&#1082;&#1086;&#1075;&#1086;&#1083;&#1100;&#1085;&#1086;&#1081; &#1080; &#1089;&#1087;&#1080;&#1088;&#1090;&#1086;&#1089;&#1086;&#1076;&#1077;&#1088;&#1078;&#1072;&#1097;&#1077;&#1081; &#1087;&#1088;&#1086;&#1076;&#1091;&#1082;&#1094;&#1080;&#1080; &#1085;&#1072; &#1090;&#1077;&#1088;&#1088;&#1080;&#1090;&#1086;&#1088;&#1080;&#1080; &#1054;&#1088;&#1083;&#1086;&#1074;&#1089;&#1082;&#1086;&#1081; &#1086;&#1073;&#1083;&#1072;&#1089;&#1090;&#1080;&#187;&quot;;
+}</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">PRINT_TEXT_4</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object n = dataRow.get(&quot;LICENSE_PROL_DATE&quot;);
+
+if(n !=null) return (String)&quot;&quot;;
+
+d = dataRow.get(&quot;LICENSE_DATE_DAY&quot;);
+m = dataRow.get(&quot;LICENSE_DATE_MONTH&quot;);
+y = dataRow.get(&quot;LICENSE_DATE_YEAR&quot;);
+
+String ms = (m instanceof String)?((String)m):m.toString();
+
+if(ms.equals(&quot;1&quot;)){month = &quot;&#1103;&#1085;&#1074;&#1072;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;2&quot;)){month = &quot;&#1092;&#1077;&#1074;&#1088;&#1072;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;3&quot;)){month = &quot;&#1084;&#1072;&#1088;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;4&quot;)){month = &quot;&#1072;&#1087;&#1088;&#1077;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;5&quot;)){month = &quot;&#1084;&#1072;&#1103;&quot;;}
+if(ms.equals(&quot;6&quot;)){month = &quot;&#1080;&#1102;&#1085;&#1103;&quot;;}
+if(ms.equals(&quot;7&quot;)){month = &quot;&#1080;&#1102;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;8&quot;)){month = &quot;&#1072;&#1074;&#1075;&#1091;&#1089;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;9&quot;)){month = &quot;&#1089;&#1077;&#1085;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;10&quot;)){month = &quot;&#1086;&#1082;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;11&quot;)){month = &quot;&#1085;&#1086;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;12&quot;)){month = &quot;&#1076;&#1077;&#1082;&#1072;&#1073;&#1088;&#1103;&quot;;}
+
+return &quot;&#1044;&#1072;&#1090;&#1072; &#1074;&#1099;&#1076;&#1072;&#1095;&#1080; &#1083;&#1080;&#1094;&#1077;&#1085;&#1079;&#1080;&#1080; &quot;+d.toString()+&quot; &quot;+month+&quot; &quot;+y.toString()+&quot; &#1075;.&quot;;
+}
+
+</property>
+            <property name="preserve">false</property>
+        </child>
+        <child type="org.jfree.report.modules.misc.beanshell.BSHExpression_DesignerWrapper">
+            <property name="name">PRINT_TEXT_5</property>
+            <property name="dependencyLevel">0</property>
+            <property name="expression">public Object getValue(){
+
+Object n = dataRow.get(&quot;LICENSE_PROL_DATE&quot;);
+
+if(n !=null) return (String)&quot;&quot;;
+
+d = dataRow.get(&quot;LICENSE_DATE_DAY&quot;);
+m = dataRow.get(&quot;LICENSE_DATE_MONTH&quot;);
+y = dataRow.get(&quot;LICENSE_DATE_YEAR&quot;);
+d1 = dataRow.get(&quot;LICENSE_END_DATE_DAY&quot;);
+m1 = dataRow.get(&quot;LICENSE_END_DATE_MONTH&quot;);
+y1= dataRow.get(&quot;LICENSE_END_DATE_YEAR&quot;);
+
+String ms = (m instanceof String)?((String)m):m.toString();
+
+String ms1 = (m instanceof String)?((String)m):m.toString();
+
+if(ms.equals(&quot;1&quot;)){month = &quot;&#1103;&#1085;&#1074;&#1072;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;2&quot;)){month = &quot;&#1092;&#1077;&#1074;&#1088;&#1072;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;3&quot;)){month = &quot;&#1084;&#1072;&#1088;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;4&quot;)){month = &quot;&#1072;&#1087;&#1088;&#1077;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;5&quot;)){month = &quot;&#1084;&#1072;&#1103;&quot;;}
+if(ms.equals(&quot;6&quot;)){month = &quot;&#1080;&#1102;&#1085;&#1103;&quot;;}
+if(ms.equals(&quot;7&quot;)){month = &quot;&#1080;&#1102;&#1083;&#1103;&quot;;}
+if(ms.equals(&quot;8&quot;)){month = &quot;&#1072;&#1074;&#1075;&#1091;&#1089;&#1090;&#1072;&quot;;}
+if(ms.equals(&quot;9&quot;)){month = &quot;&#1089;&#1077;&#1085;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;10&quot;)){month = &quot;&#1086;&#1082;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;11&quot;)){month = &quot;&#1085;&#1086;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms.equals(&quot;12&quot;)){month = &quot;&#1076;&#1077;&#1082;&#1072;&#1073;&#1088;&#1103;&quot;;}
+
+if(ms1.equals(&quot;1&quot;)){month1 = &quot;&#1103;&#1085;&#1074;&#1072;&#1088;&#1103;&quot;;}
+if(ms1.equals(&quot;2&quot;)){month1 = &quot;&#1092;&#1077;&#1074;&#1088;&#1072;&#1083;&#1103;&quot;;}
+if(ms1.equals(&quot;3&quot;)){month1 = &quot;&#1084;&#1072;&#1088;&#1090;&#1072;&quot;;}
+if(ms1.equals(&quot;4&quot;)){month1 = &quot;&#1072;&#1087;&#1088;&#1077;&#1083;&#1103;&quot;;}
+if(ms1.equals(&quot;5&quot;)){month1 = &quot;&#1084;&#1072;&#1103;&quot;;}
+if(ms1.equals(&quot;6&quot;)){month1 = &quot;&#1080;&#1102;&#1085;&#1103;&quot;;}
+if(ms1.equals(&quot;7&quot;)){month1 = &quot;&#1080;&#1102;&#1083;&#1103;&quot;;}
+if(ms1.equals(&quot;8&quot;)){month1 = &quot;&#1072;&#1074;&#1075;&#1091;&#1089;&#1090;&#1072;&quot;;}
+if(ms1.equals(&quot;9&quot;)){month1 = &quot;&#1089;&#1077;&#1085;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms1.equals(&quot;10&quot;)){month1 = &quot;&#1086;&#1082;&#1090;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms1.equals(&quot;11&quot;)){month1 = &quot;&#1085;&#1086;&#1103;&#1073;&#1088;&#1103;&quot;;}
+if(ms1.equals(&quot;12&quot;)){month1 = &quot;&#1076;&#1077;&#1082;&#1072;&#1073;&#1088;&#1103;&quot;;}
+
+return &quot;c  &quot;+d.toString()+&quot; &quot;+month+&quot; &quot;+y.toString()+&quot; &#1075;.           &#1076;&#1086;  &quot;+d1.toString()+&quot; &quot;+month1+&quot; &quot;+y1.toString()+&quot; &#1075;.&quot;;
+}
+</property>
+            <property name="preserve">false</property>
+        </child>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelPageReportElement" bandToplevelType="PAGE_HEADER">
+        <property name="name">Band1920211066</property>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">0.0</property>
+        <verticalLinealModel></verticalLinealModel>
+        <property name="displayOnFirstPage">true</property>
+        <property name="displayOnLastPage">true</property>
+        <property name="sticky">false</property>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="REPORT_HEADER">
+        <property name="name">Band1197700426</property>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1964239386</property>
+            <property name="position">425.0, 125.0</property>
+            <property name="minimumSize">75.0, 25.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">MIDDLE</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(LICENSE_NUMBER)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1829349599</property>
+            <property name="position">125.0, 285.0</property>
+            <property name="minimumSize">300.0, 55.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(OGV)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1507410391</property>
+            <property name="position">75.0, 200.0</property>
+            <property name="minimumSize">400.0, 75.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(ACTIVITY_TYPE_NAME)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1098406656</property>
+            <property name="position">75.0, 365.0</property>
+            <property name="minimumSize">400.0, 70.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(AGENT_NAME)
+
+$(AGENT_ADDRESS)
+
+$(AGENT_PASSPORT)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1911882932</property>
+            <property name="position">200.0, 605.0</property>
+            <property name="minimumSize">300.0, 20.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(PRINT_TEXT_5)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1911882932</property>
+            <property name="position">300.0, 675.0</property>
+            <property name="minimumSize">200.0, 20.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">RIGHT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(OGV_SIGNATURE_LICENCE_NAME)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1626534466</property>
+            <property name="position">300.0, 445.0</property>
+            <property name="minimumSize">200.0, 20.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(PRINT_TEXT_1)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1626534466</property>
+            <property name="position">55.0, 470.0</property>
+            <property name="minimumSize">445.0, 50.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(PRINT_TEXT_2)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1626534466</property>
+            <property name="position">55.0, 520.0</property>
+            <property name="minimumSize">445.0, 60.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(PRINT_TEXT_3)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1626534466</property>
+            <property name="position">90.0, 585.0</property>
+            <property name="minimumSize">410.0, 20.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">TOP</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(PRINT_TEXT_4)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1911882932</property>
+            <property name="position">55.0, 725.0</property>
+            <property name="minimumSize">445.0, 20.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">LEFT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(LICENSE_PROL_DATE_STR)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@1911882932</property>
+            <property name="position">350.0, 755.0</property>
+            <property name="minimumSize">150.0, 20.0</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">RIGHT</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">true</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(OGV_SIGNATURE_LICENCE_NAME_PROL)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <child type="org.pentaho.reportdesigner.crm.report.model.MessageFieldReportElement">
+            <property name="name">Element@61191574</property>
+            <property name="position">55.0, 755.0</property>
+            <property name="minimumSize">235.0, 25.0</property>
+            <property name="dynamicContent">true</property>
+            <property name="font">Roman Unicode,12,1</property>
+            <property name="foreground">0, 0, 0, 255</property>
+            <property name="underline">false</property>
+            <property name="strikethrough">false</property>
+            <property name="embedFont">true</property>
+            <property name="lineHeight">0.0</property>
+            <property name="verticalAlignment">BOTTOM</property>
+            <property name="horizontalAlignment">CENTER</property>
+            <property name="reservedLiteral">..</property>
+            <property name="trimTextContent">false</property>
+            <property name="wrapTextInExcel">true</property>
+            <property name="encoding">UTF-8</property>
+            <property name="formatString">$(OGV_SIGNATURE_LICENCE_POST_PROL)</property>
+            <property name="nullString"></property>
+            <formula>
+                <property name="text"></property>
+            </formula>
+        </child>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">884.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelItemReportElement" bandToplevelType="ITEM_BAND">
+        <property name="name">Band445384271</property>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">5.0</property>
+        <verticalLinealModel></verticalLinealModel>
+        <rowBandingDefinition enabled="false" color="192, 192, 192, 255" startState="true" switchItemCount="1"></rowBandingDefinition>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="REPORT_FOOTER">
+        <property name="name">Band1386836451</property>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">5.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelPageReportElement" bandToplevelType="PAGE_FOOTER">
+        <property name="name">Band603139146</property>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">true</property>
+        <property name="visualHeight">5.0</property>
+        <verticalLinealModel></verticalLinealModel>
+        <property name="displayOnFirstPage">true</property>
+        <property name="displayOnLastPage">true</property>
+        <property name="sticky">false</property>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="NO_DATA_BAND">
+        <property name="name">Band1892140412</property>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">false</property>
+        <property name="visualHeight">100.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.BandToplevelReportElement" bandToplevelType="WATERMARK">
+        <property name="name">Band1592932902</property>
+        <property name="pageBreakBefore">false</property>
+        <property name="pageBreakAfter">false</property>
+        <property name="showInLayoutGUI">false</property>
+        <property name="visualHeight">100.0</property>
+        <verticalLinealModel></verticalLinealModel>
+    </child>
+    <child type="org.pentaho.reportdesigner.crm.report.model.ReportGroups">
+        <property name="name">Element@836812982</property>
+    </child>
+    <property name="defaultLocale">ru_RU_</property>
+    <horizontalLinealModel></horizontalLinealModel>
+    <pageDefinition pageSize="595.0, 842.0" topBorder="20.0" bottomBorder="20.0" leftBorder="20.0" rightBorder="20.0"></pageDefinition>
+    <reportConfiguration></reportConfiguration>
+    <property name="useMaxCharBounds">true</property>
+</report>

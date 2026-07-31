@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Отчет о работе лицензионной палаты за период</title>
+  <version>1</version>
+  <documentation> 
+    <author>Иван Погодин</author>  
+    <description>Отчет о работе лицензионной палаты за период</description>  
+    <icon>PentahoReporting.png</icon>  
+    <help>Отчет о работе лицензионной палаты за период</help>  
+    <result-type>report</result-type> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[html]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <date_begin type="string"> 
+      <sources> 
+        <request>date_begin</request> 
+      </sources>  
+      <default-value/> 
+    </date_begin>  
+    <date_end type="string"> 
+      <sources> 
+        <request>date_end</request> 
+      </sources>  
+      <default-value/> 
+    </date_end>  
+    <sql type="string-list"> 
+      <default-value type="string-list"/> 
+    </sql>  
+    <RepLHNum type="string"> 
+      <sources> 
+        <request>RepLHNum</request> 
+      </sources>  
+      <default-value/> 
+    </RepLHNum> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>report-stat-work.xml</location>  
+        <mime-type>text/xml</mime-type> 
+      </solution-file> 
+    </report-definition>  
+    <parameter-template> 
+      <solution-file> 
+        <location>par_template_sr.html</location>  
+        <mime-type>text/xml</mime-type> 
+      </solution-file> 
+    </parameter-template> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputTypeList type="property-map-list"/>  
+        <outputType type="string"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <title>Формат вывода:</title>  
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+          </outputType> 
+        </selections>  
+        <target><![CDATA[Report_Window]]></target>  
+        <xsl>parameter-template</xsl> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript-Correct Date</action-type>
+      <action-inputs> 
+        <date_begin type="string"/>  
+        <date_end type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <date1 type="string"/>  
+        <date2 type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[var date_template=/(\d\d)\.(\d\d)\.(\d{4})/;
+var res1=date_begin.match(date_template);
+date1=res1[3]+'-'+res1[2]+'-'+res1[1];
+var res2=date_end.match(date_template);
+date2=res2[3]+'-'+res2[2]+'-'+res2[1];]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript-Create EJBQL</action-type>
+      <action-inputs> 
+        <sql type="string-list"/>  
+        <date1 type="string"/>  
+        <date2 type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string-list"/>  
+        <fields type="string"/> 
+      </action-outputs>
+      <component-definition> 
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql.add(
+	"select 'Принято комплектов документов, представленных:', COUNT(ac) "+
+	" from AgentCase ac where ac.caseType = 'delo_acccept_komplek' and "+
+	" ac.recordDate between '{date1}' and '{date2}'"
+);
+
+sql.add(
+	"select '- по почте', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac where ac.caseType = 'delo_acccept_komplek' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'conversionWay' and acv.stringValue = 'CT_byMail'"
+);
+
+sql.add(
+	"select '- при личном обращении', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac where ac.caseType = 'delo_acccept_komplek' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'conversionWay' and acv.stringValue = 'CT_byArrival'"
+);
+
+sql.add(
+	"select 'Принято заявлений: ', COUNT(ac) from "+
+	" AgentCase ac where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}'"
+);
+
+sql.add(
+	"select '- на получение лицензий', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%New%')"
+);
+
+sql.add(
+	"select '- на продление срока действия лицензий', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%Date%'"
+);
+
+sql.add(
+	"select '- на переоформление документов, подтверждающих наличие лицензий', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like ('%ReGet%')"
+);
+
+sql.add(
+	"select '- на добровольное прекращение действия лицензий', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%Del%'"
+);
+
+sql.add(
+	"select 'Предоставлено лицензий:', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%New%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_A_New' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_New' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_New' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select 'Отказано в предоставлении лицензий:', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%New%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_A_New' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_New' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_acccept_zajavle' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_New' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select 'Продлен срок действия лицензий:', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%Date%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_A_Date' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_Date' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_Date' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select 'Отказано в продлении срока действия лицензий:', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%Date%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_A_Date' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_Date' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_Date' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select 'Переоформлено документов, подтверждающих наличие лицензий:', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%ReGet%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and (acv.stringValue like 'Ser_A_ReGet' or "+
+	" acv.stringValue like 'Ser_A_ReGet_Re') and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_ReGet' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_ReGet' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select 'Отказано в переоформлении документов, подтверждающих наличие лицензий:', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%ReGet%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and (acv.stringValue like 'Ser_A_ReGet' or "+
+	" acv.stringValue like 'Ser_A_ReGet_Re') and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_ReGet' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_ReGet' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Reject'"
+);
+
+sql.add(
+	"select 'Прекращено действие лицензий:',  COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like '%Del%' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- розничная продажа алкогольной продукции', COUNT(acv) from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and (acv.stringValue like 'Ser_A_Del' or "+
+	" acv.stringValue like 'Ser_A_ReGet_Re') and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома черных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_M_Del' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+sql.add(
+	"select '- заготовка, переработка и реализацию лома цветных металлов', COUNT(acv) "+
+	" from AgentCaseVariable acv "+
+	" inner join acv.agentCase ac, AgentCaseVariable acv2 "+
+	" where ac.caseType = 'delo_reshenie_prinja' and "+
+	" ac.recordDate between '{date1}' and '{date2}' and "+
+	" acv.variableName = 'govServiceTypeS' and acv.stringValue like 'Ser_Mc_Del' and "+
+	" acv2.agentCase=ac and acv2.variableName = 'decisionType' and acv2.stringValue = 'DT_Success'"
+);
+
+//sql.add(
+//	"select 'Анулировано лицензий', COUNT(ac) from "+
+//	" AgentCase ac where ac.caseType = 'delo_kill_license' and "+
+//	" ac.recordDate between '{date1}' and '{date2}'"
+//);
+
+//sql.add(
+//	"select 'Выдано копий лицензий', COUNT(ac) from "+
+//	" AgentCase ac where ac.caseType = 'delo_copy_gived' and "+
+//	" ac.recordDate between '{date1}' and '{date2}'"
+//);
+
+//sql.add(
+//	"select 'Выдано дубликатов лицензий', COUNT(ac) from "+
+//	" AgentCase ac where ac.caseType = 'delo_dublicate' and "+
+//	" ac.recordDate between '{date1}' and '{date2}'"
+//);
+
+sql.add(
+	"select 'Принято деклараций для рассмотрения: ', COUNT(ac) from "+
+	" AgentCase ac where ac.caseType = 'delo_decl_giv' and "+
+	" ac.recordDate between '{date1}' and '{date2}'"
+);
+
+sql.add(
+	"select 'Проведено плановых проверок лицензиатов', COUNT(ac) from "+
+	" AgentCase ac where ac.caseType = 'delo_plan_ctrl' and "+
+	" ac.recordDate between '{date1}' and '{date2}'"
+);
+
+sql.add(
+	"select 'Проведено внеплановых проверок лицензиатов', COUNT(ac) from "+
+	" AgentCase ac where ac.caseType = 'delo_ctrl_ incident' and "+
+	" ac.recordDate between '{date1}' and '{date2}'"
+);
+
+sql.add(
+	"select 'Проведено обследований мест осуществления деятельности в ходе работ по выдаче, переоформлению, продлению лицензии', COUNT(ac) from "+
+	" AgentCase ac where ac.caseType = 'delo_ctrl_inspect' and "+
+	" ac.recordDate between '{date1}' and '{date2}'"
+);
+
+fields="TITLE,CNT_PROCESS";]]></script> 
+      </component-definition> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/>  
+        <sql type="string-list"/>  
+        <fields type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JFreeReportComponent</component-name>
+      <action-type>report</action-type>
+      <action-inputs> 
+        <output-type type="string" mapping="outputType"/>  
+        <date_begin type="string"/>  
+        <date_end type="string"/>  
+        <data type="result-set" mapping="dsResult"/>  
+        <RepLHNum type="string"/> 
+      </action-inputs>
+      <action-resources> 
+        <report-definition type="resource"/> 
+      </action-resources>
+      <action-outputs> 
+        <report-output type="content" mapping="content"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

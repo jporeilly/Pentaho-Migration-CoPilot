@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>RepNewRunEJB</title>
+  <version>1</version>
+  <logging-level>INFO</logging-level>
+  <documentation> 
+    <author/>  
+    <description>Empty blank action sequence document</description>  
+    <help/>  
+    <result-type/>  
+    <icon/> 
+  </documentation>
+
+  <inputs/>
+
+  <outputs>
+    <dsresult type="result-set"/>
+  </outputs>
+
+  <resources> 
+    <newResource> 
+      <solution-file> 
+        <location>test.xml</location>  
+        <mime-type/> 
+      </solution-file> 
+    </newResource> 
+  </resources>
+  
+  <actions> 
+    <action-definition>
+      <component-name>JavascriptRule</component-name>
+      <action-type>JavaScript</action-type>
+      <action-outputs>
+        <beenName type="string"/>
+        <method type="string"/>
+      </action-outputs>
+      <component-definition>
+        <script><![CDATA[beenName="lodint/SeamTestAction/local";
+method="getResult";]]></script>
+      </component-definition>
+    </action-definition>
+
+    <action-definition> 
+      <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+      <action-type>Custom</action-type>
+      <action-inputs> 
+        <beenName type="string"/>  
+        <method type="string"/> 
+      </action-inputs>
+      <action-outputs> 
+        <dsResult type="result-set"/>  
+        <dsMetaColumn type="string"/>
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  
+    <action-definition> 
+      <component-name>JFreeReportComponent</component-name>
+      <action-type>Pentaho Report</action-type>
+      <action-inputs> 
+        <data type="result-set" mapping="dsResult"/>
+      </action-inputs>
+      <action-resources> 
+        <report-definition type="resource" mapping="newResource"/> 
+      </action-resources>
+      <action-outputs/>
+      <component-definition> 
+        <output-type>html</output-type> 
+      </component-definition> 
+    </action-definition>
+ 
+  </actions> 
+</action-sequence>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатные формы акта и заключения обследования</title>
+  <version>1</version>
+  <logging-level/>
+  <documentation> 
+    <author>Третьякова Алёна</author>  
+    <description>Печатные формы акта и заключения обследования</description>  
+    <help/>  
+    <result-type>report</result-type>  
+    <icon/> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user>  
+    <outTypeDoc type="string"> 
+      <sources> 
+        <request>outTypeDoc</request> 
+      </sources>  
+      <default-value><![CDATA[akt_obsled]]></default-value> 
+    </outTypeDoc>  
+    <outTypeDocList type="property-map-list"> 
+      <sources> 
+        <runtime>outTypeDocList</runtime> 
+      </sources>  
+      <default-value type="property-map-list">
+        <property-map>
+          <entry key="id">akt_obsled</entry>
+          <entry key="desc">Акт обследования организации на соответствие лицензионным требованиям</entry>
+        </property-map>
+        <property-map>
+          <entry key="id">zakluch_obsled</entry>
+          <entry key="desc">Заключение о результатах обследования организации</entry>
+        </property-map>
+        <property-map>
+          <entry key="id">akt_plan_ctrl</entry>
+          <entry key="desc">Акт плановой контрольной проверки</entry>
+        </property-map>
+        <property-map>
+          <entry key="id">akt_unplan_ctrl</entry>
+          <entry key="desc">Акт внеплановой контрольной проверки</entry>
+        </property-map>
+      </default-value> 
+    </outTypeDocList> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition1> 
+      <solution-file> 
+        <location>akt_obsled.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition1>  
+    <report-definition> 
+      <solution-file> 
+        <location>zakluch_obsled.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition>  
+    <report-definition2>
+      <solution-file>
+        <location>akt_plan_control.xml</location>
+        <mime-type>text/plain</mime-type>
+      </solution-file>
+    </report-definition2>
+    <report-definition3>
+      <solution-file>
+        <location>akt_vneplan_control.xml</location>
+        <mime-type>text/plain</mime-type>
+      </solution-file>
+    </report-definition3>
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outTypeDoc type="string"/>  
+        <outTypeDocList type="property-map-list"/>  
+        <outputType type="string"/>  
+        <outputTypeList type="property-map-list"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outTypeDoc style="select"> 
+            <filter value-col-name="id" display-col-name="desc">outTypeDocList</filter>  
+            <title>Вывести на печать:</title> 
+          </outTypeDoc>  
+          <outputType style="select"> 
+            <title>Формат вывода:</title>  
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter> 
+          </outputType> 
+        </selections> 
+      </component-definition> 
+    </action-definition>
+  
+    <actions> 
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>  
+      <action-definition>
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Prepare Query to DB</action-type>
+        <action-inputs/>
+        <action-outputs>
+          <beenName type="string"/>
+          <method type="string"/>
+          <sql type="string"/>
+          <fields type="string"/>
+        </action-outputs>
+        <component-definition>
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql="select "+
+" as1.value "+
+" from AppSetting as1 "+
+" where as1.id='ogv_boss_post' ";
+
+fields="PING";]]></script>
+        </component-definition>
+      </action-definition>
+
+      <action-definition>
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Выполняем запрос</action-type>
+        <action-inputs>
+          <beenName type="string"/>
+          <method type="string"/>
+          <sql type="string"/>
+          <fields type="string"/>
+        </action-inputs>
+        <action-outputs>
+          <dsResult type="result-set"/>
+          <dsMetaColumn type="string"/>
+        </action-outputs>
+        <component-definition/>
+      </action-definition>
+
+      <actions> 
+        <condition><![CDATA[(outTypeDoc=="akt_obsled")]]></condition>  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>report - акт обследования</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource" mapping="report-definition1"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+  
+      <actions> 
+        <condition><![CDATA[(outTypeDoc=="zakluch_obsled")]]></condition>  
+        <action-definition> 
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>report - заключение обследования</action-type>
+          <action-inputs> 
+            <output-type type="string" mapping="outputType"/>  
+            <data type="result-set" mapping="dsResult"/>
+          </action-inputs>
+          <action-resources> 
+            <report-definition type="resource"/> 
+          </action-resources>
+          <action-outputs> 
+            <report-output type="content" mapping="content"/> 
+          </action-outputs>
+          <component-definition/> 
+        </action-definition>
+ 
+      </actions>
+
+      <actions>
+        <condition><![CDATA[(outTypeDoc=="akt_unplan_ctrl")]]></condition>
+        <action-definition>
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>report - акт внеплановой проверки</action-type>
+          <action-inputs>
+            <output-type type="string" mapping="outputType"/>
+            <data type="result-set" mapping="dsResult"/>
+          </action-inputs>
+          <action-resources>
+            <report-definition type="resource" mapping="report-definition3"/>
+          </action-resources>
+          <action-outputs>
+            <report-output type="content" mapping="content"/>
+          </action-outputs>
+          <component-definition/>
+        </action-definition>
+
+      </actions>
+
+      <actions>
+        <condition><![CDATA[(outTypeDoc=="akt_plan_ctrl")]]></condition>
+        <action-definition>
+          <component-name>JFreeReportComponent</component-name>
+          <action-type>report - акт планового контроля</action-type>
+          <action-inputs>
+            <output-type type="string" mapping="outputType"/>
+            <data type="result-set" mapping="dsResult"/>
+          </action-inputs>
+          <action-resources>
+            <report-definition type="resource" mapping="report-definition2"/>
+          </action-resources>
+          <action-outputs>
+            <report-output type="content" mapping="content"/>
+          </action-outputs>
+          <component-definition/>
+        </action-definition>
+
+      </actions>
+
+    </actions>
+ 
+  </actions> 
+</action-sequence>

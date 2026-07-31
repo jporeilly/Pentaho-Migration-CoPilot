@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.1.v20090903 Build &lt;2.5.1.v20090917-1447></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <parameters>
+        <scalar-parameter name="collId" id="209">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="Data Source" id="207"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="ContractDataSet" id="208">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">fieldName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">fieldValue</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">fieldValueDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">fieldName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">fieldValue</property>
+                </structure>
+                <structure>
+                    <property name="columnName">fieldValueDate</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">fieldName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">fieldValue</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">fieldValueDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.Shark();
+
+result = clazz.getEntityManagerLod().createQuery(
+" select "+
+" v.field.caption,"+
+" v.field.type, "+
+" v.stringValue, "+
+" v.integerValue, "+
+" v.dateValue, "+
+" v.booleanValue "+
+" from AdditionalFieldValue v where "+
+" v.field.model = 'org.lanit.samara.darchive.ArchiveCollection' "+
+" and v.itemId = "+params["collId"]
+).getResultList();
+totalrows = result.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = result.get(currentrow);
+row["fieldName"] = rowValue[0];
+row["fieldValue"] = "---";
+if (rowValue[1].equals("string"))
+	row["fieldValue"] = rowValue[2];
+if (rowValue[1].equals("integer"))
+	row["fieldValue"] = rowValue[3];
+if (rowValue[1].equals("date"))
+	row["fieldValueDate"] = rowValue[4];
+if (rowValue[1].equals("boolean"))
+	row["fieldValue"] = rowValue[5];
+
+if (rowValue[1].startsWith("card=")){
+	clazz1 = new Packages.org.lanit.samara.birt.plugins.Shark();
+	entity = clazz1.getEntityManagerLod().createQuery(
+	" select name from CardElement where id = :id "	
+	).setParameter("id",rowValue[2]).getResultList();
+	if (entity.size()>0)
+	row["fieldValue"] = entity;
+}
+if (rowValue[1].startsWith("entity=")){
+	clazz2 = new Packages.org.lanit.samara.birt.plugins.Shark();
+	className=rowValue[1].substring(rowValue[1].lastIndexOf(".")+1,rowValue[1].length());
+	if (className.startsWith("User"))
+	entity = clazz2.getEntityManagerLod().createQuery(
+	" select lastName||' '||firstName||' '||middleName from User where id = :id "	
+	).setParameter("id",rowValue[3]).getResultList();
+	
+	if (className.startsWith("Agent"))
+	entity = clazz2.getEntityManagerLod().createQuery(
+	" select name||' ('||inn||'/'||kpp||')' from Agent where id = :id "	
+	).setParameter("id",rowValue[3]).getResultList();
+	
+	if (className.startsWith("Person"))
+	entity = clazz2.getEntityManagerLod().createQuery(
+	" select lastName||' '||firstName||' '||middleName from Person where id = :id "	
+	).setParameter("id",rowValue[3]).getResultList();
+	
+	if (entity.size()>0)
+	row["fieldValue"] = entity;
+}
+
+currentrow = currentrow + 1;
+
+return(true);]]></method>
+            <method name="close"><![CDATA[clazz = null;
+result = null;]]></method>
+        </script-data-set>
+        <script-data-set name="StagesDataSet" id="210">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">docName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">docDate</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">notSignedPerson</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">docName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">docDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">notSignedPerson</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">docName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">docDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">notSignedPerson</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <method name="open"><![CDATA[clazz = new Packages.org.lanit.samara.birt.plugins.HibernateUtil();
+
+docInfoList=clazz.getEntityManagerLod().createQuery(
+
+" select  "+
+" ac.docName||': '||ce.name||' № '||ac.docNumber||' от:',"+
+" ac.docDate, "+
+" s.person.lastName||' '||s.person.firstName||' '||s.person.middleName "+
+" from ArchiveCard ac left join ac.signes s, CardElement ce "+
+" where "+
+" ce.card.cardCode = 'SDocType' and ce.id = ac.docType and s.isSigned=0 and "+
+" ac.collection.id = "+params["collId"]
+
+).getResultList();
+
+totalrows = docInfoList.size();
+
+currentrow = 0;]]></method>
+            <method name="fetch"><![CDATA[if (currentrow >= totalrows) {
+	return(false);
+}
+var rowValue = docInfoList.get(currentrow);
+row["docName"] = rowValue[0];
+row["docDate"] = rowValue[1];
+row["notSignedPerson"] = rowValue[2];
+
+currentrow = currentrow + 1;
+
+return(true);
+]]></method>
+            <method name="close"><![CDATA[clazz = null;
+docInfoList = null;]]></method>
+        </script-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="orientation">portrait</property>
+            <property name="topMargin">0.5cm</property>
+            <property name="leftMargin">3cm</property>
+            <property name="bottomMargin">0.5cm</property>
+            <property name="rightMargin">1cm</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="7">
+            <property name="fontFamily">"Roman Unicode"</property>
+            <property name="fontSize">8pt</property>
+            <property name="verticalAlign">middle</property>
+            <property name="width">6.847058823529411in</property>
+            <column id="8">
+                <property name="width">2.211764705882353in</property>
+            </column>
+            <column id="9">
+                <property name="width">2.458823529411765in</property>
+            </column>
+            <column id="10">
+                <property name="width">2.164705882352941in</property>
+            </column>
+            <row id="307">
+                <cell id="308">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <text id="311">
+                        <property name="contentType">auto</property>
+                        <text-property name="content"><![CDATA[ ]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="48">
+                <cell id="49">
+                    <property name="colSpan">1</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+                <cell id="100">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <table id="291">
+                        <property name="width">4.541176470588235in</property>
+                        <property name="dataSet">ContractDataSet</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">fieldName</property>
+                                <text-property name="displayName">fieldName</text-property>
+                                <expression name="expression">dataSetRow["fieldName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">fieldValue</property>
+                                <text-property name="displayName">fieldValue</text-property>
+                                <expression name="expression">dataSetRow["fieldValue"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">fieldValueDate</property>
+                                <text-property name="displayName">fieldValueDate</text-property>
+                                <expression name="expression">dataSetRow["fieldValueDate"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                        </list-property>
+                        <column id="305">
+                            <property name="width">2.3058823529411763in</property>
+                        </column>
+                        <column id="306">
+                            <property name="width">2.235294117647059in</property>
+                        </column>
+                        <header>
+                            <row id="292">
+                                <cell id="293">
+                                    <property name="colSpan">2</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftColor">#000000</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightColor">#000000</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopColor">#000000</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <text id="35">
+                                        <property name="fontSize">12pt</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[Общая информация по контракту]]></text-property>
+                                    </text>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="297">
+                                <cell id="298">
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftColor">#000000</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightColor">#000000</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopColor">#000000</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <data id="299">
+                                        <property name="fontSize">12pt</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="resultSetColumn">fieldName</property>
+                                    </data>
+                                </cell>
+                                <cell id="300">
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftColor">#000000</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightColor">#000000</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopColor">#000000</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <list id="465">
+                                        <detail>
+                                            <data id="466">
+                                                <property name="fontSize">12pt</property>
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr" type="javascript">row["fieldValueDate"]==null</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <property name="resultSetColumn">fieldValueDate</property>
+                                            </data>
+                                            <data id="467">
+                                                <property name="fontSize">12pt</property>
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr" type="javascript">row["fieldValueDate"]!=null</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <property name="resultSetColumn">fieldValue</property>
+                                            </data>
+                                        </detail>
+                                    </list>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+            <row id="19">
+                <cell id="20">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <label id="481">
+                        <property name="fontSize">12pt</property>
+                    </label>
+                    <grid id="483">
+                        <property name="dataSet">StagesDataSet</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">docName</property>
+                                <expression name="expression" type="javascript">BirtStr.concat(dataSetRow["docName"],dataSetRow["docDate"])</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">docDate</property>
+                                <expression name="expression">dataSetRow["docDate"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                            <structure>
+                                <property name="name">notSignedPerson</property>
+                                <expression name="expression">dataSetRow["notSignedPerson"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="484"/>
+                        <row id="485">
+                            <cell id="486">
+                                <label id="482">
+                                    <property name="fontSize">12pt</property>
+                                    <property name="textAlign">center</property>
+                                    <list-property name="visibility">
+                                        <structure>
+                                            <property name="format">all</property>
+                                            <expression name="valueExpr" type="javascript">row["docName"]!=null</expression>
+                                        </structure>
+                                    </list-property>
+                                    <text-property name="text">Все документы подписаны</text-property>
+                                </label>
+                            </cell>
+                        </row>
+                        <row id="487">
+                            <cell id="488">
+                                <table id="510">
+                                    <property name="verticalAlign">middle</property>
+                                    <property name="width">6.682352941176471in</property>
+                                    <list-property name="visibility">
+                                        <structure>
+                                            <property name="format">all</property>
+                                            <expression name="valueExpr" type="javascript">row["docName"]==null</expression>
+                                        </structure>
+                                    </list-property>
+                                    <column id="523">
+                                        <property name="width">1.5647058823529412in</property>
+                                    </column>
+                                    <column id="524">
+                                        <property name="width">5.117647058823529in</property>
+                                    </column>
+                                    <header>
+                                        <row id="511">
+                                            <cell id="512">
+                                                <property name="colSpan">2</property>
+                                                <property name="rowSpan">1</property>
+                                                <property name="verticalAlign">middle</property>
+                                                <text id="515">
+                                                    <property name="fontSize">14pt</property>
+                                                    <property name="fontWeight">bold</property>
+                                                    <property name="textAlign">left</property>
+                                                    <property name="contentType">html</property>
+                                                    <text-property name="content"><![CDATA[Не подписались:]]></text-property>
+                                                </text>
+                                                <label id="545"/>
+                                            </cell>
+                                        </row>
+                                    </header>
+                                    <group id="516">
+                                        <property name="groupName">NewTableGroup1</property>
+                                        <property name="interval">none</property>
+                                        <property name="sortDirection">asc</property>
+                                        <expression name="keyExpr" type="javascript">row["docName"]</expression>
+                                        <structure name="toc">
+                                            <expression name="expressionValue" type="javascript">row["docName"]</expression>
+                                        </structure>
+                                        <property name="repeatHeader">true</property>
+                                        <property name="hideDetail">false</property>
+                                        <property name="pageBreakAfter">auto</property>
+                                        <property name="pageBreakBefore">auto</property>
+                                        <property name="pageBreakInside">auto</property>
+                                        <header>
+                                            <row id="517">
+                                                <cell id="518">
+                                                    <property name="colSpan">2</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="borderLeftColor">#000000</property>
+                                                    <property name="borderLeftStyle">solid</property>
+                                                    <property name="borderLeftWidth">thin</property>
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="borderTopColor">#000000</property>
+                                                    <property name="borderTopStyle">solid</property>
+                                                    <property name="borderTopWidth">thin</property>
+                                                    <data id="519">
+                                                        <property name="fontSize">12pt</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="resultSetColumn">docName</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </header>
+                                    </group>
+                                    <detail>
+                                        <row id="542">
+                                            <cell id="543">
+                                                <property name="borderBottomColor">#000000</property>
+                                                <property name="borderBottomStyle">solid</property>
+                                                <property name="borderBottomWidth">thin</property>
+                                                <property name="borderLeftColor">#000000</property>
+                                                <property name="borderLeftStyle">solid</property>
+                                                <property name="borderLeftWidth">thin</property>
+                                                <property name="borderTopColor">#000000</property>
+                                                <property name="borderTopStyle">solid</property>
+                                                <property name="borderTopWidth">thin</property>
+                                            </cell>
+                                            <cell id="544">
+                                                <property name="borderBottomColor">#000000</property>
+                                                <property name="borderBottomStyle">solid</property>
+                                                <property name="borderBottomWidth">thin</property>
+                                                <property name="borderRightColor">#000000</property>
+                                                <property name="borderRightStyle">solid</property>
+                                                <property name="borderRightWidth">thin</property>
+                                                <property name="borderTopColor">#000000</property>
+                                                <property name="borderTopStyle">solid</property>
+                                                <property name="borderTopWidth">thin</property>
+                                                <text id="522">
+                                                    <property name="fontSize">12pt</property>
+                                                    <property name="contentType">html</property>
+                                                    <text-property name="content"><![CDATA[<VALUE-OF>row["notSignedPerson"]</VALUE-OF>]]></text-property>
+                                                </text>
+                                            </cell>
+                                        </row>
+                                    </detail>
+                                </table>
+                            </cell>
+                        </row>
+                    </grid>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатная форма выписки из реестра лицензий</title>
+  <version>1</version>
+  <logging-level/>
+  <documentation> 
+    <author>Тесля Дмитрий</author>  
+    <description>Печатная форма выписки из реестра лицензий</description>  
+    <help/>  
+    <result-type>report</result-type>  
+    <icon/> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>licence_copy_alcohol_1.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputType type="string"/>  
+        <outputTypeList type="property-map-list"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter>  
+            <title>Формат вывода:</title> 
+          </outputType> 
+        </selections> 
+      </component-definition> 
+    </action-definition>
+  
+    <actions> 
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - по DataSet формируем список переменных для запроса к SHARK</action-type>
+        <action-inputs/>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList="obj_extracts,licenseId";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Получаем перемнные из SHARK</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/>  
+          <processId type="string"/>  
+          <activityId type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - извлекаем данные</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <selectId type="string"/>  
+          <licence_id type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+selectId=dsResult.getValueAt(0,0);
+licence_id=dsResult.getValueAt(0,2);
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Preparing EJBQL query</action-type>
+        <action-inputs> 
+          <licence_id type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql="select "+
+" l1.activityTypeId "+
+" from "+
+" License l1 "+
+" where "+
+" l1.id={licence_id} ";
+
+fields="ACTIVITY_TYPE_ID";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Get data from DB</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Get type licence</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <licence_type type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+licence_type=dsResult.getValueAt(0,0);
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Preparing EJBQL query</action-type>
+        <action-inputs> 
+          <selectId type="string"/>  
+          <licence_type type="string"/>  
+          <licence_id type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql="select "+
+"(select ce2.name from CardElement ce2 where ce2.id='{licence_type}'), "+
+"(select a.name from Agent a where l1.agent = a), "+
+"(select a5.nameShort from Agent a5 where l1.agent = a5), "+
+"(select a1.address from Agent a1 where l1.agent = a1), "+
+"(select a2.inn from Agent a2 where l1.agent = a2), "+
+"(select a3.ogrn from Agent a3 where l1.agent = a3), "+
+"(select a4.passport from Agent a4 where l1.agent = a4), "+
+"l1.licenseNumber,l1.licenseDate,l1.licenseEndDate, "+
+"lobj.kladr,lobj.name, "+
+" (select ce1.name from CardElement ce1 where ce1.id=lobj.objType), lobj.isHeavyAlc, "+
+"(select as1.value from AppSetting as1 where as1.id='ogv_name'), "+
+"(select as2.value from AppSetting as2 where as2.id='ogv_signature_licence_name'), "+
+" (month(l1.licenseDate)), "+
+" (month(l1.licenseEndDate)), "+
+" (day(l1.licenseDate)), "+
+" (year(l1.licenseDate)), "+
+" (day(l1.licenseEndDate)), "+
+" (year(l1.licenseEndDate)) "+
+"from ObjectSelectionItem oi, License l1 left outer join l1.licObjects lobj "+
+"where "+
+"l1.id={licence_id} and "+
+"oi.objectSelection.id = {selectId} and "+
+"oi.objectId = lobj.id ";
+
+fields="ACTIVITY_TYPE_NAME,"+
+"AGENT_NAME,"+
+"AGENT_SHORT_NAME,"+
+"AGENT_ADDRESS,"+
+"AGENT_INN,"+
+"AGENT_OGRN,"+
+"AGENT_PASSPORT,"+
+"LICENSE_NUMBER,LICENSE_DATE,LICENSE_END_DATE,"+
+"OBJECT_ADDRESS,OBJECT_NAME,OBJECT_TYPE,IS_HEAVY_ALC,"+
+"OGV,"+
+"OGV_SIGNATURE_LICENCE_NAME,"+
+"LICENSE_DATE_MONTH,"+
+"LICENSE_END_DATE_MONTH,"+
+"LICENSE_DATE_DAY,"+
+"LICENSE_DATE_YEAR,"+
+"LICENSE_END_DATE_DAY,"+
+"LICENSE_END_DATE_YEAR";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JFreeReportComponent</component-name>
+        <action-type>report</action-type>
+        <action-inputs> 
+          <output-type type="string" mapping="outputType"/>  
+          <data type="result-set" mapping="dsResult"/> 
+        </action-inputs>
+        <action-resources> 
+          <report-definition type="resource"/> 
+        </action-resources>
+        <action-outputs> 
+          <report-output type="content" mapping="content"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+ 
+    </actions>
+ 
+  </actions> 
+</action-sequence>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатная форма запроса в ОГВ</title>
+  <version>1</version>
+  <logging-level/>
+  <documentation> 
+    <author>Тесля Дмитрий</author>  
+    <description>Печатная форма запроса в ОГВ</description>  
+    <help/>  
+    <result-type>report</result-type>  
+    <icon/> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>request.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputType type="string"/>  
+        <outputTypeList type="property-map-list"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter>  
+            <title>Формат вывода:</title> 
+          </outputType> 
+        </selections> 
+      </component-definition> 
+    </action-definition>
+  
+    <actions> 
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - по DataSet формируем список переменных для запроса к SHARK</action-type>
+        <action-inputs/>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/WorklistBean/local";
+
+method="getActivityVars";
+
+variableList="OGV_type,request_OGV";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Получаем перемнные из SHARK</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/>  
+          <processId type="string"/>  
+          <activityId type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - извлекаем данные</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <ogv_type type="string"/>  
+          <BODY type="string"/>
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+
+if((dsResult.getValueAt(0,0) != null) || (!dsResult.getValueAt(0,0).isEmpty())){
+  ogv_type=dsResult.getValueAt(0,0);
+}else{
+  ogv_type="noOgvType";
+}
+
+if((dsResult.getValueAt(0,2) != null) || (!dsResult.getValueAt(0,2).isEmpty())){
+  BODY=dsResult.getValueAt(0,2);
+}else{
+  BODY=" ";
+}
+
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition>
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Get current Date</action-type>
+        <action-outputs>
+          <CURRENT_DATE_DAY type="string"/>
+          <CURRENT_DATE_MONTH type="string"/>
+          <CURRENT_DATE_YEAR type="string"/>
+        </action-outputs>
+        <component-definition>
+          <script><![CDATA[monthNames = new Array(12);
+monthNames[1] = "января";
+monthNames[2] = "февраля";
+monthNames[3] = "марта";
+monthNames[4] = "апреля";
+monthNames[5] = "мая";
+monthNames[6] = "июня";
+monthNames[7] = "июля";
+monthNames[8] = "августа";
+monthNames[9] = "сентября";
+monthNames[10] = "октября";
+monthNames[11] = "ноября";
+monthNames[12] = "декабря";
+
+currentDate = new Date();
+
+CURRENT_DATE_DAY = currentDate.getDate().toString();
+CURRENT_DATE_MONTH = monthNames[currentDate.getMonth() + 1];
+CURRENT_DATE_YEAR = (currentDate.getYear() + 1900).toString();]]></script>
+        </component-definition>
+      </action-definition>
+
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Create EJBQL</action-type>
+        <action-inputs> 
+          <ogv_type type="string"/>
+          <user type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/SeamTestAction/local";
+
+method="getEJBQLTest";
+
+sql="select "+
+" as1.value, "+
+" as2.value, "+
+" as3.value, "+
+" as4.value, "+
+" as5.value, "+
+" as6.value, "+
+" as7.value, "+
+" as8.value, "+
+" as9.value, "+
+" as10.value, "+
+" v1.fieldStringValue, "+
+" v2.fieldStringValue, "+
+" v3.fieldStringValue, "+
+" v4.fieldStringValue, "+
+" v5.fieldStringValue, "+
+" u1.firstName,u1.middleName,u1.lastName, "+
+" u1.phone "+
+" from "+
+" User u1, "+
+" AppSetting as1, AppSetting as2, AppSetting as3, AppSetting as4, AppSetting as5, "+
+" AppSetting as6, AppSetting as7, AppSetting as8, AppSetting as9, AppSetting as10, "+
+" CardElementFieldValue v1, CardElementFieldValue v2, CardElementFieldValue v3, "+
+" CardElementFieldValue v4, CardElementFieldValue v5 "+
+" where "+
+" u1.login='{user}' and "+
+" as1.id='ogv_boss_post' and as2.id='ogv_boss_name' and "+
+" as3.id='ogv_region' and as4.id='ogv_address' and "+
+" as5.id='ogv_index' and as6.id='ogv_phones' and "+
+" as7.id='ogv_country' and as8.id='ogv_fax' and "+
+" as9.id='ogv_federal_district' and as10.id='ogv_name' and "+
+" v1.cardElement.id='{ogv_type}' and v1.cardField.fieldName='Наименование ОГВ' and "+
+" v2.cardElement.id='{ogv_type}' and v2.cardField.fieldName='ФИО Руководителя ОГВ' and "+
+" v3.cardElement.id='{ogv_type}' and v3.cardField.fieldName='Адрес ОГВ' and "+
+" v4.cardElement.id='{ogv_type}' and v4.cardField.fieldName='Должность руководителя' and "+
+" v5.cardElement.id='{ogv_type}' and v5.cardField.fieldName='Обращение к руководителю ОГВ' ";
+
+fields="OGV_BOSS_POST,"+
+"OGV_BOSS_NAME,"+
+"OGV_REGION,"+
+"OGV_ADDRESS,"+
+"OGV_INDEX,"+
+"OGV_PHONES,"+
+"OGV_COUNTRY,"+
+"OGV_FAX,"+
+"OGV_FEDERAL_DISTRICT,"+
+"OGV_NAME,"+
+"REQUEST_TO_OGV_NAME,"+
+"REQUEST_TO_OGV_BOSS_NAME,"+
+"REQUEST_TO_OGV_ADDRESS,"+
+"REQUEST_TO_OGV_BOSS_POST,"+
+"ACCESS_TO_OGV_BOSS,"+
+"EXECUTOR_FIRST_NAME,EXECUTOR_MIDDLE_NAME,EXECUTOR_LAST_NAME,"+
+"EXECUTOR_PHONE";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JFreeReportComponent</component-name>
+        <action-type>report</action-type>
+        <action-inputs> 
+          <output-type type="string" mapping="outputType"/>  
+          <data type="result-set" mapping="dsResult"/>  
+          <BODY type="string"/>
+          <CURRENT_DATE_DAY type="string"/>
+          <CURRENT_DATE_MONTH type="string"/>
+          <CURRENT_DATE_YEAR type="string"/>
+        </action-inputs>
+        <action-resources> 
+          <report-definition type="resource"/> 
+        </action-resources>
+        <action-outputs> 
+          <report-output type="content" mapping="content"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+ 
+    </actions>
+ 
+  </actions> 
+</action-sequence>

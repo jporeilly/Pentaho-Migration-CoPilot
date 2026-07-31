@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-sequence> 
+  <title>Печатная форма расписки о представленных документах</title>
+  <version>1</version>
+  <logging-level/>
+  <documentation> 
+    <author>Тесля Дмитрий</author>  
+    <description>Печатная форма расписки о представленных документах</description>  
+    <help/>  
+    <result-type>report</result-type>  
+    <icon/> 
+  </documentation>
+
+  <inputs> 
+    <outputType type="string"> 
+      <sources> 
+        <request>outputType</request>  
+        <request>type</request> 
+      </sources>  
+      <default-value><![CDATA[pdf]]></default-value> 
+    </outputType>  
+    <outputTypeList type="property-map-list"> 
+      <sources> 
+        <runtime>outputTypeList</runtime> 
+      </sources>  
+      <default-value type="property-map-list"> 
+        <property-map> 
+          <entry key="report-output-desc">PDF</entry>  
+          <entry key="report-output-type-id">pdf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Excel</entry>  
+          <entry key="report-output-type-id">xls</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Word</entry>  
+          <entry key="report-output-type-id">rtf</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Web Page</entry>  
+          <entry key="report-output-type-id">html</entry> 
+        </property-map>  
+        <property-map> 
+          <entry key="report-output-desc">Comma Separated Value</entry>  
+          <entry key="report-output-type-id">csv</entry> 
+        </property-map> 
+      </default-value> 
+    </outputTypeList>  
+    <processId type="string"> 
+      <sources> 
+        <request>processId</request> 
+      </sources> 
+    </processId>  
+    <activityId type="string"> 
+      <sources> 
+        <request>activityId</request> 
+      </sources> 
+    </activityId>  
+    <user type="string"> 
+      <sources> 
+        <request>user</request> 
+      </sources> 
+    </user> 
+  </inputs>
+
+  <outputs> 
+    <content type="content"> 
+      <destinations> 
+        <response>content</response> 
+      </destinations> 
+    </content> 
+  </outputs>
+
+  <resources> 
+    <report-definition> 
+      <solution-file> 
+        <location>archive_result_receipt.xml</location>  
+        <mime-type>text/plain</mime-type> 
+      </solution-file> 
+    </report-definition> 
+  </resources>
+  
+  <actions> 
+    <action-definition> 
+      <component-name>SecureFilterComponent</component-name>
+      <action-type>Promt params for Report</action-type>
+      <action-inputs> 
+        <outputType type="string"/>  
+        <outputTypeList type="property-map-list"/> 
+      </action-inputs>
+      <component-definition> 
+        <selections> 
+          <outputType style="select"> 
+            <filter value-col-name="report-output-type-id" display-col-name="report-output-desc">outputTypeList</filter>  
+            <title>Формат вывода:</title> 
+          </outputType> 
+        </selections> 
+      </component-definition> 
+    </action-definition>
+  
+    <actions> 
+      <condition><![CDATA[(processId!='')&&(activityId!='')]]></condition>  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - по DataSet формируем список переменных для запроса к SHARK</action-type>
+        <action-inputs/>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/EntityToolsBean/local";
+
+method="getActivityVars";
+
+variableList="cardDocument,Person";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom - Получаем перемнные из SHARK</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <variableList type="string"/>  
+          <processId type="string"/>  
+          <activityId type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS - извлекаем данные</action-type>
+        <action-inputs> 
+          <dsResult type="result-set"/> 
+        </action-inputs>
+        <action-outputs> 
+          <cardDoc type="string"/>  
+          <personId type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[rcount=dsResult.getRowCount();
+
+if (rcount!=0){
+cardDoc=dsResult.getValueAt(0,0);
+personId=dsResult.getValueAt(0,2);
+}]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JavaScript - Get current Date</action-type>
+        <action-outputs> 
+          <CURRENT_DATE_DAY type="string"/>  
+          <CURRENT_DATE_MONTH type="string"/>  
+          <CURRENT_DATE_YEAR type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[monthNames = new Array(12);
+monthNames[1] = "января";
+monthNames[2] = "февраля";
+monthNames[3] = "марта";
+monthNames[4] = "апреля";
+monthNames[5] = "мая";
+monthNames[6] = "июня";
+monthNames[7] = "июля";
+monthNames[8] = "августа";
+monthNames[9] = "сентября";
+monthNames[10] = "октября";
+monthNames[11] = "ноября";
+monthNames[12] = "декабря";
+
+currentDate = new Date();
+currentDay = currentDate.getDate();
+
+if(currentDay < 10){
+	CURRENT_DATE_DAY = "0" + currentDay.toString();
+}else{
+	CURRENT_DATE_DAY = currentDay.toString();
+}
+
+CURRENT_DATE_MONTH = monthNames[currentDate.getMonth() + 1];
+
+CURRENT_DATE_YEAR = (currentDate.getYear() + 1900).toString();]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JavascriptRule</component-name>
+        <action-type>JS</action-type>
+        <action-inputs> 
+          <cardDoc type="string"/>  
+          <personId type="string"/>
+          <user type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-outputs>
+        <component-definition> 
+          <script><![CDATA[beenName="lodint/EntityToolsBean/local";
+
+method="getEJBQLTest";
+
+sql="select "+
+" (select p1.firstName from Person p1 where p1.id=ac1.from.id), "+
+" (select p2.lastName from Person p2 where p2.id=ac1.from.id), "+
+" (select p3.middleName from Person p3 where p3.id=ac1.from.id), "+
+" (select p4.firstName from Person p4 where p4.id={personId}), "+
+" (select p5.lastName from Person p5 where p5.id={personId}), "+
+" (select p6.middleName from Person p6 where p6.id={personId}), "+
+" (select u1.firstName from User u1 where u1.login='{user}'), "+
+" (select u2.lastName from User u2 where u2.login='{user}'), "+
+" (select u3.middleName from User u3 where u3.login='{user}'), "+
+" (select u4.position from User u4 where u4.login='{user}'), "+
+" ac1.cardNumber, "+
+" ac1.archiveCode, "+
+" (select ce1.name from CardElement ce1 where ce1.id=ac1.docType), "+
+" ac1.docNumber, "+
+" ac1.docDate, "+
+" ac1.increateNum, "+
+" ac1.increateDate, "+
+" ac1.actualDate, "+
+" ac1.restoreDate, "+
+" ac1.pageCount, "+
+" ac1.pageCountApp, "+
+" ac1.hasPaper, "+
+" ac1.description, "+
+" (select c1.name from ArchiveCollection c1 where c1.id=ac1.collection.id) "+
+" from "+
+" ArchiveCard ac1 "+
+" where "+
+" ac1.id={cardDoc} ";
+
+fields="F_FIRST_NAME,F_LAST_NAME,F_MIDDLE_NAME,"+
+"FIRST_NAME,LAST_NAME,MIDDLE_NAME,"+
+"R_FIRST_NAME,R_LAST_NAME,R_MIDDLE_NAME,"+
+"R_DOLZHNOST,"+
+"CARD_NUMBER,"+
+"ARCHIVE_CODE,"+
+"DOC_TYPE,"+
+"DOC_NUM,"+
+"DOC_DATE,"+
+"IN_NUM,"+
+"IN_DATE,"+
+"ACTUAL_DATE,"+
+"RESTORE_DATE,"+
+"PAGE_COUNT,"+
+"PAGE_COUNT_APP,"+
+"HAS_PAPER,"+
+"DESCRIPTION,"+
+"COLLECTION_NAME";]]></script> 
+        </component-definition> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>org.pentaho.plugin.comsoft.DataSeamEJB</component-name>
+        <action-type>Custom</action-type>
+        <action-inputs> 
+          <beenName type="string"/>  
+          <method type="string"/>  
+          <sql type="string"/>  
+          <fields type="string"/> 
+        </action-inputs>
+        <action-outputs> 
+          <dsResult type="result-set"/>  
+          <dsMetaColumn type="string"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+  
+      <action-definition> 
+        <component-name>JFreeReportComponent</component-name>
+        <action-type>Pentaho Report</action-type>
+        <action-inputs> 
+          <output-type type="string" mapping="outputType"/>  
+          <data type="result-set" mapping="dsResult"/>  
+          <CURRENT_DATE_DAY type="string"/>  
+          <CURRENT_DATE_MONTH type="string"/>  
+          <CURRENT_DATE_YEAR type="string"/> 
+        </action-inputs>
+        <action-resources> 
+          <report-definition type="resource"/> 
+        </action-resources>
+        <action-outputs> 
+          <report-output type="content" mapping="content"/> 
+        </action-outputs>
+        <component-definition/> 
+      </action-definition>
+ 
+    </actions>
+ 
+  </actions> 
+</action-sequence>
