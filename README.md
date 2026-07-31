@@ -2,9 +2,9 @@
 
 **AI-assisted migration of legacy data platforms into Pentaho — ETL and BI reports:**
 **Informatica PowerCenter and Talend → native PDI pipelines (IBM DataStage next);**
-**SAP Crystal Reports → Pentaho Report Designer (.prpt).**
+**SAP Crystal Reports and old Pentaho Xactions (.xaction + JFreeReport `.report`) → Pentaho Report Designer (.prpt).**
 
-Version **1.41.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports & Talend ·
+Version **1.42.0** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports, Talend & Xactions ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of
@@ -26,7 +26,9 @@ PARSE (deterministic) -> MAP (rules + LLM) -> GENERATE (templating) -> VALIDATE 
 A guided dashboard walks each conversion through the pipeline with a stepper —
 one flow per artifact family. Uploads are routed by content sniffing, never by
 extension: ETL exports enter **Upload → Parse → Map → Generate → Validate**;
-Crystal RptToXml dumps enter **Upload → Inspect → Formulas → Download** (report
+Crystal RptToXml dumps — and old BI-platform **.xaction** sequences (or a
+zipped solution folder carrying the JFreeReport definition beside them) —
+enter **Upload → Inspect → Formulas → Download** (report
 structure and datasource SQL, per-formula translation with ✨ LLM assist for
 what rules cannot prove, engine-verifiable .prpt + conversion report, effort &
 cost estimate). Formulas the translator *can* prove but OpenFormula can't
@@ -124,6 +126,7 @@ Framework-agnostic Python core driven by a CLI; FastAPI as a thin API layer; Rea
 | Crystal viewer | `tools/RptViewer/` | WinForms host around the `CrystalReportViewer` control the free SAP runtime installs — put the customer's ORIGINAL .rpt on screen beside the converted .prpt, or export it headlessly to PDF. No designer, developer install or Crystal licence |
 | PDF reports | `src/pentaho_migration/report_pdf.py` | Branded per-mapping report: score, warnings, checklist, expressions, impact, data flow |
 | Reports family | `src/pentaho_migration/reports/` | SAP Crystal Reports → PRD .prpt: RptToXml parser (zero failures on the 150-file real corpus), deterministic Crystal→OpenFormula translator with blocked-idiom rewrites (running totals & aggregates become native PRD report functions, review-flagged) + LLM assist for the remainder, alias-aware record-selection → SQL WHERE folding, engine-verified bundle writer (round-trip validator), chart migration, guided UI flow, credential scrubbing, forked extractor, environment preflight |
+| Xaction family | `src/pentaho_migration/reports/xaction_parser.py` + `jfreereport_parser.py` + `xaction_triage.py` | Old BI-platform .xaction action sequences + JFreeReport `.report` definitions → .prpt: the feeding lookup becomes the query (`{PREPARE:x}` → `${x}`), SecureFilter prompts become parameters (query-backed and static pick-lists), `$()` message templates carry verbatim; orchestration (bursting/email, JavaScript, MDX) becomes suggested solutions; deterministic Low/Medium/High complexity grades; `xaction-triage` sizes a whole solutions folder into a costed T&M engagement plan |
 | API | `src/pentaho_migration/api/` | convert/parse/translate(+jobs)/suggest/sandbox/diff/project/report/settings + reports (inspect/convert) — Swagger at `/docs`; optional API-key auth |
 | UI | `frontend/` | React 18 + Vite, no UI framework, themeable CSS variables |
 

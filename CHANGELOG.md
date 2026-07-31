@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.42.0] - 2026-07-31
 
 - **Xactions: old Pentaho BI-platform reports convert to .prpt.** A new source
   family (task #67) for the estates still on `.xaction` action sequences with
