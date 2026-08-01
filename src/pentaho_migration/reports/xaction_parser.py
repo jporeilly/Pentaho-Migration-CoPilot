@@ -630,6 +630,27 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
                 "comma-list default - converted to a PRD multi-select "
                 "parameter with those values pre-selected; the engine "
                 "expands the selection into the IN clause")
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}",
+                        prm.default or ""):
+            prm.value_type = "DateField"
+
+        # a no-default parameter filtering a column by EQUALITY gets a
+        # query-backed dropdown over that very column (SELECT DISTINCT via
+        # the folded-prompt machinery) and, having no default of its own,
+        # the first available value - so the report opens WITH data
+        # instead of an empty prompt
+        if (not prm.default and not prm.default_values
+                and inp.name not in model.param_lov_sql):
+            eq = re.search(r"([A-Za-z_][\w.]*)\s*=\s*\$\{%s\}"
+                           % re.escape(inp.name), model.sql or "")
+            if eq:
+                column = eq.group(1)
+                model.param_sql_columns[inp.name] = column
+                model.issues.append(
+                    f"parameter '{inp.name}' had no default - converted to "
+                    f"a query-backed dropdown over {column}; the platform "
+                    "prompted for it every run")
+
         src = lookup_by_output.get(list_source)
         list_input = next((i for i in x.inputs
                            if i.name == list_source and i.list_maps), None)

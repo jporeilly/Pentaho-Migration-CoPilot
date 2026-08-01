@@ -43,6 +43,25 @@ function downloadText(text, filename) {
 }
 
 export default function ReportsDownloadPage({ report, file, onReconvert, loading }) {
+  const [consult, setConsult] = useState(null)
+  const [consultBusy, setConsultBusy] = useState(false)
+  const runConsultant = async () => {
+    setConsultBusy(true)
+    try {
+      const form = new FormData()
+      form.append('dump', file)
+      const res = await fetch(`/reports/consultant-report?jndi=${encodeURIComponent(jndi)}`, {
+        method: 'POST', body: form,
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setConsult(data)
+        if (data.consultant_report_html) setOverlayHtml(data.consultant_report_html)
+      }
+    } finally {
+      setConsultBusy(false)
+    }
+  }
   const [jndi, setJndi] = useState(report.summary.jndi)
   const [previewBusy, setPreviewBusy] = useState(false)
   const [previewError, setPreviewError] = useState(null)
@@ -224,10 +243,16 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             ⬇ Conversion report (.md)
           </button>
           {file && (
-            <button className="primary" onClick={runReleaseCheck} disabled={gateBusy}
-              title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
-              {gateBusy ? 'Comparing…' : '🛡 Release check'}
-            </button>
+            <>
+              <button className="ghost" onClick={runConsultant} disabled={consultBusy}
+                title="Action plan + costed effort from the conversion itself — no reference render needed">
+                {consultBusy ? 'Building…' : '📊 Consultant report'}
+              </button>
+              <button className="primary" onClick={runReleaseCheck} disabled={gateBusy}
+                title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
+                {gateBusy ? 'Comparing…' : '🛡 Release check'}
+              </button>
+            </>
           )}
           {file && (
             <button className="ghost" onClick={openPdfPreview} disabled={previewBusy}
@@ -295,6 +320,40 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
           </p>
         </div>
       )}
+
+      {consult && (
+        <div className="card">
+          <header>
+            <h2>Consultant report</h2>
+            <div className="actions">
+              <button className="primary"
+                onClick={() => setOverlayHtml(consult.consultant_report_html)}>
+                🔍 View
+              </button>
+              <button className="ghost" onClick={() => downloadHtml(
+                consult.consultant_report_html,
+                report.filename.replace(/\.prpt$/, '.consultant.html'))}>
+                ⬇ .html
+              </button>
+              {consult.consultant_report_pdf && (
+                <button className="ghost" onClick={() => downloadPdf(
+                  consult.consultant_report_pdf,
+                  report.filename.replace(/\.prpt$/, '.consultant.pdf'))}>
+                  ⬇ .pdf
+                </button>
+              )}
+              <button className="ghost" onClick={() => downloadText(
+                consult.consultant_report_markdown,
+                report.filename.replace(/\.prpt$/, '.consultant.md'))}>
+                ⬇ .md
+              </button>
+            </div>
+          </header>
+          <p className="muted">Action plan + costed effort from the conversion
+            itself — works for every family, no reference render needed.</p>
+        </div>
+      )}
+
 
       {gate && (
         <div className="card">

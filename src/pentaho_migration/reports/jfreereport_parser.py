@@ -487,4 +487,13 @@ def parse_jfreereport(source, resource_loader=None,
                                              or "StringField")
             if el.name and el.name in fn_targets:
                 el.emit_name = True
+
+    found = {el.name for sec in model.sections for el in sec.elements
+             if el.name}
+    for missing in sorted(fn_targets - found):
+        model.issues.append(
+            f"a report function targets element '{missing}', which the "
+            "original itself no longer defines (often commented out in "
+            "the source) - the function is inert in PRD exactly as it "
+            "was on the platform; delete it or restore the element")
     return model

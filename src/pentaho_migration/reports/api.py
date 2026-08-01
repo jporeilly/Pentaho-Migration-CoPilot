@@ -188,7 +188,9 @@ class ReportCounts(BaseModel):
 
 
 class ReportSummary(BaseModel):
-    """Parsed + translated view of one Crystal report."""
+    """Parsed + translated view of one converted report."""
+
+    source_family: str = "crystal"   # crystal | xaction - drives the badge
 
     source: str
     name: str
@@ -216,6 +218,14 @@ class ReportConversionResponse(BaseModel):
     report_markdown: str
     prpt_base64: str
     filename: str
+
+
+def _source_family(source_name: str) -> str:
+    """Which migration family an upload belongs to, from its artifact:
+    an action sequence or a zipped solution folder is the old Pentaho
+    BI platform; everything else on this page is Crystal."""
+    name = (source_name or "").lower()
+    return "xaction" if name.endswith((".xaction", ".zip")) else "crystal"
 
 
 def _summarize(model, source_name: str) -> ReportSummary:
@@ -256,6 +266,7 @@ def _summarize(model, source_name: str) -> ReportSummary:
     split = split_todos(todos)
     return ReportSummary(
         source=source_name,
+        source_family=_source_family(source_name),
         name=model.name,
         jndi=model.jndi,
         sql=model.sql,
@@ -440,6 +451,38 @@ def _load_xaction_zip_upload(data: bytes, filename: str, jndi: str):
     return model
 
 
+def _fill_lov_defaults(model) -> None:
+    """Give each no-default query-backed prompt its first available value,
+    read from the live connection - the converted report then opens WITH
+    data. API-layer only (a convert already runs the JVM); parsing stays
+    database-free, and an unreachable connection just leaves the
+    dropdown unselected."""
+    from pentaho_migration.reports.prpt_writer import _lov_sql
+    from pentaho_migration.reports.schema_agent import preview_query
+
+    for prm in model.parameters:
+        column = model.param_sql_columns.get(prm.name)
+        if not column or prm.default or prm.default_values:
+            continue
+        try:
+            got = preview_query(model.jndi, _lov_sql(model, column), limit=1)
+            rows = got.get("rows") if isinstance(got, dict) else got
+            if rows:
+                prm.default = str(rows[0][0])
+                model.issues.append(
+                    f"parameter '{prm.name}': first available value "
+                    f"'{prm.default}' pre-selected from the live "
+                    "connection, so the report opens with data")
+        except Exception:
+            continue
+
+
+def _fill_and_load(data, source_name, jndi=""):
+    model = _load_upload(data, source_name, jndi)
+    _fill_lov_defaults(model)
+    return model
+
+
 def _looks_like_xaction(data: bytes) -> bool:
     return b"<action-sequence" in data[:4096]
 
@@ -483,7 +526,7 @@ def open_in_report_designer(dump: UploadFile, request: Request,
         raise HTTPException(status_code=503, detail=reason)
     data = dump.file.read()
     source_name = dump.filename or "upload.xml"
-    model = _load_upload(data, source_name, jndi)
+    model = _fill_and_load(data, source_name, jndi)
     buf = _io.BytesIO()
     with tempfile.NamedTemporaryFile(suffix=".prpt", delete=False) as tf:
         prpt_tmp = Path(tf.name)
@@ -504,6 +547,29 @@ _gate_jobs: dict[str, dict] = {}
 _GATE_STAGES = ["extracting", "rendering original", "rendering conversion",
                 "comparing", "annotating", "done"]
 
+
+
+@router.post("/consultant-report", include_in_schema=False)
+def consultant_report(dump: UploadFile, jndi: str = "",
+                      rate: float = 150.0) -> dict:
+    """The single-report consultant report WITHOUT the release gate -
+    the xaction family has no original render to compare against, and a
+    Crystal report's consultant view should not be hostage to one
+    either. Action plan + costed effort from the conversion itself."""
+    from pentaho_migration.reports.consultant_report import (
+        build_consultant_report, build_consultant_report_html)
+
+    data = dump.file.read()
+    source_name = dump.filename or "upload.xml"
+    model = _fill_and_load(data, source_name, jndi)
+    html = build_consultant_report_html(model, None, rate)
+    markdown = build_consultant_report(
+        model, source_name, f"{model.name}.prpt", None)
+    return {
+        "consultant_report_html": html,
+        "consultant_report_markdown": markdown,
+        "consultant_report_pdf": _consultant_pdf_base64(model, None, rate),
+    }
 
 @router.post("/release-check/start", dependencies=[Depends(require_api_key)])
 def _no_original_detail(source_name: str) -> str:
@@ -558,7 +624,7 @@ def release_check_start(dump: UploadFile, jndi: str = "",
 
     def run() -> None:
         try:
-            model = _load_upload(data, source_name, jndi)
+            model = _fill_and_load(data, source_name, jndi)
             job["stage"] = "rendering original"
             original_pdf = render_original_pdf(original)
             job["stage"] = "rendering conversion"
@@ -649,7 +715,7 @@ def release_check(dump: UploadFile, jndi: str = "",
 
     data = dump.file.read()
     source_name = dump.filename or "upload.xml"
-    model = _load_upload(data, source_name, jndi)
+    model = _fill_and_load(data, source_name, jndi)
     original = find_original(source_name)
     if original is None:
         raise HTTPException(
@@ -694,7 +760,7 @@ def preview(dump: UploadFile, jndi: str = "", format: str = "pdf"):
                    "see `pentaho-migrate report-env`")
     data = dump.file.read()
     source_name = dump.filename or "upload.xml"
-    model = _load_upload(data, source_name, jndi)
+    model = _fill_and_load(data, source_name, jndi)
     safe = "".join(c if c.isalnum() or c in " ._-" else "_" for c in model.name).strip() or "report"
     with tempfile.TemporaryDirectory() as td:
         prpt = Path(td) / f"{safe}.prpt"
@@ -839,7 +905,7 @@ def xaction_sample(name: str = "") -> FileResponse:
              dependencies=[Depends(require_api_key)])
 def inspect(dump: UploadFile, jndi: str = "") -> ReportSummary:
     """Parse an RptToXml dump and translate its formulas, without converting."""
-    model = _load_upload(dump.file.read(), dump.filename or "upload.xml", jndi)
+    model = _fill_and_load(dump.file.read(), dump.filename or "upload.xml", jndi)
     return _summarize(model, dump.filename or "upload.xml")
 
 
@@ -869,7 +935,7 @@ def convert(dump: UploadFile, jndi: str = "",
     started = time.monotonic()
     data = dump.file.read()
     source_name = dump.filename or "upload.xml"
-    model = _load_upload(data, source_name, jndi)
+    model = _fill_and_load(data, source_name, jndi)
     if sql_override.strip():
         model.sql = sql_override.strip()
         model.issues.append(
@@ -1028,7 +1094,7 @@ def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dict:
     if not validator_available():
         raise HTTPException(status_code=503,
                             detail="parity needs a local PRD install + Java")
-    model = _load_upload(dump.file.read(), dump.filename or "upload.xml", jndi)
+    model = _fill_and_load(dump.file.read(), dump.filename or "upload.xml", jndi)
     ref_data = reference.file.read()
     ref_name = (reference.filename or "").lower()
     try:
@@ -1077,7 +1143,7 @@ def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
 
     data = dump.file.read()
     source_name = dump.filename or "upload.xml"
-    model = _load_upload(data, source_name, jndi)
+    model = _fill_and_load(data, source_name, jndi)
 
     job_id = uuid.uuid4().hex[:12]
     job: dict = {"status": "running", "done": 0, "total": 0,

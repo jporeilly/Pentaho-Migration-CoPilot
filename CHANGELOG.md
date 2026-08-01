@@ -9,6 +9,25 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The demo experience, driven live and fixed live.** order_detail (and
+  the whole family) now opens WITH data: a no-default prompt filtering a
+  column by equality becomes a query-backed dropdown over that column's
+  OWN table (`SELECT DISTINCT` - reusing the report's comma-join FROM
+  clause without its WHERE was a four-table cartesian product), and the
+  API pre-selects the first available value from the live connection.
+  Date parameters are REAL dates now - `java.util.Date` + datepicker,
+  the exact shape PRD's shipped samples author - and the repaired
+  `05-01-2005` default rides through as one. A report function whose
+  target the original itself commented out gets the honest "inert, as
+  it was on the platform" note instead of a bare PRD warning. The
+  conversion report's collapsible sections render as real
+  `<details>` blocks in the app. Every family gets the single-report
+  **Consultant report** button - action plan + costed effort, no
+  release gate required - and the workbench badge finally says XA for
+  an xaction, not CR. SampleData's JNDI switched to SERVER mode
+  (start_hypersonic.bat, port 9001) so the app, PRD Designer and the
+  render harness stop fighting over the file lock.
+
 - **Dead header-image URLs resolve or stand in** (gap #3: 57 corpus2
   reports, the whole breadboard estate). Image resolution is now three
   tiers deep in both dialects: the old server's webapps, then the

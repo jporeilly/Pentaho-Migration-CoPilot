@@ -67,6 +67,7 @@ _RULES = (
     (APPLIED, re.compile(r"\bresource-bundle text resolved\b", re.I)),
     (APPLIED, re.compile(r"\bstub query stands in\b", re.I)),
     (INFO, re.compile(r"\bno-data band\b", re.I)),
+    (INFO, re.compile(r"\bthe function is inert\b", re.I)),
     # "an HTML template wraps the render - PRD owns the whole page instead":
     # the platform's chrome went away with the platform; context, not work.
     (INFO, re.compile(r"\bHTML template wraps the render\b", re.I)),

@@ -656,6 +656,20 @@ def _parameter_xml(prm, lov_query=None, lov_cols=("LOV", "LOV")):
             f'{label}'
             f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">{render}</attribute>'
             "</list-parameter>")
+    if prm.value_type == "DateField" and re.fullmatch(
+            r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", prm.default or ""):
+        # a REAL date parameter, in the exact shape PRD's own shipped
+        # samples author: java.util.Date + ISO-with-offset default +
+        # datepicker prompt (the engine binds a timestamp, no string
+        # comparison subtleties left)
+        iso = prm.default.replace(" ", "T") + ".000+0000"
+        return (
+            f'<plain-parameter name={quoteattr(prm.name)} '
+            f'mandatory="{mandatory}" type="java.util.Date" '
+            f'default-value={quoteattr(iso)}>'
+            f'{label}'
+            f'<attribute namespace="{NS_PARAM}" name="parameter-render-type">datepicker</attribute>'
+            f"</plain-parameter>")
     default = f" default-value={quoteattr(prm.default)}" if prm.default else ""
     return (
         f'<plain-parameter name={quoteattr(prm.name)} mandatory="{mandatory}" '
@@ -811,9 +825,18 @@ def _static_lov_sql(model, prm):
 
 
 def _lov_sql(model, column):
-    """Pick-list query for a folded prompt: SELECT DISTINCT the filtered
-    column over the report's own FROM clause (before WHERE/ORDER BY), so the
-    dropdown offers exactly the values the report can filter on."""
+    """Pick-list query for a filtered prompt. A QUALIFIED column reads
+    from its own table alone - `SELECT DISTINCT ORDERS.CUSTOMERNUMBER
+    FROM ORDERS` - because reusing the report's comma-join FROM clause
+    without its WHERE predicates is a cartesian product (four tables of
+    Steel Wheels ran for minutes before the first pick-list row).
+    Unqualified columns keep the FROM-clause approach; those queries
+    carry their aliases."""
+    m = re.match(r"([A-Za-z_]\w*)\.([A-Za-z_]\w*)$", column.strip())
+    if m:
+        table, col = m.group(1), m.group(2)
+        return (f'SELECT DISTINCT {col} AS "LOV"\nFROM {table}\n'
+                f"ORDER BY 1")
     m = re.search(r"\bFROM\b(.*?)(?:\bWHERE\b|\bORDER\s+BY\b|\bGROUP\s+BY\b|$)",
                   model.sql, flags=re.IGNORECASE | re.DOTALL)
     from_clause = m.group(1).strip() if m else "TABLE"

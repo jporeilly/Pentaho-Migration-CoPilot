@@ -248,7 +248,7 @@ export default function App() {
 
           {report && (
             <div className="workbench-bar">
-              <SourceBadge tool="crystal" />
+              <SourceBadge tool={report.summary.source_family || 'crystal'} />
               <span className="file-chip" title={fileName}>📄 {fileName}</span>
               <span className="score-chip" title="Formula translation: auto / review / manual">
                 formulas {report.summary.counts.auto}✓ · {report.summary.counts.review}⚠ · {report.summary.counts.manual}✋

@@ -732,6 +732,15 @@ def parse_ext_report(source, resource_loader=None,
                 if el.name in targets:
                     el.emit_name = True
 
+    found = {el.name for sec in model.sections for el in sec.elements
+             if el.name}
+    for missing in sorted(ctx.fn_targets - found):
+        model.issues.append(
+            f"a report function targets element '{missing}', which the "
+            "original itself no longer defines (often commented out in "
+            "the source) - the function is inert in PRD exactly as it "
+            "was on the platform; delete it or restore the element")
+
     # ---- resource-bundle honesty ----------------------------------------
     resolved = sorted(k for k, ok in ctx.bundle_used.items() if ok)
     missing = sorted(k for k, ok in ctx.bundle_used.items() if not ok)

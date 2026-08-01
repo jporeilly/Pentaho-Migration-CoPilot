@@ -27,6 +27,22 @@ export default function Markdown({ text }) {
   let n = 0
   while (n < lines.length) {
     const line = lines[n]
+    if (line.startsWith('<details>')) {
+      // the conversion report's collapsible sections:
+      // <details><summary>title</summary> ... </details>
+      const t = line.match(/<summary>(.*?)<\/summary>/)
+      const inner = []
+      n++
+      while (n < lines.length && !lines[n].startsWith('</details>')) inner.push(lines[n++])
+      n++ // closing tag
+      blocks.push(
+        <details key={`d${n}`}>
+          <summary>{inline(t ? t[1] : 'details', `ds${n}`)}</summary>
+          <Markdown text={inner.join('\n')} />
+        </details>
+      )
+      continue
+    }
     if (line.startsWith('```')) {
       const code = []
       n++
