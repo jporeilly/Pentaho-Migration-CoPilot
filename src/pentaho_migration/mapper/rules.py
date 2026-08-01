@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from pentaho_migration.ir import Confidence, Pipeline, SourceTool
+from pentaho_migration.ir import Confidence, FieldDef, Hop, Pipeline, SourceTool, Step
 
 RULES_DIR = Path(__file__).resolve().parents[3] / "rules"
 DEFAULT_RULES = RULES_DIR / "powercenter_to_pdi.yaml"
@@ -91,4 +91,63 @@ class RulesMapper:
             # Untranslated expressions force at least REVIEW even on an AUTO rule.
             if step.expressions and step.confidence == Confidence.AUTO:
                 step.confidence = Confidence.REVIEW
+        insert_required_sorters(pipeline)
         return pipeline
+
+
+def insert_required_sorters(pipeline: Pipeline) -> int:
+    """Insert a Sort rows step upstream of every Group By / Merge Join /
+    Unique rows leg that lacks one - suggest AND apply, not just log.
+
+    PDI's sorted-input steps run green on unsorted data and produce
+    silently wrong results; the source engines sorted internally, so a
+    1:1 mapping quietly drops that guarantee. The inserted step carries
+    the keys the target actually needs (group keys / per-leg join keys),
+    is marked confidence=review with a note saying why it exists, and is
+    tagged in properties so the source diagram can hide it (it has no
+    source-tool counterpart). Legs whose keys are NOT knowable from the
+    export are left alone - the review agent keeps the honest finding
+    rather than a sort that sorts nothing. Idempotent: a leg that
+    already has a sorter (including one from a previous pass) is
+    skipped. Returns how many steps were inserted."""
+    from pentaho_migration.generator.ktr import (
+        INSERTED_MARK, SORT_REQUIRED_TYPES, leg_has_sorter, sort_keys_for)
+
+    inserted = 0
+    names = {s.name for s in pipeline.steps}
+    for target in [s for s in pipeline.steps
+                   if s.pdi_type in SORT_REQUIRED_TYPES]:
+        legs = [h for h in pipeline.hops if h.to_step == target.name]
+        for leg_idx, hop in enumerate(legs):
+            if leg_has_sorter(pipeline, hop.from_step):
+                continue
+            keys = sort_keys_for(target, leg_idx, pipeline)
+            if not keys:
+                continue
+            base = (f"Sort rows ({target.name}"
+                    + (f" #{leg_idx + 1}" if len(legs) > 1 else "") + ")")
+            name, n = base, 2
+            while name in names:
+                name, n = f"{base} {n}", n + 1
+            names.add(name)
+            label = SORT_REQUIRED_TYPES[target.pdi_type]
+            sorter = Step(
+                name=name, source_type="Sort rows", pdi_type="SortRows",
+                confidence=Confidence.REVIEW,
+                fields=[FieldDef(name=k) for k in keys],
+                properties={INSERTED_MARK: "sorted-input"},
+                notes=[
+                    f"INSERTED by the converter: PDI's {label} step "
+                    f"requires rows sorted by {', '.join(keys)} - the "
+                    "source engine sorted internally, PDI does not, and "
+                    "unsorted input produces silently wrong results. "
+                    "Verify the keys and direction (ascending assumed)."])
+            # the existing hop keeps its LIST POSITION and becomes
+            # sorter->target (Merge Join reads its two input steps from
+            # hop order - appending instead would swap the join legs);
+            # a new hop feeds the sorter from the original upstream
+            pipeline.hops.append(Hop(from_step=hop.from_step, to_step=name))
+            hop.from_step = name
+            pipeline.steps.insert(pipeline.steps.index(target), sorter)
+            inserted += 1
+    return inserted

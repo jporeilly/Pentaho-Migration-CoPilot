@@ -18,8 +18,9 @@ def test_gap_report_counts_and_orders_unmapped_first():
 
     report = build_gap_report(pipelines)
     assert report.mappings == 1
-    assert report.steps == 5
-    assert report.auto + report.review + report.manual == 5
+    # 5 fixture steps + the inserted Sort rows for the Group By
+    assert report.steps == 6
+    assert report.auto + report.review + report.manual == 6
     # unmapped types sort to the top of the coverage list
     assert report.types[0].source_type == "Custom Widget"
     assert report.types[0].pdi_type is None

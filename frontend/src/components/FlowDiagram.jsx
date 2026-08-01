@@ -53,22 +53,47 @@ function layout(pipeline) {
   return { pos, width, height }
 }
 
+// The SOURCE diagram shows what the source tool had - steps the
+// CONVERTER synthesized (an inserted Sort rows) have no counterpart
+// there, so they are hidden and their hops collapse (U->S, S->T reads
+// as U->T). The converted diagram shows them with their review badge.
+function sourceView(pipeline) {
+  const inserted = new Set(
+    pipeline.steps.filter((s) => s.properties?.inserted).map((s) => s.name))
+  if (!inserted.size) return pipeline
+  const feeds = {}
+  pipeline.hops.forEach((h) => {
+    if (inserted.has(h.to_step)) (feeds[h.to_step] ??= []).push(h.from_step)
+  })
+  const hops = []
+  pipeline.hops.forEach((h) => {
+    if (inserted.has(h.to_step)) return
+    if (inserted.has(h.from_step)) {
+      (feeds[h.from_step] || []).forEach((u) =>
+        hops.push({ from_step: u, to_step: h.to_step }))
+    } else hops.push(h)
+  })
+  return { ...pipeline,
+           steps: pipeline.steps.filter((s) => !inserted.has(s.name)), hops }
+}
+
 export default function FlowDiagram({ pipeline, mode = 'pdi' }) {
-  if (!pipeline.steps.length) return null
-  const { pos, width, height } = layout(pipeline)
   const isSource = mode === 'source'
+  const shown = isSource ? sourceView(pipeline) : pipeline
+  if (!shown.steps.length) return null
+  const { pos, width, height } = layout(shown)
 
   return (
     <div className="flow-wrap">
       <svg width={width} height={height} role="img"
-           aria-label={`${isSource ? 'Source' : 'Converted'} pipeline flow for ${pipeline.name}`}>
+           aria-label={`${isSource ? 'Source' : 'Converted'} pipeline flow for ${shown.name}`}>
         <defs>
           <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--text-muted)" />
           </marker>
         </defs>
 
-        {pipeline.hops.map((h) => {
+        {shown.hops.map((h) => {
           const from = pos[h.from_step]
           const to = pos[h.to_step]
           if (!from || !to) return null

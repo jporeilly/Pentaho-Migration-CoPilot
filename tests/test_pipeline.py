@@ -71,7 +71,10 @@ class TestGenerator:
         assert root.tag == "transformation"
         types = {s.findtext("name"): s.findtext("type") for s in root.iter("step")}
         assert types["AGG_SALES"] == "GroupBy"
-        assert len(root.findall("order/hop")) == 4
+        # the mapper INSERTS a Sort rows step upstream of the Group By
+        # (PDI requires sorted input) - one extra step, one extra hop
+        assert types["Sort rows (AGG_SALES)"] == "SortRows"
+        assert len(root.findall("order/hop")) == 5
 
     def test_todo_expressions_land_in_description(self, pipeline):
         RulesMapper().apply(pipeline)
@@ -111,6 +114,8 @@ class TestReport:
     def test_counts_by_confidence(self, pipeline):
         RulesMapper().apply(pipeline)
         report = build_report(pipeline)
-        assert report.total_steps == 5
-        assert report.auto + report.review + report.manual == 5
+        # 5 source steps + the Sort rows the mapper inserts for the
+        # Group By's sorted-input requirement (confidence=review)
+        assert report.total_steps == 6
+        assert report.auto + report.review + report.manual == 6
         assert report.untranslated_expressions == 2

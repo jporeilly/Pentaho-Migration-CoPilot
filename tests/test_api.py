@@ -30,7 +30,8 @@ def test_convert_returns_source_report_and_ktr():
     body = res.json()
     assert body["source"]["tool"] == "Informatica PowerCenter"
     (result,) = body["results"]
-    assert result["report"]["total_steps"] == 5
+    # 5 source steps + the Sort rows inserted for the Group By
+    assert result["report"]["total_steps"] == 6
     assert result["pipeline"]["name"] == "m_load_sales"
     assert "<transformation>" in result["ktr"]
 

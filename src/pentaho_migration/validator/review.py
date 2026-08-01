@@ -26,12 +26,9 @@ a resolution-or-guidance note, it never decides the verdict.
 from pydantic import BaseModel, Field
 
 from pentaho_migration.ir import Pipeline
-
-# PDI step types whose semantics REQUIRE sorted input; feeding them an
-# unsorted stream is the classic silently-wrong-results migration defect.
-SORT_REQUIRED = {"GroupBy": "Group By", "MergeJoin": "Merge Join",
-                 "Unique": "Unique rows"}
-SORTERS = {"SortRows"}
+from pentaho_migration.generator.ktr import (
+    SORT_REQUIRED_TYPES as SORT_REQUIRED, SORTER_TYPES as SORTERS,
+    leg_has_sorter)
 # steps that legitimately start or end a stream
 SOURCE_TYPES = {"TableInput", "CsvInput", "TextFileInput", "ExcelInput",
                 "GetSystemInfo", "RowGenerator", "DataGrid"}
@@ -132,35 +129,23 @@ def _check_hops(pipeline: Pipeline, findings: list) -> None:
             evidence=isolated[:8]))
 
 
-def _upstream_has_sorter(pipeline: Pipeline, step_name: str) -> bool:
-    """Walk the incoming hops looking for a Sort rows step; passing
-    through row-preserving steps is fine, but another reordering or
-    aggregating step resets the guarantee."""
-    seen = set()
-    frontier = [h.from_step for h in pipeline.hops if h.to_step == step_name]
-    while frontier:
-        name = frontier.pop()
-        if name in seen:
-            continue
-        seen.add(name)
-        step = pipeline.step(name)
-        if step is None:
-            continue
-        if step.pdi_type in SORTERS:
-            return True
-        if step.pdi_type in SORT_REQUIRED:      # its OWN sort problem
-            continue
-        frontier.extend(h.from_step for h in pipeline.hops
-                        if h.to_step == name)
-    return False
-
-
 def _check_sorted_input(pipeline: Pipeline, findings: list) -> None:
+    """EVERY incoming leg must be sorted - a Merge Join with one sorted
+    leg is exactly as wrong as one with none."""
     hazards = []
     for step in pipeline.steps:
         label = SORT_REQUIRED.get(step.pdi_type or "")
-        if label and not _upstream_has_sorter(pipeline, step.name):
-            hazards.append(f"{step.name} ({label})")
+        if not label:
+            continue
+        legs = [h.from_step for h in pipeline.hops
+                if h.to_step == step.name]
+        unsorted = [leg for leg in legs
+                    if not leg_has_sorter(pipeline, leg)]
+        if not legs:
+            hazards.append(f"{step.name} ({label}: no input at all)")
+        elif unsorted:
+            hazards.append(f"{step.name} ({label}: unsorted leg from "
+                           + ", ".join(unsorted) + ")")
     if hazards:
         findings.append(EtlFinding(
             severity="error", code="sorted-input",

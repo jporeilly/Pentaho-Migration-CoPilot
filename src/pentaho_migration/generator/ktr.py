@@ -47,6 +47,75 @@ AGGREGATE_RE = re.compile(r"^\s*(SUM|AVG|COUNT|MIN|MAX)\s*\(\s*(\w+)\s*\)\s*$", 
 # "LKP_COL = IN_PORT AND X = Y" -> [("LKP_COL", "IN_PORT"), ("X", "Y")]
 CONDITION_RE = re.compile(r"(\w+)\s*=\s*(\w+)")
 
+# PDI step types whose semantics REQUIRE sorted input, and the sorters
+# that satisfy them. ONE definition: the mapper's sorter insertion and
+# the review agent's lint both read these - the hazard cannot drift
+# between the tool that fixes it and the tool that checks it.
+SORT_REQUIRED_TYPES = {"GroupBy": "Group By", "MergeJoin": "Merge Join",
+                       "Unique": "Unique rows"}
+SORTER_TYPES = {"SortRows"}
+# step.properties marker for steps the CONVERTER synthesized (they have
+# no source-tool counterpart; the source diagram hides them)
+INSERTED_MARK = "inserted"
+
+
+def group_key_fields(step) -> list[str]:
+    """The group-by key columns of a GroupBy step, from either dialect:
+    Talend's GROUPBYS table, or Informatica's port metadata (GROUPBY
+    expression type; plain pass-through ports count as keys the same way
+    the Aggregator treats them)."""
+    rows = _table_rows(step, "GROUPBYS")
+    if rows:
+        return [r.get("INPUT_COLUMN", "") for r in rows if r.get("INPUT_COLUMN")]
+    expression_fields = {e.field for e in step.expressions}
+    return [f.name for f in step.fields
+            if f.attrs.get("EXPRESSIONTYPE") == "GROUPBY"
+            or (f.name not in expression_fields
+                and not f.attrs.get("EXPRESSIONTYPE"))]
+
+
+def sort_keys_for(step, leg: int, pipeline) -> list[str]:
+    """The columns a Sort rows step upstream of `step` must sort by, for
+    incoming leg `leg` (hop order). Empty when the keys are not knowable
+    from the export - the caller then leaves the hazard flagged instead
+    of inserting a sort that sorts nothing."""
+    if step.pdi_type == "GroupBy":
+        return group_key_fields(step)
+    if step.pdi_type == "MergeJoin":
+        pairs = CONDITION_RE.findall(step.properties.get("Join Condition", ""))
+        if not pairs:
+            return []
+        return [left for left, _r in pairs] if leg == 0 \
+            else [right for _l, right in pairs]
+    if step.pdi_type == "Unique":
+        rows = _table_rows(step, "UNIQUE_KEY") or _table_rows(step, "KEYS")
+        keys = [r.get("COLNAME") or r.get("KEY_COLUMN", "") for r in rows]
+        return [k for k in keys if k]
+    return []
+
+
+def leg_has_sorter(pipeline, start: str) -> bool:
+    """Walk upward from `start` (inclusive) looking for a Sort rows step.
+    Another sort-requiring step resets the guarantee - its output order
+    is its own concern, not a promise to what follows."""
+    seen: set = set()
+    frontier = [start]
+    while frontier:
+        name = frontier.pop()
+        if name in seen:
+            continue
+        seen.add(name)
+        step = pipeline.step(name)
+        if step is None:
+            continue
+        if step.pdi_type in SORTER_TYPES:
+            return True
+        if step.pdi_type in SORT_REQUIRED_TYPES:
+            continue
+        frontier.extend(h.from_step for h in pipeline.hops
+                        if h.to_step == name)
+    return False
+
 JOIN_TYPES = {
     "Normal Join": "INNER",
     "Master Outer Join": "RIGHT OUTER",
@@ -252,15 +321,10 @@ def _emit_group_by(step: Step, el: Element, pipeline: Pipeline) -> None:
                     f"emitted COUNT_ALL for '{row.get('OUTPUT_COLUMN', '')}', fix in Spoon")
         return
     SubElement(el, "all_rows").text = "N"
-    expression_fields = {e.field for e in step.expressions}
     group = SubElement(el, "group")
-    for f in step.fields:
-        is_group_key = f.attrs.get("EXPRESSIONTYPE") == "GROUPBY" or (
-            f.name not in expression_fields and not f.attrs.get("EXPRESSIONTYPE")
-        )
-        if is_group_key:
-            field = SubElement(group, "field")
-            SubElement(field, "name").text = f.name
+    for key in group_key_fields(step):
+        field = SubElement(group, "field")
+        SubElement(field, "name").text = key
 
     fields = SubElement(el, "fields")
     for expr in step.expressions:
