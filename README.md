@@ -167,6 +167,13 @@ preflight:
 ./install.sh     # Linux / macOS / Git Bash
 ```
 
+The installer offers two types: **[1] Complete** — the full installation
+(Python env with every extra, web UI, JDBC drivers into a detected Report
+Designer, Crystal preflight) — or **[2] Custom** to choose components (an
+ETL-only box can skip the Crystal environment; an API/CLI server can skip
+the web UI). Unattended: `.\install.ps1 -Mode Complete` /
+`./install.sh --complete`.
+
 Then start the app (also self-installs on first run — `COPILOT_PORT` overrides the port):
 
 ```powershell

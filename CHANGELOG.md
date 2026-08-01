@@ -9,6 +9,14 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The installer offers Complete and Custom installations.** The same
+  pattern as our other tools: [1] Complete - the full installation
+  (Python env with every extra including the LLM provider clients, web
+  UI, JDBC drivers into a detected Report Designer, Crystal preflight);
+  [2] Custom - choose the components, so an ETL-only box skips the
+  Crystal environment and an API/CLI server skips the web UI (Node.js
+  is then not required at all). Unattended installs:
+  `install.ps1 -Mode Complete` / `install.sh --complete`.
 - **Estate mode: the whole engagement in the web app.** The Project
   page batch-converts a SELECTION of uploads into the project store -
   PowerCenter/Talend exports, RptToXml dumps, .rpt binaries, .xactions
