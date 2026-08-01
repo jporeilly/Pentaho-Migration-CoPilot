@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.5] - 2026-08-01
 
 - **The ETL consultant report downloads as PDF too.** The review
   agent's result now carries the branded PDF with the verdict, the

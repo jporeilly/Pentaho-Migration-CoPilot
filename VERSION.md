@@ -1,26 +1,24 @@
 # Version
 
-**1.44.4** - 2026-08-01
+**1.44.5** - 2026-08-01
 
-**The doctor knows every moving part.** `pentaho-migrate doctor` prints
-one readiness table across the whole estate of dependencies - the
-Pentaho suite, the SAP Crystal runtime and its tools, LLM providers,
-Docker Desktop (told apart from installed-but-not-running), Airflow and
-Marquez, the sample databases - each row with what it is needed for and
-the exact next step. Both installer modes end with it, so Complete
-stays zero-prompt and a fresh box finishes with its own readiness
-report. The policy it encodes: install only what the product owns
-(venv, package, UI build, SHA-verified JDBC jars); check and report
-licensed or system-level third parties rather than accepting their
-licences on your behalf; offer exactly one assisted install where the
-path is clean (Ollama via winget, explicit opt-in in Custom mode).
+**The production list is closed.** The review agent's consultant report
+now downloads as a branded PDF - verdict, costed action plan and
+severity-coloured findings leading the document, with the header naming
+the real source family. The project store is portable: export a
+consistent snapshot from one machine's Project page and import it on
+another, through sqlite's own backup API in both directions, with the
+current store backed up beside itself and non-database uploads refused
+with the reason. The ETL family tables scale like the reports table -
+per-family name filters and Agent-verdict chips turn a 148-mapping
+estate into a worklist - and the last conversion survives a browser
+refresh, restoring with an honest note about which actions need the
+file re-uploaded.
 
-Also in this release: a render queue caps concurrent JVM/viewer
-renders so bursts stop thrashing demo laptops, background-job messages
-own the server-restart story, the demo-box image carries every extra
-and the curated demo samples with a persistent /data volume plus a
-root docker-compose with the optional Xtreme MySQL profile, and the
-solution-zip and estate upload paths passed a path-traversal audit.
+Together with 1.44.3 and 1.44.4 this completes the production-hardening
+round: estate mode, the deliverable pack, persisted gate verdicts,
+green CI, Complete/Custom installation, the dependency doctor, the
+render queue and the demo-box image.
 
 Phase 1 remains complete — Informatica PowerCenter, SAP Crystal
 Reports, Talend, and Pentaho Xactions (all three definition dialects);
