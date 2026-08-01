@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.0] - 2026-08-01
 
 - **XY-family charts translate** (gap #5 - the corpus2 gap list is
   DONE: 0 unmapped function classes, 0 unmapped templates, 0 crashes

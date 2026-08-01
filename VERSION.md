@@ -1,57 +1,72 @@
 # Version
 
-**1.43.0** - 2026-07-31
+**1.44.0** - 2026-08-01
 
-**Both old Pentaho report dialects now translate — and the whole family is
-proven against a live database.** 1.42.0 added `.xaction` sequences whose
-simple-format definitions convert; the legacy-EXT dialect (`report-definition`
-object graphs, the format the old Report Design Wizard wrote) was honestly
-flagged as a rebuild. No longer: styled elements, resource bundles, nested
-bands with parent-relative percent sizes, nested sub-reports, chart
-expressions and report functions all parse into the same model. All four
-Steel Wheels EXT reports convert and render against the SampleData HSQLDB:
-Inventory List with its traffic-light stock formatting and HASCHANGED vendor
-grouping, invoice with its watermark underlay and one invoice per page,
-Variance Report with green/red trend arrows toggling per row, alternating row
-shading and a three-series chart, Top Ten with its pie chart inside a nested
-sub-report.
+**The corpus2 gap list is closed.** 1.43.0 proved both old Pentaho report
+dialects translate; this release took a 126-report harvest (breadboard,
+lanit, pentaho-platform-5.0-OLD — 25x the original corpus) and worked its
+ranked gap list to zero: **0 crashes, 0 unmapped function classes, 0
+unmapped element templates, 125 of 126 reports with layouts** (the one
+remainder ships its definition in a jar the estate never committed; the
+extraction path is tested and works the moment the jar uploads).
 
-**The sequence's own values resolve at conversion time instead of becoming
-notes.** Dynamic `{name}` SQL fragments substitute the input's default — the
-platform's own text substitution, reproduced; one-line arithmetic JavaScript
-(`PrevYear = (YEAR - 1)`) is evaluated by a guarded interpreter and threaded
-through the query, bindings, labels and chart columns; a comma-list default
-feeding `IN (...)` becomes a PRD multi-select parameter with the values
-pre-selected; prompt pick-lists ship their lookup SQL as real query-backed
-list parameters; an MDX-fed report gets a typed empty stub query so the
-bundle opens and renders for review, with the Mondrian datasource suggested.
-Server-hosted images embed when a local install has them, the watermark band
-converts as an underlay, and the conversion-notes classifier files all of
-this as applied work — "Other manual work" holds only real hand-work. The
-Income Statement converts with zero manual notes.
+**Report functions port on jar-verified evidence.** One shared translation
+table serves both dialects: the old classes moved wholesale from
+`org.jfree.report.*` to the PRD engine's packages — visibility switches,
+element colouring, hyperlinks, BeanShell scripts (PRD still ships the same
+interpreter) — and every ported class name is verified present in the local
+engine jars by the test suite. Aggregate functions become summaries,
+PageOfPages becomes the writer's own page function. The sequences'
+JavaScript runs through a safe interpreter with prefix semantics: statements
+evaluate in order and conversion stops honestly at the first construct
+outside the subset, keeping everything the platform itself would have
+computed. What remains manual is *pointed* — each note names the PRD-native
+fix (fold the lookup into the query, `$(report.date)` for run-date parts).
 
-**The emitter is now validated against Report Designer's own output.** PRD
-ships 36 known-good sample `.prpt` files — files its own bundle writer
-authored. A validation harness sweeps them: every XML tag we emit must appear
-in PRD-authored files, unknown expression classes must resolve in the engine
-jars, all 36 render through our harness (34 do; two need scripting engines we
-don't load), and our conversions are compared structurally against the
-shipped re-authorings of the very same Steel Wheels reports — identical group
-and band skeletons. The sweep caught a real bug on its first run: static
-parameter pick-lists were emitted as `<value-list>`, a shape the engine
-parser silently ignores. They are now query-backed list parameters — the only
-kind PRD itself authors.
+**Every chart family the old platform authored now translates.** Category
+charts (bar, line, area, pie) were already in; this release adds the XY
+family — XY line, scatter, bubble, and time series — plus multi-pie, with
+the emitter speaking the new collector API verified from the legacy-charts
+jar's own metadata: the collectors dropped their `-Function` suffix, x/y/z
+column properties introspect capitalised (`XValueColumn[0]` — the JavaBeans
+two-capitals rule; the engine rejects the lowercase spelling), series named
+by a data column use the indexed `seriesColumn[i]`, and the time period is
+the Class-valued `timePeriod`. Authored properties the render depends on
+ride along — `maxBubbleSize` above all, because the PRD default of zero
+draws invisible bubbles. The chart scan lives in the shared functions
+module, so the simple dialect translates `drawable-field` and chart
+expressions through the same table the legacy-EXT parser uses. All five
+shapes render through the real engine against SampleData rows.
 
-**The workbench understands the whole estate.** The schema assistant
-introspects every database PRD has a JDBC driver for — through PRD's own Java
-and `lib/jdbc`, read-only — so SampleData browses its 14 tables, validates
-converted SQL and previews live rows. The data-source panel picks up the
-selected report's connection and tests it. The layout QA pass runs on
-xactions and knows a layered stack (mutually-exclusive visibility) from a
-real overlap; the wireframe badges layered elements so the design view is
-self-explanatory. Estate triage grades legacy-EXT as a translated dialect
-with a review sign-off, not a rebuild line.
+**Hidden definitions resolve.** The resolution ladder climbs from explicit
+action-resources through: a resource picked by name via a `resource-name`
+input (the platform's own run-time selection, reproduced from its default);
+the `report-definition*` convention; definitions extracted from uploaded
+jars; definitions embedded inline in the xaction (the WAQR ad-hoc pattern,
+parser-config properties substituted); a Report Designer 1.x `.report`
+object tree standing in for a never-committed runtime XML — the third old
+dialect, with its own parser; and a tolerant repair for a real estate defect
+(a comment closed with `->>` instead of `-->` — the typo is fixed in place).
+
+**Dead server images stop blocking review.** Image references resolve three
+tiers deep: the old server's local webapps, then the solution folder by
+basename, then a stamped same-size placeholder so layout review proceeds —
+and estate triage aggregates every placeholder into one action: drop the
+real file into the solution folder and every report that points at it fixes
+at once.
+
+**The demo experience was driven live and fixed live.** Reports open with
+data on screen: query-backed pick-lists pre-select their first value from
+the live connection, date parameters get real datepickers with repaired
+defaults (`05-01-2005` becomes ISO, the day/month order stated), and the
+schema assistant substitutes numeric defaults unquoted so HSQLDB accepts
+the validation SQL. Source badges are drawn product marks (Crystal,
+Informatica, Talend, Airflow, xaction), the consultant report renders for
+every family, conversion reports render their collapsible sections, and
+the launchers list all four migration families plus the PDI → Airflow
+studio, the default Pentaho tool paths, and how to start the SampleData
+HSQLDB.
 
 Phase 1 remains complete — Informatica PowerCenter, SAP Crystal Reports,
-Talend, and Pentaho Xactions (both definition dialects).
+Talend, and Pentaho Xactions (all three definition dialects).
 See [CHANGELOG.md](CHANGELOG.md) for history.
