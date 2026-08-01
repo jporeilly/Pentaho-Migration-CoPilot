@@ -7,6 +7,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **Markdown renders at the app's standard font and size everywhere.**
+  The conversion report's collapsible sections and footer fell outside
+  the two (slightly different) scoped style blocks and rendered at
+  browser defaults next to the styled bullets. ONE unscoped `.md`
+  stylesheet now covers every markdown surface - summary rows and
+  emphasis included - and single-asterisk `*emphasis*` renders as
+  italic instead of literal asterisks. The release-check note box also
+  fills the card width instead of stopping at 72 characters.
+
 ## [1.44.1] - 2026-08-01
 
 - **The converter INSERTS the Sort rows steps PDI needs** - suggest and

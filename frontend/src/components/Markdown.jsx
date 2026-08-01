@@ -3,7 +3,7 @@
 // content, so it doesn't need to be a full parser.
 function inline(text, keyBase) {
   const parts = []
-  const re = /(\*\*(.+?)\*\*|`(.+?)`|\[(.+?)\]\((.+?)\))/g
+  const re = /(\*\*(.+?)\*\*|`(.+?)`|\[(.+?)\]\((.+?)\)|\*([^*]+?)\*)/g
   let last = 0
   let m
   let i = 0
@@ -12,6 +12,7 @@ function inline(text, keyBase) {
     if (m[2]) parts.push(<strong key={`${keyBase}-${i}`}>{m[2]}</strong>)
     else if (m[3]) parts.push(<code key={`${keyBase}-${i}`}>{m[3]}</code>)
     else if (m[4]) parts.push(<a key={`${keyBase}-${i}`} href={m[5]} target="_blank" rel="noreferrer">{m[4]}</a>)
+    else if (m[6]) parts.push(<em key={`${keyBase}-${i}`}>{m[6]}</em>)
     last = m.index + m[0].length
     i++
   }
