@@ -25,7 +25,8 @@ if (Test-Path $initPy) {
 Write-Host ""
 Write-Host ("=" * 66) -ForegroundColor DarkCyan
 Write-Host ("  Pentaho Migration Copilot  v" + $Version) -ForegroundColor White
-Write-Host  "  Informatica + Talend -> PDI   |   SAP Crystal Reports -> PRD"
+Write-Host  "  Informatica + Talend -> PDI      |  SAP Crystal Reports -> PRD"
+Write-Host  "  Pentaho Xactions + .report -> PRD |  PDI -> Apache Airflow (Studio)"
 Write-Host ("=" * 66) -ForegroundColor DarkCyan
 Write-Host ""
 
@@ -65,6 +66,22 @@ if ($LASTEXITCODE -eq 0 -and $envJson) {
 } else {
     Warn "capability check skipped (package not importable yet?)"
 }
+# ----- Pentaho tooling on this machine (default install paths) --------------
+$PdiHome = "C:\Pentaho\design-tools\data-integration"
+if (Test-Path (Join-Path $PdiHome "Spoon.bat")) { Ok ("PDI (Spoon/Kitchen/Pan): " + $PdiHome) }
+else { Warn ("PDI not at the default path " + $PdiHome + " - Kitchen/Pan demos need it") }
+$PrdHome = "C:\Pentaho\design-tools\report-designer"
+if (Test-Path $PrdHome) { Ok ("Report Designer (default): " + $PrdHome) }
+$Hsql = "C:\Pentaho\server\hsql-sample-database"
+if (Test-Path (Join-Path $Hsql "start_hypersonic.bat")) {
+    Ok  ("SampleData HSQLDB: " + $Hsql)
+    Write-Host "         file mode: converts/renders open it in-process - no server needed"
+    Write-Host "         server mode (for Spoon/PRD shared use): start_hypersonic.bat (port 9001,"
+    Write-Host "         jdbc:hsqldb:hsql://localhost/sampledata, user pentaho_user / password)"
+} else {
+    Warn ("SampleData HSQLDB not found at " + $Hsql + " - live xaction demos render empty")
+}
+
 $viewer = Join-Path $Root "tools\RptViewer\RptViewer.exe"
 if (Test-Path $viewer) { Ok "Crystal viewer  (View original .rpt, side-by-side demos)" }
 else { Warn "Crystal viewer not built - run tools\RptViewer\build.ps1 for side-by-side" }
@@ -76,6 +93,11 @@ Write-Host ("http://localhost:" + $Port) -ForegroundColor Green
 Write-Host  "  Demo walkthrough:  docs\DEMO-WALKTHROUGH.md  (scripted 10-minute demo)"
 Write-Host  "  Quick start:       click 'Try Crystal Reports' - original opens in the"
 Write-Host  "                     viewer, converts, release-check gates the download"
+Write-Host  "                     or 'Try Xactions' - old BI-server reports (.xaction"
+Write-Host  "                     + .report, both dialects) convert and render live"
+Write-Host  "  PDI -> Airflow:    ..\PDI-AirFlow
+un.ps1  (Migration Studio :5012 -"
+Write-Host  "                     converted .kjb/.ktr schedule as DAGs with lineage)"
 Write-Host  "  Stop:              Ctrl+C"
 Write-Host ""
 & $Python -m uvicorn pentaho_migration.api.main:app --port $Port

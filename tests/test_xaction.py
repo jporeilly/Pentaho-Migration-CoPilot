@@ -351,8 +351,11 @@ class TestLocalAssetEmbedding:
         note = next(i for i in m.issues if "underlay" in i)
         assert classify_todo(note) == "applied"
 
-    def test_an_unresolvable_image_stays_an_honest_manual_note(self, tmp_path,
-                                                               monkeypatch):
+    def test_an_unresolvable_image_gets_a_stamped_placeholder(self, tmp_path,
+                                                              monkeypatch):
+        # dead URL, nothing in the solution folder: a same-size placeholder
+        # embeds so layout review proceeds, and the note names the ONE
+        # estate-wide fix (drop the real file in; tier-2 picks it up)
         monkeypatch.setenv("PENTAHO_SERVER_WEBAPPS", str(tmp_path / "nope"))
         xml = tmp_path / "r.xml"
         xml.write_text(
@@ -362,8 +365,32 @@ class TestLocalAssetEmbedding:
         m = parse_jfreereport(xml)
         img = next(e for s in m.sections for e in s.elements
                    if e.kind == "image")
-        assert not img.image_bytes
-        assert any("no local copy was found" in n for n in img.notes)
+        assert img.image_bytes[1:4] == b"PNG"
+        note = next(n for n in img.notes if "placeholder is stamped" in n)
+        assert "solution folder" in note
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        assert classify_todo(note) == "info"
+
+    def test_a_solution_folder_sibling_resolves_by_basename(self, tmp_path,
+                                                            monkeypatch):
+        monkeypatch.setenv("PENTAHO_SERVER_WEBAPPS", str(tmp_path / "nope"))
+        xml = tmp_path / "r.xml"
+        xml.write_text(
+            '<report name="R" pageformat="LETTER">'
+            '<items><imageref src="http://dead.example.com/img/logo.gif"'
+            ' x="0" y="0" width="50" height="20"/></items></report>',
+            encoding="utf-8")
+        m = parse_jfreereport(
+            xml, resource_loader=lambda n: b"GIF89a-bytes"
+            if n == "logo.gif" else None)
+        img = next(e for s in m.sections for e in s.elements
+                   if e.kind == "image")
+        assert img.image_bytes == b"GIF89a-bytes"
+        assert img.image_mime == "image/gif"
+        note = next(n for n in img.notes
+                    if "embedded from the solution folder" in n)
+        from pentaho_migration.reports.todo_kinds import classify_todo
+        assert classify_todo(note) == "applied"
 
     def test_a_hostile_src_cannot_escape_the_root(self, tmp_path, monkeypatch):
         monkeypatch.setenv("PENTAHO_SERVER_WEBAPPS", str(tmp_path))

@@ -44,6 +44,7 @@ class XTriageRecord:
     grade: str = ""           # Low | Medium | High ("" for non-reports)
     reasons: list = field(default_factory=list)
     definition: str = ""      # simple | legacy-ext | missing | "" (non-report)
+    placeholder_images: int = 0  # dead-URL images stamped with placeholders
     issues: int = 0
     copilot_hours: float = 0.0
     manual_hours: float = 0.0
@@ -86,7 +87,12 @@ def triage_estate(folder) -> list:
             file=rel, name=path.stem, kind="report", grade=grade,
             reasons=reasons, definition=definition,
             issues=len(model.issues), copilot_hours=copilot,
-            manual_hours=manual))
+            manual_hours=manual,
+            placeholder_images=sum(
+                "placeholder is stamped" in n
+                for sec in model.sections for el in sec.elements
+                for n in el.notes) + sum(
+                "placeholder is stamped" in i for i in model.issues)))
     return records
 
 
@@ -135,6 +141,15 @@ def build_xaction_estate_report_html(records, rate: float = 150.0,
                         "(styled layouts, resource bundles, charts, ported "
                         "functions) - run each converted report beside its "
                         "original and sign off the layout", legacy))
+    stamped = _rows_for(lambda r: r.placeholder_images)
+    if stamped:
+        actions.append((2, "Re-embed the brand images (one estate-wide fix)",
+                        "these reports point their header images at dead "
+                        "server URLs; conversion stamped same-size "
+                        "placeholders so layout review proceeds - drop the "
+                        "real image file(s) into the solution folder (same "
+                        "basename) and re-convert, and every report "
+                        "resolves at once", stamped))
     missing = _rows_for(lambda r: r.definition == "missing")
     if missing:
         actions.append((1, "Locate the missing report definitions",

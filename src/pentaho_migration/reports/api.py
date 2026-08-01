@@ -506,6 +506,26 @@ _GATE_STAGES = ["extracting", "rendering original", "rendering conversion",
 
 
 @router.post("/release-check/start", dependencies=[Depends(require_api_key)])
+def _no_original_detail(source_name: str) -> str:
+    """The release check needs the ORIGINAL's render to compare against.
+    What that means differs by family - say it in the family's own
+    artifacts, not Crystal's."""
+    name = (source_name or "").lower()
+    if name.endswith((".xaction", ".zip")):
+        return ("release check compares the converted output against the "
+                "ORIGINAL's render. This report came from an .xaction + "
+                ".report definition - rendering the original needs the old "
+                "BI platform, which is not installed here, so there is "
+                "nothing to compare against yet. The conversion itself is "
+                "unaffected: review via PDF preview and the conversion "
+                "report - downloads stay unlocked. (Zip the solution "
+                "folder when uploading so the .xaction, its .report/.xml "
+                "definition and .properties bundles stay together.)")
+    return ("no original .rpt known for this report - drop the .rpt "
+            "itself (or keep it beside the dump) so the release check "
+            "has something to compare against")
+
+
 def release_check_start(dump: UploadFile, jndi: str = "",
                               llm: bool = True, rate: float = 150.0) -> dict:
     """Start the release gate in the background: two full renders plus
@@ -528,9 +548,7 @@ def release_check_start(dump: UploadFile, jndi: str = "",
     if original is None:
         raise HTTPException(
             status_code=404,
-            detail="no original .rpt known for this report - drop the .rpt "
-                   "itself (or keep it beside the dump) so the release check "
-                   "has something to compare against")
+            detail=_no_original_detail(source_name))
 
     job_id = uuid.uuid4().hex[:12]
     job: dict = {"status": "running", "stage": "extracting",
@@ -636,9 +654,7 @@ def release_check(dump: UploadFile, jndi: str = "",
     if original is None:
         raise HTTPException(
             status_code=404,
-            detail="no original .rpt known for this report - drop the .rpt "
-                   "itself (or keep it beside the dump) so the release check "
-                   "has something to compare against")
+            detail=_no_original_detail(source_name))
     check = run_release_check(model, original)
     if check.verdict == "UNAVAILABLE":
         raise HTTPException(status_code=503, detail=check.reason)

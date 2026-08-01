@@ -49,9 +49,15 @@ _RULES = (
     # unconverted backlog for a report that renders correctly.
     (APPLIED, re.compile(r"\blayered-visibility layout translated\b", re.I)),
     (APPLIED, re.compile(r"\bdefault padded to\b", re.I)),
+    (APPLIED, re.compile(r"\brepaired to\b", re.I)),
     (APPLIED, re.compile(r"\bremoved so the query runs its DEFAULT\b", re.I)),
     (APPLIED, re.compile(r"\btemplated field binding\(s\) resolved\b", re.I)),
     (APPLIED, re.compile(r"\bembedded from the local server\b", re.I)),
+    (APPLIED, re.compile(r"\bembedded from the solution folder\b", re.I)),
+    # a stamped placeholder unblocks layout review; the real task is
+    # ONE estate-wide "drop the logo file in" - the triage report
+    # aggregates it, so per-report it is context, not backlog
+    (INFO, re.compile(r"\bplaceholder is stamped\b", re.I)),
     (APPLIED, re.compile(r"\bconverts as an underlay\b", re.I)),
     # Legacy-EXT / dynamic-value notes: the pipeline substituted, evaluated,
     # ported or stood in - each sentence names finished work.

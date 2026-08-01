@@ -9,6 +9,35 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Dead header-image URLs resolve or stand in** (gap #3: 57 corpus2
+  reports, the whole breadboard estate). Image resolution is now three
+  tiers deep in both dialects: the old server's webapps, then the
+  SOLUTION FOLDER by basename (6 breadboard logos resolved for real),
+  then a stamped same-size placeholder - grey field, cross, filename -
+  so layout review is never hostage to a logo. The per-report note is
+  informational and the estate triage aggregates one priority action:
+  drop the real image beside the xactions and re-convert; the basename
+  fallback then fixes every report at once.
+- **Live-testing fixes.** Schema-assistant SQL validation substitutes
+  numeric parameter defaults as bare numbers - HSQLDB refuses
+  VARCHAR-vs-numeric comparisons outright ("incompatible data types in
+  combination"), which failed order_detail and invoice while the
+  reports themselves rendered fine. A non-ISO date default is now
+  REPAIRED, not flagged: '05-01-2005' becomes '2005-01-05 00:00:00'
+  with the assumed day/month order stated for review (unambiguous when
+  either part exceeds 12). The release-check banner speaks each
+  family's language - an xaction conversion is told its original is
+  the .xaction + .report pair (zip the solution folder), not asked for
+  a .rpt. The Try picker's source badge gains a Pentaho BI Platform
+  identity, and neutral lettermark PNGs in frontend/public/logos stop
+  the 404s (drop official brand art over them any time).
+- **The launchers tell the whole story.** run.ps1's banner now lists
+  all four migration families plus the PDI -> Apache Airflow Studio
+  cross-link, shows the default Pentaho tool paths (data-integration,
+  report-designer), and explains SampleData HSQLDB's two modes (file
+  mode needs no server; start_hypersonic.bat for shared server mode).
+  The Studio's run scripts cross-link back.
+
 - **The sequences' JavaScript now runs through a real (safe) interpreter**
   (gap #2: 58 corpus2 reports). `reports/js_eval.py` evaluates the JS
   subset the estates actually use - literal assignments, string

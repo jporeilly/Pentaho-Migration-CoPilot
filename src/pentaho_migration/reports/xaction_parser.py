@@ -590,11 +590,29 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
                 f"date parameter '{inp.name}' default padded to "
                 f"'{prm.default}' - HSQLDB 2.x converts only the full "
                 "timestamp format; pick-list values may need the same padding")
-        elif re.fullmatch(r"\d{2}-\d{2}-\d{4}", inp.default or ""):
-            model.issues.append(
-                f"parameter '{inp.name}' default {inp.default!r} is not ISO "
-                "(dd-mm-yyyy?) - the database will reject it; fix the default "
-                "to yyyy-mm-dd hh:mm:ss")
+        elif re.fullmatch(r"\d{1,2}-\d{1,2}-\d{4}", inp.default or ""):
+            # the platform TEXT-substituted whatever string sat here; PRD
+            # binds a real date, so a backwards default must be repaired.
+            # Day/month order: unambiguous when one part exceeds 12,
+            # dd-mm-yyyy assumed (and said) otherwise.
+            first, second, year = (int(v) for v in inp.default.split("-"))
+            day, month, order = first, second, "dd-mm-yyyy"
+            if first <= 12 < second:
+                day, month, order = second, first, "mm-dd-yyyy"
+            if 1 <= month <= 12 and 1 <= day <= 31:
+                prm.default = f"{year}-{month:02d}-{day:02d} 00:00:00"
+                model.issues.append(
+                    f"parameter '{inp.name}' default {inp.default!r} is "
+                    f"not ISO - repaired to '{prm.default}' (read as "
+                    f"{order}; the original's own defect - the old "
+                    "platform pasted the string into the SQL, PRD binds "
+                    "a real date) - review the day/month order")
+            else:
+                model.issues.append(
+                    f"parameter '{inp.name}' default {inp.default!r} is "
+                    "not a valid date in any day/month order - the "
+                    "database will reject it; fix the default to "
+                    "yyyy-mm-dd hh:mm:ss")
         # A ${param} inside an IN (...) filter whose default is a comma list
         # is the platform's multi-select idiom: the prompt submitted several
         # values and the text substitution splatted them into the list. The

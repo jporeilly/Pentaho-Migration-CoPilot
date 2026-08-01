@@ -8,6 +8,7 @@ export const TOOLS = {
   talend: { short: 'TLND', label: 'Talend', color: '#1baf7a' },
   datastage: { short: 'DS', label: 'IBM DataStage', color: '#9085e9' },
   crystal: { short: 'CR', label: 'SAP Crystal Reports', color: '#f0ab00' },
+  xaction: { short: 'XA', label: 'Pentaho BI Platform (.xaction + .report)', color: '#005f9e' },
 }
 
 export const toolLabel = (tool) => TOOLS[tool]?.label ?? tool

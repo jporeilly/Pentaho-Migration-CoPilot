@@ -71,7 +71,8 @@ def _font(el, inherited: Font) -> Font:
     )
 
 
-def _parse_element(node, width: float, font: Font, offset_x=0.0, offset_y=0.0):
+def _parse_element(node, width: float, font: Font, offset_x=0.0,
+                   offset_y=0.0, resource_loader=None):
     """One band child -> an Element, or None for structural/ignored nodes."""
     tag = node.tag
     x = _pt(node.get("x"), width) + offset_x
@@ -129,23 +130,11 @@ def _parse_element(node, width: float, font: Font, offset_x=0.0, offset_y=0.0):
         src = node.get("src") or ""
         el = Element(kind="image",
                      **{**common, "name": common["name"] or Path(src).name})
-        resolved = _resolve_image_asset(src)
-        if resolved is not None:
-            path, data = resolved
-            el.image_bytes = data
-            el.image_mime = _IMAGE_MIMES.get(Path(src).suffix.lower(),
-                                             "image/png")
-            el.notes.append(
-                f"image {Path(src).name!r} embedded from the local server "
-                f"install ({path}) - the old xaction loaded it from "
-                f"{src!r} at run time")
-        else:
-            el.notes.append(
-                f"image resource {src!r} - a server-side path the bundle "
-                "cannot carry and no local copy was found; re-embed the image "
-                "in PRD (Insert > image), point the element at a reachable "
-                "URL, or set PENTAHO_SERVER_WEBAPPS to the old server's "
-                "tomcat/webapps folder so conversion embeds it")
+        data, mime, note = resolve_image(src, el.width, el.height,
+                                         resource_loader)
+        el.image_bytes = data
+        el.image_mime = mime
+        el.notes.append(note)
         return el
     return None
 
@@ -190,9 +179,90 @@ def _resolve_image_asset(src: str):
     return None
 
 
+def _placeholder_png(width, height, label=""):
+    """A stamped placeholder raster: grey field, border, diagonal cross,
+    the missing file's name when it fits. Visually unmistakable as
+    NOT-the-real-image, so layout review proceeds without anyone
+    mistaking the stand-in for design."""
+    w = max(8, min(int(width or 100), 2000))
+    h = max(8, min(int(height or 40), 2000))
+    try:
+        import io
+
+        from PIL import Image, ImageDraw
+
+        img = Image.new("RGB", (w, h), "#e9e9e9")
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([0, 0, w - 1, h - 1], outline="#9a9a9a", width=1)
+        draw.line([0, 0, w - 1, h - 1], fill="#c4c4c4", width=1)
+        draw.line([0, h - 1, w - 1, 0], fill="#c4c4c4", width=1)
+        if w >= 90 and h >= 14:
+            text = (label or "image")[:24] + " (placeholder)"
+            draw.text((4, max(1, h // 2 - 6)), text, fill="#666666")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+    except ImportError:                      # pragma: no cover - Pillow
+        import struct
+        import zlib
+        row = b"\x00" + b"\xe9\xe9\xe9" * w
+        raw = row * h
+
+        def chunk(tag, data):
+            body = tag + data
+            return (struct.pack(">I", len(data)) + body
+                    + struct.pack(">I", zlib.crc32(body)))
+        return (b"\x89PNG\r\n\x1a\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2,
+                                             0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(raw))
+                + chunk(b"IEND", b""))
+
+
+def resolve_image(src, width, height, resource_loader=None):
+    """An image reference -> (bytes, mime, note), three tiers deep:
+
+    1. a local copy under the old server's webapps (env override or the
+       conventional install) - the true original;
+    2. a SAME-NAMED file in the solution folder, via the caller's
+       resource loader - estates often ship the image beside the
+       xaction even though the definition points at a server URL;
+    3. a stamped same-size placeholder - the URL is dead, but layout
+       review must not be hostage to a logo. The note says the one
+       estate-wide fix: drop the real file into the solution folder
+       (the tier-2 fallback then resolves every report at once).
+    """
+    basename = Path((src or "").split("?")[0]).name
+    mime = _IMAGE_MIMES.get(Path(basename).suffix.lower(), "image/png")
+    resolved = _resolve_image_asset(src)
+    if resolved is not None:
+        path, data = resolved
+        return data, mime, (
+            f"image {basename!r} embedded from the local server "
+            f"install ({path}) - the old xaction loaded it from "
+            f"{src!r} at run time")
+    if resource_loader is not None and basename:
+        try:
+            data = resource_loader(basename)
+        except Exception:
+            data = None
+        if data:
+            return data, mime, (
+                f"image {basename!r} embedded from the solution folder - "
+                f"the definition pointed at {src!r}, and a same-named "
+                "file shipped beside the xaction")
+    return _placeholder_png(width, height, basename), "image/png", (
+        f"image URL {src!r} is unreachable - a same-size placeholder is "
+        "stamped so layout review proceeds; drop the real file "
+        f"({basename or 'the image'}) into the solution folder and "
+        "re-convert - the basename fallback then fixes every report "
+        "that points at it")
+
+
 def _parse_band(node, area_kind: str, width: float, base_font: Font,
                 group_index: int = -1, vis_map: dict | None = None,
-                fn_targets: set | None = None) -> Section:
+                fn_targets: set | None = None,
+                resource_loader=None) -> Section:
     """A band element and its children -> one Section. A nested <band> child
     offsets its children by its own x/y (JFreeReport's grouping container).
 
@@ -226,7 +296,8 @@ def _parse_band(node, area_kind: str, width: float, base_font: Font,
                      _visibility(bname) or vis,
                      bname if bname in fn_targets else inherit)
                 continue
-            el = _parse_element(child, width, font, ox, oy)
+            el = _parse_element(child, width, font, ox, oy,
+                                resource_loader=resource_loader)
             if el is not None:
                 own = _visibility(child.get("name"))
                 if own or vis:
@@ -324,7 +395,8 @@ def parse_jfreereport(source, resource_loader=None,
         if node is not None:
             model.sections.append(
                 _parse_band(node, kind, width, base_font, vis_map=vis_map,
-                            fn_targets=fn_targets))
+                            fn_targets=fn_targets,
+                            resource_loader=resource_loader))
 
     # The watermark band becomes an UNDERLAY section placed first - the same
     # machinery that carries Crystal letterhead watermarks paints its content
@@ -332,17 +404,19 @@ def parse_jfreereport(source, resource_loader=None,
     wm = root.find("watermark")
     if wm is not None and len(wm):
         section = _parse_band(wm, "ReportHeader", width, base_font,
-                              vis_map=vis_map, fn_targets=fn_targets)
+                              vis_map=vis_map, fn_targets=fn_targets,
+                              resource_loader=resource_loader)
         section.underlay = True
         model.sections.insert(0, section)
-        embedded = any(e.image_bytes for e in section.elements)
+        stamped = any("placeholder is stamped" in n
+                      for e in section.elements for n in e.notes)
         model.issues.append(
             "the watermark band converts as an underlay behind the report "
             "header"
-            + (" with its background image embedded from the local server "
-               "install" if embedded else
-               " - its background image could not be resolved locally, so "
-               "re-embed it in PRD or set PENTAHO_SERVER_WEBAPPS")
+            + (" - a PLACEHOLDER stands in for its background image (the "
+               "URL is unreachable); drop the real file into the solution "
+               "folder and re-convert" if stamped else
+               " with its background image embedded")
             + " - verify the placement against the original")
 
     # groups, outermost first; the group column is the LAST listed field
@@ -357,13 +431,15 @@ def parse_jfreereport(source, resource_loader=None,
             model.sections.append(_parse_band(gh, "GroupHeader", width,
                                               base_font, group_index=gi,
                                               vis_map=vis_map,
-                                              fn_targets=fn_targets))
+                                              fn_targets=fn_targets,
+                                              resource_loader=resource_loader))
         gf = g.find("groupfooter")
         if gf is not None:
             model.sections.append(_parse_band(gf, "GroupFooter", width,
                                               base_font, group_index=gi,
                                               vis_map=vis_map,
-                                              fn_targets=fn_targets))
+                                              fn_targets=fn_targets,
+                                              resource_loader=resource_loader))
 
     # functions/expressions -> the shared translation table: aggregates
     # become summaries, PageOfPages becomes the writer's own page

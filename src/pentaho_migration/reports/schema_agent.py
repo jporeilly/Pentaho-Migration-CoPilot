@@ -231,15 +231,21 @@ def probe_schema(jndi: str) -> dict:
 
 def substitute_params(sql: str, parameters: list[dict]) -> str:
     """Replace ${Param} placeholders with the parameter's default (or NULL)
-    so the query becomes EXPLAIN-able. Defaults are quoted as string
-    literals - Postgres casts them where the comparison needs it."""
+    so the query becomes EXPLAIN-able. A numeric-looking default stays a
+    bare number: HSQLDB (and DB2) refuse a VARCHAR literal against a
+    numeric column outright ("incompatible data types in combination") -
+    quoting '353' broke every CUSTOMERNUMBER = ${customernumber} check
+    while the report itself ran fine. Dates stay quoted; the engines
+    convert full-format date/timestamp strings."""
     defaults = {p.get("name", ""): p.get("default", "") for p in parameters}
 
     def _sub(m: re.Match) -> str:
-        value = defaults.get(m.group(1), "")
+        value = str(defaults.get(m.group(1), ""))
         if value == "":
             return "NULL"
-        return "'" + str(value).replace("'", "''") + "'"
+        if re.fullmatch(r"-?\d+(\.\d+)?", value):
+            return value
+        return "'" + value.replace("'", "''") + "'"
 
     return re.sub(r"\$\{(\w+)\}", _sub, sql)
 

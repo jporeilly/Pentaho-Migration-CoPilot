@@ -25,7 +25,7 @@ from pentaho_migration.reports.jfreereport_functions import (
     port_note, targets, translate,
 )
 from pentaho_migration.reports.jfreereport_parser import (
-    _IMAGE_MIMES, _PAGE_SIZES, _resolve_image_asset,
+    _IMAGE_MIMES, _PAGE_SIZES, _resolve_image_asset, resolve_image,
 )
 from pentaho_migration.reports.model import (
     Element, Font, Group, PageSetup, ReportModel, Section, Summary,
@@ -325,23 +325,11 @@ def _element(node, ox, oy, ctx, pw, ph):
         src = props.get("content", "")
         el.kind = "image"
         el.name = el.name or Path(src).name
-        resolved = _resolve_image_asset(src)
-        if resolved is not None:
-            path, data = resolved
-            el.image_bytes = data
-            el.image_mime = _IMAGE_MIMES.get(Path(src).suffix.lower(),
-                                             "image/png")
-            el.notes.append(
-                f"image {Path(src).name!r} embedded from the local server "
-                f"install ({path}) - the old xaction loaded it from "
-                f"{src!r} at run time")
-        else:
-            el.notes.append(
-                f"image resource {src!r} - a server-side path the bundle "
-                "cannot carry and no local copy was found; re-embed the image "
-                "in PRD (Insert > image), point the element at a reachable "
-                "URL, or set PENTAHO_SERVER_WEBAPPS to the old server's "
-                "tomcat/webapps folder so conversion embeds it")
+        data, mime, note = resolve_image(src, el.width, el.height,
+                                         ctx.loader)
+        el.image_bytes = data
+        el.image_mime = mime
+        el.notes.append(note)
         return [el]
     if ref == "image-url-field":
         formula = props.get("formula", "")
@@ -714,14 +702,15 @@ def parse_ext_report(source, resource_loader=None,
     if section is not None and section.elements:
         section.underlay = True
         model.sections.insert(0, section)
-        embedded = any(e.image_bytes for e in section.elements)
+        stamped = any("placeholder is stamped" in n
+                      for e in section.elements for n in e.notes)
         model.issues.append(
             "the watermark band converts as an underlay behind the report "
             "header"
-            + (" with its background image embedded from the local server "
-               "install" if embedded else
-               " - its background image could not be resolved locally, so "
-               "re-embed it in PRD or set PENTAHO_SERVER_WEBAPPS")
+            + (" - a PLACEHOLDER stands in for its background image (the "
+               "URL is unreachable); drop the real file into the solution "
+               "folder and re-convert" if stamped else
+               " with its background image embedded")
             + " - verify the placement against the original")
 
     # ---- computed-field formulas gathered from the walk ------------------
