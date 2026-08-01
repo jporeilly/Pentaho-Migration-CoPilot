@@ -3,11 +3,13 @@ import StatTiles from '../components/StatTiles.jsx'
 import StepsTable from '../components/StepsTable.jsx'
 import CompareView from '../components/CompareView.jsx'
 import ImpactPanel from '../components/ImpactPanel.jsx'
+import StageBar from '../components/StageBar.jsx'
 
 export default function MapPage({ result, onUpdate }) {
   const { pipeline, report } = result
   const [busy, setBusy] = useState(false)
   const [progress, setProgress] = useState('')
+  const [stageState, setStageState] = useState(null)
   const [error, setError] = useState(null)
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -37,6 +39,8 @@ export default function MapPage({ result, onUpdate }) {
           onUpdate(state.result)
           break
         }
+        setStageState({ stage: state.stage, stages: state.stages,
+                        done: state.done, total: state.total })
         if (state.total) setProgress(`${state.done}/${state.total}`)
       }
     } catch (err) {
@@ -44,6 +48,7 @@ export default function MapPage({ result, onUpdate }) {
     } finally {
       setBusy(false)
       setProgress('')
+      setStageState(null)
     }
   }
 
@@ -60,6 +65,10 @@ export default function MapPage({ result, onUpdate }) {
         )}
       </header>
       {error && <div className="error">Translation failed: {error}</div>}
+      {stageState && (
+        <StageBar stage={stageState.stage} stages={stageState.stages}
+          done={stageState.done} total={stageState.total} />
+      )}
       <p className="hint-line">
         How each source component maps to PDI: source structure above its converted
         counterpart, per-step confidence, and a detailed impact analysis of the

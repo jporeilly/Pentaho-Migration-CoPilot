@@ -7,6 +7,7 @@ import Markdown from '../components/Markdown.jsx'
 import EffortPanel from '../components/EffortPanel.jsx'
 import Explain from '../components/Explain.jsx'
 import ReportOverlay from '../components/ReportOverlay.jsx'
+import StageBar from '../components/StageBar.jsx'
 
 function downloadBase64(b64, filename) {
   const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
@@ -302,18 +303,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
       {gateStage && (
         <div className="card">
           <header><h2>Release check <span>comparing renders…</span></h2></header>
-          <div className="gate-progress">
-            {gateStage.stages.filter((s) => s !== 'done').map((s) => {
-              const idx = gateStage.stages.indexOf(gateStage.stage)
-              const mine = gateStage.stages.indexOf(s)
-              return (
-                <div key={s}
-                  className={'gate-step' + (mine < idx ? ' done' : mine === idx ? ' active' : '')}>
-                  {mine < idx ? '✓ ' : ''}{s}
-                </div>
-              )
-            })}
-          </div>
+          <StageBar stage={gateStage.stage} stages={gateStage.stages} />
           <p className="muted">
             Rendering the original through the SAP viewer and the conversion
             through the Pentaho engine — a minute or two for a long report.

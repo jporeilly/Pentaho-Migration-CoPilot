@@ -18,6 +18,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from pentaho_migration.api.security import require_api_key
+from pentaho_migration.jobs import JobStore
 from pentaho_migration.llm import ExpressionTranslator, TranslationError
 from pentaho_migration.reports import build_conversion_report, load_report_model, write_prpt
 from pentaho_migration.reports.effort import build_report_effort
@@ -541,7 +542,7 @@ def open_in_report_designer(dump: UploadFile, request: Request,
             "embedded_rows": len(model.saved_rows.rows) if model.saved_rows else 0}
 
 
-_gate_jobs: dict[str, dict] = {}
+_gate_jobs = JobStore()
 
 # the gate's stages, in order - the UI turns these into a progress bar
 _GATE_STAGES = ["extracting", "rendering original", "rendering conversion",
@@ -571,7 +572,6 @@ def consultant_report(dump: UploadFile, jndi: str = "",
         "consultant_report_pdf": _consultant_pdf_base64(model, None, rate),
     }
 
-@router.post("/release-check/start", dependencies=[Depends(require_api_key)])
 def _no_original_detail(source_name: str) -> str:
     """The release check needs the ORIGINAL's render to compare against.
     What that means differs by family - say it in the family's own
@@ -592,6 +592,7 @@ def _no_original_detail(source_name: str) -> str:
             "has something to compare against")
 
 
+@router.post("/release-check/start", dependencies=[Depends(require_api_key)])
 def release_check_start(dump: UploadFile, jndi: str = "",
                               llm: bool = True, rate: float = 150.0) -> dict:
     """Start the release gate in the background: two full renders plus
@@ -616,11 +617,7 @@ def release_check_start(dump: UploadFile, jndi: str = "",
             status_code=404,
             detail=_no_original_detail(source_name))
 
-    job_id = uuid.uuid4().hex[:12]
-    job: dict = {"status": "running", "stage": "extracting",
-                 "stages": _GATE_STAGES, "detail": "", "result": None}
-    _gate_jobs[job_id] = job
-    _evict_old_jobs(_gate_jobs)
+    job_id, job = _gate_jobs.start(stages=_GATE_STAGES)
 
     def run() -> None:
         try:
@@ -670,7 +667,7 @@ def release_check_start(dump: UploadFile, jndi: str = "",
             job["detail"] = str(exc)
             logger.exception("release-check job %s failed", job_id)
 
-    threading.Thread(target=run, daemon=True).start()
+    _gate_jobs.run(job, run)
     return {"job": job_id}
 
 
@@ -1113,19 +1110,7 @@ def parity(dump: UploadFile, reference: UploadFile, jndi: str = "") -> dict:
             "missing": result.missing, "extra": result.extra}
 
 
-_assist_jobs: dict[str, dict] = {}
-_MAX_JOBS = 50
-
-
-def _evict_old_jobs(jobs: dict) -> None:
-    """Keep the job registry bounded: drop the oldest finished entries."""
-    while len(jobs) > _MAX_JOBS:
-        for job_id, state in list(jobs.items()):
-            if state.get("status") != "running":
-                del jobs[job_id]
-                break
-        else:
-            break  # everything still running — do not evict live jobs
+_assist_jobs = JobStore()
 
 
 @router.post("/translate/start", dependencies=[Depends(require_api_key)])
@@ -1145,27 +1130,20 @@ def translate_start(dump: UploadFile, jndi: str = "") -> dict[str, str]:
     source_name = dump.filename or "upload.xml"
     model = _fill_and_load(data, source_name, jndi)
 
-    job_id = uuid.uuid4().hex[:12]
-    job: dict = {"status": "running", "done": 0, "total": 0,
-                 "translated": 0, "detail": "", "result": None}
-    _assist_jobs[job_id] = job
-    _evict_old_jobs(_assist_jobs)
+    job_id, job = _assist_jobs.start(
+        stages=["translating", "rebuilding bundle", "done"],
+        done=0, total=0, translated=0)
 
     def run() -> None:
-        try:
-            def progress(done: int, total: int) -> None:
-                job["done"], job["total"] = done, total
+        def progress(done: int, total: int) -> None:
+            job["done"], job["total"] = done, total
 
-            job["translated"] = translate_manual_formulas(
-                model, translator=translator, progress=progress)
-            job["result"] = _build_response(model, source_name).model_dump()
-            job["status"] = "done"
-        except Exception as exc:
-            job["status"] = "error"
-            job["detail"] = str(exc)
-            logger.exception("reports translate job %s failed", job_id)
+        job["translated"] = translate_manual_formulas(
+            model, translator=translator, progress=progress)
+        job["stage"] = "rebuilding bundle"
+        job["result"] = _build_response(model, source_name).model_dump()
 
-    threading.Thread(target=run, daemon=True).start()
+    _assist_jobs.run(job, run)
     return {"job": job_id}
 
 

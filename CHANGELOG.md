@@ -7,6 +7,49 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **The agent stack reaches the ETL families** (task #42). The 🛡 ETL
+  **review agent** is the Crystal release gate's counterpart for
+  transformations: deterministic checks over the CONVERTED graph -
+  unmapped steps (grouped by type, each with its suggested PDI
+  approach), untranslated/review expressions, hop integrity (dangling
+  endpoints, isolated steps), **sorted-input hazards** (Group By /
+  Merge Join with no Sort rows upstream run green and produce silently
+  wrong results - now a verdict-driving finding, proven on the FDA and
+  CSCU demos), placeholder connections, an optional **Pan run**
+  (ground truth from a real PDI install; skipped honestly when
+  connections are placeholders), and a measured **CSV parity** result
+  folded in when the diff harness has one. SHIP/REVIEW decided by
+  error findings alone; the LLM only annotates findings with
+  resolution-or-guidance notes.
+- **ONE consultant report per ETL migration** (`etl_consultant.py`):
+  costed action plan first (priorities from the findings + effort
+  constants), review findings with evidence and LLM notes, what
+  converted, behavioural risks - HTML and Markdown from one plan
+  builder, sharing the Crystal consultant stylesheet (extracted to a
+  single `CONSULTANT_CSS`).
+- **Staged progress everywhere long work runs**: the release gate's
+  background-job pattern extracted to ONE `JobStore` (`jobs.py`) and a
+  shared `StageBar` component. ETL convert (`/convert/start`), ✨
+  translation (both families - stages, not just n/total), the ETL
+  review agent, the reports triage sweep
+  (`/project/reports/triage/start`) and the new **ETL review sweep**
+  (`/project/etl-review/start`) all poll the same way.
+- **ETL downloads gate on review** - the Generate page mirrors the
+  Crystal Download page: run the 🛡 Review agent to unlock the .ktr
+  (or it unlocks when the agent provably cannot run), consultant
+  report attached to the verdict card.
+- **Project page: Agent verdicts persist per mapping**
+  (`review_verdict`/`review_json` columns, auto-migrated): the 🛡
+  Review sweep lints every stored mapping in seconds and stamps
+  SHIP/REVIEW chips into the ETL tables - verified live across the
+  148-mapping store (14 SHIP / 134 REVIEW).
+- **Fixed: the Crystal release gate endpoint was unreachable** - a
+  helper had been inserted between `@router.post("/release-check/
+  start")` and its handler, so the route bound to the helper and the
+  staged gate never started. The decorator is back on the handler.
+
 ## [1.44.0] - 2026-08-01
 
 - **XY-family charts translate** (gap #5 - the corpus2 gap list is

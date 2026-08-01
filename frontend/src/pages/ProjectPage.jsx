@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Explain from '../components/Explain.jsx'
+import StageBar from '../components/StageBar.jsx'
 
 const STATUSES = ['converted', 'in_review', 'verified', 'failed']
 const STATUS_ICON = { converted: '·', in_review: '⚠', verified: '✓', failed: '✋' }
@@ -23,6 +24,8 @@ export default function ProjectPage({ onBack, onOpen, context }) {
   const [showAll, setShowAll] = useState(false)
   const [jndi, setJndi] = useState(localStorage.getItem('triageJndi') || '')
   const [triaging, setTriaging] = useState(false)
+  const [etlReviewing, setEtlReviewing] = useState(false)
+  const [sweep, setSweep] = useState(null)      // {kind, stage, stages, done, total, detail}
   const [expanded, setExpanded] = useState(null)     // report file with open detail
   const [parityBusy, setParityBusy] = useState(null) // report file being checked
   const [agentError, setAgentError] = useState('')
@@ -58,19 +61,50 @@ export default function ProjectPage({ onBack, onOpen, context }) {
     refresh()
   }
 
+  async function pollSweep(job, kind) {
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 1000))
+      const st = await fetch(`/project/sweep/status?job=${job}`)
+      const state = await st.json()
+      if (!st.ok) throw new Error(state.detail || st.statusText)
+      setSweep({ kind, stage: state.stage, stages: state.stages,
+                 done: state.done, total: state.total, detail: state.detail })
+      if (state.status === 'done') return state.result
+      if (state.status === 'error') throw new Error(state.detail || `${kind} failed`)
+    }
+  }
+
   async function runTriage() {
     setTriaging(true)
     setAgentError('')
     localStorage.setItem('triageJndi', jndi)
     try {
-      const res = await fetch(`/project/reports/triage?jndi=${encodeURIComponent(jndi)}`,
+      const res = await fetch(`/project/reports/triage/start?jndi=${encodeURIComponent(jndi)}`,
                               { method: 'POST' })
-      if (!res.ok) throw new Error((await res.json()).detail || res.statusText)
-      setReports(await res.json())
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      setReports(await pollSweep(body.job, 'triage'))
     } catch (err) {
       setAgentError(`Triage failed: ${err.message}`)
     } finally {
       setTriaging(false)
+      setSweep(null)
+    }
+  }
+
+  async function runEtlReview() {
+    setEtlReviewing(true)
+    setAgentError('')
+    try {
+      const res = await fetch('/project/etl-review/start', { method: 'POST' })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      setRows(await pollSweep(body.job, 'review'))
+    } catch (err) {
+      setAgentError(`Review sweep failed: ${err.message}`)
+    } finally {
+      setEtlReviewing(false)
+      setSweep(null)
     }
   }
 
@@ -90,6 +124,16 @@ export default function ProjectPage({ onBack, onOpen, context }) {
       setAgentError(`Parity failed for ${row.name}: ${err.message}`)
     } finally {
       setParityBusy(null)
+    }
+  }
+
+  function reviewSummary(row) {
+    try {
+      const d = JSON.parse(row.review_json || '{}')
+      const parts = (d.findings || d.reasons || []).slice(0, 4)
+      return parts.map((f) => (typeof f === 'string' ? f : `[${f.code}] ${f.message}`)).join('\n')
+    } catch {
+      return ''
     }
   }
 
@@ -175,7 +219,9 @@ export default function ProjectPage({ onBack, onOpen, context }) {
               <th className="num">Score</th><th>Mapping</th><th>Export file</th>
               <th className="num">Steps</th><th className="num">Auto</th>
               <th className="num">Review</th><th className="num">Manual</th>
-              <th className="num" title="Estimated hours saved vs a manual rebuild">Saved</th><th>Status</th><th>Updated</th>
+              <th className="num" title="Estimated hours saved vs a manual rebuild">Saved</th>
+              <th title="The ETL review agent's verdict (deterministic checks over the converted graph)">Agent</th>
+              <th>Status</th><th>Updated</th>
             </tr>
           </thead>
           <tbody>
@@ -196,6 +242,14 @@ export default function ProjectPage({ onBack, onOpen, context }) {
                 <td className="num">{r.review}</td>
                 <td className="num">{r.manual}</td>
                 <td className="num saved-cell">{r.saved_hours ? `${r.saved_hours}h` : '—'}</td>
+                <td>
+                  {r.review_verdict
+                    ? <span className={r.review_verdict === 'SHIP' ? 'gate-ship' : 'gate-review'}
+                        title={reviewSummary(r)}>
+                        {r.review_verdict === 'SHIP' ? '✅ SHIP' : '⚠ REVIEW'}
+                      </span>
+                    : <span className="muted">—</span>}
+                </td>
                 <td onClick={(e) => e.stopPropagation()}>
                   <select
                     className="status-select"
@@ -256,16 +310,26 @@ export default function ProjectPage({ onBack, onOpen, context }) {
       <section className="card" key={f.key}>
         <header>
           <h2>{f.label} <span>{f.list.length} converted</span></h2>
-          <a
-            className="ghost portfolio-link"
-            href={`/project/portfolio?family=${f.key}&rate=${encodeURIComponent(localStorage.getItem('consultantRate') || '150')}`}
-            target="_blank"
-            rel="noreferrer"
-            title="Self-contained HTML consultant report for this family: confidence grades, unmapped-component breakdown, review load, focus list, $ figures — prints to PDF"
-          >
-            📊 Consultant report
-          </a>
+          <div className="triage-bar">
+            <button className="primary" onClick={runEtlReview} disabled={etlReviewing}
+              title="Run the ETL review agent over every stored mapping: unmapped steps, expressions, hop integrity, sorted-input hazards — verdicts persist in the store">
+              {etlReviewing ? 'Reviewing…' : '🛡 Review sweep'}
+            </button>
+            <a
+              className="ghost portfolio-link"
+              href={`/project/portfolio?family=${f.key}&rate=${encodeURIComponent(localStorage.getItem('consultantRate') || '150')}`}
+              target="_blank"
+              rel="noreferrer"
+              title="Self-contained HTML consultant report for this family: confidence grades, unmapped-component breakdown, review load, focus list, $ figures — prints to PDF"
+            >
+              📊 Consultant report
+            </a>
+          </div>
         </header>
+        {sweep?.kind === 'review' && (
+          <StageBar stage={sweep.stage} stages={sweep.stages}
+            done={sweep.done} total={sweep.total} detail={sweep.detail} />
+        )}
         <StatsStrip list={f.list} scored />
         <EtlTable list={f.list} />
       </section>
@@ -301,6 +365,10 @@ export default function ProjectPage({ onBack, onOpen, context }) {
             </a>
           </div>
         </header>
+        {sweep?.kind === 'triage' && (
+          <StageBar stage={sweep.stage} stages={sweep.stages}
+            done={sweep.done} total={sweep.total} detail={sweep.detail} />
+        )}
         <Explain>
           <b>Run triage</b> sweeps every stored report with the batch-triage
           agent: formula counts, TODO placeholders, <b>layout QA lint</b>

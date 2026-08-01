@@ -45,6 +45,8 @@ class MappingRecord(BaseModel):
     score: int
     grade: str
     status: str
+    review_verdict: str = ""   # SHIP | REVIEW | '' (agent never run)
+    review_json: str = ""      # EtlReviewCheck summary as JSON
     updated_at: str
 
 
@@ -100,10 +102,12 @@ def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(_db_path())
     conn.row_factory = sqlite3.Row
     conn.execute(SCHEMA)
-    # migrate stores created before source_path existed
+    # migrate stores created before these columns existed
     columns = {row["name"] for row in conn.execute("PRAGMA table_info(mappings)")}
-    if "source_path" not in columns:
-        conn.execute("ALTER TABLE mappings ADD COLUMN source_path TEXT NOT NULL DEFAULT ''")
+    for col in ("source_path", "review_verdict", "review_json"):
+        if col not in columns:
+            conn.execute(
+                f"ALTER TABLE mappings ADD COLUMN {col} TEXT NOT NULL DEFAULT ''")
     return conn
 
 
@@ -140,6 +144,18 @@ def list_mappings() -> list[MappingRecord]:
             "SELECT * FROM mappings ORDER BY score ASC, file, mapping"
         ).fetchall()
     return [MappingRecord(**dict(row)) for row in rows]
+
+
+def set_mapping_review(file: str, mapping: str, verdict: str,
+                       detail_json: str) -> bool:
+    """Persist the ETL review agent's verdict (SHIP/REVIEW + detail)."""
+    with _connect() as conn:
+        cursor = conn.execute(
+            "UPDATE mappings SET review_verdict=?, review_json=?, "
+            "updated_at=datetime('now') WHERE file=? AND mapping=?",
+            (verdict, detail_json, file, mapping),
+        )
+    return cursor.rowcount > 0
 
 
 def set_status(file: str, mapping: str, status: str) -> bool:

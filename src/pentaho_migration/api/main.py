@@ -28,6 +28,7 @@ MAX_UPLOAD_BYTES = 50 * 1024 * 1024  # generous: largest real export seen is ~7 
 
 
 from pentaho_migration.api.security import require_api_key
+from pentaho_migration.jobs import JobStore
 
 from pentaho_migration import __version__
 from pentaho_migration.generator import KtrGenerator
@@ -535,7 +536,7 @@ def translate(pipeline: Pipeline) -> ConversionResult:
 
 # Long translations run as background jobs the UI polls — one browser request
 # per poll, so no fetch ever outlives the browser's timeout.
-_translate_jobs: dict[str, dict] = {}
+_translate_jobs = JobStore()
 
 
 @app.post("/translate/start", dependencies=[Depends(require_api_key)])
@@ -547,26 +548,18 @@ def translate_start(pipeline: Pipeline) -> dict[str, str]:
     except TranslationError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-    job_id = uuid.uuid4().hex[:12]
-    job: dict = {"status": "running", "done": 0, "total": 0, "detail": "", "result": None}
-    _translate_jobs[job_id] = job
-    from pentaho_migration.reports.api import _evict_old_jobs
-    _evict_old_jobs(_translate_jobs)
+    job_id, job = _translate_jobs.start(
+        stages=["translating", "rebuilding result", "done"], done=0, total=0)
 
     def run() -> None:
-        try:
-            def progress(done: int, total: int) -> None:
-                job["done"], job["total"] = done, total
+        def progress(done: int, total: int) -> None:
+            job["done"], job["total"] = done, total
 
-            translator.translate_pipeline(pipeline, progress=progress)
-            job["result"] = _build_result(pipeline, KtrGenerator()).model_dump()
-            job["status"] = "done"
-        except Exception as exc:
-            job["status"] = "error"
-            job["detail"] = str(exc)
-            logger.exception("translate job %s failed", job_id)
+        translator.translate_pipeline(pipeline, progress=progress)
+        job["stage"] = "rebuilding result"
+        job["result"] = _build_result(pipeline, KtrGenerator()).model_dump()
 
-    threading.Thread(target=run, daemon=True).start()
+    _translate_jobs.run(job, run)
     return {"job": job_id}
 
 
@@ -576,6 +569,237 @@ def translate_status(job: str) -> dict:
     state = _translate_jobs.get(job)
     if state is None:
         raise HTTPException(status_code=404, detail="unknown translation job")
+    return state
+
+
+# ---------------------------------------------------- staged conversion
+
+_convert_jobs = JobStore()
+
+
+@app.post("/convert/start", dependencies=[Depends(require_api_key)])
+def convert_start(export: UploadFile) -> dict[str, str]:
+    """The same conversion as /convert, as a staged background job -
+    a many-mapping workflow export takes long enough to deserve the
+    progress bar the release gate taught users to expect."""
+    data = export.file.read()
+    filename = export.filename
+    job_id, job = _convert_jobs.start(
+        stages=["parsing", "mapping + generating", "done"], done=0, total=0)
+
+    def run() -> None:
+        generator = KtrGenerator()
+        pipelines, source = _parse_upload(data, filename)
+        job["stage"] = "mapping + generating"
+        job["total"] = len(pipelines)
+        results = []
+        for i, pipeline in enumerate(pipelines):
+            RulesMapper.for_pipeline(pipeline).apply(pipeline)
+            results.append(_build_result(pipeline, generator))
+            job["done"] = i + 1
+        assess_source(source, pipelines)
+        job["result"] = ConversionResponse(
+            source=source, results=results).model_dump()
+
+    _convert_jobs.run(job, run)
+    return {"job": job_id}
+
+
+@app.get("/convert/status")
+def convert_status(job: str) -> dict:
+    state = _convert_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown conversion job")
+    return state
+
+
+# ------------------------------------------------- the ETL review agent
+
+_review_jobs = JobStore()
+_REVIEW_STAGES = ["linting", "sandbox run", "annotating",
+                  "consultant report", "done"]
+
+
+class ReviewRequest(BaseModel):
+    pipeline: Pipeline
+    ktr: str | None = None
+    run_sandbox: bool = False
+    llm: bool = True
+    rate: float = 150.0
+
+
+@app.post("/review/start", dependencies=[Depends(require_api_key)])
+def review_start(payload: ReviewRequest) -> dict[str, str]:
+    """The ETL review agent as a staged background job: deterministic
+    checks over the converted graph (plus an optional Pan run), findings
+    LLM-annotated, and the per-mapping consultant report - the ETL
+    counterpart of the Crystal release gate."""
+    from pentaho_migration.etl_consultant import (
+        build_etl_consultant_report_html, build_etl_consultant_report_markdown)
+    from pentaho_migration.validator.review import (
+        annotate_etl_findings, review_pipeline)
+
+    job_id, job = _review_jobs.start(stages=_REVIEW_STAGES)
+    pipeline = payload.pipeline
+
+    def run() -> None:
+        ktr = payload.ktr or KtrGenerator().generate(pipeline)
+        job["stage"] = "sandbox run" if payload.run_sandbox else "linting"
+        check = review_pipeline(pipeline, ktr=ktr,
+                                run_sandbox=payload.run_sandbox)
+        annotated = 0
+        if payload.llm and check.findings:
+            job["stage"] = "annotating"
+            annotated = annotate_etl_findings(check, pipeline)
+        job["stage"] = "consultant report"
+        impact = build_impact_analysis(pipeline)
+        report = build_report(pipeline)
+        score = build_score(pipeline, impact)
+        effort = build_effort(pipeline, report)
+        job["result"] = {
+            "verdict": check.verdict,
+            "steps_checked": check.steps_checked,
+            "hops_checked": check.hops_checked,
+            "checks_run": check.checks_run,
+            "findings": [f.model_dump() for f in check.findings],
+            "llm_annotated": annotated,
+            "consultant_report_html": build_etl_consultant_report_html(
+                pipeline, report, score, effort, check,
+                rate=payload.rate, impact=impact),
+            "consultant_report_markdown":
+                build_etl_consultant_report_markdown(
+                    pipeline, report, score, effort, check,
+                    rate=payload.rate),
+        }
+
+    _review_jobs.run(job, run)
+    return {"job": job_id}
+
+
+@app.get("/review/status")
+def review_status(job: str) -> dict:
+    state = _review_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown review job")
+    return state
+
+
+# ------------------------------------------ staged project-level sweeps
+
+_sweep_jobs = JobStore()
+
+
+@app.post("/project/reports/triage/start", dependencies=[Depends(require_api_key)])
+def project_reports_triage_start(jndi: str = "") -> dict[str, str]:
+    """The batch-triage sweep as a staged job (SQL EXPLAIN validation
+    against a live connection takes minutes on a big store)."""
+    from pathlib import Path as _Path
+
+    from pentaho_migration.reports.triage import triage_one
+
+    records = [r for r in list_reports()]
+    job_id, job = _sweep_jobs.start(stages=["triaging", "done"],
+                                    done=0, total=len(records))
+
+    def run() -> None:
+        for i, record in enumerate(records):
+            job["detail"] = record.file
+            source = _Path(record.source_path) if record.source_path else None
+            if source is None or not source.is_file():
+                if record.source_path:
+                    set_report_triage(record.file, "BLOCKED", json.dumps(
+                        {"reasons": [f"source dump not found: {record.source_path}"],
+                         "sql_status": "unchecked"}))
+                job["done"] = i + 1
+                continue
+            result = triage_one(source, jndi=jndi, check_sql=bool(jndi))
+            set_report_triage(record.file, result.verdict, json.dumps({
+                "reasons": result.reasons,
+                "sql_status": result.sql_status,
+                "sql_error": result.sql_error,
+                "layout_errors": result.layout_errors,
+                "layout_warnings": result.layout_warnings,
+                "rewrites": result.rewrites,
+            }))
+            job["done"] = i + 1
+        job["detail"] = ""
+        job["result"] = [r.model_dump() for r in list_reports()]
+
+    _sweep_jobs.run(job, run)
+    return {"job": job_id}
+
+
+@app.post("/project/etl-review/start", dependencies=[Depends(require_api_key)])
+def project_etl_review_start() -> dict[str, str]:
+    """The ETL review agent over every stored mapping whose source
+    export still exists: re-parse, re-map, lint, persist the verdict -
+    the ETL counterpart of the reports triage sweep. Lint-only (no Pan
+    run, no LLM) so a big portfolio sweeps in seconds."""
+    from pentaho_migration.project import resolve_source_path, set_mapping_review
+    from pentaho_migration.validator.review import review_pipeline
+
+    records = list_mappings()
+    job_id, job = _sweep_jobs.start(stages=["reviewing", "done"],
+                                    done=0, total=len(records))
+
+    def run() -> None:
+        by_source: dict = {}
+        for i, record in enumerate(records):
+            job["detail"] = f"{record.file} · {record.mapping}"
+            source = resolve_source_path(record.source_path)
+            if source is None:
+                set_mapping_review(record.file, record.mapping, "REVIEW",
+                                   json.dumps({"reasons": [
+                                       f"source export not found: {record.source_path}"]}))
+                job["done"] = i + 1
+                continue
+            if source not in by_source:
+                try:
+                    parser = detect_parser(source)
+                    pipelines = parser.parse_file(source)
+                    for pl in pipelines:
+                        RulesMapper.for_pipeline(pl).apply(pl)
+                    by_source[source] = {pl.name: pl for pl in pipelines}
+                except Exception as exc:
+                    by_source[source] = {"__error__": str(exc)}
+            pipelines = by_source[source]
+            if "__error__" in pipelines:
+                set_mapping_review(record.file, record.mapping, "REVIEW",
+                                   json.dumps({"reasons": [
+                                       f"source no longer parses: {pipelines['__error__']}"]}))
+                job["done"] = i + 1
+                continue
+            pipeline = pipelines.get(record.mapping)
+            if pipeline is None:
+                set_mapping_review(record.file, record.mapping, "REVIEW",
+                                   json.dumps({"reasons": [
+                                       "mapping no longer present in the export"]}))
+                job["done"] = i + 1
+                continue
+            check = review_pipeline(pipeline)
+            set_mapping_review(record.file, record.mapping, check.verdict,
+                               json.dumps({
+                                   "checks_run": check.checks_run,
+                                   "findings": [
+                                       {"severity": f.severity, "code": f.code,
+                                        "message": f.message}
+                                       for f in check.findings],
+                               }))
+            job["done"] = i + 1
+        job["detail"] = ""
+        job["result"] = [
+            _project_row(r).model_dump() for r in list_mappings()]
+
+    _sweep_jobs.run(job, run)
+    return {"job": job_id}
+
+
+@app.get("/project/sweep/status")
+def project_sweep_status(job: str) -> dict:
+    """Progress of a triage or review sweep."""
+    state = _sweep_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown sweep job")
     return state
 
 

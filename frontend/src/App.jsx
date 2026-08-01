@@ -22,6 +22,7 @@ export default function App() {
   const [step, setStep] = useState(0)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [convertProgress, setConvertProgress] = useState(null)
   const [version, setVersion] = useState('')
   const [showChangelog, setShowChangelog] = useState(false)
   const [showPractices, setShowPractices] = useState(false)
@@ -62,21 +63,34 @@ export default function App() {
     if (/\.(rpt|xaction|zip)$/i.test(file.name)) return convertReport(file)
     setError(null)
     setLoading(true)
+    setConvertProgress(null)
     try {
       const form = new FormData()
       form.append('export', file)
-      const res = await fetch('/convert', { method: 'POST', body: form })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        const detail = body.detail || res.statusText
-        if (detail.includes('Reports pipeline')) {
-          // detect_parser recognized a Crystal RptToXml dump — route it there
-          setLoading(false)
-          return convertReport(file)
+      // staged background job - big workflow exports get the same
+      // progress bar the release gate taught users to expect
+      const res = await fetch('/convert/start', { method: 'POST', body: form })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      let data
+      for (;;) {
+        await new Promise((r) => setTimeout(r, 700))
+        const st = await fetch(`/convert/status?job=${body.job}`)
+        const state = await st.json()
+        if (!st.ok) throw new Error(state.detail || st.statusText)
+        setConvertProgress({ stage: state.stage, stages: state.stages,
+                             done: state.done, total: state.total })
+        if (state.status === 'done') { data = state.result; break }
+        if (state.status === 'error') {
+          if ((state.detail || '').includes('Reports pipeline')) {
+            // detect_parser recognized a Crystal dump — route it there
+            setLoading(false)
+            setConvertProgress(null)
+            return convertReport(file)
+          }
+          throw new Error(state.detail || 'conversion failed')
         }
-        throw new Error(detail)
       }
-      const data = await res.json()
       setReport(null)
       setSource(data.source)
       setResults(data.results)
@@ -89,6 +103,7 @@ export default function App() {
       setError(err.message)
     } finally {
       setLoading(false)
+      setConvertProgress(null)
     }
   }
 
@@ -313,6 +328,7 @@ export default function App() {
               infaSamples={infaSamples}
               error={error}
               loading={loading}
+              progress={convertProgress}
               source={results.length === 0 ? source : null}
               family={report ? 'reports' : results.length ? 'etl' : null}
               onShowPractices={() => setShowPractices(true)}

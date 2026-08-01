@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import DropZone from '../components/DropZone.jsx'
 import SourceCard from '../components/SourceCard.jsx'
+import StageBar from '../components/StageBar.jsx'
 
 // A "Try ..." button that opens a menu of curated demo files rather than
 // loading one fixed sample. With nothing to pick from it stays a plain button.
@@ -65,7 +66,7 @@ const PHASES = [
   { name: 'Phase 2 — Multi-source', text: 'Informatica, Crystal Reports and Talend complete; DataStage next.' },
 ]
 
-export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, infaSamples, onXactionSample, xactionSamples, error, loading, source, onShowPractices, family }) {
+export default function UploadPage({ onFile, onSample, onTalendSample, onCrystalSample, crystalSamples, infaSamples, onXactionSample, xactionSamples, error, loading, progress, source, onShowPractices, family }) {
   const stages = family === 'reports' ? REPORTS : family === 'etl' ? ETL : GENERIC
 
   return (
@@ -96,7 +97,10 @@ export default function UploadPage({ onFile, onSample, onTalendSample, onCrystal
 
       <DropZone onFile={onFile} />
       {error && <div className="error">Conversion failed: {error}</div>}
-      {loading && <p className="loading">Converting…</p>}
+      {loading && (progress?.stages
+        ? <StageBar stage={progress.stage} stages={progress.stages}
+            done={progress.done} total={progress.total} />
+        : <p className="loading">Converting…</p>)}
       {source && <SourceCard source={source} />}
 
       <div className="stage-cards">

@@ -24,6 +24,95 @@ NAVY, GOLD, SLATE, LIGHT = "#133346", "#c9a24a", "#5b7185", "#f2f5f7"
 PRIORITY_COLOR = {1: "#c0392b", 2: "#c9a24a", 3: "#5b7185"}
 PRIORITY_BG = {1: "#fdecea", 2: "#fdf5e3", 3: "#eef2f4"}
 
+# ONE stylesheet for every per-migration consultant report - the Crystal
+# and the ETL documents must read as the same house or the engagement
+# looks stitched together (and a style fixed in two places drifts).
+CONSULTANT_CSS = f"""
+  :root {{ --navy: {NAVY}; --gold: {GOLD}; --slate: {SLATE}; --light: {LIGHT}; }}
+  * {{ box-sizing: border-box; }}
+  body {{ font: 15px/1.6 system-ui, "Segoe UI", Roboto, sans-serif;
+         color: #17242e; max-width: 1000px; margin: 0 auto 60px;
+         padding: 0 22px; background: #fff; }}
+  .masthead {{ background: var(--navy); color: #fff; margin: 0 -22px 26px;
+               padding: 26px 30px 22px; border-bottom: 4px solid var(--gold); }}
+  .masthead h1 {{ margin: 0 0 4px; font-size: 26px; letter-spacing: -.2px; }}
+  .masthead p {{ margin: 0; color: #b9c9d4; font-size: 13px; }}
+  .badge {{ display: inline-block; float: right; font-weight: 700;
+            padding: 7px 16px; border-radius: 999px; font-size: 15px; }}
+  .vgreen {{ background: #0f7a34; color: #fff; }}
+  .vamber {{ background: var(--gold); color: #2b2107; }}
+  .vgrey  {{ background: #48606f; color: #dfe8ee; }}
+  h2 {{ color: var(--navy); margin: 34px 0 10px; font-size: 19px;
+        border-bottom: 2px solid #e3e9ed; padding-bottom: 6px; }}
+  h2 .sub {{ font-weight: 400; font-size: 13px; color: var(--slate); }}
+  .lede {{ background: var(--light); border-left: 4px solid var(--gold);
+           padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 0 0 18px; }}
+  .kpis {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }}
+  .kpi {{ flex: 1 1 160px; background: var(--light); border-radius: 12px;
+          padding: 14px 18px; }}
+  .kpi b {{ display: block; font-size: 25px; color: var(--navy);
+            line-height: 1.2; }}
+  .kpi.gold b {{ color: #8a6d17; }}
+  .kpi span {{ font-size: 12px; color: var(--slate); }}
+  .rolls {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0 18px; }}
+  .roll {{ flex: 1 1 180px; border-radius: 12px; padding: 12px 16px;
+           border: 1px solid #e3e9ed; }}
+  .roll b {{ display: block; font-size: 22px; }}
+  .roll span {{ display: block; font-size: 12px; color: var(--slate); }}
+  .roll.p1 {{ background: {PRIORITY_BG[1]}; }} .roll.p1 b {{ color: {PRIORITY_COLOR[1]}; }}
+  .roll.p2 {{ background: {PRIORITY_BG[2]}; }} .roll.p2 b {{ color: #8a6d17; }}
+  .roll.p3 {{ background: {PRIORITY_BG[3]}; }} .roll.p3 b {{ color: var(--slate); }}
+  .evs {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 4px; }}
+  .ev {{ flex: 1 1 170px; border: 1px solid #e3e9ed; border-radius: 10px;
+         padding: 10px 14px; }}
+  .ev b {{ display: block; font-size: 20px; color: var(--navy); }}
+  .ev span {{ font-size: 12px; color: var(--slate); }}
+  table {{ border-collapse: collapse; width: 100%; margin: 10px 0; }}
+  th {{ text-align: left; color: var(--slate); font-weight: 600; font-size: 12px;
+        text-transform: uppercase; letter-spacing: .4px;
+        border-bottom: 2px solid #e3e9ed; padding: 8px; }}
+  th.n {{ text-align: right; }}
+  td {{ padding: 12px 8px; border-bottom: 1px solid #eef2f4;
+        vertical-align: top; }}
+  td.n {{ text-align: right; font-variant-numeric: tabular-nums;
+          white-space: nowrap; width: 92px; }}
+  td.num {{ width: 30px; color: var(--slate); font-weight: 700; }}
+  .plan tr.act:hover td {{ background: #fbfcfd; }}
+  .plan .title {{ font-weight: 650; color: var(--navy); font-size: 15px;
+                  margin-bottom: 3px; }}
+  .plan .why, .plan .how {{ font-size: 13.5px; margin: 3px 0; }}
+  .plan .how {{ color: #2f4756; }}
+  .where {{ font-size: 12px; color: var(--slate); margin-top: 5px;
+            font-family: ui-monospace, Consolas, monospace; }}
+  .chip {{ display: inline-block; padding: 3px 10px; border-radius: 999px;
+           font-size: 11.5px; font-weight: 700; white-space: nowrap; }}
+  .chip.p1 {{ background: {PRIORITY_BG[1]}; color: {PRIORITY_COLOR[1]}; }}
+  .chip.p2 {{ background: {PRIORITY_BG[2]}; color: #8a6d17; }}
+  .chip.p3 {{ background: {PRIORITY_BG[3]}; color: var(--slate); }}
+  .finding {{ border-radius: 10px; padding: 12px 16px; margin: 10px 0;
+              border-left: 4px solid var(--slate); background: var(--light); }}
+  .finding.sev1 {{ border-left-color: {PRIORITY_COLOR[1]}; background: {PRIORITY_BG[1]}; }}
+  .finding.sev2 {{ border-left-color: var(--gold); background: {PRIORITY_BG[2]}; }}
+  .finding ul {{ margin: 6px 0; }}
+  .fix {{ margin: 6px 0 0; }}
+  .muted {{ color: var(--slate); }}
+  .clean {{ background: #eaf7ee; border-left: 4px solid #0f7a34;
+            padding: 12px 16px; border-radius: 0 8px 8px 0; }}
+  code {{ background: #fff; padding: 1px 6px; border-radius: 4px;
+          font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }}
+  details {{ margin: 8px 0; }}
+  summary {{ cursor: pointer; color: var(--slate); font-size: 13px; }}
+  .ref dt {{ font-weight: 650; color: var(--navy); margin-top: 10px; }}
+  .ref dd {{ margin: 2px 0 0 0; font-size: 13.5px; }}
+  footer {{ margin-top: 40px; color: var(--slate); font-size: 12.5px;
+            border-top: 2px solid #e3e9ed; padding-top: 12px; }}
+  @media print {{
+    body {{ max-width: none; }} .masthead {{ margin: 0 0 20px; }}
+    tr.act, .finding {{ break-inside: avoid; }}
+    details[open] summary ~ * {{ display: block; }}
+  }}
+"""
+
 
 def _plan_html(actions, rate, esc):
     """The action plan: the part a consultant actually works from. One row
@@ -189,91 +278,7 @@ def build_consultant_report_html(model, check=None, rate: float = 150.0) -> str:
 
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>Consultant Report — {esc(model.name)}</title>
-<style>
-  :root {{ --navy: {NAVY}; --gold: {GOLD}; --slate: {SLATE}; --light: {LIGHT}; }}
-  * {{ box-sizing: border-box; }}
-  body {{ font: 15px/1.6 system-ui, "Segoe UI", Roboto, sans-serif;
-         color: #17242e; max-width: 1000px; margin: 0 auto 60px;
-         padding: 0 22px; background: #fff; }}
-  .masthead {{ background: var(--navy); color: #fff; margin: 0 -22px 26px;
-               padding: 26px 30px 22px; border-bottom: 4px solid var(--gold); }}
-  .masthead h1 {{ margin: 0 0 4px; font-size: 26px; letter-spacing: -.2px; }}
-  .masthead p {{ margin: 0; color: #b9c9d4; font-size: 13px; }}
-  .badge {{ display: inline-block; float: right; font-weight: 700;
-            padding: 7px 16px; border-radius: 999px; font-size: 15px; }}
-  .vgreen {{ background: #0f7a34; color: #fff; }}
-  .vamber {{ background: var(--gold); color: #2b2107; }}
-  .vgrey  {{ background: #48606f; color: #dfe8ee; }}
-  h2 {{ color: var(--navy); margin: 34px 0 10px; font-size: 19px;
-        border-bottom: 2px solid #e3e9ed; padding-bottom: 6px; }}
-  h2 .sub {{ font-weight: 400; font-size: 13px; color: var(--slate); }}
-  .lede {{ background: var(--light); border-left: 4px solid var(--gold);
-           padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 0 0 18px; }}
-  .kpis {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }}
-  .kpi {{ flex: 1 1 160px; background: var(--light); border-radius: 12px;
-          padding: 14px 18px; }}
-  .kpi b {{ display: block; font-size: 25px; color: var(--navy);
-            line-height: 1.2; }}
-  .kpi.gold b {{ color: #8a6d17; }}
-  .kpi span {{ font-size: 12px; color: var(--slate); }}
-  .rolls {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0 18px; }}
-  .roll {{ flex: 1 1 180px; border-radius: 12px; padding: 12px 16px;
-           border: 1px solid #e3e9ed; }}
-  .roll b {{ display: block; font-size: 22px; }}
-  .roll span {{ display: block; font-size: 12px; color: var(--slate); }}
-  .roll.p1 {{ background: {PRIORITY_BG[1]}; }} .roll.p1 b {{ color: {PRIORITY_COLOR[1]}; }}
-  .roll.p2 {{ background: {PRIORITY_BG[2]}; }} .roll.p2 b {{ color: #8a6d17; }}
-  .roll.p3 {{ background: {PRIORITY_BG[3]}; }} .roll.p3 b {{ color: var(--slate); }}
-  .evs {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 4px; }}
-  .ev {{ flex: 1 1 170px; border: 1px solid #e3e9ed; border-radius: 10px;
-         padding: 10px 14px; }}
-  .ev b {{ display: block; font-size: 20px; color: var(--navy); }}
-  .ev span {{ font-size: 12px; color: var(--slate); }}
-  table {{ border-collapse: collapse; width: 100%; margin: 10px 0; }}
-  th {{ text-align: left; color: var(--slate); font-weight: 600; font-size: 12px;
-        text-transform: uppercase; letter-spacing: .4px;
-        border-bottom: 2px solid #e3e9ed; padding: 8px; }}
-  th.n {{ text-align: right; }}
-  td {{ padding: 12px 8px; border-bottom: 1px solid #eef2f4;
-        vertical-align: top; }}
-  td.n {{ text-align: right; font-variant-numeric: tabular-nums;
-          white-space: nowrap; width: 92px; }}
-  td.num {{ width: 30px; color: var(--slate); font-weight: 700; }}
-  .plan tr.act:hover td {{ background: #fbfcfd; }}
-  .plan .title {{ font-weight: 650; color: var(--navy); font-size: 15px;
-                  margin-bottom: 3px; }}
-  .plan .why, .plan .how {{ font-size: 13.5px; margin: 3px 0; }}
-  .plan .how {{ color: #2f4756; }}
-  .where {{ font-size: 12px; color: var(--slate); margin-top: 5px;
-            font-family: ui-monospace, Consolas, monospace; }}
-  .chip {{ display: inline-block; padding: 3px 10px; border-radius: 999px;
-           font-size: 11.5px; font-weight: 700; white-space: nowrap; }}
-  .chip.p1 {{ background: {PRIORITY_BG[1]}; color: {PRIORITY_COLOR[1]}; }}
-  .chip.p2 {{ background: {PRIORITY_BG[2]}; color: #8a6d17; }}
-  .chip.p3 {{ background: {PRIORITY_BG[3]}; color: var(--slate); }}
-  .finding {{ border-radius: 10px; padding: 12px 16px; margin: 10px 0;
-              border-left: 4px solid var(--slate); background: var(--light); }}
-  .finding.sev1 {{ border-left-color: {PRIORITY_COLOR[1]}; background: {PRIORITY_BG[1]}; }}
-  .finding.sev2 {{ border-left-color: var(--gold); background: {PRIORITY_BG[2]}; }}
-  .finding ul {{ margin: 6px 0; }}
-  .fix {{ margin: 6px 0 0; }}
-  .muted {{ color: var(--slate); }}
-  .clean {{ background: #eaf7ee; border-left: 4px solid #0f7a34;
-            padding: 12px 16px; border-radius: 0 8px 8px 0; }}
-  code {{ background: #fff; padding: 1px 6px; border-radius: 4px;
-          font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }}
-  details {{ margin: 8px 0; }}
-  summary {{ cursor: pointer; color: var(--slate); font-size: 13px; }}
-  .ref dt {{ font-weight: 650; color: var(--navy); margin-top: 10px; }}
-  .ref dd {{ margin: 2px 0 0 0; font-size: 13.5px; }}
-  footer {{ margin-top: 40px; color: var(--slate); font-size: 12.5px;
-            border-top: 2px solid #e3e9ed; padding-top: 12px; }}
-  @media print {{
-    body {{ max-width: none; }} .masthead {{ margin: 0 0 20px; }}
-    tr.act, .finding {{ break-inside: avoid; }}
-    details[open] summary ~ * {{ display: block; }}
-  }}
-</style></head><body>
+<style>{CONSULTANT_CSS}</style></head><body>
 
 <div class="masthead">
   <span class="badge {vclass}">{verdict}</span>
