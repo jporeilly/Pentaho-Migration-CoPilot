@@ -1,0 +1,33 @@
+# One-command demo box:  docker compose up
+#
+# The app alone covers both ETL families, report/xaction conversion, the
+# review agents, consultant reports, estate mode and the deliverable
+# pack. Engine renders (PDF preview, release gate) and .rpt extraction
+# need a real machine with Report Designer / the Crystal runtime.
+#
+# Add the rebuilt Xtreme sample database (for report SQL against live
+# data):  docker compose --profile samples up
+# then load it per docker/xtreme-mysql/README.md (the SQL is generated
+# from the reports by `pentaho-migrate report-sample-db`).
+
+services:
+  copilot:
+    build: .
+    ports:
+      - "8321:8321"
+    volumes:
+      - copilot-data:/data
+    restart: unless-stopped
+
+  xtreme-mysql:
+    profiles: ["samples"]
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: xtreme
+      MYSQL_DATABASE: xtreme
+    ports:
+      - "3307:3306"
+    restart: unless-stopped
+
+volumes:
+  copilot-data:

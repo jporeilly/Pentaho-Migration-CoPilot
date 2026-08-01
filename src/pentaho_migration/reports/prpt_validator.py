@@ -9,7 +9,7 @@ callers should check `validator_available()` first.
 
 import subprocess
 
-from pentaho_migration.reports.proc import run_nice
+from pentaho_migration.reports.proc import run_nice, run_render
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -40,7 +40,7 @@ def validate_prpts(paths: list[Path | str], timeout: float = 300.0) -> list[Prpt
             "round-trip validation needs Pentaho Report Designer and Java — "
             "run `pentaho-migrate report-env` for setup hints")
 
-    completed = run_nice(
+    completed = run_render(
         [str(java), "-cp", str(prd / "lib" / "*"), str(VALIDATOR_SOURCE),
          *[str(Path(p).resolve()) for p in paths]],
         capture_output=True, text=True, timeout=timeout,
@@ -81,7 +81,7 @@ def render_prpt_pdf_live(prpt_path: Path | str, timeout: float = 300.0) -> bytes
                    str(prd / "resources")])
     with tempfile.TemporaryDirectory() as td:
         out = Path(td) / "live.pdf"
-        completed = run_nice(
+        completed = run_render(
             [str(java), "-cp", cp, str(DATA_RENDERER_SOURCE),
              str(Path(prpt_path).resolve()), str(out)],
             capture_output=True, text=True, timeout=timeout,
@@ -153,7 +153,7 @@ def render_prpt_pdf(prpt_path: Path | str, timeout: float = 300.0) -> bytes:
             "run `pentaho-migrate report-env` for setup hints")
     with tempfile.TemporaryDirectory() as td:
         out = Path(td) / "preview.pdf"
-        completed = run_nice(
+        completed = run_render(
             [str(java), "-cp", str(prd / "lib" / "*"), str(RENDERER_SOURCE),
              str(Path(prpt_path).resolve()), str(out)],
             capture_output=True, text=True, timeout=timeout,

@@ -176,3 +176,39 @@ docker run -p 8321:8321 migration-copilot
 - `PENTAHO_MIGRATION_API_KEY=<secret>` — requires an `X-API-Key` header on all mutating
   endpoints (unset by default for frictionless local use).
 - Uploads are capped at 50 MB.
+
+
+## Dependency matrix - every moving part
+
+Run `pentaho-migrate doctor` (the installer runs it for you) for this
+table live against your machine, with the exact next step per item.
+
+The policy: the installer **installs** only what it owns end to end,
+idempotently and licence-free. Licensed or system-level third parties
+are **checked and reported** - installing those silently would accept
+licences on your behalf. Everything optional degrades honestly: the
+table says exactly which feature is off without it.
+
+| Component | Needed for | Policy | How to get it |
+|---|---|---|---|
+| Python 3.11+ | everything | prerequisite (checked) | python.org |
+| Copilot venv + package | everything | **installed** | installer |
+| Node.js 18+ | building the web UI once | prerequisite (checked, only when the UI is selected) | nodejs.org |
+| Web UI build | the browser UI | **installed** | installer |
+| Pentaho Report Designer | PDF preview, release gate, engine validation, Open in PRD | checked + reported | Pentaho design tools at `C:\Pentaho\design-tools\report-designer` (or `PRD_HOME`) |
+| Pentaho Data Integration | review agent's Pan run, opening .ktr in Spoon | checked + reported | design tools at `...\data-integration` (or `PDI_HOME`) |
+| Pentaho Server | xaction image resolution, publish targets | optional, checked | standard server install |
+| Java | every engine render | checked (bundled with the Pentaho suite) | ships with the suite |
+| JDBC drivers | live-database renders, schema assistant | **installed** (gap-fill, SHA-verified) when PRD present | `pentaho-migrate report-install-drivers` |
+| SAP Crystal runtime (.NET, 64-bit) | .rpt extraction, release-gate original render | checked + reported (SAP licence - your acceptance) | SAP download page |
+| RptToXml / RptViewer | raw .rpt uploads / original render | built from `tools/` once the runtime exists | `tools/RptViewer/build.ps1` |
+| Ollama | free local LLM translation/annotation | optional; Custom install offers winget assist | `winget install Ollama.Ollama` |
+| Cloud LLM key | cloud translation (alternative to Ollama) | optional, checked | Settings page |
+| Docker Desktop | demo-box image, sample DBs, Airflow | checked + reported (licence terms for larger companies) | docker.com |
+| Airflow (+ Marquez) | scheduling converted DAGs, lineage | optional, checked (ports 8088 / 3000) | PDI-AirFlow lab compose |
+| SampleData HSQLDB | Steel Wheels / xaction live demos | optional, checked (port 9001) | `start_hypersonic.bat` in the Pentaho server |
+| MySQL samples | Xtreme / BOE SQL demos | optional, checked (3306/3307) | `docker compose --profile samples up` |
+
+No LLM at all? Deterministic conversion, the agents' checks and every
+report still work - only the one-click translation and the advisory
+finding annotations are off.

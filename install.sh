@@ -129,6 +129,11 @@ else
     echo "[4/4] Crystal environment preflight: skipped"
 fi
 
+echo
+echo "Environment doctor - every moving part, what is ready and what"
+echo "is missing (third-party installs are YOUR call - see next steps):"
+"$PY" -m pentaho_migration.cli doctor || true
+
 cat <<EOF
 
 =============================================================

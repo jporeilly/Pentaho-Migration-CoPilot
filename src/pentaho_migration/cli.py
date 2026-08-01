@@ -975,6 +975,19 @@ def report_crosstabs(
 
 
 @app.command("report-env")
+def doctor() -> None:
+    """Every moving part of the Copilot in one readiness table: Pentaho
+    tools, the Crystal runtime, LLM providers, Docker, Airflow, sample
+    databases - what is ready, what is missing, and the exact next step."""
+    from pentaho_migration.doctor import format_doctor, run_doctor
+
+    typer.echo("Pentaho Migration Copilot - environment doctor")
+    typer.echo(format_doctor(run_doctor()))
+
+
+app.command()(doctor)
+
+
 def report_env() -> None:
     """Preflight for the Crystal pipeline: is everything installed?"""
     from pentaho_migration.reports.environment import environment_report

@@ -82,6 +82,20 @@ if (Test-Path $PrdHome) {
     Write-Host "  - JDBC drivers: skipped (no Report Designer at $PrdHome)"
 }
 
+# Third-party assist (CUSTOM only, explicit opt-in, default No): Ollama
+# has a clean winget path. Everything else third-party - the Pentaho
+# suite, the SAP Crystal runtime, Docker Desktop, Airflow - is licensed
+# or system-level, so the installer CHECKS and SAYS but never installs;
+# the doctor at the end prints the exact next step for each.
+$WantOllama = $false
+if ($Mode -eq "Custom") {
+    $ollamaCmd = Get-Command ollama -ErrorAction SilentlyContinue
+    $winget = Get-Command winget -ErrorAction SilentlyContinue
+    if (-not $ollamaCmd -and $winget) {
+        $WantOllama = Ask-Component "Install Ollama now via winget (free local LLM for translation)?" "N"
+    }
+}
+
 # -- prerequisites --------------------------------------------------------
 Write-Host ""
 Write-Host "[1/4] Checking prerequisites..." -ForegroundColor Yellow
@@ -171,6 +185,25 @@ if ($WantCrystal) {
 } else {
     Write-Host "[4/4] Crystal environment preflight: skipped" -ForegroundColor Yellow
 }
+
+# -- third-party assist ------------------------------------------------------
+if ($WantOllama) {
+    Write-Host ""
+    Write-Host "      Installing Ollama via winget..." -ForegroundColor Yellow
+    try {
+        winget install --id Ollama.Ollama --accept-source-agreements --accept-package-agreements
+        Write-Host "      + Ollama installed - pick a model on the Settings page"
+    } catch {
+        Write-Host "      winget install failed: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "      (install manually from https://ollama.com/download)"
+    }
+}
+
+# -- readiness ---------------------------------------------------------------
+Write-Host ""
+Write-Host "Environment doctor - every moving part, what is ready and what" -ForegroundColor Yellow
+Write-Host "is missing (third-party installs are YOUR call - see next steps):" -ForegroundColor Yellow
+& $Python -m pentaho_migration.cli doctor
 
 # -- done -------------------------------------------------------------------
 Write-Host ""

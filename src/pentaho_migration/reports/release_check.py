@@ -24,7 +24,7 @@ never decides the verdict.
 import re
 import subprocess
 
-from pentaho_migration.reports.proc import run_nice
+from pentaho_migration.reports.proc import run_nice, run_render
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -157,7 +157,7 @@ def render_original_pdf(rpt_path: Path) -> bytes:
 
     with tempfile.TemporaryDirectory() as td:
         out = Path(td) / "original.pdf"
-        proc = run_nice(
+        proc = run_render(
             [str(VIEWER), str(rpt_path), "--export", str(out)],
             capture_output=True, text=True, timeout=RENDER_TIMEOUT)
         if proc.returncode != 0 or not out.exists():

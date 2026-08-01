@@ -7,6 +7,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **`pentaho-migrate doctor` - every moving part in one readiness
+  table.** Python/venv/UI, the Pentaho suite (Report Designer, Data
+  Integration, Server, bundled Java, JDBC drivers), the SAP Crystal
+  runtime + RptToXml + RptViewer, LLM providers (Ollama probe, cloud
+  keys), Docker Desktop (distinguishing NOT INSTALLED from installed-
+  but-not-running), Airflow + Marquez, and the sample databases - each
+  row says what it is needed for and the exact next step. Probes are
+  short-timeout and exception-proof. The installer ends with the
+  doctor's table in both modes; the policy it encodes: install only
+  what we own (venv, package, UI build, SHA-verified JDBC jars),
+  check-and-report licensed/system third parties (Pentaho suite, SAP
+  runtime, Docker Desktop, Airflow) - never accept a licence on the
+  user's behalf. Custom mode offers ONE assisted third-party install
+  where the path is clean: Ollama via winget, explicit opt-in.
+- **Render queue**: at most COPILOT_RENDER_SLOTS (default 2) JVM/viewer
+  renders run concurrently - a burst of release checks now queues
+  instead of thrashing a demo laptop.
+- **Job messages own the restart story**: every background-job 404 now
+  says jobs live in memory and a server restart forgets them, with the
+  re-run action; the docker image documents the single-worker
+  constraint for the same reason.
+- **Demo box refresh**: the image installs the schema + LLM extras,
+  carries the curated demo samples for every Try picker, and persists
+  the project store/estate/packs in a /data volume; a root
+  docker-compose.yml adds the optional Xtreme MySQL profile. The
+  solution-zip and estate upload paths were audited for path traversal:
+  clean - members are read in memory and saved by basename only.
+
 ## [1.44.3] - 2026-08-01
 
 - **The installer offers Complete and Custom installations.** The same

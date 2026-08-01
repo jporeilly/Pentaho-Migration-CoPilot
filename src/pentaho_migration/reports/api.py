@@ -803,7 +803,7 @@ def _consultant_pdf_base64(model, check, rate) -> str:
 def release_check_status(job: str) -> dict:
     state = _gate_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown job")
+        raise HTTPException(status_code=404, detail="unknown job - jobs live in memory, so a server restart forgets them; run the check again")
     return state
 
 
@@ -1263,7 +1263,7 @@ def translate_status(job: str) -> dict:
     """Progress of a formula-assist job; includes the full result when done."""
     state = _assist_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown translation job")
+        raise HTTPException(status_code=404, detail="unknown translation job - jobs live in memory, so a server restart forgets them; start it again")
     return state
 
 

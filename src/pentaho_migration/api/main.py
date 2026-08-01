@@ -569,7 +569,7 @@ def translate_status(job: str) -> dict:
     """Progress of a translation job; includes the full result when done."""
     state = _translate_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown translation job")
+        raise HTTPException(status_code=404, detail="unknown translation job - jobs live in memory, so a server restart forgets them; start the translation again")
     return state
 
 
@@ -610,7 +610,7 @@ def convert_start(export: UploadFile) -> dict[str, str]:
 def convert_status(job: str) -> dict:
     state = _convert_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown conversion job")
+        raise HTTPException(status_code=404, detail="unknown conversion job - jobs live in memory, so a server restart forgets them; convert again")
     return state
 
 
@@ -681,7 +681,7 @@ def review_start(payload: ReviewRequest) -> dict[str, str]:
 def review_status(job: str) -> dict:
     state = _review_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown review job")
+        raise HTTPException(status_code=404, detail="unknown review job - jobs live in memory, so a server restart forgets them; run the review again")
     return state
 
 
@@ -800,7 +800,7 @@ def project_sweep_status(job: str) -> dict:
     """Progress of a triage or review sweep."""
     state = _sweep_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown sweep job")
+        raise HTTPException(status_code=404, detail="unknown sweep job - jobs live in memory, so a server restart forgets them; run the sweep again")
     return state
 
 
@@ -879,7 +879,7 @@ def project_pack_start(jndi: str = "", rate: float = 150.0) -> dict[str, str]:
 def project_estate_status(job: str) -> dict:
     state = _estate_jobs.get(job)
     if state is None:
-        raise HTTPException(status_code=404, detail="unknown estate job")
+        raise HTTPException(status_code=404, detail="unknown estate job - jobs live in memory, so a server restart forgets them; start it again")
     return {k: v for k, v in state.items() if k != "pack_path"}
 
 

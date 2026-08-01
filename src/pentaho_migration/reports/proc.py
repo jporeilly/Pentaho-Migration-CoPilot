@@ -8,16 +8,33 @@ a single machine. Below-normal priority costs seconds of wall clock and
 buys a UI that keeps painting.
 """
 
+import os
 import subprocess
+import threading
 
 # Windows-only flag; 0 elsewhere.
 NICE = getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0)
+
+# At most this many heavy renders at once. Each render is a whole JVM
+# (or the Crystal viewer); three release checks fired together used to
+# spawn three of each and thrash a demo laptop. Excess renders WAIT
+# their turn rather than competing - below-normal priority already keeps
+# the UI painting, this keeps the wall clock sane.
+RENDER_SLOTS = max(1, int(os.environ.get("COPILOT_RENDER_SLOTS", "2")))
+RENDER_GATE = threading.BoundedSemaphore(RENDER_SLOTS)
 
 
 def run_nice(cmd, **kwargs):
     """subprocess.run at below-normal priority."""
     kwargs.setdefault("creationflags", NICE)
     return subprocess.run(cmd, **kwargs)
+
+
+def run_render(cmd, **kwargs):
+    """run_nice for the HEAVY externals (JVM renders, viewer exports),
+    gated so only RENDER_SLOTS run concurrently."""
+    with RENDER_GATE:
+        return run_nice(cmd, **kwargs)
 
 
 # Detach flags: a viewer or Report Designer window launched from the web
