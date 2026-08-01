@@ -124,28 +124,6 @@ export default function GeneratePage({ result }) {
                 {review.verdict === 'SHIP' ? '✅ SHIP' : '⚠ REVIEW'}
               </span>
             </h2>
-            <div className="actions">
-              {review.consultant_report_html && (
-                <button className="primary"
-                  onClick={() => setOverlayHtml(review.consultant_report_html)}>
-                  🔍 Consultant report
-                </button>
-              )}
-              {review.consultant_report_html && (
-                <button className="ghost" onClick={() => downloadText(
-                  review.consultant_report_html,
-                  `${pipeline.name}.consultant.html`, 'text/html')}>
-                  ⬇ .html
-                </button>
-              )}
-              {review.consultant_report_markdown && (
-                <button className="ghost" onClick={() => downloadText(
-                  review.consultant_report_markdown,
-                  `${pipeline.name}.consultant.md`, 'text/markdown')}>
-                  ⬇ .md
-                </button>
-              )}
-            </div>
           </header>
           <p className="muted">
             {review.steps_checked} step(s) and {review.hops_checked} hop(s) through{' '}
@@ -167,6 +145,38 @@ export default function GeneratePage({ result }) {
               ))}
             </ul>
           )}
+        </div>
+      )}
+
+      {review && (
+        <div className="card">
+          <header>
+            <h2>Consultant report</h2>
+            <div className="actions">
+              {review.consultant_report_html && (
+                <button className="primary"
+                  onClick={() => setOverlayHtml(review.consultant_report_html)}>
+                  🔍 View
+                </button>
+              )}
+              {review.consultant_report_html && (
+                <button className="ghost" onClick={() => downloadText(
+                  review.consultant_report_html,
+                  `${pipeline.name}.consultant.html`, 'text/html')}>
+                  ⬇ .html
+                </button>
+              )}
+              {review.consultant_report_markdown && (
+                <button className="ghost" onClick={() => downloadText(
+                  review.consultant_report_markdown,
+                  `${pipeline.name}.consultant.md`, 'text/markdown')}>
+                  ⬇ .md
+                </button>
+              )}
+            </div>
+          </header>
+          <p className="muted">Action plan + costed effort — produced by the
+            review agent from the converted graph and its findings.</p>
         </div>
       )}
 

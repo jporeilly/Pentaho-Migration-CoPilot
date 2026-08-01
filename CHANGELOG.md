@@ -7,8 +7,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.2] - 2026-08-01
 
+- **ONE consultant flow on every workflow.** Running the release check
+  (reports) or the review agent (ETL) is now the single act that
+  produces the consultant report: the verdict card carries the
+  findings, and one Consultant report panel appears below with
+  View/.html/.pdf/.md. When the release check cannot run (an xaction
+  with no renderable original), the report is still generated from the
+  conversion itself - the panel appears either way, and the standalone
+  button that doubled the option is gone.
 - **Markdown renders at the app's standard font and size everywhere.**
   The conversion report's collapsible sections and footer fell outside
   the two (slightly different) scoped style blocks and rendered at

@@ -54,11 +54,7 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
       const res = await fetch(`/reports/consultant-report?jndi=${encodeURIComponent(jndi)}`, {
         method: 'POST', body: form,
       })
-      if (res.ok) {
-        const data = await res.json()
-        setConsult(data)
-        if (data.consultant_report_html) setOverlayHtml(data.consultant_report_html)
-      }
+      if (res.ok) setConsult(await res.json())
     } finally {
       setConsultBusy(false)
     }
@@ -192,13 +188,25 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
         const state = await s.json()
         if (!s.ok) throw new Error(state.detail || s.statusText)
         setGateStage({ stage: state.stage, stages: state.stages })
-        if (state.status === 'done') { setGate(state.result); break }
+        if (state.status === 'done') {
+          setGate(state.result)
+          // the gate already produced the consultant report - surface it
+          // in the ONE consultant panel below
+          setConsult({
+            consultant_report_html: state.result.consultant_report_html,
+            consultant_report_markdown: state.result.consultant_report_markdown,
+            consultant_report_pdf: state.result.consultant_report_pdf,
+          })
+          break
+        }
         if (state.status === 'error') throw new Error(state.detail || 'release check failed')
       }
     } catch (err) {
       // the check could not run (no original / no viewer on this machine) -
-      // say so and UNLOCK the downloads rather than deadlock the user
+      // say so, UNLOCK the downloads, and still produce the consultant
+      // report from the conversion itself so the panel appears either way
       setGateError(err.message)
+      await runConsultant()
     } finally {
       setGateBusy(false)
       setGateStage(null)
@@ -253,12 +261,6 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             <button className="ghost" onClick={openPdfPreview} disabled={previewBusy}
               title="Render the .prpt through the real Pentaho Reporting engine with an empty dataset — needs a local Report Designer install">
               {previewBusy ? 'Rendering…' : '🔍 PDF preview'}
-            </button>
-          )}
-          {file && (
-            <button className="ghost" onClick={runConsultant} disabled={consultBusy}
-              title="Action plan + costed effort from the conversion itself — no reference render needed">
-              {consultBusy ? 'Building…' : '📊 Consultant report'}
             </button>
           )}
           {file && (
@@ -346,8 +348,9 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
               </button>
             </div>
           </header>
-          <p className="muted">Action plan + costed effort from the conversion
-            itself — works for every family, no reference render needed.</p>
+          <p className="muted">Action plan + costed effort — produced by the
+            release check when the original renders, or from the conversion
+            itself when it cannot (every family).</p>
         </div>
       )}
 
@@ -361,33 +364,6 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
                 {gate.verdict === 'SHIP' ? '✅ SHIP' : '⚠ REVIEW'}
               </span>
             </h2>
-            <div className="actions">
-              {gate.consultant_report_html && (
-                <button className="primary"
-                  onClick={() => setOverlayHtml(gate.consultant_report_html)}>
-                  🔍 Consultant report
-                </button>
-              )}
-              {gate.consultant_report_html && (
-                <button className="ghost" onClick={() => downloadHtml(
-                  gate.consultant_report_html,
-                  report.filename.replace(/\.prpt$/, '.consultant.html'))}>
-                  ⬇ .html
-                </button>
-              )}
-              {gate.consultant_report_pdf && (
-                <button className="ghost" onClick={() => downloadPdf(
-                  gate.consultant_report_pdf,
-                  report.filename.replace(/\.prpt$/, '.consultant.pdf'))}>
-                  ⬇ .pdf
-                </button>
-              )}
-              <button className="ghost" onClick={() => downloadText(
-                gate.consultant_report_markdown,
-                report.filename.replace(/\.prpt$/, '.consultant.md'))}>
-                ⬇ .md
-              </button>
-            </div>
           </header>
           <p className="muted">
             Rendered original ({gate.original_pages} pages, SAP viewer) vs
