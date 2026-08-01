@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.4] - 2026-08-01
 
 - **`pentaho-migrate doctor` - every moving part in one readiness
   table.** Python/venv/UI, the Pentaho suite (Report Designer, Data

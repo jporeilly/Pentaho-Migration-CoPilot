@@ -1,19 +1,26 @@
 # Version
 
-**1.44.3** - 2026-08-01
+**1.44.4** - 2026-08-01
 
-**The engagement runs end to end in the app.** Estate mode batch-converts
-a whole selection of exports into the project store from the Project page
-- PowerCenter/Talend XML, RptToXml dumps, .rpt binaries, .xactions and
-solution zips, routed by content with staged progress, per-file failures
-as findings, sources persisted so sweeps and re-opens outlive the
-browser. One button then builds the deliverable pack: every artifact
-re-converted, each beside its consultant report, the portfolio reports,
-and a manifest where failures are listed rather than silently missing.
-Release-gate verdicts persist into the store (a Gate chip beside Triage
-and Parity), the installer offers Complete and Custom installation
-types, and CI is green again - including a real portability fix so
-engagement stores carrying Windows paths resolve on any machine.
+**The doctor knows every moving part.** `pentaho-migrate doctor` prints
+one readiness table across the whole estate of dependencies - the
+Pentaho suite, the SAP Crystal runtime and its tools, LLM providers,
+Docker Desktop (told apart from installed-but-not-running), Airflow and
+Marquez, the sample databases - each row with what it is needed for and
+the exact next step. Both installer modes end with it, so Complete
+stays zero-prompt and a fresh box finishes with its own readiness
+report. The policy it encodes: install only what the product owns
+(venv, package, UI build, SHA-verified JDBC jars); check and report
+licensed or system-level third parties rather than accepting their
+licences on your behalf; offer exactly one assisted install where the
+path is clean (Ollama via winget, explicit opt-in in Custom mode).
+
+Also in this release: a render queue caps concurrent JVM/viewer
+renders so bursts stop thrashing demo laptops, background-job messages
+own the server-restart story, the demo-box image carries every extra
+and the curated demo samples with a persistent /data volume plus a
+root docker-compose with the optional Xtreme MySQL profile, and the
+solution-zip and estate upload paths passed a path-traversal audit.
 
 Phase 1 remains complete — Informatica PowerCenter, SAP Crystal
 Reports, Talend, and Pentaho Xactions (all three definition dialects);
