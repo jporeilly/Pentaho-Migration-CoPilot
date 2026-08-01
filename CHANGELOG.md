@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.3] - 2026-08-01
 
 - **The installer offers Complete and Custom installations.** The same
   pattern as our other tools: [1] Complete - the full installation

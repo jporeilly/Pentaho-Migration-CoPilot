@@ -4,7 +4,7 @@
 **Informatica PowerCenter and Talend → native PDI pipelines (IBM DataStage next);**
 **SAP Crystal Reports and old Pentaho Xactions (.xaction + JFreeReport `.report`) → Pentaho Report Designer (.prpt).**
 
-Version **1.44.2** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports, Talend & Xactions ·
+Version **1.44.3** ([VERSION.md](VERSION.md) · [CHANGELOG.md](CHANGELOG.md)) · **Phase 1 complete** — Informatica, Crystal Reports, Talend & Xactions ·
 [Technical brief](docs/Migration_Copilot_Technical_Brief.pdf)
 
 Every legacy data platform locks customers in with the sunk cost of thousands of

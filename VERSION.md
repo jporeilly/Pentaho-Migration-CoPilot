@@ -1,15 +1,19 @@
 # Version
 
-**1.44.2** - 2026-08-01
+**1.44.3** - 2026-08-01
 
-**One consultant flow, one standard look.** Running the release check
-(reports) or the review agent (ETL) is now the single act that produces
-the consultant report - the verdict card carries the findings, one
-panel below carries the document, and when the check cannot run the
-report still generates from the conversion itself. Markdown renders at
-the app's standard font and size on every surface (one stylesheet, the
-collapsible sections and italics included), and the
-release-check-not-available message reads as a full-width note.
+**The engagement runs end to end in the app.** Estate mode batch-converts
+a whole selection of exports into the project store from the Project page
+- PowerCenter/Talend XML, RptToXml dumps, .rpt binaries, .xactions and
+solution zips, routed by content with staged progress, per-file failures
+as findings, sources persisted so sweeps and re-opens outlive the
+browser. One button then builds the deliverable pack: every artifact
+re-converted, each beside its consultant report, the portfolio reports,
+and a manifest where failures are listed rather than silently missing.
+Release-gate verdicts persist into the store (a Gate chip beside Triage
+and Parity), the installer offers Complete and Custom installation
+types, and CI is green again - including a real portability fix so
+engagement stores carrying Windows paths resolve on any machine.
 
 Phase 1 remains complete — Informatica PowerCenter, SAP Crystal
 Reports, Talend, and Pentaho Xactions (all three definition dialects);
