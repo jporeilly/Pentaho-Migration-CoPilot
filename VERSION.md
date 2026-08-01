@@ -1,72 +1,60 @@
 # Version
 
-**1.44.0** - 2026-08-01
+**1.44.1** - 2026-08-01
 
-**The corpus2 gap list is closed.** 1.43.0 proved both old Pentaho report
-dialects translate; this release took a 126-report harvest (breadboard,
-lanit, pentaho-platform-5.0-OLD — 25x the original corpus) and worked its
-ranked gap list to zero: **0 crashes, 0 unmapped function classes, 0
-unmapped element templates, 125 of 126 reports with layouts** (the one
-remainder ships its definition in a jar the estate never committed; the
-extraction path is tested and works the moment the jar uploads).
+**The agent stack now covers every family.** 1.44.0 closed the corpus2
+gap list for reports; this release brings the Crystal-side agent
+experience to Informatica and Talend, and makes the converter fix the
+classic silent ETL defect instead of only flagging it.
 
-**Report functions port on jar-verified evidence.** One shared translation
-table serves both dialects: the old classes moved wholesale from
-`org.jfree.report.*` to the PRD engine's packages — visibility switches,
-element colouring, hyperlinks, BeanShell scripts (PRD still ships the same
-interpreter) — and every ported class name is verified present in the local
-engine jars by the test suite. Aggregate functions become summaries,
-PageOfPages becomes the writer's own page function. The sequences'
-JavaScript runs through a safe interpreter with prefix semantics: statements
-evaluate in order and conversion stops honestly at the first construct
-outside the subset, keeping everything the platform itself would have
-computed. What remains manual is *pointed* — each note names the PRD-native
-fix (fold the lookup into the query, `$(report.date)` for run-date parts).
+**The 🛡 ETL review agent** is the release gate's counterpart for
+transformations. With no "rendered original" to compare, the
+deterministic evidence is the converted graph itself: unmapped steps
+(grouped by type, each with its suggested PDI approach), untranslated
+and review-flagged expressions, hop integrity (dangling endpoints,
+isolated steps), sorted-input hazards on EVERY input leg, placeholder
+connections, an optional Pan run through a real PDI install, and a
+measured CSV parity result when the diff harness has one. SHIP or
+REVIEW is decided by error findings alone; the LLM only annotates
+findings with resolution-or-guidance notes. The Generate page gates the
+.ktr download on the review, the project page sweeps every stored
+mapping and persists SHIP/REVIEW verdicts per row, and ONE consultant
+document per mapping — costed action plan first, findings with
+evidence, what converted — shares the Crystal consultant stylesheet, in
+HTML and Markdown from a single plan builder.
 
-**Every chart family the old platform authored now translates.** Category
-charts (bar, line, area, pie) were already in; this release adds the XY
-family — XY line, scatter, bubble, and time series — plus multi-pie, with
-the emitter speaking the new collector API verified from the legacy-charts
-jar's own metadata: the collectors dropped their `-Function` suffix, x/y/z
-column properties introspect capitalised (`XValueColumn[0]` — the JavaBeans
-two-capitals rule; the engine rejects the lowercase spelling), series named
-by a data column use the indexed `seriesColumn[i]`, and the time period is
-the Class-valued `timePeriod`. Authored properties the render depends on
-ride along — `maxBubbleSize` above all, because the PRD default of zero
-draws invisible bubbles. The chart scan lives in the shared functions
-module, so the simple dialect translates `drawable-field` and chart
-expressions through the same table the legacy-EXT parser uses. All five
-shapes render through the real engine against SampleData rows.
+**The converter now INSERTS the Sort rows steps PDI needs.** Group By,
+Merge Join and Unique rows run green on unsorted input and produce
+silently wrong results — the source engines sorted internally. The
+mapper synthesizes a Sort rows step on every unsorted leg with the keys
+the target actually needs (group keys; per-leg join keys, both legs of
+a join), marked review with a note saying why it exists. Keys the
+export cannot reveal leave the honest finding in place rather than a
+sort that sorts nothing. The insertion and the review lint share one
+semantics table, so the fix and the check can never drift.
 
-**Hidden definitions resolve.** The resolution ladder climbs from explicit
-action-resources through: a resource picked by name via a `resource-name`
-input (the platform's own run-time selection, reproduced from its default);
-the `report-definition*` convention; definitions extracted from uploaded
-jars; definitions embedded inline in the xaction (the WAQR ad-hoc pattern,
-parser-config properties substituted); a Report Designer 1.x `.report`
-object tree standing in for a never-committed runtime XML — the third old
-dialect, with its own parser; and a tolerant repair for a real estate defect
-(a comment closed with `->>` instead of `-->` — the typo is fixed in place).
+**Defaults open the report with data.** A converted report's authored
+parameter defaults were written against the original estate's database;
+on the demo connection they can be perfectly set and still select
+nothing. The API layer now probes the query with the substituted
+defaults and, when nothing comes back, repoints the date window at the
+data's own MIN/MAX span for the selected defaults — noted as applied
+work with the authored window quoted, review flagged. General logic:
+any date parameters bounding one date column, any report.
 
-**Dead server images stop blocking review.** Image references resolve three
-tiers deep: the old server's local webapps, then the solution folder by
-basename, then a stamped same-size placeholder so layout review proceeds —
-and estate triage aggregates every placeholder into one action: drop the
-real file into the solution folder and every report that points at it fixes
-at once.
+**Staged progress everywhere, and demo polish.** The release gate's
+staged background-job pattern is now one JobStore and one StageBar
+component: ETL convert, expression translation in both families, the
+review agent and the project sweeps all show the same named-stage
+progress bar. Wireframe labels clip to their element's box so a long
+field name never overlaps its neighbour, the Download actions read in
+workflow order with the consultant report last, the
+release-check-not-available message is a readable note, and a helper
+script runs the API in a visible console so an audience can watch the
+calls. Also fixed: a code-motion regression had left the Crystal
+release-gate endpoint bound to a helper function — the staged gate was
+unreachable; it is restored and re-verified.
 
-**The demo experience was driven live and fixed live.** Reports open with
-data on screen: query-backed pick-lists pre-select their first value from
-the live connection, date parameters get real datepickers with repaired
-defaults (`05-01-2005` becomes ISO, the day/month order stated), and the
-schema assistant substitutes numeric defaults unquoted so HSQLDB accepts
-the validation SQL. Source badges are drawn product marks (Crystal,
-Informatica, Talend, Airflow, xaction), the consultant report renders for
-every family, conversion reports render their collapsible sections, and
-the launchers list all four migration families plus the PDI → Airflow
-studio, the default Pentaho tool paths, and how to start the SampleData
-HSQLDB.
-
-Phase 1 remains complete — Informatica PowerCenter, SAP Crystal Reports,
-Talend, and Pentaho Xactions (all three definition dialects).
+Phase 1 remains complete — Informatica PowerCenter, SAP Crystal
+Reports, Talend, and Pentaho Xactions (all three definition dialects).
 See [CHANGELOG.md](CHANGELOG.md) for history.

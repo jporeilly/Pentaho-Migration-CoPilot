@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.1] - 2026-08-01
 
 - **The converter INSERTS the Sort rows steps PDI needs** - suggest and
   apply, not just log. Group By / Merge Join / Unique rows run green on
