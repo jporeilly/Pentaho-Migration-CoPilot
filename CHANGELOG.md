@@ -7,6 +7,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **The ETL consultant report downloads as PDF too.** The review
+  agent's result now carries the branded PDF with the verdict, the
+  costed action plan and every finding (severity-coloured, with any
+  LLM resolution note) leading the document - and the header names the
+  real source family instead of assuming Informatica.
+- **The project store is portable.** ⬇ Export downloads a consistent
+  snapshot (sqlite backup API, safe while the app writes); ⬆ Import
+  replaces the store's CONTENT through the same API - a file rename
+  would fight Windows over open handles - after backing the current
+  store up beside itself. Local-machine only, and a non-sqlite upload
+  is refused with the reason.
+- **ETL tables scale like the reports table**: each family card gets
+  its own name filter and Agent-verdict chips (SHIP / REVIEW / not
+  reviewed), so a 148-mapping estate is a worklist, not a scroll.
+- **Conversions survive a refresh.** The last conversion (under 4 MB)
+  restores from the browser session on F5, with an honest note that
+  file-dependent actions (previews, release check) need the file
+  re-uploaded; New upload clears it.
+
 ## [1.44.4] - 2026-08-01
 
 - **`pentaho-migrate doctor` - every moving part in one readiness

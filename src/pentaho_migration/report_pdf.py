@@ -40,7 +40,10 @@ class _ReportPdf(FPDF):
 
 
 def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, score, impact,
-                     effort=None, rate: float = 150.0) -> bytes:
+                     effort=None, rate: float = 150.0, check=None) -> bytes:
+    """`check` is an EtlReviewCheck: when given, the PDF leads with the
+    review agent's verdict, the costed action plan and the findings -
+    the same document the HTML consultant report renders."""
     pdf = _ReportPdf(orientation="P", unit="mm", format="A4")
     pdf.alias_nb_pages()
     pdf.set_auto_page_break(auto=True, margin=16)
@@ -55,7 +58,10 @@ def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, scor
     pdf.set_font("helvetica", "B", 16)
     pdf.cell(0, 7, "Migration Report", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("helvetica", "", 10)
-    pdf.cell(0, 6, _s(f"{pipeline.name} - Informatica PowerCenter -> Pentaho Data Integration"))
+    from pentaho_migration.etl_consultant import FAMILY_LABELS
+    family = FAMILY_LABELS.get(pipeline.source_tool.value,
+                               pipeline.source_tool.value.title())
+    pdf.cell(0, 6, _s(f"{pipeline.name} - {family} -> Pentaho Data Integration"))
     pdf.set_y(32)
 
     # score hero
@@ -94,6 +100,72 @@ def build_pdf_report(source: SourceInfo | None, pipeline: Pipeline, report, scor
         pdf.set_fill_color(*ACCENT)
         pdf.rect(x, y + 8.6, bar_width * factor.score / 100, 1.8, style="F")
     pdf.set_y(y0 + ((len(score.factors) + 1) // 2) * 14 + 4)
+
+    # review agent: verdict, costed plan, findings - the consultant view
+    if check is not None:
+        from pentaho_migration.etl_consultant import (
+            PRIORITY_LABEL, build_etl_action_plan)
+
+        verdict_color = (12, 130, 12) if check.verdict == "SHIP" else (200, 140, 20)
+        _heading(pdf, f"Review agent - {check.verdict}")
+        pdf.set_font("helvetica", "", 8.5)
+        pdf.set_text_color(*INK)
+        pdf.multi_cell(0, 4.6, _s(
+            f"{check.steps_checked} step(s) and {check.hops_checked} hop(s) "
+            f"through: {', '.join(check.checks_run)}. Every check is "
+            "deterministic; any LLM note is advisory."),
+            new_x="LMARGIN", new_y="NEXT")
+
+        actions = build_etl_action_plan(pipeline, check)
+        if actions:
+            total_h = sum(a.hours for a in actions)
+            pdf.ln(1)
+            pdf.set_font("helvetica", "B", 9)
+            pdf.set_text_color(*NAVY)
+            pdf.multi_cell(0, 5, _s(
+                f"Action plan - {len(actions)} action(s), {total_h:,.2f}h "
+                f"(${total_h * rate:,.0f}) at ${rate:g}/h"),
+                new_x="LMARGIN", new_y="NEXT")
+            for n, a in enumerate(actions, 1):
+                pdf.set_font("helvetica", "B", 8.5)
+                pdf.set_text_color(*INK)
+                pdf.multi_cell(0, 4.6, _s(
+                    f"{n}. [{PRIORITY_LABEL[a.priority]}] {a.title} - "
+                    f"{a.count} item(s), {a.hours:,.2f}h "
+                    f"(${a.hours * rate:,.0f})"),
+                    new_x="LMARGIN", new_y="NEXT")
+                pdf.set_font("helvetica", "", 8)
+                pdf.set_text_color(*MUTED)
+                pdf.multi_cell(0, 4.2, _s(f"    why: {a.why}"),
+                               new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 4.2, _s(f"    how: {a.how}"),
+                               new_x="LMARGIN", new_y="NEXT")
+
+        if check.findings:
+            pdf.ln(1)
+            sev_colors = {"error": LEVEL_COLORS["serious"],
+                          "warning": LEVEL_COLORS["warning"],
+                          "info": LEVEL_COLORS["info"]}
+            for f in check.findings:
+                pdf.set_font("helvetica", "B", 8.5)
+                pdf.set_text_color(*sev_colors.get(f.severity, MUTED))
+                pdf.cell(16, 4.6, _s(f.severity.upper()))
+                pdf.set_text_color(*INK)
+                pdf.set_font("helvetica", "", 8.5)
+                pdf.multi_cell(0, 4.6, _s(f"[{f.code}] {f.message}"),
+                               new_x="LMARGIN", new_y="NEXT")
+                for ev in f.evidence[:6]:
+                    pdf.set_font("helvetica", "", 7.8)
+                    pdf.set_text_color(*MUTED)
+                    pdf.multi_cell(0, 4, _s(f"      {ev}"),
+                                   new_x="LMARGIN", new_y="NEXT")
+                if f.resolution:
+                    pdf.set_font("helvetica", "I", 8)
+                    pdf.set_text_color(*LEVEL_COLORS["info"])
+                    pdf.multi_cell(0, 4.2,
+                                   _s(f"      resolution: {f.resolution}"),
+                                   new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(1)
 
     # source facts
     if source:

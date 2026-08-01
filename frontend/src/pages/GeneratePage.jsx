@@ -9,6 +9,15 @@ import { useState } from 'react'
 import ReportOverlay from '../components/ReportOverlay.jsx'
 import StageBar from '../components/StageBar.jsx'
 
+function downloadPdf(base64, filename) {
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }))
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
 function downloadText(text, filename, type = 'application/xml') {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([text], { type }))
@@ -164,6 +173,13 @@ export default function GeneratePage({ result }) {
                   review.consultant_report_html,
                   `${pipeline.name}.consultant.html`, 'text/html')}>
                   ⬇ .html
+                </button>
+              )}
+              {review.consultant_report_pdf && (
+                <button className="ghost" onClick={() => downloadPdf(
+                  review.consultant_report_pdf,
+                  `${pipeline.name}.consultant.pdf`)}>
+                  ⬇ .pdf
                 </button>
               )}
               {review.consultant_report_markdown && (

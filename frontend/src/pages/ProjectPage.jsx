@@ -282,6 +282,69 @@ export default function ProjectPage({ onBack, onOpen, context }) {
     )
   }
 
+  function EtlFamilyCard({ family }) {
+    const [q, setQ] = useState('')
+    const [agent, setAgent] = useState('all')
+    const needle = q.trim().toLowerCase()
+    const shown = family.list.filter((r) => {
+      if (agent !== 'all' && (r.review_verdict || 'NONE') !== agent) return false
+      if (!needle) return true
+      return `${r.mapping} ${r.file}`.toLowerCase().includes(needle)
+    })
+    return (
+      <section className="card">
+        <header>
+          <h2>{family.label} <span>
+            {shown.length === family.list.length
+              ? `${family.list.length} converted`
+              : `${shown.length} of ${family.list.length}`}
+          </span></h2>
+          <div className="triage-bar">
+            <button className="primary" onClick={runEtlReview} disabled={etlReviewing}
+              title="Run the ETL review agent over every stored mapping: unmapped steps, expressions, hop integrity, sorted-input hazards — verdicts persist in the store">
+              {etlReviewing ? 'Reviewing…' : '🛡 Review sweep'}
+            </button>
+            <a
+              className="ghost portfolio-link"
+              href={`/project/portfolio?family=${family.key}&rate=${encodeURIComponent(localStorage.getItem('consultantRate') || '150')}`}
+              target="_blank"
+              rel="noreferrer"
+              title="Self-contained HTML consultant report for this family: confidence grades, unmapped-component breakdown, review load, focus list, $ figures — prints to PDF"
+            >
+              📊 Consultant report
+            </a>
+          </div>
+        </header>
+        {sweep?.kind === 'review' && (
+          <StageBar stage={sweep.stage} stages={sweep.stages}
+            done={sweep.done} total={sweep.total} detail={sweep.detail} />
+        )}
+        <div className="filters report-filters">
+          {[['all', 'all'], ['SHIP', '✅ SHIP'], ['REVIEW', '⚠ REVIEW'],
+            ['NONE', 'not reviewed']].map(([key, label]) => {
+            const n = key === 'all'
+              ? family.list.length
+              : family.list.filter((r) => (r.review_verdict || 'NONE') === key).length
+            return (
+              <button key={key} className={agent === key ? 'active' : ''}
+                onClick={() => setAgent(key)} disabled={n === 0 && key !== 'all'}>
+                {label} {n}
+              </button>
+            )
+          })}
+          <input className="jndi-input report-search"
+            placeholder="Filter by mapping or export name…"
+            value={q} onChange={(e) => setQ(e.target.value)} />
+          {(q || agent !== 'all') && (
+            <button onClick={() => { setQ(''); setAgent('all') }}>clear</button>
+          )}
+        </div>
+        <StatsStrip list={shown} scored />
+        <EtlTable list={shown} />
+      </section>
+    )
+  }
+
   function EtlTable({ list }) {
     return (
       <div className="table-scroll">
@@ -366,6 +429,27 @@ export default function ProjectPage({ onBack, onOpen, context }) {
             title="One zip: every stored artifact re-converted, its consultant report beside it, the portfolio reports and a manifest — the engagement hand-over">
             {packBusy ? 'Packing…' : '📦 Deliverable pack'}
           </button>
+          <a className="ghost portfolio-link" href="/project/export"
+            title="Download the whole project store (sqlite) — move the engagement to another machine and import it there">
+            ⬇ Export store
+          </a>
+          <label className="ghost file-btn"
+            title="Replace this store with an exported one — the current store is backed up beside itself first">
+            ⬆ Import store
+            <input type="file" hidden accept=".db"
+              onChange={async (e) => {
+                const f = e.target.files[0]
+                e.target.value = ''
+                if (!f) return
+                setAgentError('')
+                const form = new FormData()
+                form.append('store', f)
+                const res = await fetch('/project/import', { method: 'POST', body: form })
+                const body = await res.json().catch(() => ({}))
+                if (!res.ok) { setAgentError(`Import failed: ${body.detail || res.statusText}`); return }
+                refresh()
+              }} />
+          </label>
           <button className="ghost" onClick={refresh}>↻ Refresh</button>
         </div>
       </header>
@@ -415,32 +499,7 @@ export default function ProjectPage({ onBack, onOpen, context }) {
     </section>
 
     {families.filter((f) => visible(f.key)).map((f) => (
-      <section className="card" key={f.key}>
-        <header>
-          <h2>{f.label} <span>{f.list.length} converted</span></h2>
-          <div className="triage-bar">
-            <button className="primary" onClick={runEtlReview} disabled={etlReviewing}
-              title="Run the ETL review agent over every stored mapping: unmapped steps, expressions, hop integrity, sorted-input hazards — verdicts persist in the store">
-              {etlReviewing ? 'Reviewing…' : '🛡 Review sweep'}
-            </button>
-            <a
-              className="ghost portfolio-link"
-              href={`/project/portfolio?family=${f.key}&rate=${encodeURIComponent(localStorage.getItem('consultantRate') || '150')}`}
-              target="_blank"
-              rel="noreferrer"
-              title="Self-contained HTML consultant report for this family: confidence grades, unmapped-component breakdown, review load, focus list, $ figures — prints to PDF"
-            >
-              📊 Consultant report
-            </a>
-          </div>
-        </header>
-        {sweep?.kind === 'review' && (
-          <StageBar stage={sweep.stage} stages={sweep.stages}
-            done={sweep.done} total={sweep.total} detail={sweep.detail} />
-        )}
-        <StatsStrip list={f.list} scored />
-        <EtlTable list={f.list} />
-      </section>
+      <EtlFamilyCard key={f.key} family={f} />
     ))}
 
     {reports.length > 0 && visible('crystal') && (

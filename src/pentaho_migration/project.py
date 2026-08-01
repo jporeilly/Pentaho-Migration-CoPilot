@@ -164,6 +164,51 @@ def set_mapping_review(file: str, mapping: str, verdict: str,
     return cursor.rowcount > 0
 
 
+def export_store() -> Path:
+    """A consistent snapshot of the live store (sqlite backup API - safe
+    while the app is writing), left under config/ for download."""
+    dst_path = _db_path().with_name("project_export.db")
+    src, dst = _connect(), sqlite3.connect(dst_path)
+    try:
+        src.backup(dst)
+    finally:
+        # sqlite3's context manager scopes TRANSACTIONS, not the handle -
+        # close explicitly or Windows keeps the files locked
+        src.close()
+        dst.close()
+    return dst_path
+
+
+def import_store(data: bytes) -> dict:
+    """Replace the store's CONTENT with an exported snapshot, through the
+    sqlite backup API - a file rename would fight Windows over handles
+    other connections still hold. The current store is snapshotted to a
+    .bak first; the upload must BE a sqlite file."""
+    if not data.startswith(b"SQLite format 3\x00"):
+        raise ValueError("that file is not a sqlite database - export the "
+                         "store from the other machine's Project page")
+    import shutil
+    import time
+
+    db = _db_path()
+    if db.is_file():
+        shutil.copy2(db, db.with_name(
+            f"project.db.bak-{time.strftime('%Y%m%d-%H%M%S')}"))
+    tmp = db.with_name("project_import_tmp.db")
+    tmp.write_bytes(data)
+    src, dst = sqlite3.connect(tmp), sqlite3.connect(db)
+    try:
+        src.backup(dst)
+    finally:
+        src.close()
+        dst.close()
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+    return {"mappings": len(list_mappings()), "reports": len(list_reports())}
+
+
 def set_status(file: str, mapping: str, status: str) -> bool:
     if status not in STATUSES:
         raise ValueError(f"status must be one of {STATUSES}")

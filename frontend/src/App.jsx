@@ -23,6 +23,41 @@ export default function App() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [convertProgress, setConvertProgress] = useState(null)
+  const [restored, setRestored] = useState(false)
+
+  // refresh-safe sessions: the last conversion survives an F5 (small
+  // payloads only - a monster estate export stays re-uploadable). The
+  // original FILE cannot survive a refresh, so file-dependent actions
+  // (previews, gate) hide until re-upload - graceful, not broken.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('copilot:last')
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      if (saved.kind === 'etl' && saved.results?.length) {
+        setSource(saved.source)
+        setResults(saved.results)
+        setFileName(saved.fileName)
+        setSelected(0)
+        setStep(1)
+        setRestored(true)
+      } else if (saved.kind === 'report' && saved.report) {
+        setReport(saved.report)
+        setFileName(saved.fileName)
+        setStep(1)
+        setRestored(true)
+      }
+    } catch { /* a corrupt cache never blocks a fresh start */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function cacheSession(payload) {
+    try {
+      const raw = JSON.stringify(payload)
+      if (raw.length < 4 * 1024 * 1024) sessionStorage.setItem('copilot:last', raw)
+      else sessionStorage.removeItem('copilot:last')
+    } catch { /* quota - skip silently */ }
+  }
   const [version, setVersion] = useState('')
   const [showChangelog, setShowChangelog] = useState(false)
   const [showPractices, setShowPractices] = useState(false)
@@ -97,6 +132,8 @@ export default function App() {
       setFileName(file.name)
       setSelected(0)
       if (data.results.length) setStep(1)
+      cacheSession({ kind: 'etl', source: data.source,
+                     results: data.results, fileName: file.name })
     } catch (err) {
       setResults([])
       setSource(null)
@@ -125,6 +162,7 @@ export default function App() {
       setReportFile(file)
       setFileName(file.name)
       setStep((s) => (s > 0 && s <= 3 ? s : 1))
+      cacheSession({ kind: 'report', report: data, fileName: file.name })
     } catch (err) {
       setReport(null)
       setError(err.message)
@@ -205,6 +243,8 @@ export default function App() {
     setFileName('')
     setStep(0)
     setError(null)
+    setRestored(false)
+    try { sessionStorage.removeItem('copilot:last') } catch { /* fine */ }
   }
 
   return (
@@ -272,6 +312,13 @@ export default function App() {
               <button className="ghost" onClick={reset}>New upload</button>
             </div>
           )}
+          {restored && (
+            <p className="summary">
+              Restored <b>{fileName}</b> from this browser session — preview
+              and release-check need the file re-uploaded; everything else
+              works. <button className="ghost inline-btn" onClick={reset}>Start fresh</button>
+            </p>
+          )}
 
           {results.length > 0 && (
             <div className="workbench-bar">
@@ -314,6 +361,13 @@ export default function App() {
               )}
               <button className="ghost" onClick={reset}>New upload</button>
             </div>
+          )}
+          {restored && (
+            <p className="summary">
+              Restored <b>{fileName}</b> from this browser session — preview
+              and release-check need the file re-uploaded; everything else
+              works. <button className="ghost inline-btn" onClick={reset}>Start fresh</button>
+            </p>
           )}
 
           {step === 0 && (

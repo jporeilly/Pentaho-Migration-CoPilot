@@ -671,10 +671,30 @@ def review_start(payload: ReviewRequest) -> dict[str, str]:
                 build_etl_consultant_report_markdown(
                     pipeline, report, score, effort, check,
                     rate=payload.rate),
+            "consultant_report_pdf": _review_pdf_base64(
+                pipeline, report, score, impact, effort, check,
+                payload.rate),
         }
 
     _review_jobs.run(job, run)
     return {"job": job_id}
+
+
+def _review_pdf_base64(pipeline, report, score, impact, effort, check,
+                       rate: float) -> str:
+    """The consultant PDF, base64 for the job result - a failure to
+    build it must not lose the HTML/MD that DID build."""
+    import base64
+
+    from pentaho_migration.report_pdf import build_pdf_report
+
+    try:
+        return base64.b64encode(build_pdf_report(
+            None, pipeline, report, score, impact, effort=effort,
+            rate=rate, check=check)).decode()
+    except Exception:
+        logger.exception("review consultant PDF failed for %s", pipeline.name)
+        return ""
 
 
 @app.get("/review/status")
@@ -881,6 +901,38 @@ def project_estate_status(job: str) -> dict:
     if state is None:
         raise HTTPException(status_code=404, detail="unknown estate job - jobs live in memory, so a server restart forgets them; start it again")
     return {k: v for k, v in state.items() if k != "pack_path"}
+
+
+@app.get("/project/export")
+def project_export() -> FileResponse:
+    """The whole project store as a portable sqlite file - move an
+    engagement between machines (import it on the other side)."""
+    from pentaho_migration.project import export_store
+
+    path = export_store()
+    stamp = datetime.now().strftime("%Y-%m-%d")
+    return FileResponse(path, media_type="application/octet-stream",
+                        filename=f"project_store_{stamp}.db")
+
+
+@app.post("/project/import", dependencies=[Depends(require_api_key)])
+def project_import(store: UploadFile, request: Request) -> dict:
+    """Replace the project store with an exported one. Destructive by
+    intent, so: local callers only, the file must actually be a sqlite
+    database, and the current store is backed up beside itself first."""
+    host = (request.client.host if request.client else "") or ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(status_code=403,
+                            detail="store import runs on the local machine "
+                                   "only")
+    from pentaho_migration.project import import_store
+
+    data = store.file.read()
+    try:
+        counts = import_store(data)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return counts
 
 
 @app.get("/project/pack/download")
