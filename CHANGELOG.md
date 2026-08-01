@@ -9,6 +9,24 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Definition-resolution hardening** (gap #4: 6 of 7 hidden
+  definitions now resolve; 125 of corpus2's 126 reports have layouts).
+  The ladder: a `resource-name` input picks the definition the way the
+  platform did (chart-types pattern, alternates listed); `report-jar`
+  resources extract their definition from the uploaded jar; WAQR
+  ad-hoc xactions parse the definition embedded INLINE in the sequence
+  (with `${reportheader}` parser-config substitution); a Report
+  Designer 1.x `.report` source stands in when the runtime `.xml` was
+  never committed - a THIRD dialect parser
+  (`reportdesigner1_parser.py`) reads the designer's object tree; and
+  a malformed definition whose author typed `->>` for `-->` is
+  repaired at the typo, keeping everything the author meant to keep.
+- **Source badges are product marks now**: Crystal's faceted diamond,
+  Informatica's origami mark, Talend's hub-and-spokes, the Airflow
+  pinwheel, an IBM-blue hexagon, the Pentaho action ring - drawn
+  geometry in brand colours under `frontend/public/logos/`, official
+  art drops straight over them.
+
 - **The demo experience, driven live and fixed live.** order_detail (and
   the whole family) now opens WITH data: a no-default prompt filtering a
   column by equality becomes a query-backed dropdown over that column's

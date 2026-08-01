@@ -66,6 +66,7 @@ class XActionModel:
     title: str = ""
     inputs: list = field(default_factory=list)     # [XInput]
     resources: dict = field(default_factory=dict)  # resource name -> location
+    inline_resources: dict = field(default_factory=dict)  # name -> XML bytes embedded IN the xaction (WAQR)
     actions: list = field(default_factory=list)    # [XAction]
 
     @property
@@ -119,6 +120,14 @@ def parse_xaction(source) -> XActionModel:
             loc = node.findtext("./solution-file/location")
             if loc:
                 model.resources[node.tag] = loc.strip()
+                continue
+            # WAQR embeds the whole definition INLINE:
+            # <resource><xml><location><report ...> - the location holds
+            # a document, not a path
+            xml_node = node.find("./xml/location")
+            if xml_node is not None and len(xml_node):
+                model.inline_resources[node.tag] = ET.tostring(
+                    xml_node[0], encoding="utf-8")
 
     def walk(node, in_loop):
         for child in node:
@@ -241,6 +250,60 @@ def _select_columns(sql: str):
         if name:
             out.append((name, "(" in item))
     return out
+
+
+def _repair_nested_comments(text: str):
+    """Tolerant repair for the malformations the corpus actually has.
+
+    The billing dashboard's author typed ``->>`` where ``-->`` belongs,
+    so the comment never closed and the next ``<!--`` nested (illegal).
+    Repair order inside an open comment: a TYPO'D closer (``->>``,
+    ``- ->``, ``--!>``) becomes ``-->`` - the comment ends exactly where
+    the author meant it to; failing that, the stray comment is closed
+    just before the next ``<!--``; an EOF inside a comment gets a
+    closer appended. Returns the repaired text, or None if nothing
+    needed repair."""
+    typo = re.compile(r"-\s?->>|->>|--!>|-\s->")
+    out = []
+    pos = 0
+    in_comment = False
+    changed = False
+    while True:
+        if not in_comment:
+            i = text.find("<!--", pos)
+            if i == -1:
+                out.append(text[pos:])
+                break
+            out.append(text[pos:i + 4])
+            pos = i + 4
+            in_comment = True
+        else:
+            close = text.find("-->", pos)
+            nxt = text.find("<!--", pos)
+            m = typo.search(text, pos)
+            candidates = [c for c in (
+                ("close", close), ("open", nxt),
+                ("typo", m.start() if m else -1)) if c[1] != -1]
+            if not candidates:
+                out.append(text[pos:] + " -->")
+                changed = True
+                break
+            kind, at = min(candidates, key=lambda c: c[1])
+            if kind == "close":
+                out.append(text[pos:at + 3])
+                pos = at + 3
+                in_comment = False
+            elif kind == "typo":
+                out.append(text[pos:at] + "-->")
+                pos = m.end()
+                in_comment = False
+                changed = True
+            else:
+                out.append(text[pos:at] + " -->")
+                pos = at
+                in_comment = False
+                changed = True
+    return "".join(out) if changed else None
 
 
 def _scripted_values(x):
@@ -450,14 +513,56 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
     report_action = x.report_actions[0]
 
     # ---- layout: the paired old JFreeReport definition -------------------
-    # The component may name its resource explicitly (action-resources
-    # mapping) or rely on the platform convention: a resource called
-    # report-definition (optionally suffixed) binds implicitly.
+    # Resolution ladder, most explicit first: the component's own
+    # action-resources mapping; a resource picked BY NAME through a
+    # `resource-name` input (the chart-types pattern - the platform's own
+    # selection, reproduced from the input's default / first pick-list
+    # row); the report-definition* naming convention; a definition
+    # embedded INLINE in the xaction (WAQR). What resolves may be a
+    # file, a jar carrying the definition, or - when the runtime .xml
+    # was never committed - the Report Designer 1.x `.report` source
+    # beside the xaction.
     res_ref = next((m for _n, _t, m in report_action.resources), None)
     location = x.resources.get(res_ref or "", "")
-    if not location:
+    resolution_notes = []
+    inline_name = res_ref if res_ref in x.inline_resources else ""
+
+    if not location and not inline_name:
+        rn_input = next((m for n, _t, m in report_action.inputs
+                         if n == "resource-name"), None)
+        if rn_input:
+            inp = next((i for i in x.inputs if i.name == rn_input), None)
+            pick = (inp.default if inp and inp.default else "")
+            if not pick:
+                for i2 in x.inputs:
+                    for pm in i2.list_maps:
+                        if pm.get(rn_input):
+                            pick = pm[rn_input]
+                            break
+                    if pick:
+                        break
+            if pick and pick in x.resources:
+                location = x.resources[pick]
+                others = sorted(n for n, loc in x.resources.items()
+                                if n != pick and loc.endswith(".xml"))
+                resolution_notes.append(
+                    f"the sequence picks its definition at run time via "
+                    f"'{rn_input}' - converted with {pick!r} "
+                    f"({location}), the platform's own default choice; "
+                    "the alternates convert the same way: "
+                    + ", ".join(others[:8]))
+
+    if not location and not inline_name:
         location = next((loc for name, loc in x.resources.items()
                          if name.startswith("report-definition")), "")
+    if not location and not inline_name:
+        location = next((loc for name, loc in x.resources.items()
+                         if name.startswith("report-jar")
+                         or loc.lower().endswith(".jar")), "")
+    if not location and not inline_name:
+        inline_name = next((n for n in x.inline_resources
+                            if n.startswith("report-definition")), "")
+
     def _sibling(name):
         try:
             return resolver(name)
@@ -466,28 +571,126 @@ def build_report_model(xaction_source, resolver=None) -> ReportModel:
 
     derived, script_states = _scripted_values(x)
 
+    def _parse_definition(data, defaults):
+        from pentaho_migration.reports.reportdesigner1_parser import (
+            looks_like_designer1, parse_designer1_report)
+        if looks_like_designer1(data):
+            return parse_designer1_report(data)
+        return parse_jfreereport(data, resource_loader=_sibling,
+                                 input_defaults=defaults)
+
     model = ReportModel()
-    if location:
+    defaults = {i.name: i.default for i in x.inputs if i.default}
+    defaults.update(derived)
+
+    if inline_name:
+        data = x.inline_resources[inline_name]
+        # WAQR definitions template their headers from parser-config
+        # properties (${reportheader}) - the platform substituted them,
+        # so conversion does too
         try:
-            defaults = {i.name: i.default for i in x.inputs if i.default}
-            defaults.update(derived)
-            model = parse_jfreereport(
-                resolver(location), resource_loader=_sibling,
-                input_defaults=defaults)
-        except FileNotFoundError:
+            cfg = ET.fromstring(data).find("parser-config")
+            if cfg is not None:
+                for prop in cfg.iter("property"):
+                    if prop.get("name") and (prop.text or "").strip():
+                        derived.setdefault(prop.get("name"),
+                                           prop.text.strip())
+                        defaults.setdefault(prop.get("name"),
+                                            prop.text.strip())
+        except ET.ParseError:
+            pass
+        try:
+            model = _parse_definition(data, defaults)
             model.issues.append(
-                f"report definition {location!r} was not uploaded with the "
-                ".xaction - upload the paired report XML from the same "
-                "solution folder to convert the layout")
+                "the report definition was embedded INLINE in the "
+                "xaction (the WAQR ad-hoc pattern) - parsed straight "
+                "from the sequence, nothing to upload")
         except ET.ParseError as exc:
             model.issues.append(
-                f"report definition {location!r} did not parse ({exc}) - "
+                f"the inline report definition did not parse ({exc}) - "
                 "the layout must be rebuilt by hand")
+    elif location and location.lower().endswith(".jar"):
+        jar_bytes = _sibling(location)
+        candidate = None
+        if jar_bytes and jar_bytes[:2] == b"PK":
+            import io
+            import zipfile
+            with zipfile.ZipFile(io.BytesIO(jar_bytes)) as z:
+                for entry in z.namelist():
+                    if not entry.lower().endswith(".xml"):
+                        continue
+                    body = z.read(entry)
+                    if b"<report" in body[:2000]:
+                        candidate = (entry, body)
+                        break
+        if candidate:
+            entry, body = candidate
+            try:
+                model = _parse_definition(body, defaults)
+                model.issues.append(
+                    f"the report definition was extracted from "
+                    f"{location!r} (entry {entry!r}) - jar-shipped "
+                    "definitions convert like any other")
+            except ET.ParseError as exc:
+                model.issues.append(
+                    f"the definition inside {location!r} did not parse "
+                    f"({exc}) - the layout must be rebuilt by hand")
+        else:
+            model.issues.append(
+                f"the report definition ships inside {location!r}, which "
+                "was not uploaded with the solution - include the jar "
+                "and re-convert (definitions are extracted from jars)")
+    elif location:
+        try:
+            model = _parse_definition(resolver(location), defaults)
+        except FileNotFoundError:
+            fallback = _sibling(Path(location).stem + ".report")
+            if fallback:
+                try:
+                    model = _parse_definition(fallback, defaults)
+                    model.issues.append(
+                        f"the runtime definition {location!r} was never "
+                        "committed, but its Report Designer 1.x source "
+                        f"('{Path(location).stem}.report') sits beside "
+                        "the xaction - the layout was recovered from "
+                        "the designer source; verify against a rendered "
+                        "original if one exists")
+                except ET.ParseError:
+                    fallback = None
+            if not fallback:
+                model.issues.append(
+                    f"report definition {location!r} was not uploaded "
+                    "with the .xaction - upload the paired report XML "
+                    "from the same solution folder to convert the layout")
+        except ET.ParseError as exc:
+            repaired = None
+            try:
+                raw = resolver(location)
+                fixed = _repair_nested_comments(
+                    raw.decode("utf-8", "replace"))
+                if fixed is not None:
+                    repaired = _parse_definition(
+                        fixed.encode("utf-8"), defaults)
+            except Exception:
+                repaired = None
+            if repaired is not None:
+                model = repaired
+                model.issues.append(
+                    f"the definition's own XML was malformed ({exc}) - "
+                    "an unterminated/nested comment was repaired "
+                    "tolerantly (everything between the stray comment "
+                    "markers stays commented); review that region "
+                    "against the original")
+            else:
+                model.issues.append(
+                    f"report definition {location!r} did not parse "
+                    f"({exc}) - the layout must be rebuilt by hand")
     else:
         model.issues.append(
             "the xaction names no report-definition resource (the definition "
             "may be inline or generated) - the layout must come from the "
             "original solution folder")
+    model.issues.extend(resolution_notes)
     model.name = x.title if x.title and not x.title.startswith("%") else \
         (Path(x.name).stem if x.name else model.name)
 

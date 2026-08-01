@@ -9,6 +9,7 @@ export const TOOLS = {
   datastage: { short: 'DS', label: 'IBM DataStage', color: '#9085e9' },
   crystal: { short: 'CR', label: 'SAP Crystal Reports', color: '#f0ab00' },
   xaction: { short: 'XA', label: 'Pentaho BI Platform (.xaction + .report)', color: '#005f9e' },
+  airflow: { short: 'AF', label: 'Apache Airflow', color: '#017cee' },
 }
 
 export const toolLabel = (tool) => TOOLS[tool]?.label ?? tool

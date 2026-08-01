@@ -542,3 +542,85 @@ class TestLegacyExtParser:
         # condition references a name nothing declares ('Total Selected')
         assert kinds["manual"], "the Total Selected arrow stays honest"
         assert all("Total Selected" in n for n in kinds["manual"])
+
+
+class TestDefinitionResolution:
+    """Corpus2 gap #4: the five ways an estate hides its definition.
+    Each case is a real file from the harvest (plus one synthetic jar,
+    since the estate never committed its own)."""
+
+    C2 = Path("samples/xactions/corpus2")
+
+    def _find(self, pattern):
+        hit = next(self.C2.rglob(pattern), None)
+        if hit is None:
+            pytest.skip("corpus2 not present")
+        return hit
+
+    def test_waqr_inline_definitions_parse_from_the_xaction(self):
+        m = build_report_model(self._find("recruiter_report.waqr.xaction"))
+        assert sum(len(s.elements) for s in m.sections) > 20
+        assert any("embedded INLINE" in i for i in m.issues)
+        # the ${reportheader} parser-config property fed the title
+        texts = " ".join(e.text + e.text_template
+                         for s in m.sections for e in s.elements)
+        assert "Recruiter Report" in texts
+
+    def test_resource_name_input_picks_the_platforms_definition(self):
+        m = build_report_model(
+            self._find("JFreeReport_Chart_ChartTypes.xaction"))
+        assert m.sections, "the picked definition should parse"
+        note = next(i for i in m.issues if "picks its definition" in i)
+        assert "'multipie'" in note and "alternates" in note
+
+    def test_missing_jar_gets_the_pointed_note(self):
+        m = build_report_model(
+            self._find("jfreereport-reports-test-2.xaction"))
+        assert any("ships inside" in i and ".jar" in i for i in m.issues)
+
+    def test_a_jar_shipped_definition_extracts(self, tmp_path):
+        import io
+        import zipfile
+        definition = (
+            '<report name="Jarred" pageformat="LETTER">'
+            '<items><label x="0" y="0" width="100" height="12">'
+            "hello</label></items></report>")
+        jar = io.BytesIO()
+        with zipfile.ZipFile(jar, "w") as z:
+            z.writestr("reports/demo.xml", definition)
+        (tmp_path / "demo.jar").write_bytes(jar.getvalue())
+        (tmp_path / "j.xaction").write_text(
+            "<action-sequence><name>j</name>"
+            "<resources><report-jar><solution-file>"
+            "<location>demo.jar</location>"
+            "<mime-type>application/x-java-archive</mime-type>"
+            "</solution-file></report-jar></resources>"
+            "<inputs/><actions><action-definition>"
+            "<component-name>JFreeReportComponent</component-name>"
+            "<action-inputs/><action-resources/>"
+            "<component-definition/>"
+            "</action-definition></actions></action-sequence>",
+            encoding="utf-8")
+        m = build_report_model(tmp_path / "j.xaction")
+        assert sum(len(s.elements) for s in m.sections) == 1
+        assert any("extracted from" in i for i in m.issues)
+
+    def test_designer1_source_recovers_a_missing_runtime_xml(self):
+        m = build_report_model(self._find("prikaz_vidacha_licen.xaction"))
+        assert m.definition_format == "designer1"
+        assert sum(len(s.elements) for s in m.sections) >= 10
+        assert any("designer source" in i.lower() or "recovered" in i
+                   for i in m.issues)
+
+    def test_a_typoed_comment_closer_is_repaired(self):
+        from pentaho_migration.reports.xaction_parser import (
+            _repair_nested_comments)
+        fixed = _repair_nested_comments(
+            "<r><!-- oops ->> <a/><!-- fine --><b/></r>")
+        assert fixed is not None and "->>" not in fixed
+        import xml.etree.ElementTree as ET
+        assert len(ET.fromstring(fixed)) == 2
+        m = build_report_model(
+            self._find("billing_dashboard_report.xaction"))
+        assert sum(len(s.elements) for s in m.sections) >= 10
+        assert any("repaired" in i for i in m.issues)
