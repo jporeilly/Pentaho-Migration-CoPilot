@@ -18,6 +18,12 @@ def test_health():
 
 
 def test_index_serves_ui():
+    from pentaho_migration.api.main import UI_DIST
+
+    if not UI_DIST.is_dir():
+        import pytest
+
+        pytest.skip("frontend not built (npm run build) - API-only checkout")
     res = client.get("/")
     assert res.status_code == 200
     assert "Migration" in res.text

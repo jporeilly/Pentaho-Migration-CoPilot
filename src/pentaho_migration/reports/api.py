@@ -744,6 +744,7 @@ def release_check_start(dump: UploadFile, jndi: str = "",
                 "consultant_report_pdf": _consultant_pdf_base64(
                     model, check, rate),
             }
+            _persist_gate_verdict(source_name, check)
             job["stage"] = "done"
             job["status"] = "done"
         except Exception as exc:
@@ -753,6 +754,32 @@ def release_check_start(dump: UploadFile, jndi: str = "",
 
     _gate_jobs.run(job, run)
     return {"job": job_id}
+
+
+def _persist_gate_verdict(source_name: str, check) -> None:
+    """Stamp the gate's SHIP/REVIEW into the project store when the
+    uploaded source matches a batch-recorded report - the Project page
+    then shows the estate's gate state, not just this session's. A
+    report that was never batch-recorded simply isn't stamped."""
+    import json as _json
+
+    from pentaho_migration.project import (
+        find_report_for_source, set_report_gate)
+
+    try:
+        record = find_report_for_source(source_name)
+        if record is None:
+            return
+        set_report_gate(record.file, check.verdict, _json.dumps({
+            "original_pages": check.original_pages,
+            "converted_pages": check.converted_pages,
+            "groups_checked": check.groups_checked,
+            "groups_matching": check.groups_matching,
+            "findings": [{"severity": f.severity, "code": f.code,
+                          "message": f.message} for f in check.findings],
+        }))
+    except Exception:                      # persistence must never fail a gate
+        logger.exception("gate verdict persistence failed for %s", source_name)
 
 
 def _consultant_pdf_base64(model, check, rate) -> str:

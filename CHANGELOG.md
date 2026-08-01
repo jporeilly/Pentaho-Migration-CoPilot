@@ -7,6 +7,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **Estate mode: the whole engagement in the web app.** The Project
+  page batch-converts a SELECTION of uploads into the project store -
+  PowerCenter/Talend exports, RptToXml dumps, .rpt binaries, .xactions
+  and solution zips, routed by content exactly like the single-file
+  flow - with staged progress, per-file failures as findings, and
+  sources persisted under config/estate/ so sweeps and re-opens keep
+  working after the browser closes.
+- **The engagement deliverable pack.** One button, one zip: every
+  stored source re-converted, each .ktr/.prpt beside its consultant
+  report, the portfolio reports, and a MANIFEST.json where anything
+  that failed to convert is listed rather than silently missing.
+- **The release-gate verdict persists.** Running the gate from the
+  Download page now stamps SHIP/REVIEW (with a findings summary) into
+  the project store when the source matches a batch-recorded report;
+  the Project page shows it as a Gate chip beside Triage and Parity.
+- **CI is green again.** The workflow had been failing on every push:
+  a runtime dependency (pypdf) was never declared, three tests assumed
+  the local Pentaho server's web assets, one assumed a built frontend,
+  one lacked its pytest import - and `resolve_source_path` could not
+  read Windows-style stored paths on a POSIX runner, a real
+  portability bug for engagement stores moved between machines
+  (backslash paths now normalise before the rebase/basename
+  fallbacks).
+
 ## [1.44.2] - 2026-08-01
 
 - **ONE consultant flow on every workflow.** Running the release check

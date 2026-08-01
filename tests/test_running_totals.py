@@ -3,6 +3,7 @@ The {#name} references resolve through the same summary machinery as the
 WhilePrintingRecords variable rewrite (an Item*Function read mid-detail IS
 the running value - live-verified mapping)."""
 
+import pytest
 from pathlib import Path
 
 from pentaho_migration.reports import load_report_model

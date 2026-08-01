@@ -61,6 +61,12 @@ def resolve_source_path(raw: str) -> Path | None:
     p = Path(raw)
     if p.is_file():
         return p
+    # the store may carry Windows-style paths while the server runs on
+    # POSIX (an engagement store moved between machines) - backslashes
+    # never appear in the repo's own relative segments, so normalising
+    # them is safe and makes the rebase/basename fallbacks portable
+    if "\\" in raw:
+        p = Path(raw.replace("\\", "/"))
     parts = p.parts
     if "samples" in parts:
         candidate = REPO_ROOT.joinpath(*parts[parts.index("samples"):])
@@ -193,7 +199,8 @@ CREATE TABLE IF NOT EXISTS reports (
 
 # agent-result columns added after the table first shipped (auto-migrated)
 _REPORTS_AGENT_COLUMNS = ("triage_verdict", "triage_json",
-                          "parity_verdict", "parity_note")
+                          "parity_verdict", "parity_note",
+                          "gate_verdict", "gate_json")
 
 
 def _ensure_reports(conn) -> None:
@@ -219,6 +226,8 @@ class ReportRecord(BaseModel):
     triage_json: str = ""      # TriageResult detail as JSON (reasons, sql, layout)
     parity_verdict: str = ""   # PASS | NEAR | FAIL | '' (never checked)
     parity_note: str = ""
+    gate_verdict: str = ""     # SHIP | REVIEW | '' (release gate never run)
+    gate_json: str = ""        # gate summary: pages, findings, groups
     updated_at: str = ""
 
 
@@ -276,6 +285,40 @@ def set_report_triage(file: str, verdict: str, detail_json: str) -> bool:
             (verdict, detail_json, file),
         )
     return cursor.rowcount > 0
+
+
+def set_report_gate(file: str, verdict: str, detail_json: str) -> bool:
+    """Persist a release-gate verdict (SHIP/REVIEW + summary JSON) so the
+    Project page carries the estate's gate state, not just the upload
+    session that happened to run it."""
+    with _connect() as conn:
+        _ensure_reports(conn)
+        cursor = conn.execute(
+            "UPDATE reports SET gate_verdict=?, gate_json=?, "
+            "updated_at=datetime('now') WHERE file=?",
+            (verdict, detail_json, file),
+        )
+    return cursor.rowcount > 0
+
+
+def find_report_for_source(source_name: str) -> "ReportRecord | None":
+    """The stored report an UPLOADED source corresponds to, matched by
+    file name, then by stem (the upload may be 'x.rpt' where the store
+    holds the 'x.xml' dump, or vice versa)."""
+    from pathlib import Path as _P
+
+    name = _P(source_name or "").name
+    stem = _P(name).stem.lower()
+    if not stem:
+        return None
+    records = list_reports()
+    for r in records:
+        if r.file == name:
+            return r
+    for r in records:
+        if _P(r.file).stem.lower() == stem                 or _P(r.source_path or "").stem.lower() == stem:
+            return r
+    return None
 
 
 def set_report_parity(file: str, verdict: str, note: str) -> bool:

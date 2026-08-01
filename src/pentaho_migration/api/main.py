@@ -10,6 +10,7 @@ Interactive API docs at /docs.
 import json
 import logging
 import os
+from datetime import datetime
 import tempfile
 import threading
 import time
@@ -801,6 +802,99 @@ def project_sweep_status(job: str) -> dict:
     if state is None:
         raise HTTPException(status_code=404, detail="unknown sweep job")
     return state
+
+
+# ------------------------------------------------------------ estate mode
+
+_estate_jobs = JobStore()
+
+
+@app.post("/project/batch/start", dependencies=[Depends(require_api_key)])
+def project_batch_start(exports: list[UploadFile],
+                        jndi: str = "") -> dict[str, str]:
+    """Estate mode: batch-convert a SELECTION of uploads into the
+    project store - the CLI `batch`/`report-batch` loops behind one
+    staged job. Files route by content (PowerCenter/Talend exports,
+    RptToXml dumps, .rpt binaries, .xactions, solution zips); sources
+    persist under config/estate/ so sweeps and re-opens keep working."""
+    from pentaho_migration.estate import batch_convert_files
+
+    uploads = [(f.filename or f"upload_{i}", f.file.read())
+               for i, f in enumerate(exports)]
+    for _name, data in uploads:
+        if len(data) > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail=(
+                f"an upload exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)} MB"))
+    job_id, job = _estate_jobs.start(
+        stages=["converting", "done"], done=0, total=len(uploads))
+
+    def run() -> None:
+        def progress(done: int, total: int, name: str) -> None:
+            job["done"], job["total"], job["detail"] = done, total, name
+
+        summary = batch_convert_files(uploads, jndi=jndi, progress=progress)
+        job["detail"] = ""
+        summary["rows"] = [_project_row(r).model_dump()
+                           for r in list_mappings()]
+        summary["reports_rows"] = [r.model_dump() for r in list_reports()]
+        job["result"] = summary
+
+    _estate_jobs.run(job, run)
+    return {"job": job_id}
+
+
+@app.post("/project/pack/start", dependencies=[Depends(require_api_key)])
+def project_pack_start(jndi: str = "", rate: float = 150.0) -> dict[str, str]:
+    """Build the engagement deliverable pack: one zip with every stored
+    artifact re-converted, its consultant report beside it, the
+    portfolio reports and a manifest. Poll /project/sweep/status-style;
+    download via /project/pack/download when done."""
+    from pentaho_migration.estate import build_deliverable_pack
+    from pentaho_migration.project import REPO_ROOT as _ROOT
+
+    total = len(list_mappings()) + len(list_reports())
+    if not total:
+        raise HTTPException(status_code=404,
+                            detail="the project store is empty - batch-convert "
+                                   "an estate first")
+    job_id, job = _estate_jobs.start(
+        stages=["packing", "done"], done=0, total=total)
+    out = _ROOT / "config" / "packs" / f"pack_{job_id}.zip"
+
+    def run() -> None:
+        def progress(done: int, total_: int, name: str) -> None:
+            job["done"], job["total"], job["detail"] = done, total_, name
+
+        summary = build_deliverable_pack(out, jndi=jndi, rate=rate,
+                                         progress=progress)
+        job["detail"] = ""
+        job["result"] = {**summary, "download": f"/project/pack/download?job={job_id}"}
+        job["pack_path"] = str(out)
+
+    _estate_jobs.run(job, run)
+    return {"job": job_id}
+
+
+@app.get("/project/estate/status")
+def project_estate_status(job: str) -> dict:
+    state = _estate_jobs.get(job)
+    if state is None:
+        raise HTTPException(status_code=404, detail="unknown estate job")
+    return {k: v for k, v in state.items() if k != "pack_path"}
+
+
+@app.get("/project/pack/download")
+def project_pack_download(job: str) -> FileResponse:
+    state = _estate_jobs.get(job)
+    if state is None or state.get("status") != "done"             or not state.get("pack_path"):
+        raise HTTPException(status_code=404,
+                            detail="no finished pack for that job id")
+    path = Path(state["pack_path"])
+    if not path.is_file():
+        raise HTTPException(status_code=410, detail="pack file was removed")
+    stamp = datetime.now().strftime("%Y-%m-%d")
+    return FileResponse(path, media_type="application/zip",
+                        filename=f"migration_deliverables_{stamp}.zip")
 
 
 class SettingsResponse(BaseModel):

@@ -33,6 +33,11 @@ export default function ProjectPage({ onBack, onOpen, context }) {
   // a scroll, not a worklist.
   const [reportQuery, setReportQuery] = useState('')
   const [reportVerdict, setReportVerdict] = useState('all')
+  const [estateBusy, setEstateBusy] = useState(false)
+  const [estate, setEstate] = useState(null)     // {stage,stages,done,total,detail} while running
+  const [estateResult, setEstateResult] = useState(null)
+  const [packBusy, setPackBusy] = useState(false)
+  const [pack, setPack] = useState(null)
 
   const refresh = useCallback(async () => {
     const res = await fetch('/project')
@@ -59,6 +64,62 @@ export default function ProjectPage({ onBack, onOpen, context }) {
       body: JSON.stringify({ file: row.file, status }),
     })
     refresh()
+  }
+
+  async function pollEstate(job, setProgress) {
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 800))
+      const st = await fetch(`/project/estate/status?job=${job}`)
+      const state = await st.json()
+      if (!st.ok) throw new Error(state.detail || st.statusText)
+      setProgress({ stage: state.stage, stages: state.stages,
+                    done: state.done, total: state.total, detail: state.detail })
+      if (state.status === 'done') return state.result
+      if (state.status === 'error') throw new Error(state.detail || 'job failed')
+    }
+  }
+
+  async function runEstateBatch(files) {
+    if (!files?.length) return
+    setEstateBusy(true)
+    setEstateResult(null)
+    setAgentError('')
+    try {
+      const form = new FormData()
+      for (const f of files) form.append('exports', f)
+      const res = await fetch(`/project/batch/start?jndi=${encodeURIComponent(jndi)}`,
+                              { method: 'POST', body: form })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      const result = await pollEstate(body.job, setEstate)
+      setEstateResult(result)
+      refresh()
+    } catch (err) {
+      setAgentError(`Batch convert failed: ${err.message}`)
+    } finally {
+      setEstateBusy(false)
+      setEstate(null)
+    }
+  }
+
+  async function runPack() {
+    setPackBusy(true)
+    setPack(null)
+    setAgentError('')
+    try {
+      const rate = localStorage.getItem('consultantRate') || '150'
+      const res = await fetch(
+        `/project/pack/start?jndi=${encodeURIComponent(jndi)}&rate=${encodeURIComponent(rate)}`,
+        { method: 'POST' })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.detail || res.statusText)
+      setPack(await pollEstate(body.job, setEstate))
+    } catch (err) {
+      setAgentError(`Deliverable pack failed: ${err.message}`)
+    } finally {
+      setPackBusy(false)
+      setEstate(null)
+    }
   }
 
   async function pollSweep(job, kind) {
@@ -132,6 +193,17 @@ export default function ProjectPage({ onBack, onOpen, context }) {
       const d = JSON.parse(row.review_json || '{}')
       const parts = (d.findings || d.reasons || []).slice(0, 4)
       return parts.map((f) => (typeof f === 'string' ? f : `[${f.code}] ${f.message}`)).join('\n')
+    } catch {
+      return ''
+    }
+  }
+
+  function gateSummary(row) {
+    try {
+      const d = JSON.parse(row.gate_json || '{}')
+      const head = `original ${d.original_pages}pp vs converted ${d.converted_pages}pp`
+      const finds = (d.findings || []).slice(0, 4).map((f) => `[${f.code}] ${f.message}`)
+      return [head, ...finds].join('\n')
     } catch {
       return ''
     }
@@ -283,8 +355,44 @@ export default function ProjectPage({ onBack, onOpen, context }) {
             {reports.length ? ` · ${reports.length} Crystal` : ''}
           </span>
         </h2>
-        <button className="ghost" onClick={refresh}>↻ Refresh</button>
+        <div className="triage-bar">
+          <label className={estateBusy ? 'ghost file-btn disabled' : 'ghost file-btn'}
+            title="Batch-convert a selection of exports into the project store: PowerCenter/Talend XML, RptToXml dumps, .rpt binaries, .xactions, solution zips — routed by content">
+            {estateBusy ? 'Converting…' : '⬆ Batch convert exports'}
+            <input type="file" multiple hidden disabled={estateBusy}
+              onChange={(e) => { runEstateBatch([...e.target.files]); e.target.value = '' }} />
+          </label>
+          <button className="primary" onClick={runPack} disabled={packBusy}
+            title="One zip: every stored artifact re-converted, its consultant report beside it, the portfolio reports and a manifest — the engagement hand-over">
+            {packBusy ? 'Packing…' : '📦 Deliverable pack'}
+          </button>
+          <button className="ghost" onClick={refresh}>↻ Refresh</button>
+        </div>
       </header>
+      {estate && (
+        <StageBar stage={estate.stage} stages={estate.stages}
+          done={estate.done} total={estate.total} detail={estate.detail} />
+      )}
+      {estateResult && (
+        <p className="summary">
+          Batch converted <b>{estateResult.etl_mappings}</b> ETL mapping(s) and{' '}
+          <b>{estateResult.reports}</b> report(s).
+          {estateResult.failed?.length > 0 && (
+            <> <b>{estateResult.failed.length} failed:</b> {estateResult.failed.slice(0, 3).join(' · ')}</>
+          )}
+          {estateResult.skipped?.length > 0 && (
+            <> <span className="muted">{estateResult.skipped.length} skipped (unrecognised format).</span></>
+          )}
+        </p>
+      )}
+      {pack && (
+        <p className="summary">
+          📦 Pack ready — <b>{pack.etl_mappings_packed}</b> mapping(s) +{' '}
+          <b>{pack.reports_packed}</b> report(s), {(pack.bytes / 1048576).toFixed(1)} MB.
+          {pack.failures?.length > 0 && <> {pack.failures.length} item(s) failed (listed in the manifest).</>}{' '}
+          <a className="portfolio-link" href={pack.download}>⬇ Download</a>
+        </p>
+      )}
       <Explain>
         The whole engagement in one place — every artifact <b>batch-converted</b>
         into the store (<code>pentaho-migrate batch</code> for ETL exports,
@@ -417,6 +525,7 @@ export default function ProjectPage({ onBack, onOpen, context }) {
               <tr>
                 <th>Report</th><th>Dump file</th>
                 <th title="Batch-triage verdict — click a chip for reasons">Triage</th>
+                <th title="Release-gate verdict — rendered original vs rendered conversion (runs from the Download page)">Gate</th>
                 <th title="Output parity vs the customer's Crystal export (upload PDF/CSV)">Parity</th>
                 <th className="num" title="Formulas translated deterministically">✓ auto</th>
                 <th className="num" title="Formulas needing a human glance">⚠ review</th>
@@ -446,6 +555,14 @@ export default function ProjectPage({ onBack, onOpen, context }) {
                         {reasons.length > 0 && ` (${reasons.length})`}
                       </button>
                     ) : <span className="muted">—</span>}
+                  </td>
+                  <td>
+                    {r.gate_verdict
+                      ? <span className={r.gate_verdict === 'SHIP' ? 'gate-ship' : 'gate-review'}
+                          title={gateSummary(r)}>
+                          {r.gate_verdict === 'SHIP' ? '✅ SHIP' : '⚠ REVIEW'}
+                        </span>
+                      : <span className="muted">—</span>}
                   </td>
                   <td>
                     {parityBusy === r.file ? (

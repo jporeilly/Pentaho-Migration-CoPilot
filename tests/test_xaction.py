@@ -411,11 +411,22 @@ class TestXactionNoteClassification:
         assert manual == []
 
 
+def _has_server_assets() -> bool:
+    """The three live-styling tests verify images EMBEDDING from a local
+    Pentaho server install (webapps roots) - on a machine without one the
+    resolver stamps placeholders by design, which other tests cover."""
+    from pentaho_migration.reports.jfreereport_parser import _asset_roots
+
+    return bool(_asset_roots())
+
+
 class TestLegacyExtParser:
     """The OTHER old dialect (report-definition root) translates for real:
     styled object graphs, resource bundles, ported functions, conditional
     images, chart expressions. Steel Wheels ships four of them."""
 
+    @pytest.mark.skipif(not _has_server_assets(),
+                        reason="needs the local Pentaho server's web assets")
     def test_inventory_layout_translates_with_live_styling(self):
         m = build_report_model(SW / "Inventory List.xaction")
         assert [g.column for g in m.groups] == ["PRODUCTLINE"]
@@ -485,6 +496,8 @@ class TestLegacyExtParser:
         assert (total.operation, total.group_field, total.running) == \
             ("Sum", "ORDERNUMBER", True)
 
+    @pytest.mark.skipif(not _has_server_assets(),
+                        reason="needs the local Pentaho server's web assets")
     def test_variance_resolves_everything(self):
         m = build_report_model(SW / "Variance Report.xaction")
         # JS arithmetic evaluated + fragments substituted -> runnable SQL
@@ -530,6 +543,8 @@ class TestLegacyExtParser:
         # the pie lives in the nested EXT sub-report (Product Line Mix)
         assert {c.chart_type for c in charts_of(m)} >= {"bar", "pie"}
 
+    @pytest.mark.skipif(not _has_server_assets(),
+                        reason="needs the local Pentaho server's web assets")
     def test_pipeline_work_classifies_applied_not_manual(self):
         from pentaho_migration.reports.todo_kinds import split_todos
         m = build_report_model(SW / "Variance Report.xaction")
