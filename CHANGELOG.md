@@ -9,6 +9,37 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The converter INSERTS the Sort rows steps PDI needs** - suggest and
+  apply, not just log. Group By / Merge Join / Unique rows run green on
+  unsorted input and produce silently wrong results; the source engines
+  sorted internally. The mapper now synthesizes a `Sort rows` step on
+  every unsorted leg, carrying the keys the target actually needs
+  (group keys; per-leg join keys - a Merge Join gets BOTH legs), marked
+  confidence=review with a note saying why it exists. Legs whose keys
+  are not knowable from the export stay flagged instead of getting a
+  sort that sorts nothing. One source of truth: the mapper's insertion
+  and the review agent's lint share the same semantics table and
+  upstream walk, and the lint now checks EVERY leg (one sorted join leg
+  no longer passes). The source diagram hides inserted steps (they have
+  no source-tool counterpart); the converted diagram shows them with
+  their review badge.
+- **Defaults now OPEN the report with data.** order_detail authored
+  customer 103 with a 2005-01-01..2005-01-05 window - authored against
+  the ORIGINAL estate's database; on the demo connection those three
+  orders live in 2003-2004, so every default was set and the report
+  still opened empty. The API layer now probes the query with the
+  substituted defaults and, when nothing comes back, repoints the date
+  window at the data's own MIN/MAX span for the selected defaults -
+  noted as applied work, review flagged. General logic: any DateField
+  parameters bounding one date column, any report.
+- **Live-demo polish**: wireframe labels CLIP to their element's box
+  (SVG clipPath - a long field name can never overlap its neighbour,
+  any report); the upload bar drops the document emoji (the product
+  badge already names the family); the Download actions read in
+  workflow order with 📊 Consultant report last, after PDF preview; the
+  release-check-not-available message renders as a readable note block
+  instead of one long error line.
+
 - **The agent stack reaches the ETL families** (task #42). The 🛡 ETL
   **review agent** is the Crystal release gate's counterpart for
   transformations: deterministic checks over the CONVERTED graph -

@@ -50,6 +50,7 @@ _RULES = (
     (APPLIED, re.compile(r"\blayered-visibility layout translated\b", re.I)),
     (APPLIED, re.compile(r"\bdefault padded to\b", re.I)),
     (APPLIED, re.compile(r"\brepaired to\b", re.I)),
+    (APPLIED, re.compile(r"\brepointed to the data's own span\b", re.I)),
     (APPLIED, re.compile(r"\bremoved so the query runs its DEFAULT\b", re.I)),
     (APPLIED, re.compile(r"\btemplated field binding\(s\) resolved\b", re.I)),
     (APPLIED, re.compile(r"\bembedded from the local server\b", re.I)),

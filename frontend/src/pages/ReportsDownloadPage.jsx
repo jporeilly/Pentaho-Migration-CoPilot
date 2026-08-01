@@ -244,21 +244,21 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
             ⬇ Conversion report (.md)
           </button>
           {file && (
-            <>
-              <button className="ghost" onClick={runConsultant} disabled={consultBusy}
-                title="Action plan + costed effort from the conversion itself — no reference render needed">
-                {consultBusy ? 'Building…' : '📊 Consultant report'}
-              </button>
-              <button className="primary" onClick={runReleaseCheck} disabled={gateBusy}
-                title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
-                {gateBusy ? 'Comparing…' : '🛡 Release check'}
-              </button>
-            </>
+            <button className="primary" onClick={runReleaseCheck} disabled={gateBusy}
+              title="Render the ORIGINAL .rpt and the converted .prpt, compare them, and produce the consultant report - needs the original beside the dump">
+              {gateBusy ? 'Comparing…' : '🛡 Release check'}
+            </button>
           )}
           {file && (
             <button className="ghost" onClick={openPdfPreview} disabled={previewBusy}
               title="Render the .prpt through the real Pentaho Reporting engine with an empty dataset — needs a local Report Designer install">
               {previewBusy ? 'Rendering…' : '🔍 PDF preview'}
+            </button>
+          )}
+          {file && (
+            <button className="ghost" onClick={runConsultant} disabled={consultBusy}
+              title="Action plan + costed effort from the conversion itself — no reference render needed">
+              {consultBusy ? 'Building…' : '📊 Consultant report'}
             </button>
           )}
           {file && (
@@ -285,7 +285,14 @@ export default function ReportsDownloadPage({ report, file, onReconvert, loading
           </button>
         </div>
         {previewError && <div className="error">{previewError}</div>}
-        {gateError && <div className="error">Release check could not run: {gateError} — downloads are unlocked.</div>}
+        {gateError && (
+          <div className="gate-note">
+            <b>Release check not available for this report.</b>
+            <p>{gateError}</p>
+            <p className="muted">Downloads are unlocked — review via the PDF
+              preview and the conversion report instead.</p>
+          </div>
+        )}
         {prdNote && <p className="muted">{prdNote}</p>}
         {downloadsLocked && (
           <p className="muted">

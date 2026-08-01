@@ -4,7 +4,7 @@
 // wireframe previews both source and target layout. A design-time view —
 // use the PDF preview for the engine-rendered version.
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
 const BAND_ORDER = ['ReportHeader', 'PageHeader', 'GroupHeader', 'Detail',
   'GroupFooter', 'ReportFooter', 'PageFooter']
@@ -77,6 +77,10 @@ export default function LayoutPreview({ sections }) {
   const [fit, setFit] = useState(true)
   const scaleY = fit && overflows ? Math.min(SCALE_Y, fitScale) : SCALE_Y
 
+  // labels CLIP to their element's box - a name longer than its field
+  // can never spill into the neighbour (CUSTOMERNAME over the next box)
+  const clipBase = useId()
+
   let y = 0
   const bands = visible.map((s) => {
     const h = Math.max(s.height, 14) * scaleY
@@ -130,11 +134,18 @@ export default function LayoutPreview({ sections }) {
                       fontFamily="system-ui">▤</text>
                   )}
                   {eh >= 10 && el.width >= 24 && (
-                    <text x={LABEL_W + el.x + 3} y={ey + Math.min(eh - 4, 12)}
-                      fill={el.kind === 'unknown' ? 'var(--status-serious)' : 'var(--text-secondary)'}
-                      fontSize="8.5" fontFamily="system-ui">
-                      {el.label.slice(0, Math.floor(el.width / 4.5))}
-                    </text>
+                    <>
+                      <clipPath id={`${clipBase}-${i}-${j}`}>
+                        <rect x={LABEL_W + el.x} y={ey}
+                          width={Math.max(el.width - 2, 2)} height={eh} />
+                      </clipPath>
+                      <text x={LABEL_W + el.x + 3} y={ey + Math.min(eh - 4, 12)}
+                        clipPath={`url(#${clipBase}-${i}-${j})`}
+                        fill={el.kind === 'unknown' ? 'var(--status-serious)' : 'var(--text-secondary)'}
+                        fontSize="8.5" fontFamily="system-ui">
+                        {el.label.slice(0, Math.ceil(el.width / 4))}
+                      </text>
+                    </>
                   )}
                 </g>
               )

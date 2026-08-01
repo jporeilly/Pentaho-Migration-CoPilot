@@ -478,9 +478,93 @@ def _fill_lov_defaults(model) -> None:
             continue
 
 
+def _widen_empty_date_window(model) -> None:
+    """When the authored defaults return NO rows on the live connection,
+    repoint the date window at the data's own span.
+
+    The order_detail case: the xaction authors customer 103 with a
+    2005-01-01..2005-01-05 window - authored against the ORIGINAL
+    estate's database. On this connection customer 103's orders all live
+    in 2003-2004, so every default is set and the report still opens
+    empty. The defaults exist to open the report WITH data (the same
+    contract as the pick-list pre-select), so: probe the query with all
+    defaults substituted; if it returns nothing and the date parameters
+    bound a single column, ask the data for MIN/MAX of that column with
+    the date conditions lifted, and make THAT the window - noted, and
+    flagged for review."""
+    import re as _re
+
+    from pentaho_migration.reports.schema_agent import (
+        preview_query, substitute_params)
+
+    date_prms = [p for p in model.parameters
+                 if p.value_type == "DateField" and p.default]
+    if not (model.sql and model.jndi and date_prms):
+        return
+    params = [{"name": p.name, "default": p.default}
+              for p in model.parameters]
+    try:
+        got = preview_query(model.jndi,
+                            substitute_params(model.sql, params), limit=1)
+        if got.get("rows") if isinstance(got, dict) else got:
+            return                       # the authored window has data
+    except Exception:
+        return                           # unreachable/unqueryable - leave it
+
+    # which column do the date parameters constrain?
+    bounds = {}
+    for prm in date_prms:
+        m = _re.search(r"([\w.]+)\s*(>=|<=|>|<)\s*\$\{"
+                       + _re.escape(prm.name) + r"\}", model.sql)
+        if m:
+            bounds[prm.name] = (m.group(1), m.group(2))
+    columns = {c for c, _op in bounds.values()}
+    if len(columns) != 1:
+        return                           # zero or several date columns - stay out
+    column = columns.pop()
+
+    probe = model.sql
+    for name, (col, op) in bounds.items():
+        probe = _re.sub(_re.escape(col) + r"\s*" + _re.escape(op)
+                        + r"\s*\$\{" + _re.escape(name) + r"\}",
+                        "1=1", probe)
+    probe = substitute_params(probe, params)
+    probe = _re.sub(r"\bORDER\s+BY\b.*$", "", probe,
+                    flags=_re.S | _re.I)
+    short = column.split(".")[-1]
+    try:
+        got = preview_query(
+            model.jndi,
+            f"SELECT MIN({short}), MAX({short}) FROM ({probe}) PROBE_T",
+            limit=1)
+        rows = got.get("rows") if isinstance(got, dict) else got
+    except Exception:
+        return
+    if not rows or rows[0][0] is None:
+        return                           # no rows at ALL for these defaults
+    span = {"start": str(rows[0][0])[:10], "end": str(rows[0][1])[:10]}
+    authored = {}
+    for prm in date_prms:
+        col_op = bounds.get(prm.name)
+        if not col_op:
+            continue
+        authored[prm.name] = prm.default
+        edge = "start" if col_op[1] in (">=", ">") else "end"
+        prm.default = f"{span[edge]} 00:00:00"
+    if authored:
+        was = ", ".join(f"{n}={v}" for n, v in authored.items())
+        model.issues.append(
+            "the authored date window returns NO rows on this connection "
+            f"({was} - authored against the original estate's database); "
+            f"the window is repointed to the data's own span for the "
+            f"selected defaults ({span['start']}..{span['end']}) so the "
+            "report opens with data - review the window before publishing")
+
+
 def _fill_and_load(data, source_name, jndi=""):
     model = _load_upload(data, source_name, jndi)
     _fill_lov_defaults(model)
+    _widen_empty_date_window(model)
     return model
 
 

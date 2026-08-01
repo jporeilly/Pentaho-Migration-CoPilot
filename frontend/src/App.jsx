@@ -264,7 +264,7 @@ export default function App() {
           {report && (
             <div className="workbench-bar">
               <SourceBadge tool={report.summary.source_family || 'crystal'} />
-              <span className="file-chip" title={fileName}>📄 {fileName}</span>
+              <span className="file-chip" title={fileName}>{fileName}</span>
               <span className="score-chip" title="Formula translation: auto / review / manual">
                 formulas {report.summary.counts.auto}✓ · {report.summary.counts.review}⚠ · {report.summary.counts.manual}✋
               </span>
@@ -276,7 +276,7 @@ export default function App() {
           {results.length > 0 && (
             <div className="workbench-bar">
               {result && <SourceBadge tool={result.pipeline.source_tool} />}
-              <span className="file-chip" title={fileName}>📄 {fileName}</span>
+              <span className="file-chip" title={fileName}>{fileName}</span>
               {result?.score && (
                 <span className={`score-chip grade-${result.score.grade}`}
                       title={result.score.verdict}>
