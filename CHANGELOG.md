@@ -9,6 +9,30 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **XY-family charts translate** (gap #5 - the corpus2 gap list is
+  DONE: 0 unmapped function classes, 0 unmapped templates, 0 crashes
+  across all 126 report xactions). XYLine/Scatter/Bubble expressions
+  and the XY/XYZ/TimeSeries collectors convert; the time-series
+  pattern maps to XYLineChartExpression over TimeSeriesCollector
+  (TimeSeriesChartExpression did not survive into PRD - the corpus's
+  own report is authored exactly this way). The emitter speaks the
+  new collectors' API verified from the legacy-charts jar metadata:
+  capitalised `XValueColumn[i]` (the JavaBeans two-capitals rule),
+  indexed `seriesColumn[i]` for series named by a data column, and
+  the Class-valued `timePeriod` (`org.jfree.data.time.Day`). Authored
+  props the render depends on ride along (`maxBubbleSize` - the PRD
+  default of 0 draws invisible bubbles - `stacked`,
+  `stackedBarRenderPercentages`). Live-proven: all five shapes render
+  through the real engine against SampleData
+  (`output/xactions/xy_live_proof.pdf`).
+- **Chart translation is ONE shared table for both dialects**
+  (`build_chart_protos` in `jfreereport_functions.py`). The ChartTypes
+  solution authors the same chart expressions in the SIMPLE dialect,
+  so the simple parser now translates `drawable-field` + chart
+  expressions through the same scan the legacy-EXT parser uses, and
+  MultiPieChartExpression (ships and registers in the PRD jar) maps to
+  the category collector - one pie per measure, drawn live.
+
 - **Definition-resolution hardening** (gap #4: 6 of 7 hidden
   definitions now resolve; 125 of corpus2's 126 reports have layouts).
   The ladder: a `resource-name` input picks the definition the way the

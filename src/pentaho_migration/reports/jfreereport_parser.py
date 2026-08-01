@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from pentaho_migration.reports.jfreereport_functions import (
+    CHART_TYPES, COLLECTOR_CLASSES, build_chart_protos, clone_chart,
     port_note, targets, translate,
 )
 from pentaho_migration.reports.model import (
@@ -72,7 +73,7 @@ def _font(el, inherited: Font) -> Font:
 
 
 def _parse_element(node, width: float, font: Font, offset_x=0.0,
-                   offset_y=0.0, resource_loader=None):
+                   offset_y=0.0, resource_loader=None, charts=None):
     """One band child -> an Element, or None for structural/ignored nodes."""
     tag = node.tag
     x = _pt(node.get("x"), width) + offset_x
@@ -125,6 +126,18 @@ def _parse_element(node, width: float, font: Font, offset_x=0.0,
         if (node.get("draw") or "").lower() == "true":
             el.border_color = node.get("color") or "#000000"
             el.border_width = _pt(node.get("weight"), 0, 1.0)
+        return el
+    if tag == "drawable-field":
+        proto = (charts or {}).get(node.get("fieldname") or "")
+        if proto:
+            el = clone_chart(proto)
+            el.x, el.y, el.width, el.height = x, y, w, h
+            return el
+        el = Element(kind="unknown", **common)
+        el.notes.append(
+            f"drawable field {node.get('fieldname', '?')!r} references an "
+            "expression this report does not define as a chart - rebuild "
+            "the drawable in PRD")
         return el
     if tag == "imageref":
         src = node.get("src") or ""
@@ -262,7 +275,7 @@ def resolve_image(src, width, height, resource_loader=None):
 def _parse_band(node, area_kind: str, width: float, base_font: Font,
                 group_index: int = -1, vis_map: dict | None = None,
                 fn_targets: set | None = None,
-                resource_loader=None) -> Section:
+                resource_loader=None, charts: dict | None = None) -> Section:
     """A band element and its children -> one Section. A nested <band> child
     offsets its children by its own x/y (JFreeReport's grouping container).
 
@@ -297,7 +310,8 @@ def _parse_band(node, area_kind: str, width: float, base_font: Font,
                      bname if bname in fn_targets else inherit)
                 continue
             el = _parse_element(child, width, font, ox, oy,
-                                resource_loader=resource_loader)
+                                resource_loader=resource_loader,
+                                charts=charts)
             if el is not None:
                 own = _visibility(child.get("name"))
                 if own or vis:
@@ -370,15 +384,23 @@ def parse_jfreereport(source, resource_loader=None,
                 + list(root.iter("expression"))]
     vis_map = {}
     fn_targets = set()
+    collectors = {}
+    chart_exprs = []
     for fn in fn_nodes:
         cls = (fn.get("class") or "").rsplit(".", 1)[-1]
+        name = fn.get("name") or cls
         props = {p.get("name"): (p.text or "").strip()
                  for p in fn.iter("property")}
-        if cls == "HideElementByNameFunction":
+        if cls in COLLECTOR_CLASSES:
+            collectors[name] = (cls, props)
+        elif cls in CHART_TYPES:
+            chart_exprs.append((name, cls, props))
+        elif cls == "HideElementByNameFunction":
             if props.get("element") and props.get("field"):
                 vis_map[props["element"]] = props["field"]
         else:
             fn_targets.update(targets(cls, props))
+    charts = build_chart_protos(chart_exprs, collectors, model.issues)
     if vis_map:
         model.issues.append(
             "layered-visibility layout translated: HideElementByNameFunction "
@@ -396,7 +418,7 @@ def parse_jfreereport(source, resource_loader=None,
             model.sections.append(
                 _parse_band(node, kind, width, base_font, vis_map=vis_map,
                             fn_targets=fn_targets,
-                            resource_loader=resource_loader))
+                            resource_loader=resource_loader, charts=charts))
 
     # The watermark band becomes an UNDERLAY section placed first - the same
     # machinery that carries Crystal letterhead watermarks paints its content
@@ -405,7 +427,8 @@ def parse_jfreereport(source, resource_loader=None,
     if wm is not None and len(wm):
         section = _parse_band(wm, "ReportHeader", width, base_font,
                               vis_map=vis_map, fn_targets=fn_targets,
-                              resource_loader=resource_loader)
+                              resource_loader=resource_loader,
+                              charts=charts)
         section.underlay = True
         model.sections.insert(0, section)
         stamped = any("placeholder is stamped" in n
@@ -432,14 +455,16 @@ def parse_jfreereport(source, resource_loader=None,
                                               base_font, group_index=gi,
                                               vis_map=vis_map,
                                               fn_targets=fn_targets,
-                                              resource_loader=resource_loader))
+                                              resource_loader=resource_loader,
+                                              charts=charts))
         gf = g.find("groupfooter")
         if gf is not None:
             model.sections.append(_parse_band(gf, "GroupFooter", width,
                                               base_font, group_index=gi,
                                               vis_map=vis_map,
                                               fn_targets=fn_targets,
-                                              resource_loader=resource_loader))
+                                              resource_loader=resource_loader,
+                                              charts=charts))
 
     # functions/expressions -> the shared translation table: aggregates
     # become summaries, PageOfPages becomes the writer's own page
@@ -449,6 +474,8 @@ def parse_jfreereport(source, resource_loader=None,
         cls = (fn.get("class") or "").rsplit(".", 1)[-1]
         if cls == "HideElementByNameFunction":
             continue
+        if cls in COLLECTOR_CLASSES or cls in CHART_TYPES:
+            continue  # translated by the shared chart machinery above
         name = fn.get("name") or cls
         props = {p.get("name"): (p.text or "").strip()
                  for p in fn.iter("property")}

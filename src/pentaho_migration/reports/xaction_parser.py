@@ -423,6 +423,9 @@ def _resolve_templated_bindings(model, x, derived=None) -> None:
                     el.chart_value = _sub(el.chart_value)
                     el.chart_values = [(_sub(c), _sub(n))
                                        for c, n in el.chart_values]
+                    el.chart_xy = [{k: (_sub(v) if isinstance(v, str)
+                                        else v) for k, v in e.items()}
+                                   for e in el.chart_xy]
                 el.style_expressions = [(k, _sub(f))
                                         for k, f in el.style_expressions]
     if resolved:

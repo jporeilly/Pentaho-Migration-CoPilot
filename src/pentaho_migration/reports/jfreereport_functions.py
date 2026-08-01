@@ -131,3 +131,131 @@ def translate(cls_short, name, props):
     if cls_short in PORTABLE:
         return 'port', PORTABLE[cls_short]
     return None, None
+
+
+# ---------------------------------------------------------------- charts
+# Chart expressions and their data collectors appear in BOTH dialects
+# with the same class names and property shapes; the scan lives here so
+# the mapping cannot drift between parsers. Every expression class below
+# ships in PRD's legacy-charts jar and is registered for parsing;
+# TimeSeriesChartExpression alone did not survive - but its DATA shape
+# did (TimeSeriesCollector), and the corpus's own time-series reports
+# author XYLineChartExpression over it, which is exactly the mapping.
+CHART_TYPES = {
+    'BarChartExpression': 'bar',
+    'LineChartExpression': 'line',
+    'AreaChartExpression': 'area',
+    'PieChartExpression': 'pie',
+    'MultiPieChartExpression': 'multi-pie',
+    'XYLineChartExpression': 'xy-line',
+    'ScatterPlotChartExpression': 'scatter',
+    'BubbleChartExpression': 'bubble',
+    'TimeSeriesChartExpression': 'xy-line',
+}
+
+XY_COLLECTORS = ('XYSeriesCollectorFunction', 'XYZSeriesCollectorFunction',
+                 'TimeSeriesCollectorFunction')
+COLLECTOR_CLASSES = ('PieSetCollectorFunction',
+                     'CategorySetCollectorFunction') + XY_COLLECTORS
+
+# authored expression props the RENDER depends on (a bubble scale of 0 -
+# the class default - draws nothing; stacked turns a bar into a stack)
+CHART_RIDE_ALONG = ('maxBubbleSize', 'stacked', 'stackedBarRenderPercentages')
+
+
+def build_chart_protos(charts, collectors, issues):
+    """Chart expressions + their collectors -> prototype chart Elements.
+
+    ``charts`` is [(name, cls_short, props)], ``collectors`` is
+    {name: (cls_short, props)}; conversion notes append to ``issues``.
+    Returns {expression name: prototype Element} for drawable-field
+    binding; a proto is cloned per placement (clone_chart)."""
+    from pentaho_migration.reports.model import Element
+
+    out = {}
+    for name, cls, props in charts:
+        proto = Element(kind="chart", chart_type=CHART_TYPES[cls],
+                        chart_title=props.get("title", ""))
+        # the definition SAYS what the chart shows - no title means
+        # none, and the axis labels ride along
+        proto.chart_title_literal = True
+        proto.chart_category_axis_label = props.get("categoryAxisLabel", "")
+        proto.chart_value_axis_label = props.get("valueAxisLabel", "")
+        for extra in CHART_RIDE_ALONG:
+            if props.get(extra):
+                proto.chart_extra[extra] = props[extra]
+        col_cls, col_props = collectors.get(props.get("dataSource", ""),
+                                            ("", {}))
+        if col_cls in XY_COLLECTORS:
+            # boolean seriesColumn=true: seriesName[i] holds a COLUMN
+            # whose row values name the series (the corpus's only shape)
+            by_column = col_props.get("seriesColumn", "") == "true"
+            entries = []
+            for i in range(64):
+                series = col_props.get(f"seriesName[{i}]")
+                if col_cls == "TimeSeriesCollectorFunction":
+                    x = col_props.get(f"timeValueColumn[{i}]")
+                    y = col_props.get(f"valueColumn[{i}]")
+                else:
+                    x = col_props.get(f"xValueColumn[{i}]")
+                    y = col_props.get(f"yValueColumn[{i}]")
+                if not (x and y):
+                    break
+                entry = {"x": x, "y": y}
+                if by_column and series:
+                    entry["series_col"] = series
+                else:
+                    entry["series"] = series or f"series {i}"
+                z = col_props.get(f"zValueColumn[{i}]")
+                if z:
+                    entry["z"] = z
+                if col_cls == "TimeSeriesCollectorFunction":
+                    entry["time"] = True
+                    if col_props.get("domainPeriodType"):
+                        entry["period"] = col_props["domainPeriodType"]
+                entries.append(entry)
+            proto.chart_xy = entries
+            proto.chart_value = entries[0]["y"] if entries else ""
+            # the XY family names its axis labels domainTitle/rangeTitle
+            proto.chart_category_axis_label = props.get(
+                "domainTitle", proto.chart_category_axis_label)
+            proto.chart_value_axis_label = props.get(
+                "rangeTitle", proto.chart_value_axis_label)
+        elif col_cls == "PieSetCollectorFunction":
+            proto.chart_category = col_props.get("seriesColumn", "")
+            proto.chart_value = col_props.get("valueColumn", "")
+        elif col_cls == "CategorySetCollectorFunction":
+            proto.chart_category = col_props.get("categoryColumn", "")
+            values = []
+            for i in range(8):
+                col = col_props.get(f"valueColumn[{i}]")
+                if not col:
+                    break
+                values.append((col, col_props.get(f"seriesName[{i}]", col)))
+            proto.chart_values = values
+            proto.chart_value = values[0][0] if values else ""
+        if proto.chart_value:
+            out[name] = proto
+            issues.append(
+                f"chart migrated as a PRD legacy chart ('{name}': {cls} -> "
+                f"{proto.chart_type})")
+        else:
+            issues.append(
+                f"chart expression '{name}' ({cls}) has an empty or "
+                "unrecognised data collector - rebuild the chart in PRD")
+    return out
+
+
+def clone_chart(proto):
+    """A fresh Element from a chart prototype, for one placement."""
+    from pentaho_migration.reports.model import Element
+
+    el = Element(kind="chart")
+    for attr in ("chart_type", "chart_title", "chart_category",
+                 "chart_series", "chart_value", "chart_title_literal",
+                 "chart_category_axis_label", "chart_value_axis_label"):
+        setattr(el, attr, getattr(proto, attr))
+    el.chart_values = list(proto.chart_values)
+    el.chart_xy = [dict(e) for e in proto.chart_xy]
+    el.chart_extra = dict(proto.chart_extra)
+    return el

@@ -22,7 +22,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from pentaho_migration.reports.jfreereport_functions import (
-    port_note, targets, translate,
+    CHART_TYPES as _CHART_TYPES, COLLECTOR_CLASSES, build_chart_protos,
+    clone_chart as _clone_chart, port_note, targets, translate,
 )
 from pentaho_migration.reports.jfreereport_parser import (
     _IMAGE_MIMES, _PAGE_SIZES, _resolve_image_asset, resolve_image,
@@ -41,12 +42,6 @@ _COLORS = {
     "cyan": "#00ffff", "magenta": "#ff00ff",
 }
 
-_CHART_TYPES = {
-    "BarChartExpression": "bar",
-    "LineChartExpression": "line",
-    "AreaChartExpression": "area",
-    "PieChartExpression": "pie",
-}
 
 _EXT_BANDS = [
     ("report-header", "ReportHeader"),
@@ -361,16 +356,6 @@ def _element(node, ox, oy, ctx, pw, ph):
     return []
 
 
-def _clone_chart(proto):
-    el = Element(kind="chart")
-    for attr in ("chart_type", "chart_title", "chart_category",
-                 "chart_series", "chart_value", "chart_title_literal",
-                 "chart_category_axis_label", "chart_value_axis_label"):
-        setattr(el, attr, getattr(proto, attr))
-    el.chart_values = list(proto.chart_values)
-    return el
-
-
 def _band(node, area_kind, ctx, group_index=-1):
     """A band -> one Section; nested <band> children flatten with their
     offsets, a painted nested band leaves a box behind so its fill (and any
@@ -494,7 +479,7 @@ def _scan_functions(root, model, ctx):
                 props[pp.get("name") or ""] = (pp.text or "").strip()
         if _local(fn) == "property-ref":
             continue
-        if cls in ("PieSetCollectorFunction", "CategorySetCollectorFunction"):
+        if cls in COLLECTOR_CLASSES:
             collectors[name] = (cls, props)
             continue
         if cls in _CHART_TYPES:
@@ -541,38 +526,8 @@ def _scan_functions(root, model, ctx):
             "SQL column, then point the elements that reference "
             f"$({name}) at it")
 
-    for name, cls, props in charts:
-        proto = Element(kind="chart", chart_type=_CHART_TYPES[cls],
-                        chart_title=props.get("title", ""))
-        # the definition SAYS what the chart shows - no title means
-        # none, and the axis labels ride along
-        proto.chart_title_literal = True
-        proto.chart_category_axis_label = props.get("categoryAxisLabel", "")
-        proto.chart_value_axis_label = props.get("valueAxisLabel", "")
-        col_cls, col_props = collectors.get(props.get("dataSource", ""),
-                                            ("", {}))
-        if col_cls == "PieSetCollectorFunction":
-            proto.chart_category = col_props.get("seriesColumn", "")
-            proto.chart_value = col_props.get("valueColumn", "")
-        elif col_cls == "CategorySetCollectorFunction":
-            proto.chart_category = col_props.get("categoryColumn", "")
-            values = []
-            for i in range(8):
-                col = col_props.get(f"valueColumn[{i}]")
-                if not col:
-                    break
-                values.append((col, col_props.get(f"seriesName[{i}]", col)))
-            proto.chart_values = values
-            proto.chart_value = values[0][0] if values else ""
-        if proto.chart_value:
-            ctx.charts[name] = proto
-            model.issues.append(
-                f"chart migrated as a PRD legacy chart ('{name}': {cls} -> "
-                f"{proto.chart_type})")
-        else:
-            model.issues.append(
-                f"chart expression '{name}' ({cls}) has an empty or "
-                "unrecognised data collector - rebuild the chart in PRD")
+    ctx.charts.update(
+        build_chart_protos(charts, collectors, model.issues))
 
 
 def parse_ext_report(source, resource_loader=None,

@@ -96,6 +96,8 @@ class Element:
     chart_series: str = ""     # resolved series column (optional)
     chart_value: str = ""      # resolved value column
     chart_values: list = field(default_factory=list)  # (value column, series label) pairs when one chart plots several series
+    chart_extra: dict = field(default_factory=dict)  # authored expression props the render depends on (maxBubbleSize)
+    chart_xy: list = field(default_factory=list)  # XY-family series: dicts with series/x/y (+z bubble, time+value+period time-series)
     chart_title_literal: bool = False  # chart_title is authored (even empty) - do not invent one
     chart_category_axis_label: str = ""
     chart_value_axis_label: str = ""

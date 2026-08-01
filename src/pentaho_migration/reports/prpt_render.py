@@ -239,6 +239,10 @@ CHART_EXPRESSIONS = {
     "line": "org.pentaho.plugin.jfreereport.reportcharts.LineChartExpression",
     "area": "org.pentaho.plugin.jfreereport.reportcharts.AreaChartExpression",
     "pie": "org.pentaho.plugin.jfreereport.reportcharts.PieChartExpression",
+    "xy-line": "org.pentaho.plugin.jfreereport.reportcharts.XYLineChartExpression",
+    "scatter": "org.pentaho.plugin.jfreereport.reportcharts.ScatterPlotChartExpression",
+    "bubble": "org.pentaho.plugin.jfreereport.reportcharts.BubbleChartExpression",
+    "multi-pie": "org.pentaho.plugin.jfreereport.reportcharts.MultiPieChartExpression",
     # PRD's nearest thing to a Crystal gauge: a single value against a scale
     # with warning/critical sub-ranges. Fed by the single-value collector,
     # not the category/pie one.
@@ -254,7 +258,54 @@ def _render_chart(el, tp, sp):
     expr_class = CHART_EXPRESSIONS.get(el.chart_type)
     if not expr_class or not el.chart_value:
         return render_element(_todo_label(el, f"[TODO chart: {el.chart_type or 'unsupported'}]"), tp, sp)
-    if el.chart_type == "thermometer":
+    xy = getattr(el, "chart_xy", None) or []
+    if el.chart_type in ("xy-line", "scatter", "bubble") and xy:
+        # the XY family: per-series x/y(/z) column pairs. The collector
+        # classes dropped their -Function suffix moving into PRD's
+        # legacy-charts module; the indexed property names survived.
+        base = "org.pentaho.plugin.jfreereport.reportcharts.collectors."
+        if any("z" in e for e in xy):
+            collector = base + "XYZSeriesCollector"
+        elif any(e.get("time") for e in xy):
+            collector = base + "TimeSeriesCollector"
+        else:
+            collector = base + "XYSeriesCollector"
+        parts = []
+        for i, e in enumerate(xy):
+            if e.get("series_col"):
+                # series named by a data column - the new collectors index
+                # this directly (the old boolean-seriesColumn semantics)
+                parts.append(f'<property name="seriesColumn[{i}]">'
+                             f'{escape(e["series_col"])}</property>')
+            else:
+                parts.append(f'<property name="seriesName[{i}]">'
+                             f'{escape(e["series"])}</property>')
+            if e.get("time"):
+                parts.append(f'<property name="timeValueColumn[{i}]">'
+                             f'{escape(e["x"])}</property>')
+                parts.append(f'<property name="valueColumn[{i}]">'
+                             f'{escape(e["y"])}</property>')
+            else:
+                # capital X/Y/Z: JavaBeans keeps the property name as-is
+                # when its first two letters are capitals (setXValueColumn
+                # introspects as "XValueColumn"), and the parser resolves
+                # properties through introspection
+                parts.append(f'<property name="XValueColumn[{i}]">'
+                             f'{escape(e["x"])}</property>')
+                parts.append(f'<property name="YValueColumn[{i}]">'
+                             f'{escape(e["y"])}</property>')
+                if e.get("z"):
+                    parts.append(f'<property name="ZValueColumn[{i}]">'
+                                 f'{escape(e["z"])}</property>')
+        period = next((e["period"] for e in xy if e.get("period")), "")
+        if period in ("Millisecond", "Second", "Minute", "Hour", "Day",
+                      "Week", "Month", "Quarter", "Year"):
+            # timePeriod is Class-valued; the engine's ClassValueConverter
+            # resolves the org.jfree.data.time period class by name
+            parts.append('<property name="timePeriod">'
+                         f"org.jfree.data.time.{period}</property>")
+        dataset_props = "".join(parts)
+    elif el.chart_type == "thermometer":
         # a single value against a scale - no category or series axis, just
         # the one measure the gauge was reading
         collector = "org.pentaho.plugin.jfreereport.reportcharts.collectors.ValueDataSetCollector"
@@ -297,11 +348,16 @@ def _render_chart(el, tp, sp):
         chart_props = ((f'<property name="titleText">{escape(title)}</property>'
                         if title else "")
                        + '<property name="showLegend" class="java.lang.Boolean">true</property>')
-        for prop, value in (("categoryAxisLabel",
-                             getattr(el, "chart_category_axis_label", "")),
-                            ("valueAxisLabel",
-                             getattr(el, "chart_value_axis_label", ""))):
-            if value and el.chart_type != "pie":
+        for prop, value in sorted(getattr(el, "chart_extra", {}).items()):
+            chart_props += (f"<property name={quoteattr(prop)}>"
+                            f"{escape(value)}</property>")
+        xy_family = el.chart_type in ("xy-line", "scatter", "bubble")
+        for prop, value in (
+                ("domainTitle" if xy_family else "categoryAxisLabel",
+                 getattr(el, "chart_category_axis_label", "")),
+                ("rangeTitle" if xy_family else "valueAxisLabel",
+                 getattr(el, "chart_value_axis_label", ""))):
+            if value and el.chart_type not in ("pie", "multi-pie"):
                 chart_props += f"<property name={quoteattr(prop)}>{escape(value)}</property>"
     return (
         f'<legacy-charts:legacy-chart core:element-type="legacy-chart" '
