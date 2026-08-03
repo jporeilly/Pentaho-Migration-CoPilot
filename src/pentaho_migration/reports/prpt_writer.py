@@ -364,10 +364,38 @@ def build_layout_xml(model, root_type="master-report"):
 # CrosstabBuilder-built reports (tools/CrosstabRef*.java) and verified to
 # parse, render and aggregate - mimic them precisely.
 
+# One grid language for the whole pivot: thin borders on every cell,
+# shaded bold headers, right-aligned measures - the way Crystal draws a
+# cross-tab, and what makes the render read as a TABLE instead of loose
+# text columns.
+_CT_BORDER = ('<style:border-styles border-width="0.5" '
+              'border-color="#c8c8c8" border-style="solid"/>')
+_CT_HEAD_BORDER = ('<style:border-styles background-color="#eef1f4" '
+                   'border-width="0.5" border-color="#c8c8c8" '
+                   'border-style="solid"/>')
 _CT_CELL = ('<style:element-style><style:spatial-styles min-width="80" '
-            'min-height="20" max-width="80" max-height="20"/></style:element-style>')
+            'min-height="20" max-width="80" max-height="20"/>'
+            f"{_CT_BORDER}</style:element-style>")
+_CT_NUM_CELL = ('<style:element-style>'
+                '<style:common-styles alignment="right"/>'
+                '<style:spatial-styles min-width="80" min-height="20" '
+                'max-width="80" max-height="20"/>'
+                f"{_CT_BORDER}</style:element-style>")
+_CT_HEAD_CELL = ('<style:element-style>'
+                 '<style:common-styles dynamic-height="true"/>'
+                 '<style:text-styles font-face="Arial" bold="true"/>'
+                 '<style:spatial-styles min-width="80" min-height="20" '
+                 'max-width="80"/>'
+                 f"{_CT_HEAD_BORDER}</style:element-style>")
 _CT_FULL = ('<style:element-style><style:spatial-styles min-height="100%"/>'
             "</style:element-style>")
+
+
+def _ct_title(column: str) -> str:
+    """A header label from a COLUMN NAME: underscores become spaces so
+    the text can wrap at word breaks instead of colliding with its
+    neighbour ('Account_Heading_Name' ran into 'Account_Name')."""
+    return column.replace("_", " ").strip()
 
 
 # A crosstab dimension that is a DATE - the BOE family's month/year column,
@@ -387,41 +415,61 @@ def _ct_header_field(column, col_type=""):
         fmt = "yyyy-MM-dd HH:mm" if col_type == "DateTimeField" else _CT_DATE_FORMAT
         return (f'<date-field core:element-type="date-field" '
                 f"core:format-string={quoteattr(fmt)} "
-                f"core:field={quoteattr(column)}>{_CT_CELL}</date-field>")
-    return f"<text-field core:field={quoteattr(column)}>{_CT_CELL}</text-field>"
+                f"core:field={quoteattr(column)}>{_CT_HEAD_CELL}</date-field>")
+    return f"<text-field core:field={quoteattr(column)}>{_CT_HEAD_CELL}</text-field>"
 
 
-def _ct_group_headers(column, col_type=""):
-    """title-header / header / summary-header triple every crosstab group carries."""
+def _ct_group_headers(column, col_type="", axis="row"):
+    """title-header / header / summary-header triple every crosstab group
+    carries. Row groups keep a HUMANISED title (the corner header naming
+    the row dimension - 'Account Type'); column groups get an EMPTY
+    title-header, because the engine repeats it over every column value
+    and Crystal never prints dimension names there at all."""
+    if axis == "column":
+        title = f"<crosstab-title-header>{_CT_FULL}</crosstab-title-header>"
+    else:
+        # a PLAIN label: the wizard metadata attribute lets the engine
+        # swap the text back to the raw field name, undoing the humanising
+        title = (
+            f"<crosstab-title-header>{_CT_FULL}"
+            "<label>"
+            f"{_CT_HEAD_CELL}<core:value>{escape(_ct_title(column))}</core:value>"
+            "</label></crosstab-title-header>")
     return (
-        f"<crosstab-title-header>{_CT_FULL}"
-        f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(column)}>'
-        f"{_CT_CELL}<core:value>{escape(column)}</core:value></label></crosstab-title-header>"
-        f"<crosstab-header>{_CT_FULL}"
+        title
+        + f"<crosstab-header>{_CT_FULL}"
         f"{_ct_header_field(column, col_type)}</crosstab-header>"
         f"<crosstab-summary-header>{_CT_FULL}"
         f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(column)}>'
-        f"{_CT_CELL}<core:value>Summary</core:value></label></crosstab-summary-header>")
+        f"{_CT_HEAD_CELL}<core:value>Summary</core:value></label></crosstab-summary-header>")
 
 
 def _ct_cell_body(summaries):
-    """details-header labels + the details cell, one number-field per measure."""
-    headers = "".join(
-        f'<label wizard:allow-metadata-attributes="true" wizard:label-for={quoteattr(c)}>'
-        f"{_CT_CELL}<core:value>{escape(f'{op} of {c}')}</core:value></label>"
-        for c, op in summaries)
+    """details-header labels + the details cell, one number-field per
+    measure. With a SINGLE measure the header row is dropped - repeating
+    'Amount' under every column is noise Crystal does not print; with
+    several measures the (humanised) names are what tells them apart."""
+    if len(summaries) > 1:
+        labels = "".join(
+            "<label>"
+            f"{_CT_HEAD_CELL}<core:value>{escape(_ct_title(c))}</core:value></label>"
+            for c, _op in summaries)
+        headers = (
+            '<details-header><style:element-style><style:band-styles layout="row"/>'
+            '<style:common-styles avoid-page-break="true"/>'
+            '<style:spatial-styles min-height="100%"/></style:element-style>'
+            f"{labels}</details-header>")
+    else:
+        headers = ""
     fields = "".join(
         f'<number-field core:format-string={quoteattr("#,##0" if op == "Count" else "#,##0.00")} '
         f"core:field={quoteattr(c)} "
-        f"wizard:aggregation-type={quoteattr(CROSSTAB_AGG_MAP[op])}>{_CT_CELL}</number-field>"
+        f"wizard:aggregation-type={quoteattr(CROSSTAB_AGG_MAP[op])}>{_CT_NUM_CELL}</number-field>"
         for c, op in summaries)
     return (
         '<crosstab-cell-body><style:element-style>'
         '<style:common-styles avoid-page-break="false"/></style:element-style>'
-        '<details-header><style:element-style><style:band-styles layout="row"/>'
-        '<style:common-styles avoid-page-break="true"/>'
-        '<style:spatial-styles min-height="100%"/></style:element-style>'
-        f"{headers}</details-header>"
+        f"{headers}"
         '<crosstab-cell core:name="details-cell"><style:element-style>'
         '<style:band-styles layout="row"/><style:spatial-styles min-height="100%"/>'
         f"</style:element-style>{fields}</crosstab-cell></crosstab-cell-body>")
@@ -436,7 +484,7 @@ def _ct_column_chain(columns, summaries, col_types=None):
             f"core:name={quoteattr(column)} core:field={quoteattr(column)} "
             f'crosstab:print-summary="false">'
             f"<field>{escape(column)}</field>"
-            f"{_ct_group_headers(column, col_types.get(column, ''))}{inner}"
+            f"{_ct_group_headers(column, col_types.get(column, ''), axis='column')}{inner}"
             "</crosstab-column-group></crosstab-column-group-body>")
     return inner
 

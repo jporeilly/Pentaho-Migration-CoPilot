@@ -9,6 +9,19 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Cross-tabs render as a proper pivot grid.** Four presentation
+  defects in the emitted crosstab, fixed at the source: column groups
+  no longer print their DIMENSION NAME over every value ("date" and
+  "Type" repeated above each month - Crystal never shows those); a
+  single measure no longer repeats its name under every column; the
+  row-area corner headers humanise (underscores become spaces so
+  "Account_Heading_Name" wraps at words instead of colliding into its
+  neighbour) and stay OUR text (the wizard metadata attribute was
+  letting the engine swap the label back to the raw field name); and
+  every header and cell now carries the grid - thin borders, shaded
+  bold headers, right-aligned measures. Verified live against the
+  rebuilt BOE sample database.
+
 - **Podman is a first-class container runtime.** The doctor's runtime
   check probes docker AND podman, each with its own info template -
   docker's `{{.ServerVersion}}` is a template ERROR under podman even
