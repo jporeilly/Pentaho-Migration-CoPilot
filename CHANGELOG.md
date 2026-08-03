@@ -37,6 +37,18 @@ deliberately — not one per work session.
   4pt horizontal; a touch more in headers) so text no longer sits flush
   against the borders, with row heights in step.
 
+- **Security: postcss 8.5.19 → 8.5.25.** Cleared Dependabot alert #5
+  (moderate, GHSA-fxqj-rqcc-2cmp) — the follow-up to postcss's
+  sourceMappingURL advisory whose original fix was incomplete: an
+  attacker-controlled `sourceMappingURL` could make postcss read
+  arbitrary `.map` files when `from` is unset. Dev-toolchain only, same
+  category as the 1.42.0 vite round: postcss is a transitive
+  devDependency of vite, and the shipped bundle in `frontend/dist`
+  contains no postcss. The patched version sits inside vite's existing
+  `^8.5.3` range, so the fix is a lockfile-only `npm audit fix`; `npm
+  audit` reports zero vulnerabilities, and the rebuilt frontend renders
+  clean.
+
 ## [1.44.6] - 2026-08-03
 
 - **Cross-tabs render as a proper pivot grid.** Four presentation
