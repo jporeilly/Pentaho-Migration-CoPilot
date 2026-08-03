@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.6] - 2026-08-03
 
 - **Cross-tabs render as a proper pivot grid.** Four presentation
   defects in the emitted crosstab, fixed at the source: column groups
