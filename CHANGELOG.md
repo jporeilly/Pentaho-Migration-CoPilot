@@ -7,6 +7,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **Crosstab cells breathe.** Padding on every pivot cell (2pt vertical,
+  4pt horizontal; a touch more in headers) so text no longer sits flush
+  against the borders, with row heights in step.
+
 ## [1.44.6] - 2026-08-03
 
 - **Cross-tabs render as a proper pivot grid.** Four presentation

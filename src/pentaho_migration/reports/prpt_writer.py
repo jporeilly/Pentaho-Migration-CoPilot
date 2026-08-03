@@ -369,22 +369,26 @@ def build_layout_xml(model, root_type="master-report"):
 # cross-tab, and what makes the render read as a TABLE instead of loose
 # text columns.
 _CT_BORDER = ('<style:border-styles border-width="0.5" '
-              'border-color="#c8c8c8" border-style="solid"/>')
+              'border-color="#c8c8c8" border-style="solid" '
+              'padding-top="2" padding-bottom="2" '
+              'padding-left="4" padding-right="4"/>')
 _CT_HEAD_BORDER = ('<style:border-styles background-color="#eef1f4" '
                    'border-width="0.5" border-color="#c8c8c8" '
-                   'border-style="solid"/>')
+                   'border-style="solid" '
+                   'padding-top="3" padding-bottom="3" '
+                   'padding-left="4" padding-right="4"/>')
 _CT_CELL = ('<style:element-style><style:spatial-styles min-width="80" '
-            'min-height="20" max-width="80" max-height="20"/>'
+            'min-height="22" max-width="80" max-height="22"/>'
             f"{_CT_BORDER}</style:element-style>")
 _CT_NUM_CELL = ('<style:element-style>'
                 '<style:common-styles alignment="right"/>'
-                '<style:spatial-styles min-width="80" min-height="20" '
-                'max-width="80" max-height="20"/>'
+                '<style:spatial-styles min-width="80" min-height="22" '
+                'max-width="80" max-height="22"/>'
                 f"{_CT_BORDER}</style:element-style>")
 _CT_HEAD_CELL = ('<style:element-style>'
                  '<style:common-styles dynamic-height="true"/>'
                  '<style:text-styles font-face="Arial" bold="true"/>'
-                 '<style:spatial-styles min-width="80" min-height="20" '
+                 '<style:spatial-styles min-width="80" min-height="22" '
                  'max-width="80"/>'
                  f"{_CT_HEAD_BORDER}</style:element-style>")
 _CT_FULL = ('<style:element-style><style:spatial-styles min-height="100%"/>'
