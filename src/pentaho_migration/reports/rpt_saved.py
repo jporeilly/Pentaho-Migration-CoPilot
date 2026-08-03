@@ -6,13 +6,14 @@ database — and, recovered here, what lets the CONVERTED .prpt open in Report
 Designer showing real rows with no database either: the missing half of the
 end-to-end demo.
 
-rpt-rs (`rpt saved --limit all --json`) decodes the stored batches into raw
-cells. The stored encodings, calibrated against reports whose true values are
-known (the SAP viewer render, the AdventureWorks/Xtreme datasets, a MilkoScan
-instrument report whose fat percentages are physical reality):
+rpt-rs (`rpt saved --limit all --json`, v0.4.0+) decodes the stored batches
+into raw cells. The cell encodings, calibrated against reports whose true
+values are known (the SAP viewer render, the AdventureWorks/Xtreme datasets,
+a MilkoScan instrument report whose fat percentages are physical reality):
 
-* Number / Currency — an 8-byte double holding the value **x100** (a milk-fat
-  reading of 3.5478% is stored as 354.78..., $1,139.55 as 113955);
+* Number / Currency — the real value ($1,139.55 arrives as "1139.55"; the
+  binary stores an 8-byte double holding the value x100, and since v0.4.0
+  the tool un-scales it itself — a 0.2.0-era build would arrive x100);
 * Date — an integer Julian Day Number, midnight-based (2452368 = 2002-04-03);
 * DateTime — a 64-bit scalar: low u32 = the date's JDN, high u32 = seconds
   since midnight;
@@ -108,9 +109,10 @@ def _convert_cell(raw: str | None, value_type: str):
         raw = _repair_byteswapped_utf16(raw)
     try:
         if value_type in ("Number", "Currency"):
-            # the /100 un-scaling introduces float dust (20565.620600000002);
-            # 10 decimals is far beyond report precision and kills the noise
-            return round(float(raw) / 100.0, 10)
+            # the tool's own x100 un-scaling leaves float dust in the raw
+            # text ("20565.620600000002"); 10 decimals is far beyond report
+            # precision and kills the noise
+            return round(float(raw), 10)
         if value_type in ("Int8s", "Int16s", "Int32s", "Int32u"):
             return int(raw)
         if value_type == "Date":

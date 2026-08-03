@@ -9,6 +9,30 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **rpt-rs v0.4.0: the upstream fix landed, and the adapter speaks
+  json-dump now.** The maintainer shipped our Windows
+  stream-classification fix natively (upstream PR #1 closed as
+  superseded), so the locally-patched 0.2.0 build and its
+  build-from-a-patched-clone install story are retired — the release
+  binaries sit in `tools/rpt-rs/` beside the zip and its verified
+  `.sha256`. The release also RETIRES `xml-dump`, the subcommand
+  cross-tab recovery shelled out to: `rpt_crosstabs` now reads the
+  `rpt json-dump` JSON model instead (dimension levels from the
+  cross-tab's `rows`/`columns`, skipping structural grand-total levels;
+  measures from the report's pre-layout Summary definitions, running
+  totals excluded under their own kind — the same report-level list
+  xml-dump serialised per cross-tab). Proven, not assumed: recovered
+  definitions are identical for all 155 demo+corpus reports between the
+  old and new paths, and the B1Budget_M recovery walkthrough (its dump
+  path caught up with the corpus reorg) still lands a live PRD crosstab.
+  Saved-data recovery follows the tool: `rpt saved` now emits
+  Number/Currency cells as real, un-scaled values (the x100 un-scaling
+  moved into the tool — a corpus-wide cell diff shows those are the ONLY
+  cells that changed), so `_convert_cell` drops its /100 and the demo
+  statement still recovers 53 rows with viewer-verified values. The
+  Int32s-mistyped reports (World Sales) are unchanged upstream, so the
+  values-beat-metadata defences stay.
+
 - **Crosstab cells breathe.** Padding on every pivot cell (2pt vertical,
   4pt horizontal; a touch more in headers) so text no longer sits flush
   against the borders, with row heights in step.

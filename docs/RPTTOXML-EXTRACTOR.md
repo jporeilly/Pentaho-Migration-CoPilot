@@ -194,19 +194,34 @@ with real field names (e.g. `Data.Date1`).
 
 **Status: ADOPTED for cross-tab recovery.** The fix was submitted upstream
 ([MrSrsen/rpt-rs#1](https://github.com/MrSrsen/rpt-rs/pull/1)) with the
-repro and a regression test. Locally, `tools/rpt-rs-src` also carries a
-second change that teaches `xml-dump` to emit the decoded grid as
+repro and a regression test. Locally, `tools/rpt-rs-src` also carried a
+second change that taught `xml-dump` to emit the decoded grid as
 `<CrossTabDefinition>` (`crates/rpt-cli/src/export/objects.rs` —
 the model already decoded `columns`/`rows`/`measures`, they were simply
 marked "not exported").
+
+**Upstream outcome (2026-08-02, adapter migrated 2026-08-03):** the
+maintainer shipped **v0.4.0** with the Windows fix native (PR #1 closed as
+superseded) and **retired `xml-dump`** in favour of `rpt json-dump`
+(exhaustive deterministic JSON) and `rpt kdl`. The adapter now reads the
+JSON model: a cross-tab's `rows`/`columns` carry the dimension levels
+(grand-total levels have an empty `field_ref`), and the measures are the
+report's pre-layout Summary field definitions — the same report-level list
+the retired `xml-dump` serialised per cross-tab, with running totals under
+their own kind and excluded as before. Verified corpus-wide: the recovered
+definitions are **identical for all 155 demo+corpus reports** between the
+patched 0.2.0 `xml-dump` path and the v0.4.0 `json-dump` path. The local
+fork build is superseded; the vendored release zip + `.sha256` sit in
+`tools/rpt-rs/`.
 
 `pentaho-migrate report-crosstabs <dump> [rpt]` shells out to that binary,
 lifts the definitions and injects them into the RptToXml dump — the ordinary
 conversion path then produces a live PRD crosstab. See
 `src/pentaho_migration/reports/rpt_crosstabs.py`. The tool is located via
-`RPT_RS_PATH`, `tools/rpt-rs/rpt[.exe]`, the cargo build output, or `PATH`;
-when it is missing, cross-tabs keep their hand-add TODO exactly as before —
-nothing else in the pipeline depends on it.
+`RPT_RS_PATH`, `tools/rpt-rs/rpt[.exe]`, or `PATH` (v0.4.0+; an older build
+answers `json-dump` with a usage error and recovery honestly reports
+nothing); when it is missing, cross-tabs keep their hand-add TODO exactly as
+before — nothing else in the pipeline depends on it.
 
 **Corpus result: 12 cross-tabs across 10 reports recovered**, all converting
 to live crosstabs (previously all were TODOs). The SAP-based fork remains

@@ -117,15 +117,16 @@ does two jobs the SAP SDK cannot:
 Both are **optional** — without it, cross-tabs keep their hand-add TODO,
 reports convert without embedded rows, and nothing else changes.
 
-Put the binary at `tools/rpt-rs/rpt.exe` (or set `RPT_RS_PATH`). Note that
-release v0.2.0 decodes nothing on Windows; the one-line fix is
-[upstream PR #1](https://github.com/MrSrsen/rpt-rs/pull/1), so until it is
-merged build from a clone with that patch applied:
-
-```powershell
-cargo build --release --bin rpt      # in the rpt-rs clone
-copy target\release\rpt.exe <repo>\tools\rpt-rs\
-```
+Put the binary at `tools/rpt-rs/rpt.exe` (or set `RPT_RS_PATH`).
+**Use release v0.4.0 or later** — grab the
+[Windows release zip](https://github.com/MrSrsen/rpt-rs/releases) and verify
+it against its published `.sha256`. v0.4.0 works unpatched on Windows (the
+path-separator fix from our upstream PR #1 shipped natively), replaced the
+`xml-dump` subcommand this project used with `json-dump` (which the adapter
+now calls), and `rpt saved` emits numeric cells as real, un-scaled values.
+An older build answers the new invocations with a usage error, so recovery
+honestly reports nothing — but do not point `RPT_RS_PATH` at a 0.2.0-era
+build expecting the old behaviour back.
 
 Check it with `python scripts/demo_crosstab_recovery.py`, which walks the
 before/after on a real corpus report.
@@ -161,7 +162,7 @@ puts the customer's original on screen beside the converted `.prpt`.
   is on SAP's supported list for the SP you download — otherwise install the
   standalone **SAP Crystal Reports 2020** designer (30-day trial) instead, which
   does not depend on VS at all.
-- **No-SAP option:** the patched `rpt-rs` above also renders `.rpt` to
+- **No-SAP option:** `rpt-rs` above also renders `.rpt` to
   PNG/PDF/HTML on any platform (`rpt-render <file>.rpt -f png -o out.png`).
 
 ## Optional: Docker

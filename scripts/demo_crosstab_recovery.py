@@ -30,7 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 REPORT = "B1Budget_M"
-DUMP = REPO_ROOT / "samples" / "crystal" / "real" / f"{REPORT}.xml"
+DUMP = REPO_ROOT / "samples" / "crystal" / "corpus" / f"{REPORT}.xml"
 BINARY = REPO_ROOT / "samples" / "crystal" / "corpus" / f"{REPORT}.rpt"
 
 

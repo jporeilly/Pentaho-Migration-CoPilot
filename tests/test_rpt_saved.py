@@ -26,11 +26,14 @@ DEMO = REPO / "samples" / "crystal" / "demo"
 
 
 class TestStoredEncodings:
-    def test_numbers_and_currency_are_stored_x100(self):
-        """$1,139.55 is stored as the double 113955; 3.5478% milk fat as
-        354.78... - the x100 applies to Number and Currency alike."""
-        assert _convert_cell("113955", "Number") == 1139.55
-        assert _convert_cell("2056562.06", "Currency") == 20565.6206
+    def test_numbers_and_currency_arrive_unscaled(self):
+        """The binary stores numbers as a double holding the value x100;
+        rpt-rs v0.4.0+ un-scales it itself, so $1,139.55 arrives as
+        "1139.55" and only the float dust is ours to clean. (Verified
+        corpus-wide against the 0.2.0 output: Number/Currency cells are the
+        one decode change in v0.4.0 - every other type is byte-identical.)"""
+        assert _convert_cell("1139.55", "Number") == 1139.55
+        assert _convert_cell("20565.620600000002", "Currency") == 20565.6206
 
     def test_dates_are_midnight_based_julian_day_numbers(self):
         # the demo statement's invoice date, per the SAP viewer: 2002-04-03

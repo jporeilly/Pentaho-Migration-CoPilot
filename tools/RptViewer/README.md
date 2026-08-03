@@ -43,7 +43,7 @@ saved without data — not a raw Crystal exception.
 
 ```powershell
 .\tools\RptViewer\RptViewer.exe samples\crystal\corpus\Foo.rpt          # original
-pentaho-migrate report samples\crystal\real\Foo.xml --jndi MyDS      # converted .prpt -> open in PRD
+pentaho-migrate report samples\crystal\corpus\Foo.xml --jndi MyDS    # converted .prpt -> open in PRD
 ```
 
 ## Alternatives
@@ -51,5 +51,6 @@ pentaho-migrate report samples\crystal\real\Foo.xml --jndi MyDS      # converted
 - **Editing** reports (not just viewing) needs SAP's "Crystal Reports,
   developer version for Visual Studio" installer, or the standalone Crystal
   Reports 2020 designer — see [docs/INSTALL.md](../../docs/INSTALL.md).
-- **No SAP runtime at all:** the patched `rpt-rs` renders `.rpt` to
-  PNG/PDF/HTML on any platform (`rpt-render report.rpt -f png -o out.png`).
+- **No SAP runtime at all:** `rpt-rs` (v0.4.0+, `tools/rpt-rs/`) renders
+  `.rpt` to PNG/PDF/HTML on any platform
+  (`rpt-render report.rpt -f png -o out.png`).

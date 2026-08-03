@@ -6,10 +6,17 @@ the CrossTabObject's geometry and nothing else — which is why a cross-tab
 otherwise needs a hand-written <CrossTabDefinition> block before it converts.
 
 rpt-rs (MPL-2.0, https://github.com/MrSrsen/rpt-rs) decodes those records
-straight from the .rpt binary. This adapter shells out to its `rpt xml-dump`,
-lifts the <CrossTabDefinition> blocks, and injects them into the matching
-CrossTabObject of an existing RptToXml dump — so the ordinary conversion
-path picks them up with no further change.
+straight from the .rpt binary. This adapter shells out to its
+`rpt json-dump` (v0.4.0+; it replaced the retired `xml-dump`), reads the
+grid out of the JSON model, and injects an equivalent <CrossTabDefinition>
+into the matching CrossTabObject of an existing RptToXml dump — so the
+ordinary conversion path picks it up with no further change.
+
+In the JSON model a cross-tab's `rows`/`columns` list its dimension levels
+(grand-total levels carry an empty `field_ref` and are structural, not
+user-chosen groupings), while the data-cell measures are the report's
+pre-layout Summary field definitions — shared across the report, exactly
+the list the retired xml-dump serialised per cross-tab as <SummaryFields>.
 
 Field references are normalised on the way in: rpt-rs emits bare
 `Table.Field` / `@Formula`, our parser expects the RptToXml `{...}` form.
@@ -19,7 +26,7 @@ report, or a cross-tab rpt-rs cannot decode simply leaves the dump alone,
 and the report keeps its existing TODO.
 """
 
-import re
+import json
 import shutil
 import subprocess
 
@@ -29,12 +36,13 @@ from xml.etree import ElementTree as ET
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
-# Where we look for the rpt-rs CLI, in order. RPT_RS_PATH overrides everything.
+# Where we look for the rpt-rs CLI, in order. RPT_RS_PATH overrides
+# everything. Needs v0.4.0+ (`json-dump`; `saved` emits real, un-scaled
+# numeric values) — an older build answers with a usage error and recovery
+# honestly reports nothing.
 _CANDIDATES = (
     REPO_ROOT / "tools" / "rpt-rs" / "rpt.exe",
     REPO_ROOT / "tools" / "rpt-rs" / "rpt",
-    REPO_ROOT / "tools" / "rpt-rs-src" / "target" / "release" / "rpt.exe",
-    REPO_ROOT / "tools" / "rpt-rs-src" / "target" / "release" / "rpt",
 )
 
 TIMEOUT = 120.0
@@ -65,6 +73,56 @@ def _normalise_ref(ref: str) -> str:
     return "{" + ref + "}"
 
 
+def _report_nodes(model: dict):
+    """The report model plus every nested subreport model, in document order
+    (a subreport entry wraps its model under `report`)."""
+    yield model
+    for sub in model.get("subreports") or []:
+        inner = (sub or {}).get("report")
+        if isinstance(inner, dict):
+            yield from _report_nodes(inner)
+
+
+def _summary_measures(report: dict) -> list:
+    """[(field ref, operation)] from the report's Summary field definitions.
+
+    These are the pre-layout summary records — the same report-level list the
+    retired xml-dump serialised as every cross-tab's <SummaryFields> (the
+    binary does not tie a measure to one grid; running totals live under
+    their own kind and stay excluded, as before)."""
+    measures = []
+    for fd in (report.get("data_definition") or {}).get("field_definitions") or []:
+        kind = fd.get("kind")
+        if not isinstance(kind, dict) or "Summary" not in kind:
+            continue
+        summary = kind["Summary"] or {}
+        field = str(summary.get("summarized_field") or "")
+        operation = summary.get("operation")
+        if field:
+            # a parameterized operation serialises as {name: parameter}
+            if isinstance(operation, dict) and operation:
+                operation = next(iter(operation))
+            measures.append((field, str(operation or "Sum")))
+    return measures
+
+
+def _crosstab_objects(report: dict):
+    """Every (object, CrossTab payload) placed in the report's layout."""
+    for area in (report.get("report_definition") or {}).get("areas") or []:
+        for section in area.get("sections") or []:
+            for obj in section.get("objects") or []:
+                kind = obj.get("kind")
+                if isinstance(kind, dict) and "CrossTab" in kind:
+                    yield obj, kind["CrossTab"] or {}
+
+
+def _axis_refs(ct: dict, axis: str) -> list:
+    """The user-chosen dimension levels of one axis, in order. Grand-total
+    levels carry an empty field_ref and are skipped — structural, not
+    groupings."""
+    return [d["field_ref"] for d in ct.get(axis) or [] if d.get("field_ref")]
+
+
 def extract_definitions(rpt_path: Path, exe: Path | None = None) -> dict:
     """{crosstab object name: <CrossTabDefinition> Element} decoded from the
     .rpt binary by rpt-rs. Empty when the tool is unavailable or the report
@@ -74,7 +132,7 @@ def extract_definitions(rpt_path: Path, exe: Path | None = None) -> dict:
         return {}
     try:
         proc = run_nice(
-            [str(exe), "xml-dump", str(rpt_path)],
+            [str(exe), "json-dump", str(rpt_path)],
             capture_output=True, timeout=TIMEOUT,
         )
     except (OSError, subprocess.SubprocessError):
@@ -82,23 +140,28 @@ def extract_definitions(rpt_path: Path, exe: Path | None = None) -> dict:
     if proc.returncode != 0 or not proc.stdout:
         return {}
     try:
-        root = ET.fromstring(proc.stdout.decode("utf-8", errors="replace"))
-    except ET.ParseError:
+        doc = json.loads(proc.stdout.decode("utf-8", errors="replace"))
+    except json.JSONDecodeError:
         return {}
 
     out = {}
-    for obj in root.iter("CrossTabObject"):
-        definition = obj.find("CrossTabDefinition")
-        if definition is None:
-            continue
-        rows = definition.findall("RowFields/Field")
-        cols = definition.findall("ColumnFields/Field")
-        sums = definition.findall("SummaryFields/Field")
-        if not (rows and cols and sums):
-            continue  # a partial grid is not usable — leave the TODO in place
-        for field in rows + cols + sums:
-            field.set("FieldName", _normalise_ref(field.get("FieldName", "")))
-        out[obj.get("Name", "")] = definition
+    for report in _report_nodes(doc.get("model") or {}):
+        measures = _summary_measures(report)
+        for obj, ct in _crosstab_objects(report):
+            rows = _axis_refs(ct, "rows")
+            cols = _axis_refs(ct, "columns")
+            if not (rows and cols and measures):
+                continue  # a partial grid is not usable — leave the TODO in place
+            definition = ET.Element("CrossTabDefinition")
+            for tag, refs in (("RowFields", rows), ("ColumnFields", cols)):
+                axis = ET.SubElement(definition, tag)
+                for ref in refs:
+                    ET.SubElement(axis, "Field", FieldName=_normalise_ref(ref))
+            sums = ET.SubElement(definition, "SummaryFields")
+            for field, operation in measures:
+                ET.SubElement(sums, "Field", FieldName=_normalise_ref(field),
+                              Operation=operation)
+            out[obj.get("name", "")] = definition
     return out
 
 
