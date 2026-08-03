@@ -56,22 +56,41 @@ def _http_ok(url: str, timeout: float = 1.5) -> bool:
         return False
 
 
-def _docker_state() -> tuple[str, str]:
-    """(status, detail) for Docker Desktop: distinguish 'not installed'
-    from 'installed but not running' - the action differs."""
-    exe = shutil.which("docker")
-    if not exe:
-        return MISSING, "docker CLI not on PATH"
+def _runtime_probe(exe: str, label: str, fmt: str) -> tuple[str, str] | None:
+    """One container CLI probed: None when absent, else its state. Each
+    CLI gets ITS OWN info template - docker's {{.ServerVersion}} is a
+    template ERROR under podman even with the engine up, which read as
+    engine-down until a live Podman box proved otherwise."""
+    path = shutil.which(exe)
+    if not path:
+        return None
     import subprocess
 
     try:
-        proc = subprocess.run([exe, "info", "--format", "{{.ServerVersion}}"],
-                              capture_output=True, text=True, timeout=6)
+        proc = subprocess.run([path, "info", "--format", fmt],
+                              capture_output=True, text=True, timeout=8)
     except Exception as exc:
-        return WARN, f"docker CLI present but not answering ({exc})"
+        return WARN, f"{label} present but not answering ({exc})"
     if proc.returncode == 0 and proc.stdout.strip():
-        return OK, f"engine {proc.stdout.strip()}"
-    return WARN, "installed but the engine is not running"
+        return OK, f"{label} engine {proc.stdout.strip()}"
+    return WARN, f"{label} installed but its engine is not running"
+
+
+def _docker_state() -> tuple[str, str]:
+    """(status, detail) for the CONTAINER RUNTIME - Docker or Podman,
+    whichever is present (Podman speaks the same CLI and builds the
+    same images; the compose files run under `podman compose` too).
+    Three states, three different next steps: not installed, installed
+    with the engine down, ready."""
+    podman = _runtime_probe("podman", "Podman", "{{.Version.Version}}")
+    docker = _runtime_probe("docker", "Docker", "{{.ServerVersion}}")
+    ready = [r for r in (podman, docker) if r and r[0] == OK]
+    if ready:
+        return ready[0]
+    present = [r for r in (podman, docker) if r]
+    if present:
+        return present[0]
+    return MISSING, "neither docker nor podman on PATH"
 
 
 def run_doctor() -> list[Check]:
@@ -217,11 +236,12 @@ def run_doctor() -> list[Check]:
     # ---- Airflow lane ------------------------------------------------
     dstatus, ddetail = _docker_state()
     checks.append(Check(
-        "Airflow", "Docker Desktop", dstatus, ddetail,
+        "Airflow", "Container runtime", dstatus, ddetail,
         "the demo-box image, sample databases, and Airflow itself",
-        {MISSING: "install Docker Desktop (licence terms apply to larger "
-                  "companies - your call, never auto-installed)",
-         WARN: "start Docker Desktop, then re-run doctor"}.get(dstatus, "")))
+        {MISSING: "install Podman (free) or Docker Desktop (licence terms "
+                  "for larger companies) - your call, never auto-installed",
+         WARN: "start the engine (podman machine start / Docker Desktop), "
+               "then re-run doctor"}.get(dstatus, "")))
     airflow = _http_ok("http://localhost:8088/health")
     checks.append(Check(
         "Airflow", "Airflow webserver", OK if airflow else INFO,

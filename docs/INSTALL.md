@@ -204,7 +204,7 @@ table says exactly which feature is off without it.
 | RptToXml / RptViewer | raw .rpt uploads / original render | built from `tools/` once the runtime exists | `tools/RptViewer/build.ps1` |
 | Ollama | free local LLM translation/annotation | optional; Custom install offers winget assist | `winget install Ollama.Ollama` |
 | Cloud LLM key | cloud translation (alternative to Ollama) | optional, checked | Settings page |
-| Docker Desktop | demo-box image, sample DBs, Airflow | checked + reported (licence terms for larger companies) | docker.com |
+| Container runtime | demo-box image, sample DBs, Airflow | checked + reported (Podman is free; Docker Desktop has licence terms for larger companies) | podman.io or docker.com |
 | Airflow (+ Marquez) | scheduling converted DAGs, lineage | optional, checked (ports 8088 / 3000) | PDI-AirFlow lab compose |
 | SampleData HSQLDB | Steel Wheels / xaction live demos | optional, checked (port 9001) | `start_hypersonic.bat` in the Pentaho server |
 | MySQL samples | Xtreme / BOE SQL demos | optional, checked (3306/3307) | `docker compose --profile samples up` |

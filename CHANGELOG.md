@@ -7,6 +7,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **Podman is a first-class container runtime.** The doctor's runtime
+  check probes docker AND podman, each with its own info template -
+  docker's `{{.ServerVersion}}` is a template ERROR under podman even
+  with the engine up, which read as engine-down until a live Podman box
+  proved otherwise. Three states, three next steps (not installed /
+  engine down / ready), and the missing-runtime action names Podman as
+  the free option. The demo-box image is now BUILT AND RUN VERIFIED
+  under Podman 6 (health + UI probed in the container); .dockerignore
+  stopped excluding the demo samples the Dockerfile ships, and the
+  compose header says `podman compose` works as-is.
+
 ## [1.44.5] - 2026-08-01
 
 - **The ETL consultant report downloads as PDF too.** The review

@@ -30,11 +30,12 @@ class TestDoctor:
                                 OSError("boom")) if False else False)
         monkeypatch.setattr(doctor, "_http_ok", lambda *a, **k: False)
         monkeypatch.setattr(doctor, "_docker_state",
-                            lambda: ("--", "docker CLI not on PATH"))
+                            lambda: ("--", "neither docker nor podman on PATH"))
         checks = run_doctor()
-        docker = next(c for c in checks if c.name == "Docker Desktop")
-        assert docker.status == "--"
-        assert "never auto-installed" in docker.action
+        runtime = next(c for c in checks if c.name == "Container runtime")
+        assert runtime.status == "--"
+        assert "never auto-installed" in runtime.action
+        assert "Podman" in runtime.action     # the free option is named
 
     def test_format_renders_a_summary_line(self):
         text = format_doctor([
