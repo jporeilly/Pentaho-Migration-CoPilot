@@ -25,11 +25,14 @@ shifting a fraction of a millimetre and loud about a panel disappearing.
 # Rasterization is cheap at this size and the grid is what does the work.
 RENDER_SCALE = 0.5            # ~36 dpi: enough for regions, not for glyphs
 GRID_COLS, GRID_ROWS = 16, 22  # ~A4 proportions
-# Set from the two cases that have to be separated, not by taste. A pale
-# background panel - the beige letter block the statement lost - is about
-# 0.06 of ink density once greyscaled; a shape shifting a couple of points
-# between engines moves an edge cell by about 0.026. Anything between the two
-# divides them; 0.04 sits in the middle.
+# Set from the two cases that have to be separated, not by taste. A missing
+# background panel or block of content is about 0.06 of ink density once
+# greyscaled; a shape shifting a couple of points between engines moves an
+# edge cell by about 0.026. Anything between the two divides them; 0.04 sits
+# in the middle. Deliberately ABOVE palette noise: an old viewer's indexed
+# PDF export can shift a white image background to #fffdfa, which is 0.007
+# of density - the reference's artifact, not a difference worth a finding
+# (see CRYSTAL-COVERAGE.md item 7).
 CELL_TOLERANCE = 0.04          # ink-density change before a cell counts
 PAGE_TOLERANCE = 0.06          # fraction of cells differing before a page does
 # EVERY pairable page. A sample cannot see the page it did not look at, and

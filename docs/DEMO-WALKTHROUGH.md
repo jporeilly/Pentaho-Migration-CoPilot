@@ -16,7 +16,7 @@ onto the drop zone:
 
 | File | Role in the demo |
 | --- | --- |
-| `Statement_of_Account` | the main flow — letterhead, watermark, saved data, the beige-panel honesty moment |
+| `Statement_of_Account` | the main flow — letterhead, watermark, saved data, and the evidence moment: the “missing” beige panel is the old viewer’s palette, proven to the byte |
 | `AdventureWorks-TotalSalesByYear` | "something recent" — 2026 save, zero manual work, a clean bar chart |
 | `ComparativeIncomeStatement` | "something recent, and substantial" — a 2016 SAP income statement whose cross-tab renders a fully populated pivot against `boe_samples` |
 | `WorldSalesReport` | "show me a hard one" — the honesty demo, comes back ⚠ REVIEW with named blockers |
@@ -149,16 +149,20 @@ letterhead, same watermark and signature, same $43.50.
 
 ## Known rough edges (say them before they're noticed)
 
-- **The letter's beige background panel is missing**, and the gate says so —
-  this is the honest centrepiece, so lead with it rather than hope. Crystal
-  paints the letter block on a pale panel; the conversion does not. It is not
-  recoverable from what the extractor gives us: there is no beige anywhere in
-  the dump, no box, no section background, and the image inside the `.rpt` is
-  white-backed. Crystal applies it at render time and RptToXml never exports
-  it — the same family as the picture bytes and the cross-tab grids the free
-  SAP SDK will not open. Talk track: *"That is the boundary of what the free
-  SDK exposes, and the tool tells you where the boundary is instead of
-  quietly rendering something close."*
+- **The letter looks paler than the original’s — and the original is the
+  one that is wrong.** The gate reports the appearance difference (good),
+  but the cause is the reference, not the conversion: the letter image in
+  the `.rpt` is pure white-backed, and the SAP viewer’s PDF export
+  quantises it to a 256-colour palette whose background lands on `#fffdfa`.
+  Our bundle embeds the same picture losslessly, so white stays white —
+  proven to the byte: two independent decoders read the source as
+  227,093 px of pure white, while the reference PDF’s own embedded copy
+  carries 225,936 px of `#fffdfa` and no pure white at all. The same
+  report shows the lesson twice: the `.rpt` specifies Letter and the
+  viewer renders A4, because it takes paper size from the default
+  printer. Talk track: *“We diffed it to the byte. The tint you are
+  seeing is the old viewer’s palette, not your report — and this is
+  exactly why the gate shows you the evidence instead of a green tick.”*
 - **The conversion is 37 pages against the original's 74** — and that is the
   conversion being *better*, not worse: every statement prints on one page,
   exactly as in the original, and the original follows each one with a blank

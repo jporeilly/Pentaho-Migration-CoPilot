@@ -154,14 +154,21 @@ where conversion stops being mechanical:
    grand-total summary in report footers.
 6. Multi-link subreports (two `Pm-` fields) convert and filter correctly —
    verified live.
-7. **A fill Crystal paints at render time is not in the dump.** The demo
-   statement prints its letter on a pale beige panel; nothing exports it.
-   Ruled out conclusively: the dump holds nine distinct RGB values and none
-   is beige, there is no box but the grey Total, no section background, and
-   the DIB carved from the `.rpt` is white-backed. Same family as
-   `PictureData` returning null and cross-tab grids behind reserved COM
-   slots - the free SDK does not expose it. The **appearance check reports
-   it** rather than letting it pass silently, which is the point.
+7. **The demo statement's "beige panel" is an artifact of the REFERENCE
+   render, not a lost feature.** Settled to the byte: the letter image
+   inside the `.rpt` is pure white-backed - our carve and rpt-rs's
+   independent decode of the picture record produce byte-identical
+   histograms (227,093 px of `#ffffff`, 17,078 of tyre-track tan). The
+   SAP viewer's PDF export quantises that image to a 256-colour indexed
+   palette and lands its background on `#fffdfa`; the reference PDF's own
+   embedded copy carries 225,936 px of `#fffdfa` and no pure white at all.
+   Our bundle embeds the picture losslessly in DeviceRGB, so white stays
+   white. **The conversion is the faithful one** - there is nothing to
+   recover, and nothing to apologise for. (Same lesson, same report: the
+   `.rpt` specifies Letter - 11,720 + 520 twips = 612x792pt - while the
+   viewer renders A4, because it takes the paper size from the machine's
+   default printer.) When comparing against any viewer export, expect
+   palette and paper differences that belong to the reference.
 8. **Sub-reports reach past the saved data.** Crystal caches rows for the
    MASTER report only, so a report whose sub-reports carry their own queries
    renders its own bands from the embedded rows and then asks the database

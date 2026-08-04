@@ -9,6 +9,29 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **The demo statement's "missing beige panel" was never a defect - and
+  the docs now say so.** Settled to the byte rather than argued: the
+  letter image inside the `.rpt` is pure white-backed, and two
+  independent decoders agree exactly (our OLE carve and rpt-rs's decode
+  of the picture record both read 227,093 px of `#ffffff` and 17,078 of
+  tyre-track tan). The SAP viewer's PDF export quantises that image to a
+  256-colour INDEXED palette and lands its background on `#fffdfa` - the
+  reference PDF's own embedded copy carries 225,936 px of `#fffdfa` and
+  no pure white at all. Our bundle embeds the picture losslessly in
+  DeviceRGB, so white stays white: **the conversion is the faithful
+  one.** rpt-rs also confirms there is no beige anywhere in the binary
+  (background colours: 58 null, 5 teal, 1 the grey Total box; no
+  page/paper colour), which retires the parked "maybe the RAS model
+  exposes it" next step - the value is not in the file for any extractor
+  to find. The same report carries the same lesson twice: its
+  `print_options` specify Letter (612x792pt) while the viewer renders A4,
+  because it takes paper size from the machine's default printer.
+  CRYSTAL-COVERAGE item 7, the demo walkthrough's "known rough edges"
+  and the appearance check's tolerance comment are corrected - the demo
+  no longer concedes a fidelity gap that does not exist, and the
+  tolerance is documented as deliberately above palette noise (0.007 of
+  ink density) so a reference artifact cannot masquerade as a finding.
+
 - **rpt-rs v0.4.0: the upstream fix landed, and the adapter speaks
   json-dump now.** The maintainer shipped our Windows
   stream-classification fix natively (upstream PR #1 closed as
