@@ -9,6 +9,20 @@ deliberately — not one per work session.
 
 ## [Unreleased]
 
+- **Date special fields keep the format the report authored.** Crystal's
+  print date / data date / modification date carry a `DateFieldFormat`
+  like any other date, but they have no `value_type` to match on, so the
+  authored pattern was dropped and the render fell back to a default:
+  the demo statement prints "August 04, 2026" and we printed
+  "Aug 4, 2026". The parser now promotes the format for the date
+  specials and the emitter passes it into PRD's message template. Not
+  just the demo - **61 of the 150 corpus reports** author one, 56 of
+  them `MM/dd/yyyy`, every one of which was rendering as "Aug 4, 2026".
+  The authored pattern contains a comma, which has to survive PRD's
+  comma-delimited `$(name, type, format)` template; verified through the
+  real engine rather than assumed - the statement now renders Crystal's
+  exact wording.
+
 - **The gate names a paper-size mismatch instead of burying it in a
   percentage.** Chasing the statement demo's "18-23% of each page
   differs" finding to its cause: the two renders are on DIFFERENT PAPER

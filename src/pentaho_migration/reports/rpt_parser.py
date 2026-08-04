@@ -1265,9 +1265,20 @@ def apply_topn(model):
                     "'Others'")
 
 
+# Crystal's date SPECIAL fields (print date, data date, modification
+# date) carry a DateFieldFormat like any other date, but they have no
+# value_type to match on - so the authored format used to be dropped and
+# the render fell back to a default ("Aug 4, 2026" where the report says
+# "August 04, 2026").
+_DATE_SPECIALS = ("printdate", "datadate", "modificationdate")
+
+
 def _resolve_format(el):
     """Pick the explicit format candidate matching the field's value type."""
     if el.format_string:
+        return
+    if el.kind == "special" and el.column in _DATE_SPECIALS:
+        el.format_string = el.format_date
         return
     vt = el.value_type
     if vt in ("NumberField", "CurrencyField", "IntegerField", "DecimalField",

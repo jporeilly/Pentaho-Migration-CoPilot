@@ -169,8 +169,11 @@ def render_element(el, tp="", sp="style:"):
             return (f'<{tp}message core:element-type="message">{_style_block(el, sp)}'
                     f"<core:value>Page $(PageofPages)</core:value></{tp}message>")
         if el.column in ("printdate", "datadate", "modificationdate"):
+            # the report's OWN date format when it authored one; PRD's
+            # message template takes the pattern verbatim
+            fmt = el.format_string or "MMM d, yyyy"
             return (f'<{tp}message core:element-type="message">{_style_block(el, sp)}'
-                    f"<core:value>$(report.date, date, MMM d, yyyy)</core:value></{tp}message>")
+                    f"<core:value>$(report.date, date, {fmt})</core:value></{tp}message>")
         return render_element(_todo_label(el, f"[TODO special field: {el.column}]"), tp, sp)
     if el.kind == "field":
         if not el.column:
