@@ -429,6 +429,72 @@ def _group_breaks(pages: list, values: list) -> dict:
     return breaks
 
 
+def _page_geometry(pdf_bytes: bytes):
+    """(width, height) of the first page in points, or None."""
+    try:
+        from pypdf import PdfReader
+        import io
+
+        box = PdfReader(io.BytesIO(pdf_bytes)).pages[0].mediabox
+        return round(float(box.width)), round(float(box.height))
+    except Exception:
+        return None
+
+
+# Common sheets, so the finding can NAME the paper rather than print
+# two number pairs at a consultant.
+_PAPERS = {(612, 792): "Letter", (612, 1008): "Legal", (595, 842): "A4",
+           (420, 595): "A5", (792, 1224): "Tabloid"}
+
+
+def _paper_finding(original_pdf: bytes, converted_pdf: bytes):
+    """A paper-size mismatch between the two renders, said plainly.
+
+    The viewer takes its page size from the MACHINE'S DEFAULT PRINTER
+    when the report asks for DefaultPaperSize, so a reference exported on
+    an A4 box differs from a Letter conversion in ways that are nobody's
+    defect: page-footer bands are anchored to the bottom edge and move by
+    the height difference, and content near the right margin can be
+    clipped by a narrower sheet. Measured on the statement demo: the
+    footer rule sits 153pt from the bottom in both renders - identical -
+    while its absolute y differs by the full 50pt of page height. Naming
+    it keeps the appearance percentage from reading as a fidelity gap."""
+    o = _page_geometry(original_pdf)
+    c = _page_geometry(converted_pdf)
+    if not o or not c or o == c:
+        return None
+    def name(g):
+        # rounding differs by a point between producers (A4 comes back
+        # 595x841 as often as 595x842), so match within a couple of points
+        for sheet, label in _PAPERS.items():
+            if abs(sheet[0] - g[0]) <= 2 and abs(sheet[1] - g[1]) <= 2:
+                return label
+        return f"{g[0]}x{g[1]}pt"
+
+    dh, dw = c[1] - o[1], c[0] - o[0]
+    effects = []
+    if dh:
+        effects.append(
+            f"page-footer bands are anchored to the bottom edge, so they "
+            f"sit {abs(dh)}pt {'higher' if dh < 0 else 'lower'} up the page")
+    if dw:
+        narrower = "original" if dw > 0 else "conversion"
+        effects.append(
+            f"content near the right margin can be clipped on the "
+            f"{narrower}'s narrower sheet ({abs(dw)}pt)")
+    return Finding(
+        "info", "paper-size",
+        f"the two renders are on DIFFERENT PAPER: original {name(o)}, "
+        f"conversion {name(c)}. A Crystal viewer takes its page size from "
+        "the machine's default printer when the report asks for the "
+        "default, so this is usually the reference's environment rather "
+        "than a conversion defect - but it moves content: "
+        + "; ".join(effects)
+        + ". Expect the appearance check to report a difference for it.",
+        evidence=[f"original {o[0]}x{o[1]}pt ({name(o)})",
+                  f"conversion {c[0]}x{c[1]}pt ({name(c)})"])
+
+
 def compare_renders(original_pdf: bytes, converted_pdf: bytes,
                     group_values: list | None = None) -> ReleaseCheck:
     """Deterministic comparison of the two renders. `group_values` (e.g. the
@@ -613,6 +679,9 @@ def compare_renders(original_pdf: bytes, converted_pdf: bytes,
                               orig_line_sets, conv_line_sets)
     result.pages_compared = visual["compared"]
     result.pages_pairable = visual["available"]
+    paper = _paper_finding(original_pdf, converted_pdf)
+    if paper is not None:
+        result.findings.append(paper)
     if visual["pages"]:
         result.findings.append(_appearance_finding(visual))
     elif not visual["compared"]:

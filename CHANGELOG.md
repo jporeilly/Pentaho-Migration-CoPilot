@@ -7,6 +7,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
+## [Unreleased]
+
+- **The gate names a paper-size mismatch instead of burying it in a
+  percentage.** Chasing the statement demo's "18-23% of each page
+  differs" finding to its cause: the two renders are on DIFFERENT PAPER
+  - the viewer exports A4 (the machine's default printer) while the
+  report specifies Letter. Measured, not assumed: top-anchored content
+  is at IDENTICAL absolute positions (the invoice table header sits at
+  y419.3-429.3pt in the original and y419.5-431.3pt in ours), but the
+  page-footer band is anchored to the BOTTOM edge - 153pt from it in the
+  original, 154pt in ours - so the taller sheet pushes it 50pt down the
+  page, and the logo is clipped by A4's narrower width. None of that is
+  a conversion defect. `compare_renders` now emits an `info`
+  `paper-size` finding naming both sheets and the two effects it has on
+  content, so a consultant reads the appearance number for what it is.
+  (Honest limit: this is a REPORTING improvement - the appearance check
+  still counts those cells, because normalising them away would blind it
+  to real bottom-anchored defects.)
+
 ## [1.44.7] - 2026-08-04
 
 - **The demo statement's "missing beige panel" was never a defect - and
