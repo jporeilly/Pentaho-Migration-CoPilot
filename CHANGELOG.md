@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.8] - 2026-08-04
 
 - **Date special fields keep the format the report authored.** Crystal's
   print date / data date / modification date carry a `DateFieldFormat`
@@ -770,8 +770,6 @@ deliberately — not one per work session.
   release gate, the consultant report and the action plan, and the
   walkthrough's "known rough edges" no longer lists things that have since
   been fixed.
-
-## [Unreleased]
 
 - **The gate checks WHERE statements break, not just how many pages they
   take.** A span count said 36 of 36 groups matched while a statement still
