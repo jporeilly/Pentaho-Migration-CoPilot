@@ -7,7 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning follo
 minor feature changes and fixes bump the patch version (x.y.Z). Releases are batched
 deliberately — not one per work session.
 
-## [Unreleased]
+## [1.44.7] - 2026-08-04
 
 - **The demo statement's "missing beige panel" was never a defect - and
   the docs now say so.** Settled to the byte rather than argued: the

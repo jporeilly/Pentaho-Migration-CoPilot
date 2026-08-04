@@ -1,23 +1,32 @@
 # Version
 
-**1.44.6** - 2026-08-03
+**1.44.7** - 2026-08-04
 
-**Cross-tabs render as a proper pivot grid, and Podman is a first-class
-runtime.** Four presentation defects in the emitted crosstab are fixed
-at the source: column groups no longer print their dimension name over
-every value, a single measure no longer repeats under every column, the
-row-area corner headers humanise and wrap instead of colliding (and
-stay our text - the wizard metadata attribute had been letting the
-engine swap labels back to raw field names), and every header and cell
-carries the grid: thin borders, shaded bold headers, right-aligned
-measures. Verified live through the real engine.
+**The demo statement's "missing beige panel" was never a defect - and
+the evidence says so.** The letter image inside the `.rpt` is pure
+white-backed, and two independent decoders agree exactly: our OLE carve
+and rpt-rs's decode of the picture record both read 227,093 pixels of
+white and 17,078 of tyre-track tan. The SAP viewer's PDF export
+quantises that image into a 256-colour indexed palette and lands its
+background on `#fffdfa` - the reference PDF's own embedded copy carries
+225,936 pixels of `#fffdfa` and no pure white at all. Our bundle embeds
+the picture losslessly, so white stays white: the conversion is the
+faithful one. The coverage notes, the demo walkthrough and the
+appearance check's tolerance comment are corrected accordingly - the
+demo no longer concedes a fidelity gap that does not exist, and the
+tolerance is documented as sitting deliberately above palette noise so
+a reference artifact cannot masquerade as a finding.
 
-The dependency doctor now treats Podman as a first-class container
-runtime alongside Docker - each CLI probed with its own info template
-(docker's template is an error under podman even with the engine up),
-three states with runtime-specific next steps, and Podman named as the
-free option. The demo-box image is built and run-verified under Podman
-6, with the compose files working as-is via `podman compose`.
+**rpt-rs v0.4.0.** Upstream shipped our Windows fix natively and retired
+the `xml-dump` subcommand cross-tab recovery depended on; the adapter
+now reads the `json-dump` model, with recovered definitions identical
+across all 155 demo and corpus reports. Saved-data values arrive
+un-scaled from the tool, so the decoder drops its own correction. The
+locally-patched build is retired in favour of the verified release
+binaries.
+
+Also: crosstab cells gain padding so text clears the grid, and postcss
+moves to 8.5.25, clearing the last open Dependabot alert.
 
 Phase 1 remains complete — Informatica PowerCenter, SAP Crystal
 Reports, Talend, and Pentaho Xactions (all three definition dialects);
